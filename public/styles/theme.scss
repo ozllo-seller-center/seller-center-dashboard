@@ -1,0 +1,29 @@
+body {
+  margin: 0;
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 400;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+$desktop-size: 1920px;
+$desktop-small-size: 1200px;
+$tablet_horizontal: 1024px;
+$ablet_vertical: 768px;
+$cellphone: 568px;
+$cellphone_small: 320px;
+
+@media screen and (max-width: $tablet_horizontal) {
+}
+
+@media screen and (max-width: $ablet_vertical) {
+}
+
+@media screen and (max-width: $cellphone) {
+}

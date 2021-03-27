@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Chrome",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Next JS",
+            "skipFiles": ["<node_internals>/**"],
+            "preLaunchTask": "npm dev",
+            "port": 9229
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Next: Full",
+            "configurations": [
+                "Next JS",
+                "Chrome"
+            ]
+        }
+    ]
+}
