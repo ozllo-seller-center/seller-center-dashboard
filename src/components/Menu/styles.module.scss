@@ -1,0 +1,66 @@
+@import '../../../public/styles/__dimensions.scss';
+
+.menuOpen {
+  display: flex;
+  flex-direction: column;
+  background: var(--grafite);
+
+  border-radius: 0px 4px 4px 0px;
+  box-shadow: 16px 0px 52px -28px rgba(0,0,0,0.5);
+
+  width: 20rem;
+  height: 100vh;
+
+  text-align: left;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  transition: transform 0.5s ease-in-out;
+  transform: translateX(0);
+
+  h1 {
+    color: #FFFFFF;
+  }
+}
+
+.menuClosed {
+  display: flex;
+  flex-direction: column;
+  background: var(--grafite);
+
+  border-radius: 0px 4px 4px 0px;
+  box-shadow: 16px 0px 52px -28px rgba(0,0,0,0.5);
+
+  width: 20rem;
+  height: 100vh;
+
+  text-align: left;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  transition: transform 0.5s ease-in-out;
+  transform: translateX(-150%);
+
+  h1 {
+    color: #FFFFFF;
+  }
+}
+
+.menuHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 1rem;
+
+  svg {
+    transition: filter 0.5s;
+  }
+
+  svg:hover {
+    filter: brightness(0.8);
+  }
+}

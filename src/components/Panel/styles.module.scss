@@ -1,0 +1,82 @@
+.panelHeader {
+  display:flex;
+  flex-direction: row;
+  height: 3rem;
+  padding: 1.25rem;
+
+  span {
+    font-weight: 500;
+  }
+
+  svg {
+    font-size: 1.25rem;
+    margin-right: 1rem;
+  }
+}
+
+.divider {
+  display: flex;
+  width: 100%;
+  height: 2px;
+  margin-top: 0.75rem;
+  background-color: var(--gray-100);
+}
+
+.panelBody {
+  display: flex;
+  flex-direction: column;
+  margin: 1rem;
+  height: 16rem;
+
+  border-bottom: 1px solid var(--gray-100);
+
+  > span {
+    font-weight: 500;
+    color: var(--gray-300);
+    // margin-bottom: 1rem;
+  }
+}
+
+.panelContent {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+
+  padding: 1.5rem 0;
+}
+
+.panelFooter {
+  display: flex;
+  padding: 0 1rem;
+
+  button {
+    width: 6.5rem;
+    padding: 0.8rem;
+
+    border: 0;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: var(--white);
+    background-color: var(--grafite);
+
+    transition: color 0.5s, background-color 0.5s, font-weight 0.5s;
+
+    &:hover {
+      color: var(--grafite);
+      background-color: var(--yellow-100);
+      font-weight: bold;
+    }
+  }
+}
+
+.panelContainer {
+  height: 26rem;
+  background-color: var(--white);
+  justify-self: stretch;
+  margin: 1rem;
+
+  border-radius: 4px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}

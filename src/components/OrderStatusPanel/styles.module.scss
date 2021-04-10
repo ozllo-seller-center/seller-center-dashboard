@@ -1,0 +1,80 @@
+.container {
+  width: 13rem;
+  padding: 0.75rem;
+
+  border-radius: 4px;
+  box-shadow: 0 2px 3px rgba(0,0,0,0.09), 0 6px 6px rgba(0,0,0,0.05);
+
+  border: 1px solid var(--gray-200);
+  transition: border 0.5s, border-color 0.5s, background-color 0.5s;
+
+  &:hover {
+    border: 1px solid var(--yellow-100);
+    background-color: var(--white);
+  }
+
+  label {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+}
+
+.containerActive {
+  width: 13rem;
+  padding: 0.75rem;
+
+  background-color: var(--white);
+
+  border-radius: 4px;
+  box-shadow: 0 2px 3px rgba(0,0,0,0.09), 0 6px 6px rgba(0,0,0,0.05);
+
+  border: 1px solid var(--yellow-100);
+  transition: border 0.5s, border-color 0.5s;
+
+  label {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+}
+
+.content {
+  font-size: 1.35rem;
+  font-weight: bold;
+
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.link {
+  width: fit-content;
+  height: 1.5rem;
+  display: flex;
+
+  align-items: center;
+
+  cursor: pointer;
+
+  color: var(--grafite);
+  transition: color 0.5s;
+
+  &:hover {
+    color: var(--yellow-100);
+  }
+
+  a {
+    margin-bottom: 1px;
+    margin-right: 0.25rem;
+
+    text-decoration: none;
+
+    font-size: .7rem;
+  }
+
+  svg {
+    display: flex;
+    align-items: center;
+
+    width: .85rem;
+    height: 1.2rem;
+  }
+}

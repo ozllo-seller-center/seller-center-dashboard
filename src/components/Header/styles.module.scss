@@ -1,0 +1,46 @@
+.headerContainer {
+  height: 5rem;
+  background-color: var(--yellow-50);
+}
+
+.headerContent {
+  // max-width: 1120px;
+  height: 5rem;
+  padding: 0 2rem;
+
+  display: flex;
+  align-items: center;
+
+  nav {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-left: 2rem;
+    height: 5rem;
+
+    h2 {
+      display: inline-block;
+      position: relative;
+      padding: 0 0.5rem;
+      line-height: 5rem;
+      font-size: 1.7rem;
+      color: var(--grafite);
+      font-weight: bold;
+    }
+
+    > span {
+      display: inline-block;
+      position: relative;
+      padding: 0 0.5rem;
+
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--gray-300);
+      line-height: 5rem;
+    }
+  }
+
+  button {
+    margin-right: auto;
+  }
+}

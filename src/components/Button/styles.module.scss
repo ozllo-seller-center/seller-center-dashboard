@@ -1,0 +1,47 @@
+.button {
+  display: flex;
+  flex-direction: row;
+  padding: 0 0.6rem;
+  height: 2rem;
+
+  background-color: var(--white);
+
+  border: 0;
+  border-radius: 2px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.12);
+
+  transition: background-color 0.5s, padding 0.2s;
+
+  align-items: center;
+  text-align: center;
+
+  font-size: 0.75rem;
+  font-weight: 500;
+
+  &:hover {
+    // padding-left: 0.75rem;
+    // padding-right: 0.75rem;
+    background-color: var(--yellow-100);
+  }
+}
+
+.buttonActive {
+  display: flex;
+  flex-direction: row;
+  padding: 0 0.6rem;
+  height: 2rem;
+
+  border: 0;
+  border-radius: 2px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.12);
+
+  background-color: var(--yellow-100);
+
+  transition: background-color 0.2s, padding 0.2s;
+
+  align-items: center;
+  text-align: center;
+
+  font-size: 0.75rem;
+  font-weight: 500;
+}

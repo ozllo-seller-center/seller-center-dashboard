@@ -1,0 +1,111 @@
+.container {
+  height: 100vh;
+
+  display: flex;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  margin-right: auto;
+
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+
+  width: 100%;
+  max-width: 700px;
+}
+
+@keyframes appearFromLeft {
+ 0% {
+    opacity: 0;
+    transform: translateX(-20rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.AnimationContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: appearFromLeft 1s;
+
+  form {
+    margin: 80px 0;
+    width: 340px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+
+    text-align: center;
+
+    h1 {
+      margin-bottom: 24px;
+    }
+
+    a {
+      font-size: 1.2rem;
+      color: #FFCF4B;
+      display: block;
+      margin-top: 24px;
+      text-decoration: none;
+      transition: color 0.2s;
+
+      &:hover {
+        color: #d6ae3e;
+      }
+    }
+
+    .errorContainer {
+      align-items: center;
+      margin: 1rem 0;
+      color: var(--red-100);
+
+      .errorMessage {
+        font-size: 1.2rem;
+        font-weight: 500;
+      }
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+        margin-right: 0.2rem;
+      }
+    }
+  }
+
+  > a {
+    font-size: 1.2rem;
+    color: #FFCF4B;
+    margin-top: 24px;
+    text-decoration: none;
+    transition: color 0.2s;
+
+    display: flex;
+    align-items: center;
+
+    svg {
+      margin-right: 16px;
+    }
+
+    &:hover {
+      color: #d6ae3e;
+    }
+  }
+}
+
+.background {
+  flex: 1;
+  background: url('https://media-exp1.licdn.com/dms/image/C4D1BAQF5KNE1uc-Sqg/company-background_10000/0/1537540293336?e=2159024400&v=beta&t=l-7PmhxZetQbvCiQtaNXxI_3OpeM5wc4zV93Du7-xj8') no-repeat center;
+  background-size: contain;
+  // filter: grayscale(1);
+}

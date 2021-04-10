@@ -1,0 +1,160 @@
+.container {
+  background: #FFFFFF;
+  border-radius: 8px;
+  padding: 1rem;
+  width: 100%;
+
+  /* border: 1px solid var(--grafite); */
+  color: var(--grafite);
+  transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
+
+  box-shadow: 0 10px 20px rgba(0,0,0,0.16), 0 6px 6px rgba(0,0,0,0.23);
+
+  display: flex;
+  align-items: center;
+
+  & + div {
+    margin-top: 1.5rem;
+  }
+
+  input {
+    color: var(--grafite);
+    flex: 1;
+    background: transparent;
+    border: 0;
+
+    &::placeholder {
+      color: #666360;
+    }
+  }
+
+  svg {
+    margin-right: 1rem;
+  }
+}
+
+.containerError {
+    background: #FFFFFF;
+    border-radius: 8px;
+    padding: 1rem;
+    width: 100%;
+
+    /* border: 1px solid var(--grafite); */
+    color: #FC2A58;
+    transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
+
+    color: #FC2A58;
+    border-color: #FC2A58;
+
+    box-shadow: 0 10px 20px #FC2A5826, 0 6px 6px #FC2A5833;
+
+    display: flex;
+    align-items: center;
+
+    & + div {
+      margin-top: 1.5rem;
+    }
+
+    input {
+      color: var(--grafite);
+      flex: 1;
+      background: transparent;
+      border: 0;
+
+      &::placeholder {
+        color: #666360;
+      }
+    }
+
+    svg {
+      margin-right: 1rem;
+    }
+}
+
+.containerFocused {
+    background: #FFFFFF;
+    border-radius: 8px;
+    padding: 1rem;
+    width: 100%;
+
+    /* border: 1px solid var(--grafite); */
+    color: #FC2A58;
+    transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
+
+    color: #FFCF4B;
+    border-color: #FFCF4B;
+
+    box-shadow: 0 10px 20px #FFCF4B26, 0 6px 6px #FFCF4B33;
+
+    display: flex;
+    align-items: center;
+
+    & + div {
+      margin-top: 1.5rem;
+    }
+
+    input {
+      color: var(--grafite);
+      flex: 1;
+      background: transparent;
+      border: 0;
+
+      &::placeholder {
+        color: #666360;
+      }
+    }
+
+    svg {
+      margin-right: 1rem;
+    }
+}
+
+.containerFilled {
+    background: #FFFFFF;
+    border-radius: 8px;
+    padding: 1rem;
+    width: 100%;
+
+    /* border: 1px solid var(--grafite); */
+    color: #FC2A58;
+    transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
+
+    color: #88AFDD;
+    border-color: #88AFDD;
+
+    box-shadow: 0 10px 20px #88AFDD26, 0 6px 6px #88AFDB33;
+
+    display: flex;
+    align-items: center;
+
+    & + div {
+      margin-top: 1.5rem;
+    }
+
+    input {
+      color: var(--grafite);
+      flex: 1;
+      background: transparent;
+      border: 0;
+
+      &::placeholder {
+        color: #666360;
+      }
+    }
+
+    svg {
+      margin-right: 1rem;
+    }
+}
+
+
+.error {
+    width: 100%;
+    text-align: left;
+
+    padding-left: 1rem;
+
+    color: #FC2A58;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}

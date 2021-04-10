@@ -1,8 +1,94 @@
-body {
+@import './__dimensions.scss';
+
+* {
   margin: 0;
-  font-family: "Open Sans";
-  font-style: normal;
-  font-weight: 400;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --white: #FFFFFF;
+
+  --gray-50: #F7F7F7;
+  --gray-100: #EFF0F4;
+  --gray-200: #E2E2E2;
+  --gray-300: #a8a8b3;
+  --gray-800: #29292e;
+  --gray-900: #121214;
+
+  --blue-100: #88AFDD;
+
+  --green-100: #88DDA5;
+
+  --red-100: #FC2A58;
+
+  --orange-100: #FF8A56;
+
+  --yellow-50: #FFFBEA;
+  --yellow-50-50: #FFFBEA80;
+  --yellow-100: #FFCF4B;
+
+  --grafite: #353535;
+}
+
+body {
+  background: #F7F7F7;
+  color: var(--grafite);
+  -webkit-font-smoothing: antialiased;
+}
+
+html {
+  --scrollbarBG: #EFF0F4;
+  --thumbBG: #353535;
+}
+
+body::-webkit-scrollbar {
+  width: 11px;
+}
+
+body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--thumbBG) var(--scrollbarBG);
+}
+
+body::-webkit-scrollbar-track {
+  background: var(--scrollbarBG);
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: var(--thumbBG) ;
+  border-radius: 6px;
+  border: 3px solid var(--scrollbarBG);
+}
+
+body, input, button, textarea {
+  font-family: 'Mulish', sans-serif;
+  font-size: 1rem;
+  outline: none;
+}
+
+h1, h2, h3, h4, h5, h6, strong {
+  font-weight: 500;
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+h4 {
+    font-size: 1.25rem;
+}
+
+button {
+  cursor: pointer;
 }
 
 .main {
@@ -12,17 +98,10 @@ body {
   align-items: center;
 }
 
-$desktop-size: 1920px;
-$desktop-small-size: 1200px;
-$tablet_horizontal: 1024px;
-$ablet_vertical: 768px;
-$cellphone: 568px;
-$cellphone_small: 320px;
-
 @media screen and (max-width: $tablet_horizontal) {
 }
 
-@media screen and (max-width: $ablet_vertical) {
+@media screen and (max-width: $tablet_vertical) {
 }
 
 @media screen and (max-width: $cellphone) {

@@ -1,0 +1,18 @@
+.openMenu {
+  margin-left: 20rem;
+  transition: margin-left 0.5s;
+  transition-delay: 0.2s;
+
+  // overflow: hidden;
+}
+
+.closedMenu {
+  margin-left: 0;
+  transition: margin-left 0.5s;
+
+  // overflow: hidden;
+}
+
+.container {
+  height: calc(100vh - 5rem);
+}

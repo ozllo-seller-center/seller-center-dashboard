@@ -1,0 +1,122 @@
+@mixin transform($value){
+  -webkit-transform: ($value);
+     -moz-transform: ($value);
+      -ms-transform: ($value);
+          transform: ($value);
+}
+@mixin transition($value){
+  -webkit-transition: ($value);
+     -moz-transition: ($value);
+      -ms-transition: ($value);
+          transition: ($value);
+}
+
+
+.profileContainer {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  // justify-content: space-between;
+  align-items: center;
+  z-index: 1;
+
+  margin-top: 0.4rem;
+  margin-right: 0.5rem;
+
+  &:hover {
+    height: 13rem;
+    // padding: 1rem;
+
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    background-color: var(--white);
+
+    transition: height .5s, display .5s, box-shadow .5s, background-color .5s;
+
+    .profileContent {
+      display: flex;
+      opacity: 1;
+    }
+  }
+
+  .info {
+    display: flex;
+    margin-left: auto;
+    align-items: center;
+    margin-top: 0.6rem;
+    padding: 0 1rem;
+
+    > img {
+      width: 3.25rem;
+      height: 3.25rem;
+
+      border: 1px solid var(--grafite);
+      border-radius: 100%;
+
+      margin-left: 1rem;
+    }
+
+    > span {
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+  }
+
+  .profileContent {
+    width: 100%;
+    display: none;
+    // margin-top: 5rem;
+    flex-direction: column;
+    flex: 1;
+
+    background-color: var(--white);
+
+    opacity: 0;
+
+    transition: opacity 0.5s;
+
+    .divider {
+      display: flex;
+      width: 100%;
+      height: 2px;
+      margin: 0.75rem 0;
+      background-color: var(--gray-100);
+    }
+
+    .optionsMenu {
+      flex: 1;
+      display: flex;
+      justify-content: space-around;
+      flex-direction: column;
+
+      padding: 0 1.25rem;
+
+      a {
+        text-decoration: none;
+      }
+
+      .menuItem {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+
+        color: var(--grafite);
+        transition: color 0.2s;
+
+        svg {
+          width: 1.75rem;
+          height: 1.75rem;
+
+          margin-right: 1rem;
+        }
+
+        span {
+          font-size: 1.25rem;
+        }
+
+        &:hover {
+          color: var(--yellow-100);
+        }
+      }
+    }
+  }
+}
