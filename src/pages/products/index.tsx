@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetStaticProps } from "next";
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
@@ -6,12 +6,16 @@ import { isSameDay, isSameWeek, isSameMonth, parse, format } from 'date-fns';
 import { FiSearch, FiCameraOff, FiEdit } from 'react-icons/fi';
 
 import BulletedButton from '@components/BulletedButton';
-import Button from '@components/Button';
 import FilterInput from '@components/FilterInput';
-import Switch from '@components/Switch';
+
+import { useRouter } from 'next/router';
+
+import { Switch } from '@material-ui/core';
 
 import styles from './styles.module.scss';
-import { useRouter } from 'next/router';
+import switchStyles from './switch-styles.module.scss';
+
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core';
 
 enum ProductStatus {
   Ativado = 0,
@@ -38,10 +42,23 @@ interface ProductsProps {
   products: Product[];
 }
 
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#E2E2E2'
+    },
+    secondary: {
+      main: '#FFFFFF'
+    }
+  },
+});
+
 export function Products({ products }: ProductsProps) {
   const [items, setItems] = useState([] as Product[]);
   const [search, setSeacrh] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // const itemsRef = useMemo(() => Array(items.length).fill(0).map(i => React.createRef<HTMLInputElement>()), [items]);
 
   const formRef = useRef<FormHandles>(null);
   const [error, setError] = useState('');
@@ -77,21 +94,35 @@ export function Products({ products }: ProductsProps) {
     [search],
   );
 
+  const handleAvailability = useCallback((id: string) => {
+    console.log(id);
+
+    const updatedItems = items.map(i => {
+      if (i.id === id)
+        return { ...i, status: i.status === ProductStatus.Ativado ? ProductStatus.Desativado : ProductStatus.Ativado };
+
+      return i;
+    })
+
+    setItems(updatedItems);
+
+  }, [items]);
+
   return (
     <div className={styles.productsContainer}>
       <div className={styles.productsHeader}>
         <BulletedButton
           onClick={() => { router.push('/products') }}
           isActive>
-          Número de Pedidos
+          Meus produtos
         </BulletedButton>
         <BulletedButton
-          onClick={() => { router.push('/products/sent') }}>
-          Envios
+          onClick={() => { router.push('/products/create') }}>
+          Criar novo produto
         </BulletedButton>
         <BulletedButton
-          onClick={() => { router.push('/products/order-products') }}>
-          Produtos
+          onClick={() => { router.push('/products/import') }}>
+          Importar ou exportar
         </BulletedButton>
       </div>
       <div className={styles.divider} />
@@ -119,12 +150,12 @@ export function Products({ products }: ProductsProps) {
                   <th>Data</th>
                   <th>Valor</th>
                   <th>Estoque</th>
-                  <th>Estado</th>
+                  <th>Status</th>
                   <th>Ação</th>
                 </tr>
               </thead>
               <tbody className={styles.tableBody}>
-                {items.map(item =>
+                {items.map((item, i) => (
                   <tr className={styles.tableItem} key={item.id}>
                     <td id={styles.imgCell} >
                       {item.image ? <img src={item.image} alt={item.name} /> : <FiCameraOff />}
@@ -153,27 +184,27 @@ export function Products({ products }: ProductsProps) {
                     <td className={item.stock <= 0 ? styles.redText : ''}>
                       {item.stock}
                     </td>
-                    <td>
-                      <Switch
-                        onColor="#88DDA5"
-                        offColor="#a8a8b3"
-                        // onBgColor="#FFFFFF"
-                        // offBgColor="#FFFFFF"
-                        handleToggle={() => {
-                          console.log(`(${item.id}) - Before: ${item.status}`)
-                          item.status = item.status === ProductStatus.Ativado ? ProductStatus.Desativado : ProductStatus.Ativado;
-                          console.log(`(${item.id}) - After: ${item.status}`)
-                        }}
-                        isOn={!item.status}
-                      // text={item.status === ProductStatus.Ativado ? 'Ativado' : 'Desativado'}
-                      />
+                    <td id={styles.switchCell}>
+                      <MuiThemeProvider theme={theme}>
+                        <Switch
+                          checked={item.status === ProductStatus.Ativado}
+                          onChange={() => handleAvailability(item.id)}
+                          classes={{
+                            root: switchStyles.root,
+                            thumb: item.status === ProductStatus.Ativado ? switchStyles.thumb : switchStyles.thumbUnchecked,
+                            track: item.status === ProductStatus.Ativado ? switchStyles.track : switchStyles.trackUnchecked,
+                            checked: switchStyles.checked,
+                          }}
+                        />
+                      </MuiThemeProvider>
+                      <span className={styles.switchSubtitle}>{item.status === ProductStatus.Ativado ? 'Ativado' : 'Desativado'}</span>
                     </td>
                     <td id={styles.editCell}>
                       <FiEdit />
                       <label> Editar </label>
                     </td>
                   </tr>
-                )
+                ))
                 }
               </tbody>
             </table>

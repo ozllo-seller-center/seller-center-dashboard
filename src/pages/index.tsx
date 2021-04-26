@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router'
-import { FiLogIn, FiUser, FiLock, FiAlertTriangle } from 'react-icons/fi';
+import { FiUser, FiLock, FiAlertTriangle } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
@@ -16,7 +16,7 @@ import Input from '@components/LoginInput';
 import Button from '@components/LoginButton';
 
 interface SignInFormData {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -38,14 +38,14 @@ const SignIn: React.FC = () => {
         formRef.current?.setErrors({});
 
         const schema = Yup.object().shape({
-          username: Yup.string().required('Usuário obrigatório'),
+          email: Yup.string().required('E-mail obrigatório'),
           password: Yup.string().required('Senha obrigatória'),
         });
 
         await schema.validate(data, { abortEarly: false });
 
         await signIn({
-          username: data.username,
+          email: data.email,
           password: data.password,
         });
 
@@ -68,15 +68,17 @@ const SignIn: React.FC = () => {
     <div className={styles.container}>
       <div className={styles.content}>
         <div className={styles.AnimationContainer}>
-          <Image src='/assets/logo.png' alt="Ozllo" width={375} height={85} />
+          <img src='/assets/logo_white.png' alt="Ozllo" />
 
           <Form ref={formRef} onSubmit={handleSubmit}>
-            <h1>Faça seu Logon</h1>
+            <h3 className={styles.title}>Bem-vindo(a) à Plataforma Ozllo</h3>
+            <span className={styles.subtitle}>Faça seu login com seu usuário e senha</span>
+            {/* <h1>Faça seu Logon</h1> */}
 
             <Input
-              name="username"
+              name="email"
               icon={FiUser}
-              placeholder="Nome de Usuário"
+              placeholder="Insira seu email"
               autoComplete="off"
             />
 
@@ -84,10 +86,14 @@ const SignIn: React.FC = () => {
               name="password"
               icon={FiLock}
               type="password"
-              placeholder="Senha"
+              placeholder="Digite sua senha"
             />
 
-            <Button type="submit">Entrar</Button>
+            <Link href="/forgot-password">
+              <a>Esqueci minha senha</a>
+            </Link>
+
+            <Button type="submit" className={styles.buttonStyle}>Entrar</Button>
 
             {
               error && (
@@ -99,15 +105,12 @@ const SignIn: React.FC = () => {
             }
 
             {/* <Link to="/forgot-password">Esqueci minha senha</Link> */}
-            <Link href="/forgot-password">
-              <a>Esqueci minha senha</a>
-            </Link>
           </Form>
 
-          <a href="/signup">
+          {/* <a href="/signup">
             <FiLogIn />
             Criar conta
-          </a>
+          </a> */}
         </div>
       </div>
       <div className={styles.background} />

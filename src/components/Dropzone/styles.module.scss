@@ -1,0 +1,72 @@
+@keyframes appear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.dropzone {
+  width: 10rem;
+  height: 10rem;
+
+  background-color: var(--white);
+  border: 1px var(--gray-300) solid;
+  border-radius: 4px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  outline: 0;
+
+  transition: filter 0.5s;
+
+  cursor: pointer;
+
+  animation: appear 1s;
+
+  img {
+    /* width: 100%;
+    height: 100%;
+    object-fit: cover; */
+    display: none;
+  }
+
+  p {
+    /* width: calc(100% - 60px);
+    height: calc(100% - 60px); */
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--gray-300);
+
+    animation: appear 1s;
+
+    svg {
+      color: var(--gray-300);
+      width: 2.5rem;
+      height: 2.5rem;
+      margin-bottom: 8px;
+
+      opacity: 0.5;
+    }
+
+  }
+
+  .error {
+    color: var(--red-100);
+
+    svg {
+      color: var(--red-100);
+    }
+  }
+
+  &:hover {
+    filter: brightness(0.9);
+  }
+}

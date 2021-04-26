@@ -54,7 +54,8 @@
   justify-content: space-between;
   align-items: center;
 
-  padding: 1rem;
+  padding: 1.25rem;
+  margin-bottom: 0.75rem;
 
   svg {
     transition: filter 0.5s;
@@ -62,5 +63,9 @@
 
   svg:hover {
     filter: brightness(0.8);
+  }
+
+  img {
+    width: 8rem;
   }
 }

@@ -1,0 +1,66 @@
+.selectBlock {
+  flex: 1;
+
+  display: flex;
+  align-items: center;
+
+  select {
+    flex: 1;
+
+    padding: 1.05rem 1rem;
+
+    font-family: 'Mulish', sans-serif;
+    color: var(--grafite);
+    font-size: 1rem;
+
+    background: #FFFFFF;
+    border: none;
+    border-radius: 4px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.15), 0 0 6px rgba(0,0,0,0.20);
+
+    outline: 0;
+  }
+}
+
+// .selectBlock {
+//   flex: 1;
+
+//   display: grid;
+//   grid-template-areas: 'select';
+//   align-items: center;
+
+//   background: #FFFFFF;
+//   border: none;
+//   border-radius: 4px;
+//   box-shadow: 0 0 20px rgba(0,0,0,0.15), 0 0 6px rgba(0,0,0,0.20);
+
+//   margin: .5rem;
+//   padding: 0.5rem 1rem;
+
+//   &::after {
+//     grid-area: select;
+//     justify-self: end;
+//     content: "";
+//     border-right: 2px solid black;
+//     border-bottom: 2px solid black;
+//     width: .75rem;
+//     height: .75rem;
+//     transform: rotate(45deg);
+//   }
+
+//   select {
+//     grid-area: select;
+//     appearance: none;
+
+//     font-family: 'Mulish', sans-serif;
+//     color: var(--grafite);
+//     outline: none;
+
+//     flex: 1;
+//     border: none;
+
+//     // padding: 1.175rem 1rem;
+
+//   }
+
+// }

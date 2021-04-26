@@ -9,7 +9,7 @@
   transition: border 0.5s, border-color 0.5s, background-color 0.5s;
 
   &:hover {
-    border: 1px solid var(--yellow-100);
+    border: 1px solid var(--yellow-300);
     background-color: var(--white);
   }
 
@@ -28,7 +28,7 @@
   border-radius: 4px;
   box-shadow: 0 2px 3px rgba(0,0,0,0.09), 0 6px 6px rgba(0,0,0,0.05);
 
-  border: 1px solid var(--yellow-100);
+  border: 1px solid var(--yellow-300);
   transition: border 0.5s, border-color 0.5s;
 
   label {
@@ -58,7 +58,7 @@
   transition: color 0.5s;
 
   &:hover {
-    color: var(--yellow-100);
+    color: var(--yellow-300);
   }
 
   a {

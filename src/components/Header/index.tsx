@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import MenuButton from '../MenuButton';
 import ProfileButton from '../ProfileButton';
 
@@ -10,30 +10,60 @@ interface HeaderProps {
   setOpen: Function;
 }
 
+enum OnPage {
+  Dashboard,
+  Sells,
+  Orders,
+  Products,
+  NewProduct
+}
+
 export const Header: React.FC<HeaderProps> = ({ open, setOpen }) => {
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState<React.ReactNode>();
 
   const router = useRouter();
 
-  console.log(router.pathname);
+  const onPage = useCallback((pathname: string): OnPage => {
+
+    if (pathname === '/' || pathname.includes('dashboard'))
+      return OnPage.Dashboard
+
+    if (pathname.includes('sells'))
+      return OnPage.Sells
+
+    if (pathname.includes('orders'))
+      return OnPage.Orders
+
+    if (pathname.includes('create/product')) {
+      console.log(pathname)
+      return OnPage.NewProduct
+    }
+
+    return OnPage.Products
+  }, [title, description]);
 
   useEffect(() => {
-    switch (router.pathname) {
-      case '/':
-      case '/dashboard':
+    switch (onPage(router.pathname)) {
+      case OnPage.Dashboard:
         setTitle('Bem-vindo(a)');
-        setDescription('Essa é a sua área de controle de vendas da Ozllo');
+        setDescription(<span>Essa é a sua área de controle de vendas da Ozllo</span>);
         break;
-      case '/sells':
+      case OnPage.Sells:
         setTitle('Vendas');
-        setDescription('Confira o resumo das suas vendas');
+        setDescription(<span>Confira o resumo das suas vendas</span>);
         break;
-      case '/orders':
-      case '/orders/sent':
-      case '/orders/products':
+      case OnPage.Orders:
         setTitle('Pedidos');
-        setDescription('Confirao resumo dos seus pedidos');
+        setDescription(<span>Confira o resumo dos seus pedidos</span>);
+        break;
+      case OnPage.Products:
+        setTitle('Produtos');
+        setDescription(<span>Adicione produtos manualmente ou através de um planilha</span>);
+        break;
+      case OnPage.NewProduct:
+        setTitle('Cadastrar novo Produto')
+        setDescription(<span>Preencha <b>todos</b> os campos</span>);
         break;
     }
   }, [router, title])
@@ -44,7 +74,7 @@ export const Header: React.FC<HeaderProps> = ({ open, setOpen }) => {
         {!open && <MenuButton open={open} setOpen={setOpen} />}
         <nav>
           <h2>{title}</h2>
-          <span>{description}</span>
+          {description}
 
           <ProfileButton />
         </nav>

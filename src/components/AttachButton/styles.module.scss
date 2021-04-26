@@ -1,0 +1,93 @@
+.container {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  > button {
+    flex: 1;
+    display: flex;
+
+    border: none;
+    border-radius: 2rem;
+
+    padding: 0.1rem;
+
+    background-color: var(--gray-100);
+
+    align-items: center;
+
+    transition: background-color 0.2s;
+
+    > span {
+      flex: 1;
+      text-align: center;
+    }
+
+    > svg {
+      color: var(--gray-400);
+      background-color: var(--white);
+      border-radius: 50%;
+
+      width: 1.7rem;
+      height: 1.7rem;
+
+      padding: 0.25rem;
+    }
+
+    &:hover {
+      background-color: var(--gray-200);
+
+      > svg {
+        color: var(--grafite);
+      }
+    }
+  }
+
+  .attachment {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+
+    align-items: center;
+
+    .attachmentInput {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      input {
+        border: none;
+        border-bottom: 1px solid var(--gray-300);
+      }
+
+      > svg {
+        color: var(--gray-300);
+        margin-right: 0.5rem;
+
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+
+    button {
+      width: 5.5rem;
+      padding: 0.5rem;
+      margin-top: 1rem;
+
+      border: 0;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: var(--white);
+      background-color: var(--grafite);
+
+      transition: color 0.5s, background-color 0.5s, font-weight 0.5s;
+
+      &:hover {
+        color: var(--grafite);
+        background-color: var(--yellow-300);
+        font-weight: bold;
+      }
+    }
+  }
+}

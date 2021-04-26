@@ -1,0 +1,45 @@
+.root {
+  flex: 1;
+  height: 2.425rem !important;
+  width: 4rem !important;
+  padding: 0.5rem !important;
+}
+
+.thumb {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+
+  color: var(--green-100);
+  transition: color 0.2s;
+}
+
+.thumbUnchecked {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+
+  color: var(--gray-300);
+  transition: color 0.2s;
+}
+
+.track {
+  border-radius: 1rem !important;
+
+  box-shadow: 0 0 14px var(--green-100-25), 0 0 10px var(--green-100-22);
+
+  transition: box-shadow 0.2s;
+}
+
+
+.trackUnchecked {
+  background-color: white !important;
+  border-radius: 1rem !important;
+
+  box-shadow: 0 0 14px rgba(0,0,0,0.25), 0 0 10px rgba(0,0,0,0.22);
+
+  transition: box-shadow 0.2s;
+}
+
+
+.checked {
+  transform: translateX(1.6rem) !important;
+}

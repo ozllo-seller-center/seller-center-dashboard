@@ -1,0 +1,48 @@
+.button {
+  display: flex;
+  flex-direction: row;
+
+  border: 0;
+  border-radius: 4px;
+  font-size: 1rem;
+  color: var(--white);
+  background-color: var(--grafite);
+
+  transition: color 0.5s, background-color 0.5s, font-weight 0.5s;
+
+  > svg {
+    color: var(--white);
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+  }
+
+  &:hover {
+    color: var(--grafite);
+    background-color: var(--yellow-300);
+
+    > svg {
+      color: var(--grafite);
+    }
+  }
+}
+
+.buttonActive {
+  display: flex;
+  flex-direction: row;
+
+  border: 0;
+  border-radius: 4px;
+  font-size: 1rem;
+  color: var(--grafite);
+  background-color: var(--yellow-300);
+
+  transition: color 0.5s, background-color 0.5s, font-weight 0.5s;
+
+  > svg {
+    color: var(--grafite);
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+  }
+}

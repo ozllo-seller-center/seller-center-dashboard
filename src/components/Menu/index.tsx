@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 import { FiChevronLeft, FiHome, FiPackage, FiUser, FiShoppingCart } from 'react-icons/fi';
 import { FaRegMoneyBillAlt } from 'react-icons/fa';
 import MenuItem from '@components/MenuItem';
@@ -20,14 +21,12 @@ const Menu: React.FC<MenuProps> = ({ open, setOpen }) => {
   return (
     <div className={open ? styles.menuOpen : styles.menuClosed}>
       <div className={styles.menuHeader}>
-        <h1>Ozllo</h1>
+        <img src='/assets/logo_white.png' alt="Ozllo" />
         <FiChevronLeft color="#FFFFFF" size={40} onClick={() => setOpen(!open)} />
       </div>
       <MenuItem to="/dashboard" name="Home" setSelected={setSelected} iconLib={FiHome} />
       <MenuItem to="/sells" name="Minhas vendas" setSelected={setSelected} iconLib={FaRegMoneyBillAlt} />
-      <MenuItem to="/orders" name="Pedidos" setSelected={setSelected} iconLib={FiShoppingCart} />
       <MenuItem to="/products" name="Produtos" setSelected={setSelected} iconLib={FiPackage} />
-      <MenuItem to="/seller-register" name="Vendedor" setSelected={setSelected} iconLib={FiUser} />
     </div>
   )
 }

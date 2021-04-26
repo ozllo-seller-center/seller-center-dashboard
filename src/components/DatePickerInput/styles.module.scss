@@ -1,0 +1,120 @@
+.container {
+  background: #FFFFFF;
+  border-radius: 6px;
+  padding: 0.2rem 0.5rem;
+
+  width: 100%;
+
+  /* border: 1px solid var(--grafite); */
+  color: var(--grafite);
+  font-size: 0.8rem;
+
+  // box-shadow: 0 5px 10px rgba(0,0,0,0.04), 0 6px 6px rgba(0,0,0,0.06);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  cursor: default;
+
+  & + div {
+    margin-top: 1rem;
+  }
+
+  span {
+    width: 1.75rem;
+    text-align: left;
+    color: var(--gray-300);
+    transition: color 0.4s;
+  }
+
+  .datePicker {
+    width: 100%;
+  }
+
+  input {
+    font-size: 0.85rem;
+    text-align: center;
+    color: var(--grafite);
+    transition: color 0.4s;
+
+    flex: 1;
+    background: transparent;
+    border: 0;
+
+    &::placeholder {
+      color: var(--gray-400);
+      opacity: .75;
+    }
+  }
+
+  svg {
+    color: var(--gray-300);
+    margin-left: 0.25rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    transition: color 0.4s;
+  }
+}
+
+.containerFocused {
+  background: #FFFFFF;
+  border-radius: 6px;
+  padding: 0.2rem 0.5rem;
+
+  width: 100%;
+
+  /* border: 1px solid var(--grafite); */
+  color: var(--grafite);
+  font-size: 0.8rem;
+  transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
+
+  // box-shadow: 0 5px 10px rgba(0,0,0,0.04), 0 6px 6px rgba(0,0,0,0.06);
+  // box-shadow: 0 10px 20px #FFCF4B26, 0 6px 6px #FFCF4B33;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  cursor: default;
+
+  & + div {
+    margin-top: 1rem;
+  }
+
+  span {
+    width: 1.75rem;
+    text-align: left;
+    color: var(--yellow-400);
+
+  }
+
+  .datePicker {
+    width: 100%;
+  }
+
+  input {
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-align: center;
+    color: var(--yellow-300);
+    transition: color 0.4s;
+
+    flex: 1;
+    background: transparent;
+    border: 0;
+
+    &::placeholder {
+      color: var(--gray-400);
+      opacity: .75;
+    }
+  }
+
+  svg {
+    color: var(--yellow-400);
+    margin-left: 0.25rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    transition: color 0.4s;
+  }
+}

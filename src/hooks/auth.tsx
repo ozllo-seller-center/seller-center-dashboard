@@ -4,7 +4,7 @@ import api from '../services/api';
 interface User {
   id: string;
   name: string;
-  username: string;
+  email: string;
   avatar_url: string;
 }
 
@@ -14,7 +14,7 @@ interface AuthState {
 }
 
 interface SignInCredentials {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -43,11 +43,10 @@ const AuthProvider: React.FC = ({ children }) => {
     return {} as AuthState;
   });
 
-  const signIn = useCallback(async ({ username, password }) => {
-    console.log(`User-logging: ${username} | ${password}`);
+  const signIn = useCallback(async ({ email, password }) => {
 
-    if (username === 'admin' && password === 'admin') {
-      const admin: User = { id: 'admin', name: 'Ozllo', username: 'admin', avatar_url: 'https://www.projetodraft.com/wp-content/uploads/2019/06/ozllo_logo.jpg' };
+    if (email === 'admin@ozllo.com' && password === 'admin') {
+      const admin: User = { id: 'admin', name: 'Ozllo', email: 'admin@ozllo.com', avatar_url: 'https://www.projetodraft.com/wp-content/uploads/2019/06/ozllo_logo.jpg' };
 
       localStorage.setItem('@SellerCenter:token', 'token');
       localStorage.setItem('@SellerCenter:user', JSON.stringify(admin));
@@ -59,7 +58,7 @@ const AuthProvider: React.FC = ({ children }) => {
       return;
     }
 
-    const response = await api.post('sessions', { username, password });
+    const response = await api.post('sessions', { email, password });
 
     const { token, user } = response.data;
 

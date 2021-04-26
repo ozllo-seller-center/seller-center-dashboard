@@ -1,0 +1,60 @@
+.radioContainer {
+  display: flex;
+
+  .radio + .radio {
+    margin-left: 1rem;
+  }
+
+  .radio {
+    font-size: 1.25rem;
+    color: var(--grafite);
+
+    display: grid;
+    grid-template-columns: min-content auto;
+    grid-gap: 0.5rem;
+    align-items: center;
+
+    cursor: pointer;
+
+    .radioLabel {
+      line-height: 1;
+    }
+
+    .radioInput {
+      display: flex;
+
+      input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      input + .radioControl::before {
+        content: "";
+        width: 1.25rem;
+        height: 1.25rem;
+        box-shadow: inset 1.25rem 1.25rem var(--grafite);
+        border-radius: 50%;
+        transition: 0.2s transform ease-in-out;
+        transform: scale(0);
+      }
+
+      input:checked + .radioControl::before {
+        transform: scale(1);
+      }
+    }
+
+    .radioControl {
+      display: grid;
+      place-items: center;
+
+      background-color: var(--white);
+
+      width: 2rem;
+      height: 2rem;
+
+      border-radius: 50%;
+      border: 0.15rem solid var(--grafite);
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import { NextPageContext } from 'next'
 import { AppProps, AppContext } from 'next/app'
+
 import '@public/styles/theme.scss'
 
 import { AuthProvider } from '../hooks/auth';

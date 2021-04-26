@@ -17,7 +17,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   containerStyle?: object;
 }
 
-const Input: React.FC<InputProps> = ({
+const FilterInput: React.FC<InputProps> = ({
   name,
   containerStyle = {},
   icon: Icon,
@@ -73,4 +73,4 @@ const Input: React.FC<InputProps> = ({
   );
 };
 
-export default Input;
+export default FilterInput;

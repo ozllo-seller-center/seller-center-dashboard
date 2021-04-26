@@ -1,25 +1,28 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { FiCameraOff, FiSearch } from 'react-icons/fi'
+import React, { createRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { FiCalendar, FiCameraOff, FiPaperclip, FiSearch } from 'react-icons/fi'
 import { FormHandles } from '@unform/core';
 import { GetStaticProps } from 'next';
-import { format, isSameDay, isSameWeek, isSameMonth, parse } from 'date-fns'
+import { format, isSameWeek, isSameMonth, isToday, parseISO, parse, toDate, fromUnixTime } from 'date-fns';
 import { Form } from '@unform/web';
 
-import Button from '@components/Button';
+import Button from '@components/FilterButton';
 import BulletedButton from '@components/BulletedButton';
 import FilterInput from '@components/FilterInput';
 import StatusPanel from '@components/OrderStatusPanel';
 
 import styles from './styles.module.scss';
+import DatePickerPopup from '@components/DatePickerPopup';
+import Collapsible from '@components/Collapsible';
+import AttachButton from '@components/AttachButton';
 
 enum SellStatus {
-  Faturado = 0,
-  Aguardando_Confirmação = 1,
-  Retornado = 2,
-  Cancelado = 3,
-  Aguardando_Faturamento = 4,
-  Aguardando_Despacho = 5,
-  Todos = 9
+  Entregue,
+  Processando,
+  Retornado,
+  Cancelado,
+  Faturando,
+  Despachando,
+  Todos
 }
 
 enum OrderStatus {
@@ -33,16 +36,27 @@ enum OrderStatus {
 enum Filter {
   Hoje = 0,
   Semana = 1,
-  Mes = 3
+  Mes = 3,
+  Custom = 4
 }
 
-type Sell = {
-  id: string;
-  status: SellStatus;
-  name: string;
-  date: string;
-  value: number;
-  image?: string;
+type OrderProduct = {
+  name: string,
+  quantity: number,
+  price: number,
+  discount: number,
+}
+
+export type Sell = {
+  id: any,
+  order_number: string,
+  marketplace: 'VTEX' | 'AMAZON' | 'OZLLO' | 'B2W',
+  date: number;
+  status: SellStatus, //'Processando' | 'Faturando' | 'Despachando' | 'Retornado' | 'Cancelado' | 'Entregue',
+  products: OrderProduct[]
+  total: number,
+  nfe_url?: string,
+  shipment_cod?: string,
 }
 
 interface SearchFormData {
@@ -61,46 +75,42 @@ interface Totals {
   total: number;
 }
 
-function InInterval(order: Sell, filter: number): boolean {
-  switch (filter) {
-    case Filter.Hoje:
-      return isSameDay(parse(order.date, 'dd/MM/yyyy', new Date()), new Date());
-
-    case Filter.Semana:
-      return isSameWeek(parse(order.date, 'dd/MM/yyyy', new Date()), new Date());
-
-    case Filter.Mes:
-      return isSameMonth(parse(order.date, 'dd/MM/yyyy', new Date()), new Date());
-
-    default:
-      return isSameDay(parse(order.date, 'dd/MM/yyyy', new Date()), new Date());
-  }
-}
-
 function InOrderStatus(order: Sell, filter: OrderStatus): boolean {
 
   switch (filter) {
     case OrderStatus.Aprovado:
-      return order.status === SellStatus.Faturado;
+      return order.status === SellStatus.Entregue;
     case OrderStatus.Cancelado:
       return order.status === SellStatus.Cancelado;
     case OrderStatus.Devolvido:
       return order.status === SellStatus.Retornado;
     case OrderStatus.Processando:
-      return order.status === SellStatus.Aguardando_Despacho || order.status === SellStatus.Aguardando_Faturamento || order.status === SellStatus.Aguardando_Confirmação;
+      return order.status === SellStatus.Processando || order.status === SellStatus.Faturando || order.status === SellStatus.Despachando;
   }
 
   return true;
 }
 
+function OrderContainsProduct(order: Sell, search: string): boolean {
+  const contains = order.products.reduce((accumulator: number, product: OrderProduct) => {
+    accumulator += product.name.toLowerCase().includes(search.toLowerCase()) ? 1 : 0;
+    return accumulator;
+  }, 0)
+
+  return !!contains;
+}
 
 export function Sells({ sells }: SellsProps) {
   const [items, setItems] = useState([] as Sell[]);
   const [status, setStatus] = useState(SellStatus.Todos as SellStatus);
   const [orderStatus, setOrderStatus] = useState(OrderStatus.Todos as OrderStatus);
+  const [fromDateFilter, setFromDateFilter] = useState(new Date());
+  const [toDateFilter, setToDateFilter] = useState(new Date());
   const [filter, setFilter] = useState(Filter.Hoje);
   const [search, setSeacrh] = useState('');
-  const [loading, setLoading] = useState(false);
+
+  const itemsRef = useMemo(() => Array(items.length).fill(0).map(i => React.createRef<HTMLTableRowElement>()), [items]);
+  const collapsibleRefs = useMemo(() => items.length > 2 && Array(items.length).fill(0).map(i => React.createRef<HTMLDivElement>()), [items]);
 
   const [totalApproved, setTotalApproved] = useState('Carregando...');
   const [totalProcessing, setTotalProcessing] = useState('Carregando...');
@@ -108,27 +118,47 @@ export function Sells({ sells }: SellsProps) {
   const [totalReturned, setTotalReturned] = useState('Carregando...');
   const [total, setTotal] = useState('Carregando...');
 
+  const inInterval = useCallback((order: Sell) => {
+    switch (filter) {
+      case Filter.Hoje:
+        return isToday(order.date);
+
+      case Filter.Semana:
+        return isSameWeek(order.date, new Date());
+
+      case Filter.Mes:
+        return isSameMonth(order.date, new Date());
+
+      case Filter.Custom:
+        console.log(order.order_number);
+        return format(order.date, 'yyyy/MM/dd') <= format(toDateFilter, 'yyyy/MM/dd') && format(order.date, 'yyyy/MM/dd') >= format(fromDateFilter, 'yyyy/MM/dd');
+
+      default:
+        return isToday(order.date);
+    }
+  }, [fromDateFilter, toDateFilter, filter])
+
   useEffect(() => {
     const totals = sells.reduce((accumulator: Totals, order: Sell) => {
-      if (InInterval(order, filter)) {
+      if (inInterval(order)) {
         switch (order.status) {
-          case SellStatus.Faturado:
-            accumulator.totalApproved += order.value;
-            accumulator.total += order.value;
+          case SellStatus.Entregue:
+            accumulator.totalApproved += order.total;
+            accumulator.total += order.total;
             break;
-          case SellStatus.Aguardando_Confirmação:
-          case SellStatus.Aguardando_Faturamento:
-          case SellStatus.Aguardando_Despacho:
-            accumulator.totalProcessing += order.value;
-            accumulator.total += order.value;
+          case SellStatus.Processando:
+          case SellStatus.Faturando:
+          case SellStatus.Despachando:
+            accumulator.totalProcessing += order.total;
+            accumulator.total += order.total;
             break;
           case SellStatus.Cancelado:
-            accumulator.totalCanceled += order.value;
-            accumulator.total -= order.value;
+            accumulator.totalCanceled += order.total;
+            accumulator.total -= order.total;
             break;
           case SellStatus.Retornado:
-            accumulator.totalReturned += order.value;
-            accumulator.total -= order.value;
+            accumulator.totalReturned += order.total;
+            accumulator.total -= order.total;
             break;
         }
       }
@@ -160,25 +190,26 @@ export function Sells({ sells }: SellsProps) {
       style: 'currency',
       currency: 'BRL',
     }).format(totals.total));
-  }, [orderStatus, filter]);
+  }, [orderStatus, fromDateFilter, toDateFilter, filter]);
 
   const formRef = useRef<FormHandles>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    setLoading(true);
-
+    sells.map(sell => {
+      console.log({
+        ...sell,
+        date: format(sell.date, 'dd/MM/yyyy')
+      });
+    });
 
     setItems(sells.filter(sell => {
-
       if (status === SellStatus.Todos)
-        return InInterval(sell, filter) && InOrderStatus(sell, orderStatus) && (search === '' || sell.name.toLowerCase().includes(search.toLowerCase()))
+        return inInterval(sell) && InOrderStatus(sell, orderStatus) && (search === '' || OrderContainsProduct(sell, search));
 
-      return InInterval(sell, filter) && (sell.status === status) && (search === '' || sell.name.toLowerCase().includes(search.toLowerCase()));
+      return inInterval(sell) && (sell.status === status) && (search === '' || OrderContainsProduct(sell, search));
     }));
-
-    setLoading(false);
-  }, [status, orderStatus, search, filter]);
+  }, [sells, status, orderStatus, fromDateFilter, toDateFilter, search, filter]);
 
   const handleSubmit = useCallback(
     async (data: SearchFormData) => {
@@ -196,6 +227,17 @@ export function Sells({ sells }: SellsProps) {
     [search],
   );
 
+  const handleAttachment = useCallback(async (data: any) => {
+    console.log(data);
+  }, [items]);
+
+  const datePickerRef = useRef<FormHandles>(null);
+  const [datePickerVisibility, setDatePickerVisibility] = useState(false);
+
+  useEffect(() => {
+    console.log(`Alterou data: ${fromDateFilter}`);
+  }, []);
+
   return (
     <div className={styles.sellsContainer}>
       <div className={styles.sellsHeader}>
@@ -205,23 +247,18 @@ export function Sells({ sells }: SellsProps) {
           Todas
         </BulletedButton>
         <BulletedButton
-          onClick={() => setStatus(SellStatus.Faturado)}
-          isActive={status === SellStatus.Faturado}>
-          Faturados
+          onClick={() => setStatus(SellStatus.Processando)}
+          isActive={status === SellStatus.Processando}>
+          Aguardando Pagamento
         </BulletedButton>
         <BulletedButton
-          onClick={() => setStatus(SellStatus.Aguardando_Confirmação)}
-          isActive={status === SellStatus.Aguardando_Confirmação}>
-          Aguardando Confirmação
-        </BulletedButton>
-        <BulletedButton
-          onClick={() => setStatus(SellStatus.Aguardando_Faturamento)}
-          isActive={status === SellStatus.Aguardando_Faturamento}>
+          onClick={() => setStatus(SellStatus.Faturando)}
+          isActive={status === SellStatus.Faturando}>
           Aguardando Faturamento
         </BulletedButton>
         <BulletedButton
-          onClick={() => setStatus(SellStatus.Aguardando_Despacho)}
-          isActive={status === SellStatus.Aguardando_Despacho}>
+          onClick={() => setStatus(SellStatus.Despachando)}
+          isActive={status === SellStatus.Despachando}>
           Aguardando Despacho
         </BulletedButton>
         <BulletedButton
@@ -234,6 +271,11 @@ export function Sells({ sells }: SellsProps) {
           isActive={status === SellStatus.Cancelado}>
           Cancelados
         </BulletedButton>
+        <BulletedButton
+          onClick={() => setStatus(SellStatus.Entregue)}
+          isActive={status === SellStatus.Entregue}>
+          Entregues
+        </BulletedButton>
       </div>
       <div className={styles.divider} />
       <div className={styles.sellsContent}>
@@ -242,13 +284,37 @@ export function Sells({ sells }: SellsProps) {
             <Button isActive={filter === Filter.Hoje} onClick={() => setFilter(Filter.Hoje)}>
               Hoje
             </Button>
-            {/* <Button isActive={filter === Filter.Semana} onClick={() => setFilter(Filter.Semana)}>
+            <Button isActive={filter === Filter.Semana} onClick={() => setFilter(Filter.Semana)}>
               Esta semana
-            </Button> */}
+            </Button>
             <Button isActive={filter === Filter.Mes} onClick={() => setFilter(Filter.Mes)}>
               Este mês
             </Button>
-            <Form ref={formRef} onSubmit={handleSubmit}>
+            <div className={styles.verticalDivider} />
+            <div>
+              <Button
+                icon={FiCalendar}
+                isActive={filter === Filter.Custom}
+                onClick={() => {
+                  setFilter(Filter.Custom);
+                  setDatePickerVisibility(!datePickerVisibility);
+                }}>Escolher período</Button>
+
+              {filter === Filter.Custom && (
+                <DatePickerPopup
+                  formRef={datePickerRef}
+                  setToDateFilter={setToDateFilter}
+                  setFromDateFilter={setFromDateFilter}
+                  style={{
+                    marginBottom: '-13.25rem'
+                  }}
+                  className={styles.datePopupContainer}
+                  visibility={datePickerVisibility}
+                  setVisibility={setDatePickerVisibility}
+                />
+              )}
+            </div>
+            <Form ref={formRef} onSubmit={handleSubmit} className={styles.searchContainer}>
               <FilterInput
                 name="search"
                 icon={FiSearch}
@@ -259,6 +325,9 @@ export function Sells({ sells }: SellsProps) {
         </div>
         {status === SellStatus.Todos && (
           <div className={styles.orderStatusButtons}>
+            <StatusPanel title='Todos' onClick={() => setOrderStatus(OrderStatus.Todos)} isActive={orderStatus === OrderStatus.Todos}>
+              <span className={styles.grayText}> {total} </span>
+            </StatusPanel>
             <StatusPanel title='Aprovados' onClick={() => setOrderStatus(OrderStatus.Aprovado)} isActive={orderStatus === OrderStatus.Aprovado}>
               <span className={styles.greenText}> {totalApproved} </span>
             </StatusPanel>
@@ -271,43 +340,53 @@ export function Sells({ sells }: SellsProps) {
             <StatusPanel title='Devolvidos' onClick={() => setOrderStatus(OrderStatus.Devolvido)} isActive={orderStatus === OrderStatus.Devolvido}>
               <span className={styles.orangeText}> {totalReturned} </span>
             </StatusPanel>
-            <StatusPanel title='Todos' onClick={() => setOrderStatus(OrderStatus.Todos)} isActive={orderStatus === OrderStatus.Todos}>
-              <span className={styles.grayText}> {total} </span>
-            </StatusPanel>
           </div>
         )}
         {items.length > 0 ? (
           <table className={styles.table}>
             <thead className={styles.tableHeader}>
               <tr>
-                <th>Foto</th>
-                {status === SellStatus.Todos && <th>Status</th>}
-                <th>Número venda</th>
-                <th>Nome do produto</th>
+                <th>Número do pedido</th>
+                <th>Produtos</th>
                 <th>Data</th>
                 <th>Valor</th>
+                <th>Status</th>
                 <th>Ação</th>
               </tr>
             </thead>
             <tbody className={styles.tableBody}>
-              {items.map(item =>
-                <tr className={styles.tableItem} key={item.id}>
-                  <td id={styles.imgCell} >
-                    {item.image ? <img src={item.image} alt={item.name} /> : <FiCameraOff />}
+              {items.map((item, i) =>
+                <tr className={styles.tableItem} key={item.order_number} ref={itemsRef[i]}>
+                  <td width='12.5%'>
+                    {item.order_number}
                   </td>
-                  {status === SellStatus.Todos && (
-                    <td width='12.5%'>
-                      {SellStatus[item.status].split('_').join(' ')}
-                    </td>
-                  )}
-                  <td>
-                    {item.id}
-                  </td>
-                  <td id={styles.nameCell}>
-                    {item.name}
+                  <td id={styles.itemsCell}>
+                    {
+                      item.products.map((product, i) => {
+                        return (i < 2 && <p key={i}>{product.name}</p>)
+                      })
+                    }
+                    {
+                      item.products.length > 2 && (
+                        <>
+                          <Collapsible totalItems={item.products.length} toggleRef={!!collapsibleRefs ? collapsibleRefs[i] : undefined}>
+                            {
+                              item.products.map((product, i) => {
+                                if (i < 2)
+                                  return (<></>)
+
+                                return (
+                                  <p key={i}>{product.name}</p>
+                                )
+                              })
+                            }
+                          </Collapsible>
+                        </>
+                      )
+                    }
                   </td>
                   <td id={styles.dateCell}>
-                    {item.date}
+                    {format(item.date, 'dd/MM/yyyy')}
                   </td>
                   <td id={styles.valueCell}>
                     {
@@ -315,11 +394,37 @@ export function Sells({ sells }: SellsProps) {
                         style: 'currency',
                         currency: 'BRL',
                       }
-                      ).format(item.value)
+                      ).format(item.total)
                     }
                   </td>
-                  <td id={styles.actionCell}>
-                    <span className={styles.action}> Ver detalhes </span>
+                  <td width='12.5%'>
+                    {SellStatus[item.status]}
+                  </td>
+                  <td id={status === SellStatus.Faturando || status === SellStatus.Despachando ? styles.attachmentCell : styles.actionCell}>
+                    {status === SellStatus.Faturando ?
+                      <AttachButton
+                        name={item.id}
+                        title='Anexo de NF-e'
+                        attachedText='NF-e Anexada'
+                        unattachedText='Anexar NF-e'
+                        placeholder='Informe a URL da NF-e'
+                        handleAttachment={handleAttachment}
+                        isAttached={!!item.nfe_url}
+                      />
+                      :
+                      status === SellStatus.Despachando ?
+                        <AttachButton
+                          name={item.id}
+                          title='Código de envio'
+                          attachedText='Código de Envio'
+                          unattachedText='Informar código'
+                          placeholder='Informe o código de envio'
+                          handleAttachment={handleAttachment}
+                          isAttached={!!item.nfe_url}
+                        />
+                        :
+                        <span className={styles.action} style={{ cursor: 'help', opacity: 0.5 }} title="Desabilitado"> Ver detalhes </span>
+                    }
                   </td>
                 </tr>
               )
@@ -336,114 +441,255 @@ export function Sells({ sells }: SellsProps) {
 
 const ordersFromApi: Sell[] = [
   {
-    id: '111111111',
-    status: SellStatus.Faturado,
-    name: 'TRT Molteom Candy Bloomer...',
-    date: '01/04/2021',
-    value: 299.90,
-    image: 'https://images.rappi.com.br/products/2105890298-1611681705552.png'
+    id: '1',
+    order_number: '111111111',
+    marketplace: 'OZLLO',
+    status: SellStatus.Entregue,
+    date: parse('01/04/2021', 'dd/MM/yyyy', new Date()).getTime(),
+    products: [
+      {
+        name: 'TRT Molteom Candy Bloomer...',
+        price: 299.90,
+        discount: 0,
+        quantity: 1,
+      },
+      {
+        name: 'Molteom Candy Bloomer...',
+        price: 299.90,
+        discount: 0,
+        quantity: 1,
+      },
+      {
+        name: 'Molteom Candy Bloomer...',
+        price: 299.90,
+        discount: 0,
+        quantity: 1,
+      },
+      {
+        name: 'Molteom Candy Bloomer...',
+        price: 299.90,
+        discount: 0,
+        quantity: 1,
+      },
+      {
+        name: 'Molteom Candy Bloomer...',
+        price: 299.90,
+        discount: 0,
+        quantity: 1,
+      }
+    ],
+    total: 599.80,
   },
   {
-    id: '222222222',
-    status: SellStatus.Aguardando_Faturamento,
-    name: 'RTT Molteom Candy Bloomer...',
-    date: format(new Date(), 'dd/MM/yyyy'),
-    value: 299.90,
-    image: 'https://images-americanas.b2w.io/produtos/01/00/img/2608684/5/2608684535_1GG.jpg'
+    id: '2',
+    order_number: '222222222',
+    marketplace: 'OZLLO',
+    status: SellStatus.Faturando,
+    products: [
+      {
+        name: 'RTT Molteom Candy Bloomer...',
+        price: 299.90,
+        discount: 0,
+        quantity: 2,
+      },
+      {
+        name: 'ZUZ Molteom Candy Bloomer...',
+        price: 299.90,
+        discount: 0,
+        quantity: 1,
+      },
+      {
+        name: 'ZUZ Molteom Candy Bloomer...',
+        price: 299.90,
+        discount: 0,
+        quantity: 1,
+      },
+      {
+        name: 'ZUZ Molteom Candy Bloomer...',
+        price: 299.90,
+        discount: 0,
+        quantity: 1,
+      }
+    ],
+    date: new Date().getTime(),
+    total: 899.7,
   },
   {
-    id: '3333333333',
-    status: SellStatus.Aguardando_Faturamento,
-    name: 'ZUZ Molteom Candy Bloomer...',
-    date: format(new Date(), 'dd/MM/yyyy'),
-    value: 299.90,
-  },
-  {
-    id: '4444444444',
+    id: '3',
+    order_number: '4444444444',
+    marketplace: 'OZLLO',
     status: SellStatus.Retornado,
-    name: 'Molteom Candy Bloomer...',
-    date: format(new Date(), 'dd/MM/yyyy'),
-    value: 299.90,
+    date: parse('13/04/2021', 'dd/MM/yyyy', new Date()).getTime(),
+    products: [
+      {
+        name: 'TRT Molteom Candy Bloomer...',
+        price: 299.90,
+        discount: 0,
+        quantity: 2,
+      },
+    ],
+    total: 599.80,
+  },
+  {
+    id: '4',
+    order_number: '5555555555',
+    marketplace: 'OZLLO',
+    status: SellStatus.Entregue,
+    date: new Date().getTime(),
+    products: [
+      {
+        name: 'Molteom Candy Bloomer...',
+        price: 299.9,
+        discount: 0,
+        quantity: 1,
+      }
+    ],
+    total: 299.90,
 
   },
   {
-    id: '5555555555',
-    status: SellStatus.Faturado,
-    name: 'Molteom Candy Bloomer...',
-    date: format(new Date(), 'dd/MM/yyyy'),
-    value: 299.90,
+    id: '5',
+    order_number: '66666666',
+    marketplace: 'OZLLO',
+    status: SellStatus.Faturando,
+    products: [
+      {
+        name: 'Molteom Candy Bloomer...',
+        price: 299.9,
+        discount: 0,
+        quantity: 1
+      }
+    ],
+    date: new Date().getTime(),
+    total: 299.90,
 
   },
   {
-    id: '66666666',
-    status: SellStatus.Aguardando_Faturamento,
-    name: 'Molteom Candy Bloomer...',
-    date: format(new Date(), 'dd/MM/yyyy'),
-    value: 299.90,
+    id: '6',
+    order_number: '77777777',
+    marketplace: 'OZLLO',
+    status: SellStatus.Faturando,
+    products: [
+      {
+        name: 'Molteom Candy Bloomer...',
+        price: 299.9,
+        discount: 0,
+        quantity: 1
+      }
+    ],
+    date: new Date().getTime(),
+    total: 299.90,
 
   },
   {
-    id: '77777777',
-    status: SellStatus.Aguardando_Faturamento,
-    name: 'Molteom Candy Bloomer...',
-    date: format(new Date(), 'dd/MM/yyyy'),
-    value: 299.90,
+    id: '7',
+    order_number: '8888888888',
+    marketplace: 'OZLLO',
+    status: SellStatus.Despachando,
+    products: [
+      {
+        name: 'Molteom Candy Bloomer...',
+        price: 299.9,
+        discount: 0,
+        quantity: 1
+      }
+    ],
+    date: new Date().getTime(),
+    total: 299.90,
 
   },
   {
-    id: '8888888888',
-    status: SellStatus.Aguardando_Faturamento,
-    name: 'Molteom Candy Bloomer...',
-    date: format(new Date(), 'dd/MM/yyyy'),
-    value: 299.90,
+    id: '8',
+    order_number: '999999999',
+    marketplace: 'OZLLO',
+    status: SellStatus.Faturando,
+    products: [
+      {
+        name: 'Molteom Candy Bloomer...',
+        price: 299.9,
+        discount: 0,
+        quantity: 1
+      }
+    ],
+    date: new Date().getTime(),
+    total: 299.90,
 
   },
   {
-    id: '999999999',
-    status: SellStatus.Aguardando_Faturamento,
-    name: 'Molteom Candy Bloomer...',
-    date: format(new Date(), 'dd/MM/yyyy'),
-    value: 299.90,
+    id: '9',
+    order_number: '10101010',
+    marketplace: 'OZLLO',
+    status: SellStatus.Faturando,
+    products: [
+      {
+        name: 'Molteom Candy Bloomer...',
+        price: 299.9,
+        discount: 0,
+        quantity: 1
+      }
+    ],
+    date: new Date().getTime(),
+    total: 299.90,
 
   },
   {
-    id: '10101010',
-    status: SellStatus.Aguardando_Faturamento,
-    name: 'Molteom Candy Bloomer...',
-    date: format(new Date(), 'dd/MM/yyyy'),
-    value: 299.90,
+    id: '10',
+    order_number: '1111111111',
+    marketplace: 'OZLLO',
+    status: SellStatus.Processando,
+    products: [
+      {
+        name: 'Molteom Candy Bloomer...',
+        price: 299.9,
+        discount: 0,
+        quantity: 1
+      }
+    ],
+    date: new Date().getTime(),
+    total: 299.90,
 
   },
   {
-    id: '1111111111',
-    status: SellStatus.Aguardando_Confirmação,
-    name: 'Molteom Candy Bloomer...',
-    date: format(new Date(), 'dd/MM/yyyy'),
-    value: 299.90,
+    id: '11',
+    order_number: '12121212',
+    marketplace: 'OZLLO',
+    status: SellStatus.Processando,
+    products: [
+      {
+        name: 'Molteom Candy Bloomer...',
+        price: 299.9,
+        discount: 0,
+        quantity: 1
+      }
+    ],
+    date: new Date().getTime(),
+    total: 299.90,
 
   },
   {
-    id: '12121212',
-    status: SellStatus.Aguardando_Confirmação,
-    name: 'Molteom Candy Bloomer...',
-    date: format(new Date(), 'dd/MM/yyyy'),
-    value: 299.90,
-
-  },
-  {
-    id: '1313131313',
+    id: '12',
+    order_number: '1313131313',
+    marketplace: 'OZLLO',
     status: SellStatus.Cancelado,
-    name: 'Molteom Candy Bloomer...',
-    date: format(new Date(), 'dd/MM/yyyy'),
-    value: 299.90,
+    products: [
+      {
+        name: 'Molteom Candy Bloomer...',
+        price: 299.9,
+        discount: 0,
+        quantity: 1
+      }
+    ],
+    date: new Date().getTime(),
+    total: 299.90,
 
   },
 ];
 
 export const getStaticProps: GetStaticProps = async ({ }) => {
+  const sells = ordersFromApi.sort((a, b) => a.date < b.date ? -1 : 1);
 
   return ({
-    props: { sells: ordersFromApi },
+    props: { sells },
     revalidate: 10
   })
 }

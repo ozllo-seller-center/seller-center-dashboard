@@ -1,0 +1,104 @@
+.button {
+  width: 12.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0.8rem 0.8rem;
+
+  background-color: var(--white);
+
+  border: none;
+  border-radius: 4px;
+
+  box-shadow: 0 3px 6px rgba(0,0,0,0.02), 0 3px 10px rgba(0,0,0,0.06);
+
+  color: var(--grafite);
+
+  transition: border 0.5s, width 0.5s, padding 0.5s;
+
+  > svg {
+    width: 0.75rem;
+    height: 0.75rem;
+
+    color: var(--grafite);
+
+    transition: color 0.5s;
+  }
+
+  &:hover {
+    width: 13.25rem;
+    padding: 0.7rem 0.8rem;
+
+    border: 1px var(--yellow-300) solid;
+
+    > svg {
+      color: var(--yellow-300);
+    }
+  }
+}
+
+.buttonActive {
+  width: 13.25rem;
+  padding: 0.7rem 0.8rem;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background-color: var(--white);
+
+  color: var(--grafite);
+
+  border: 1px var(--yellow-300) solid;
+  border-radius: 4px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.09), 0 3px 5px rgba(0,0,0,0.12);
+
+  > svg {
+    width: 0.75rem;
+    height: 0.75rem;
+
+    color: var(--yellow-300);
+  }
+}
+
+.buttonBordered {
+  width: 12.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0.8rem 0.8rem;
+
+  background-color: var(--white);
+
+  border: 1px var(--gray-300) solid;
+  border-radius: 4px;
+
+  box-shadow: 0 3px 6px rgba(0,0,0,0.02), 0 3px 10px rgba(0,0,0,0.06);
+
+  color: var(--grafite);
+
+  transition: border 0.5s, width 0.5s, padding 0.5s;
+
+  > svg {
+    width: 0.75rem;
+    height: 0.75rem;
+
+    color: var(--grafite);
+
+    transition: color 0.5s;
+  }
+
+  &:hover {
+    width: 13.25rem;
+    padding: 0.7rem 0.8rem;
+
+    border: 1px var(--yellow-300) solid;
+
+    > svg {
+      color: var(--yellow-300);
+    }
+  }
+}
+

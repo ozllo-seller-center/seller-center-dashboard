@@ -9,7 +9,7 @@ type PanelProps = HTMLAttributes<HTMLDivElement> & {
 }
 
 const OrderStatusPanel: React.FC<PanelProps> = ({ children, isActive, title, onClick }) => {
-  console.log(`${title} - ${isActive}`)
+  // console.log(`${title} - ${isActive}`)
   return (
     <div onClick={onClick} className={isActive ? styles.containerActive : styles.container} >
       <label>{title}</label>

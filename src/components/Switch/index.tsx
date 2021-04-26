@@ -1,28 +1,42 @@
-import React from 'react';
+import { FormHandles, SubmitHandler, useField } from '@unform/core';
+import { Form } from '@unform/web';
+import React, { InputHTMLAttributes, useCallback, useEffect, useRef, useState } from 'react';
 
 import styles from './styles.module.scss';
 
-type SwitchProps = {
+type SwitchProps = InputHTMLAttributes<HTMLInputElement> & {
   isOn: boolean;
-  handleToggle: React.MouseEventHandler<HTMLInputElement> | undefined;
   onColor: string;
   offColor: string;
-}
+  handleToggle: any;
+  item: any;
+  id: string;
+};
 
-const Switch = ({ isOn, handleToggle, onColor, offColor }: SwitchProps) => {
+const Switch = ({ id, item, handleToggle, isOn, onColor, offColor, ...rest }: SwitchProps) => {
+  const [checked, setChecked] = useState(isOn);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  console.log(item.id);
+
   return (
     <>
       <input
+        ref={inputRef}
         checked={isOn}
-        onClick={handleToggle}
+        onChange={() => handleToggle(id)}
         className={styles.react_switch_checkbox}
-        id={styles.react_switch_new}
+        id={'react_switch_new'}
         type="checkbox"
+        style={{}}
       />
       <label
-        style={{ background: isOn ? onColor : offColor }}
+        style={{
+          background: isOn ? onColor : offColor, boxShadow: `0 0 1rem ${isOn ? onColor : offColor}4D, 0 0 1rem ${isOn ? onColor : offColor}BF`
+        }}
         className={styles.react_switch_label}
-        htmlFor={styles.react_switch_new}
+        htmlFor={'react_switch_new'}
       >
         <span className={styles.react_switch_button} />
       </label>

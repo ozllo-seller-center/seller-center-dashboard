@@ -1,0 +1,63 @@
+.button {
+  // flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--grafite);
+
+  border: none;
+  background-color: transparent;
+
+  transition: color .5s;
+
+  padding: .25rem;
+
+  > svg {
+    color: var(--grafite);
+    width: 1.75rem;
+    height: 1.75rem;
+
+    margin-right: .75rem;
+    padding: .25rem;
+
+    border-radius: 50%;
+    border: 1.5px var(--grafite) solid;
+
+    background-color: var(--white);
+
+    transition: color .5s, border-color .5s;
+  }
+
+  &:hover {
+    color: var(--yellow-300);
+
+
+    > svg {
+      color: var(--yellow-300);
+      border-color: var(--yellow-300);
+    }
+  }
+}
+
+.buttonActive {
+  display: flex;
+  flex-direction: row;
+
+  border: 0;
+  border-radius: 4px;
+  font-size: 1rem;
+  color: var(--grafite);
+  background-color: var(--yellow-300);
+
+  transition: color 0.5s, background-color 0.5s, font-weight 0.5s;
+
+  > svg {
+    color: var(--grafite);
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+  }
+}

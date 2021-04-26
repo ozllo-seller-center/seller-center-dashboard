@@ -1,0 +1,46 @@
+.container {
+  input[type='checkbox'] {
+    display: none;
+  }
+
+  .lblToggleContainer {
+    display: flex;
+    flex-direction: row;
+
+    margin-top: 0.25rem;
+  }
+
+  .overflowItems {
+    font-size: 0.75rem;
+    color: var(--gray-300);
+
+    margin-left: 0.25rem;
+  }
+
+  .lblToggle {
+    cursor: pointer;
+    display: block;
+
+    font-size: 0.75rem;
+    text-decoration: underline;
+    color: var(--grafite);
+  }
+
+  .collapsibleContent {
+    height: 0px;
+    overflow: hidden;
+
+    transition: height .25s ease-in-out;
+  }
+
+  .collapsibleContentShow {
+    height: fit-content;
+    overflow: hidden;
+
+    transition: height .25s ease-in-out;
+  }
+
+  .hidden {
+    display: none;
+  }
+}

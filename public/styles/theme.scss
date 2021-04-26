@@ -1,8 +1,15 @@
 @import './__dimensions.scss';
 
+
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
   box-sizing: border-box;
 }
 
@@ -12,23 +19,38 @@
   --gray-50: #F7F7F7;
   --gray-100: #EFF0F4;
   --gray-200: #E2E2E2;
+  --gray-250: #CCCCCC;
   --gray-300: #a8a8b3;
+  --gray-350: #787878;
+  --gray-400: #666360;
   --gray-800: #29292e;
   --gray-900: #121214;
 
   --blue-100: #88AFDD;
 
   --green-100: #88DDA5;
+  --green-100-22: #88DDA5CC;
+  --green-100-25: #88DDA599;
+  --green-100-40: #88DDA54D;
+  --green-100-60: #88DDA566;
 
   --red-100: #FC2A58;
+  --red-100-40: #FC2A584D;
+  --red-100-60: #FC2A5866;
 
   --orange-100: #FF8A56;
 
   --yellow-50: #FFFBEA;
   --yellow-50-50: #FFFBEA80;
-  --yellow-100: #FFCF4B;
+  --yellow-400: #c48f00;
+  --yellow-300: #FFCF4B;
+  --yellow-300-40: #FFCF4B4D;
+  --yellow-300-60: #FFCF4B66;
 
   --grafite: #353535;
+
+  --chevron-width: 0.5rem;
+  --chevron-heigth: 0.5rem;
 }
 
 body {
@@ -56,6 +78,46 @@ body::-webkit-scrollbar-track {
 }
 
 body::-webkit-scrollbar-thumb {
+  background-color: var(--thumbBG) ;
+  border-radius: 6px;
+  border: 3px solid var(--scrollbarBG);
+}
+
+div::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+div {
+  scrollbar-width: thin;
+  scrollbar-color: var(--thumbBG) var(--scrollbarBG);
+}
+
+div::-webkit-scrollbar-track {
+  background: var(--scrollbarBG);
+}
+
+div::-webkit-scrollbar-thumb {
+  background-color: var(--thumbBG) ;
+  border-radius: 6px;
+  border: 3px solid var(--scrollbarBG);
+}
+
+main::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+main {
+  scrollbar-width: thin;
+  scrollbar-color: var(--thumbBG) var(--scrollbarBG);
+}
+
+main::-webkit-scrollbar-track {
+  background: var(--scrollbarBG);
+}
+
+main::-webkit-scrollbar-thumb {
   background-color: var(--thumbBG) ;
   border-radius: 6px;
   border: 3px solid var(--scrollbarBG);
@@ -106,3 +168,7 @@ button {
 
 @media screen and (max-width: $cellphone) {
 }
+
+
+@import '../../src/components/DatePickerInput/datepickerstyles.module.css';
+@import '../../src/components/Dropzone/styles.module.scss';

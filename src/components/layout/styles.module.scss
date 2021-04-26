@@ -1,18 +1,22 @@
 .openMenu {
+  height: 100vh;
   margin-left: 20rem;
   transition: margin-left 0.5s;
   transition-delay: 0.2s;
 
-  // overflow: hidden;
+  overflow: hidden;
 }
 
 .closedMenu {
+  height: 100vh;
   margin-left: 0;
   transition: margin-left 0.5s;
 
-  // overflow: hidden;
+  overflow: hidden;
 }
 
 .container {
-  height: calc(100vh - 5rem);
+  height: 100vh;
+
+  overflow: hidden;
 }

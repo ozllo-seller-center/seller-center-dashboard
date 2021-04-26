@@ -79,7 +79,7 @@
     .table {
       width: 100%;
 
-      border: 1px solid var(--yellow-100);
+      border: 1px solid var(--yellow-300);
       border-radius: 4px;
       box-shadow: 0 2px 3px rgba(0,0,0,0.09), 0 6px 6px rgba(0,0,0,0.05);
 
@@ -151,6 +151,19 @@
             cursor: pointer;
             text-decoration: underline;
           }
+
+          #switchCell {
+            width: 3.5rem;
+            // display: flex;
+
+            // justify-content: center;
+            // flex-direction: column;
+
+            .switchSubtitle {
+              font-size: 0.8rem;
+              font-weight: lighter;
+            }
+          }
         }
       }
     }
@@ -176,3 +189,4 @@
 .grayText {
   color: var(--gray-300);
 }
+

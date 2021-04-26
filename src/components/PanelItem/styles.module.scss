@@ -6,7 +6,7 @@
   justify-content: space-around;
   text-align: center;
 
-  padding: 1.5rem 0.75rem;
+  padding: 1.5rem 0.5rem;
 
   & + div {
     border-left: 1px solid var(--gray-100);
@@ -26,7 +26,7 @@
     }
 
     &:hover {
-      color: var(--yellow-100);
+      color: var(--yellow-300);
     }
   }
 
@@ -61,6 +61,6 @@
   }
 
   .yellow {
-    color: var(--yellow-100);
+    color: var(--yellow-300);
   }
 }
