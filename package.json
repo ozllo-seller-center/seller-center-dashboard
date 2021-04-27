@@ -18,7 +18,7 @@
     "test:coverage": "jest --coverage",
     "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
-    "start": "NODE_ENV=production next start",
+    "start": "NODE_ENV=npm run dev",
     "export": "next export"
   },
   "dependencies": {
