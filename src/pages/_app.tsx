@@ -9,12 +9,6 @@ import Layout from '../components/Layout/layout'
 import SignIn from './index'
 import { redirect } from 'next/dist/next-server/server/api-utils';
 
-// Will be called once for every metric that has to be reported.
-// These metrics can be sent to any analytics service
-export function reportWebVitals(metric: any) {
-  console.log(metric)
-}
-
 function MyApp({ Component, pageProps }: AppProps) {
 
   return (

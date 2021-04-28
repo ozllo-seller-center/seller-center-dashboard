@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
-import { throttle } from 'utils/util'
+import { throttle } from '@utils/util'
 
 interface WindowDimension {
   width: number | undefined
   height: number | undefined
 }
 
-export default function useWindowSize( interval = 500 ) {
+export default function useWindowSize(interval = 500) {
   const isClient = typeof window === 'object'
 
   function getSize(): WindowDimension {
@@ -16,18 +16,18 @@ export default function useWindowSize( interval = 500 ) {
     }
   }
 
-  const [windowSize, setWindowSize] = useState( getSize() )
+  const [windowSize, setWindowSize] = useState(getSize())
 
-  useEffect( () => {
-    if ( !isClient ) return
+  useEffect(() => {
+    if (!isClient) return
 
-    const handleResize = throttle( () => {
-      setWindowSize( getSize() )
-    }, interval )
+    const handleResize = throttle(() => {
+      setWindowSize(getSize())
+    }, interval)
 
-    window.addEventListener( 'resize', handleResize )
-    return () => window.removeEventListener( 'resize', handleResize )
-  }, [] ) // Empty array ensures that effect is only run on mount and unmount
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, []) // Empty array ensures that effect is only run on mount and unmount
 
   return windowSize
 }
