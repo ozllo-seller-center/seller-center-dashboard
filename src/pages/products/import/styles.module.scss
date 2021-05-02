@@ -1,0 +1,175 @@
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.importContainer {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  padding: 2rem;
+  padding-left: 2.5rem;
+
+  .importHeader {
+    display: flex;
+    flex-direction: row;
+
+    button + button {
+      margin-left: 2rem;
+    }
+  }
+
+  .divider {
+    display: flex;
+    width: 100%;
+    height: 1.5px;
+    margin: 1.5rem 0;
+    background-color: var(--gray-300);
+    opacity: 0.5;
+  }
+
+  .importContent{
+    max-width: 90%;
+
+    display: flex;
+    flex-direction: row;
+
+    overflow: auto;
+
+    h3 {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--grafite);
+
+      margin-bottom: 1.5rem;
+    }
+
+    button {
+      border: none;
+      margin-top:auto;
+      margin-right: auto;
+
+      border-radius: 4px;
+      font-weight: lighter;
+
+      transition: color 0.5s, background-color 0.5s;
+    }
+
+    .exportPanel {
+      flex: 1;
+
+      display: flex;
+      flex-direction: column;
+
+      margin-right: 1rem;
+
+      padding: 1rem;
+
+      background-color: var(--white);
+      border: 1px var(--yellow-300) solid;
+      border-radius: 6px;
+
+      box-shadow: 0 3px 6px rgba(0,0,0,0.02), 0 3px 10px rgba(0,0,0,0.06);
+
+      > svg {
+        width: 4rem;
+        height: 4rem;
+        color: var(--grafite);
+
+        margin-bottom: 1rem;
+      }
+
+      button {
+        width: 10rem;
+        padding: 0.75rem;
+
+        background-color: var(--grafite);
+
+        color: var(--white);
+
+        &:hover {
+          color: var(--black);
+          background-color: var(--yellow-300);
+        }
+      }
+    }
+
+    .importPanel {
+      flex: 1;
+
+      display: flex;
+      flex-direction: column;
+
+      margin-left: 1rem;
+
+      padding: 1rem;
+
+      background-color: var(--yellow-50);
+      border-radius: 6px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.02), 0 3px 10px rgba(0,0,0,0.06);
+
+      > svg {
+        width: 4rem;
+        height: 4rem;
+        color: var(--yellow-300);
+
+        margin-bottom: 1rem;
+      }
+
+      .smallText {
+        font-size: 0.9rem;
+        font-weight: lighter;
+      }
+
+      p + p {
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      button {
+        margin-top: 1rem;
+        padding: 0.75rem;
+
+        background-color: var(--yellow-300);
+        color: var(--grafite);
+
+        &:hover {
+          background-color: var(--grafite);
+          color: var(--white);
+        }
+      }
+    }
+  }
+
+  .modalContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+
+    .loader {
+      align-self: center;
+      border: 1rem solid var(--gray-100); /* Light grey */
+      border-top: 1rem solid var(--grafite); /* Blue */
+      border-radius: 50%;
+      width: 6.5rem;
+      height: 6.5rem;
+      animation: spin 2s linear infinite;
+    }
+
+    p {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--grafite);
+    }
+
+    > svg {
+      width: 5rem;
+      height: 5rem;
+      color: var(--orange-200);
+      margin-bottom: 2rem;
+    }
+  }
+}

@@ -1,7 +1,15 @@
+.wrapper {
+  height: calc(100% - 4rem);
+  width: 100%;
+
+  overflow: auto;
+}
+
 .productsContainer {
-  min-height: 100%;
   display: flex;
   flex-direction: column;
+
+  // height: calc(100% - 3rem);
 
   padding: 2rem;
   padding-left: 2.5rem;
@@ -25,10 +33,11 @@
   }
 
   .productsContent {
-    flex: 1;
+    // flex: 1;
     display: flex;
     flex-direction: column;
-    // overflow: auto;
+
+    // height: 20%;
 
     .tableContainer {
       flex: 1;
@@ -76,92 +85,98 @@
       color: var(--gray-300);
     }
 
-    .table {
-      width: 100%;
+    .tableContainer {
+      flex: 1;
 
-      border: 1px solid var(--yellow-300);
-      border-radius: 4px;
-      box-shadow: 0 2px 3px rgba(0,0,0,0.09), 0 6px 6px rgba(0,0,0,0.05);
+      .table {
+        flex: 1;
 
-      margin-top: 0.5rem;
+        border: 1px solid var(--yellow-300);
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,0.09), 0 6px 6px rgba(0,0,0,0.05);
 
-      .tableHeader {
+        margin-top: 0.5rem;
 
-        th {
-          text-align: left;
-          padding: 1rem 1rem;
-          font-size: 0.8rem;
-          font-weight: bold;
-        }
-
-        th:first-child {
-          padding-left: 1rem;
-        }
-      }
-
-      .tableBody {
-        padding: 0 0.5rem;
-        background-color: var(--white);
-
-        .tableItem {
-          height: 5rem;
-          align-items: center;
-          margin: 1rem 1rem;
-
-          text-align: center;
-
-          transition: background-color 0.2s;
-
-          &:hover {
-            background-color: var(--yellow-50);
-          }
-
-          td {
-            padding: 1.25rem 1rem;
-          }
-
-          #imgCell {
-            width: 10rem;
-            padding: 0 1rem;
-
-            svg {
-              width: 1.5rem;
-              height: 1.5rem;
-            }
-
-            img {
-              max-height: 5rem;
-            }
-          }
-
-          #nameCell {
+        .tableHeader {
+          flex: 1;
+          th {
             text-align: left;
+            padding: 1rem 1rem;
+            font-size: 0.8rem;
+            font-weight: bold;
           }
 
-          #dateCell {
-            width: 8rem;
+          th:first-child {
+            padding-left: 1rem;
           }
+        }
 
-          #valueCell {
-            width: 12rem;
-          }
+        .tableBody {
+          flex: 1;
 
-          #actionCell {
-            width: 10rem;
-            cursor: pointer;
-            text-decoration: underline;
-          }
+          padding: 0 0.5rem;
+          background-color: var(--white);
 
-          #switchCell {
-            width: 3.5rem;
-            // display: flex;
+          .tableItem {
+            height: 5rem;
+            align-items: center;
+            margin: 1rem 1rem;
 
-            // justify-content: center;
-            // flex-direction: column;
+            text-align: center;
 
-            .switchSubtitle {
-              font-size: 0.8rem;
-              font-weight: lighter;
+            transition: background-color 0.2s;
+
+            &:hover {
+              background-color: var(--yellow-50);
+            }
+
+            td {
+              padding: 1.25rem 1rem;
+            }
+
+            #imgCell {
+              width: 10rem;
+              padding: 0 1rem;
+
+              svg {
+                width: 1.5rem;
+                height: 1.5rem;
+              }
+
+              img {
+                max-height: 5rem;
+              }
+            }
+
+            #nameCell {
+              text-align: left;
+            }
+
+            #dateCell {
+              width: 8rem;
+            }
+
+            #valueCell {
+              width: 12rem;
+            }
+
+            #actionCell {
+              width: 10rem;
+              cursor: pointer;
+              text-decoration: underline;
+            }
+
+            #switchCell {
+              width: 3.5rem;
+              // display: flex;
+
+              // justify-content: center;
+              // flex-direction: column;
+
+              .switchSubtitle {
+                font-size: 0.8rem;
+                font-weight: lighter;
+              }
             }
           }
         }

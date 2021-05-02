@@ -6,14 +6,16 @@ import '@public/styles/theme.scss'
 import { AuthProvider } from '../hooks/auth';
 
 import Layout from '../components/Layout/layout'
+import SignUp from './signup';
 import SignIn from './index'
 import { redirect } from 'next/dist/next-server/server/api-utils';
+import Verify from './verify';
 
 function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <AuthProvider>
-      { Component === SignIn ? (
+      { Component === SignIn || Component === SignUp || Component === Verify ? (
         <Component {...pageProps} />
       ) : (
         <Layout>

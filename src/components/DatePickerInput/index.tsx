@@ -1,17 +1,12 @@
 import React, {
-  InputHTMLAttributes,
   useEffect,
   useRef,
   useState,
-  useCallback,
-  forwardRef,
 } from 'react';
 
 import DatePicker from 'react-datepicker';
-import ReactDayPicker from 'react-datepicker';
 import pt from 'date-fns/locale/pt-BR';
 
-import { IconBaseProps } from 'react-icons';
 import { FiCalendar } from 'react-icons/fi';
 import { useField } from '@unform/core';
 
@@ -20,8 +15,6 @@ import ReactDatePicker from 'react-datepicker';
 // import 'react-datepicker/dist/react-datepicker.css';
 import './datepickerstyles.module.css';
 import styles from './styles.module.scss';
-import { addMonths, subMonths } from 'date-fns';
-
 
 interface DatePickerInputProps {
   name: string;
@@ -29,8 +22,6 @@ interface DatePickerInputProps {
   isStart?: boolean;
   isEnd?: boolean;
 }
-
-type DatePickerRef = ReactDayPicker & HTMLInputElement;
 
 const Input: React.FC<DatePickerInputProps> = ({
   name,
@@ -53,10 +44,6 @@ const Input: React.FC<DatePickerInputProps> = ({
       },
     });
   }, [fieldName, registerField]);
-
-  useEffect(() => {
-    console.log(`New Date: ${JSON.stringify(dateRef.current?.props.selected)}`)
-  }, [inputDate])
 
   return (
     <>

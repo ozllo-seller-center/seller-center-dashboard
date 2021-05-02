@@ -1,0 +1,101 @@
+.container {
+  height: 100vh;
+
+  display: flex;
+
+  .verifying {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    p {
+      margin-top: 2rem;
+      color: var(--gray-300);
+    }
+  }
+
+
+  .verified {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 5rem;
+      height: 5rem;
+      color: var(--green-100);
+    }
+
+    h2 {
+      margin-top: 1rem;
+      font-weight: bold;
+      color: var(--grafite);
+    }
+
+    p {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      color: var(--gray-300);
+    }
+  }
+}
+
+.dotFlashing {
+  position: relative;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: var(--yellow-300);
+  color: var(--yellow-300);
+  animation: flashing 1s infinite linear alternate;
+  animation-delay: .5s;
+
+  margin-bottom: 3rem;
+}
+
+.dotFlashing::before, .dotFlashing::after {
+  content: '';
+  display: inline-block;
+  position: absolute;
+  top: 0;
+}
+
+.dotFlashing::before {
+  left: -3.5rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: var(--yellow-300);
+  color: var(--yellow-300);
+  animation: flashing 1s infinite alternate;
+  animation-delay: 0s;
+}
+
+.dotFlashing::after {
+  left: 3.5rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: var(--yellow-300);
+  color: var(--yellow-300);
+  animation: flashing 1s infinite alternate;
+  animation-delay: 1s;
+}
+
+@keyframes flashing {
+  0% {
+    background-color: var(--yellow-300);
+  }
+  50%,
+  100% {
+    background-color: var(--yellow-100);
+  }
+}

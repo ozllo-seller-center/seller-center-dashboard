@@ -1,5 +1,5 @@
 
-import { Panel } from '@components/Panel';
+import Panel from '@components/Panel';
 import { useAuth } from '@hooks/auth';
 import { GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
@@ -17,9 +17,6 @@ interface OrderSummary {
 }
 
 const Dashboard: React.FC = () => {
-  const { user } = useAuth();
-  const router = useRouter();
-
   const [approvedOrders, setApprovedOrders] = useState({
     name: 'Aprovados', value: new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -28,12 +25,6 @@ const Dashboard: React.FC = () => {
   } as OrderSummary);
   const [canceledOrders, setCanceledOrders] = useState({} as OrderSummary);
   const [returnedOredres, setReturnedOrders] = useState({} as OrderSummary);
-
-  useEffect(() => {
-    if (!user) {
-      router.push('/');
-    }
-  }, [user, router])
 
   return (
     <div className={styles.dashboardContainer}>

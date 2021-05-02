@@ -1,13 +1,28 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import Footer from '../Footer';
 import Menu from '../Menu';
 import { Header } from '../Header';
 
 import styles from './styles.module.scss';
+import { useAuth } from '@hooks/auth';
+import { useRouter } from 'next/router';
 
 const Layout: React.FC = ({ children }) => {
   const [open, setOpen] = useState(false);
+
+  const { user, isRegisterCompleted } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/');
+    }
+    if (!isRegisterCompleted) {
+      router.push('/profile');
+    }
+  }, [user, router])
+
 
   return (
     <>

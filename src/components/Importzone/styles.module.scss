@@ -1,0 +1,146 @@
+@keyframes appear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.importzone {
+  width: 16rem;
+  height: 6rem;
+
+  background-color: var(--white);
+  border: 1px var(--grafite) dashed;
+  border-radius: 4px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  outline: 0;
+
+  transition: filter 0.5s;
+
+  cursor: pointer;
+
+  animation: appear 1s;
+
+  p {
+    /* width: calc(100% - 60px);
+    height: calc(100% - 60px); */
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--gray-300);
+
+    animation: appear 1s;
+  }
+
+  &:hover {
+    filter: brightness(0.8);
+  }
+}
+
+.uploaded {
+  width: 16rem;
+  height: 6rem;
+
+  background-color: var(--green-100-40);
+  border: 1px var(--grafite) dashed;
+  border-radius: 4px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  outline: 0;
+
+  transition: filter 0.5s;
+
+  cursor: pointer;
+
+  animation: appear 1s;
+
+  p {
+    /* width: calc(100% - 60px);
+    height: calc(100% - 60px); */
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    color: var(--green-100);
+    filter: brightness(0.8);
+
+    animation: appear 1s;
+  }
+
+  svg {
+    color: var(--green-100);
+    width: 2rem;
+    height: 2rem;
+
+    filter: brightness(0.8);
+
+    opacity: 0.5;
+  }
+
+  &:hover {
+    filter: brightness(0.8);
+  }
+}
+
+
+.error {
+  width: 16rem;
+  height: 6rem;
+
+  background-color: var(--red-100-40);
+  border: 1px var(--grafite) dashed;
+  border-radius: 4px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  outline: 0;
+
+  transition: filter 0.5s;
+
+  cursor: pointer;
+
+  animation: appear 1s;
+
+  p {
+    /* width: calc(100% - 60px);
+    height: calc(100% - 60px); */
+    text-align: center;
+
+    color: var(--red-100);
+
+    animation: appear 1s;
+
+  }
+
+  svg {
+    color: var(--red-100);
+    width: 2rem;
+    height: 2rem;
+
+    opacity: 0.5;
+  }
+
+  &:hover {
+    filter: brightness(0.8);
+  }
+}

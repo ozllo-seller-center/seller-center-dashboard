@@ -17,7 +17,7 @@ import RadioButtonGroup from '@components/RadioButtonGroup';
 import VariationsController from '@components/Variations';
 import getValidationErrors from '@utils/getValidationErrors';
 
-import { productsFromApi } from '../../index';
+import { productsFromApi } from '../index';
 import { format } from 'date-fns';
 
 export type Product = {
@@ -74,7 +74,7 @@ type ProductDTO = {
   image?: string;
 }
 
-export function ProductForm() {
+export function ProductEdit() {
   const [filesUrl, setFilesUrl] = useState<string[]>([]);
 
   const [filledFields, setFilledFields] = useState(0);
@@ -366,4 +366,4 @@ export function ProductForm() {
   );
 }
 
-export default ProductForm;
+export default ProductEdit;

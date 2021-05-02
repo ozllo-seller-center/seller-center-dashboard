@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useState, useContext } from 'react';
+import React, { createContext, useCallback, useState, useContext, useMemo } from 'react';
 import api from '../services/api';
 
 interface User {
@@ -6,6 +6,25 @@ interface User {
   name: string;
   email: string;
   avatar_url: string;
+  address?: string,
+  birthday?: Date,
+  block?: string,
+  category: string,
+  city?: string,
+  commission: number,
+  complement?: string,
+  cpf: string,
+  number?: number,
+  phone: string,
+  rg: string,
+  store: {
+    address?: string,
+    block?: string,
+    city?: string,
+    cnpj: string,
+    complement?: string,
+    number?: number,
+  }
 }
 
 interface AuthState {
@@ -23,6 +42,7 @@ interface AuthContextData {
   signIn(credentials: SignInCredentials): Promise<void>;
   signOut(): void;
   updateUser(user: User): void;
+  isRegisterCompleted: boolean;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -92,9 +112,19 @@ const AuthProvider: React.FC = ({ children }) => {
     [setData, data.token, data.user],
   );
 
+  const isRegisterCompleted = useMemo(() => {
+    return true;
+
+    // if (!!data.user) {
+    //   return !!data.user.avatar_url && !!data.user.cpf && !!data.user.rg && !!data.user.phone && !!data.user.category
+    // }
+
+    // return false
+  }, [data]);
+
   return (
     <AuthContext.Provider
-      value={{ user: data.user, signIn, signOut, updateUser }}
+      value={{ user: data.user, signIn, signOut, updateUser, isRegisterCompleted }}
     >
       {children}
     </AuthContext.Provider>

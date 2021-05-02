@@ -14,6 +14,7 @@ type Variation = {
   value?: number | string,
   stock?: number,
   color?: string,
+  price?: number,
 }
 
 interface VariationsControllerProps {
@@ -26,7 +27,7 @@ interface VariationRefProps extends FormHandles {
 
 const VariationsController: React.FC<VariationsControllerProps> = ({ name }: VariationsControllerProps) => {
   const variationsRef = useRef<VariationRefProps>(null);
-  const { fieldName, registerField, defaultValue = [{}, {}, {}] } = useField(name);
+  const { fieldName, registerField, defaultValue = [{}] } = useField(name);
 
   const [variations, setVariations] = useState<Variation[]>(defaultValue);
 
@@ -80,6 +81,13 @@ const VariationsController: React.FC<VariationsControllerProps> = ({ name }: Var
                   name='color'
                   label='Escolha a cor da variação'
                   options={[{ value: 'blue', label: 'Azul' }, { value: 'yellow', label: 'Amarela' }, { value: 'black', label: 'Preta' }, { value: 'pink', label: 'Rosa' }, { value: 'red', label: 'Vermelha' }, { value: 'Green', label: 'Verde' }, { value: 'other', label: 'Outra' }]} />
+                <Input
+                  name='price'
+                  label='Valor (R$)'
+                  placeholder='Valor'
+                  autoComplete='off'
+                  type='number'
+                />
               </div>
             </Scope>
           )

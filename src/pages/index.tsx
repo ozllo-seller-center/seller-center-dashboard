@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router'
-import { FiUser, FiLock, FiAlertTriangle } from 'react-icons/fi';
+import { FiUser, FiLock, FiAlertTriangle, FiLogIn } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
@@ -107,10 +107,12 @@ const SignIn: React.FC = () => {
             {/* <Link to="/forgot-password">Esqueci minha senha</Link> */}
           </Form>
 
-          {/* <a href="/signup">
-            <FiLogIn />
-            Criar conta
-          </a> */}
+          <Link href="/signup">
+            <a>
+              <FiLogIn />
+              Criar conta
+            </a>
+          </Link>
         </div>
       </div>
       <div className={styles.background} />

@@ -1,0 +1,56 @@
+.modalBackground {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background-color: var(--grafite);
+
+  opacity: 0.5;
+
+  z-index: 99;
+}
+
+.modalContainer {
+  z-index: 99;
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  border-radius: 6px;
+
+  display: flex;
+  align-content: center;
+  text-align: center;
+
+  padding: 3rem;
+
+  > button {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    padding: 0.5rem 0.75rem;
+
+    border: none;
+    background-color: var(--grafite);
+    border-radius: 0 6px 0 0;
+
+    transition: filter 0.5s;
+
+    color: var(--white);
+    font-size: 1rem;
+    font-weight: lighter;
+
+    // svg {
+    //   color: var(--white);
+    //   width: 1.5rem;
+    //   height: 1.5rem;
+    // }
+
+    &:hover {
+      filter: brightness(0.8);
+    }
+  }
+}

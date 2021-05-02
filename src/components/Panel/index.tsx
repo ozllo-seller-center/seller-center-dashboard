@@ -9,7 +9,7 @@ type PanelProps = {
   icon: IconType;
 }
 
-export const Panel: React.FC<PanelProps> = ({ children, icon: Icon, title, description }) => {
+const Panel: React.FC<PanelProps> = ({ children, icon: Icon, title, description }) => {
   return (
     <div className={styles.panelContainer}>
       <div className={styles.panelHeader}>
@@ -29,3 +29,5 @@ export const Panel: React.FC<PanelProps> = ({ children, icon: Icon, title, descr
     </div>
   );
 }
+
+export default Panel;

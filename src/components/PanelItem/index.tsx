@@ -1,11 +1,8 @@
-import { IconProps } from '@icons/props/iconInterface';
-import Link from 'next/link';
 import React from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useRouter } from "next/router";
 
 import styles from './styles.module.scss';
-import { Loader } from '@components/Loader';
 
 interface PanelItemProps {
   title: string;

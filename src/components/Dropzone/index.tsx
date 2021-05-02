@@ -34,7 +34,7 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, filesUrl, setFilesUrl
         if (!filesUrl.includes(file)) {
           const fileUrl = URL.createObjectURL(file);
 
-          acceptedFiles = [...filesUrl, fileUrl];
+          dropZoneRef.current.acceptedFiles = [...filesUrl, fileUrl];
           setFilesUrl([...filesUrl, fileUrl]);
           onFileUploaded(file);
         }
@@ -46,7 +46,7 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, filesUrl, setFilesUrl
         setErr(undefined);
       }, 3000);
     }
-  }, [onFileUploaded])
+  }, [filesUrl, onFileUploaded])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -58,7 +58,7 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, filesUrl, setFilesUrl
       name: fieldName,
       ref: dropZoneRef.current,
       getValue: (ref: InputRefProps) => {
-        return ref.acceptedFiles || [];
+        return ref.acceptedFiles;
       },
       clearValue: (ref: InputRefProps) => {
         ref.acceptedFiles = [];
@@ -71,6 +71,10 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, filesUrl, setFilesUrl
     });
   }, [fieldName, registerField]);
 
+  useEffect(() => {
+    console.log(error)
+  }, [error])
+
   return (
     <div className='dropzone' {...getRootProps()} onClick={() => dropZoneRef.current?.click()}>
       <input {...getInputProps()} accept='image/*' ref={dropZoneRef} />
@@ -79,19 +83,19 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, filesUrl, setFilesUrl
         //   ?
         //   <img src={selectedFileUrl} alt='Point thumbnail' />
         //   :
-        !!err ?
+        !!error ?
           <p className='error'>
             <FiAlertCircle />
+            {error}
+          </p>
+          :
+          !!err ?
+            <p className='error'>
+              <FiAlertCircle />
             Erro com o arquivo selecionado
             <br />
             Tente novamente
           </p>
-          :
-          !!error ?
-            <p className='error'>
-              <FiAlertCircle />
-              {error}
-            </p>
             :
             isDragActive ?
               <p>
