@@ -66,7 +66,20 @@ const AuthProvider: React.FC = ({ children }) => {
   const signIn = useCallback(async ({ email, password }) => {
 
     if (email === 'admin@ozllo.com' && password === 'admin') {
-      const admin: User = { id: 'admin', name: 'Ozllo', email: 'admin@ozllo.com', avatar_url: 'https://www.projetodraft.com/wp-content/uploads/2019/06/ozllo_logo.jpg' };
+      const admin: User = {
+        id: 'admin',
+        name: 'Ozllo',
+        email: 'admin@ozllo.com',
+        avatar_url: 'https://www.projetodraft.com/wp-content/uploads/2019/06/ozllo_logo.jpg',
+        category: '',
+        commission: 0,
+        cpf: '',
+        rg: '',
+        phone: '',
+        store: {
+          cnpj: '',
+        }
+      };
 
       localStorage.setItem('@SellerCenter:token', 'token');
       localStorage.setItem('@SellerCenter:user', JSON.stringify(admin));

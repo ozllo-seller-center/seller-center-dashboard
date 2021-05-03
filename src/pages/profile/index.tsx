@@ -70,20 +70,20 @@ const Profile: React.FC = () => {
           address: Yup.string(),
           number: Yup.mixed()
             .when('address', {
-              is: val => !!val.length,
+              is: (val: string) => !!val.length,
               then: Yup.number().typeError('Número obrigatório').required('Número obrigaório'),
               otherwise: Yup.string()
             }),
           complement: Yup.string(),
           block: Yup.string()
             .when('address', {
-              is: val => !!val.length,
+              is: (val: string) => !!val.length,
               then: Yup.string().required('Bairro obrigaório'),
               otherwise: Yup.string()
             }),
           city: Yup.string()
             .when('address', {
-              is: val => !!val.length,
+              is: (val: string) => !!val.length,
               then: Yup.string().required('Cidade obrigaória'),
               otherwise: Yup.string()
             }),
@@ -94,20 +94,20 @@ const Profile: React.FC = () => {
             address: Yup.string(),
             number: Yup.mixed()
               .when('address', {
-                is: val => !!val.length,
+                is: (val: string) => !!val.length,
                 then: Yup.number().required('Número obrigaório'),
                 otherwise: Yup.string()
               }),
             complement: Yup.string(),
             block: Yup.string()
               .when('address', {
-                is: val => !!val.length,
+                is: (val: string) => !!val.length,
                 then: Yup.string().required('Bairro obrigaório'),
                 otherwise: Yup.string()
               }),
             city: Yup.string()
               .when('address', {
-                is: val => !!val.length,
+                is: (val: string) => !!val.length,
                 then: Yup.string().required('Cidade obrigaória'),
                 otherwise: Yup.string()
               }),

@@ -87,7 +87,10 @@ const InputDatePicker: React.FC<InputRefProps> = ({ dateRef, name, placeholder, 
       name={name}
       placeholderText={placeholder}
       selected={inputDate}
-      onChange={setInputDate}
+      onChange={(date) => {
+        if (!!date)
+          setInputDate(date as Date)
+      }}
       onFocus={handleInputFocused}
       onBlur={handleInputBlur}
       onSelect={handleInputBlur}
