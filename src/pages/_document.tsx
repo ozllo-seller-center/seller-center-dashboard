@@ -1,5 +1,5 @@
 import Document, { Head, Html, Main, NextScript } from 'next/document'
-import { IS_PRODUCTION_ENV } from '@utils/consts'
+import { IS_PRODUCTION_ENV } from '../utils/consts'
 
 export default class extends Document {
   render() {

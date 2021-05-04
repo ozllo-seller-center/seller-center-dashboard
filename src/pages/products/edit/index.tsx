@@ -5,17 +5,18 @@ import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 
-import Dropzone from '@components/Dropzone';
-import Button from '@components/PrimaryButton';
+import Dropzone from '../../../components/Dropzone';
+import Button from '../../../components/PrimaryButton';
+import ImageCard from '../../../components/ImageCard';
+import Input from '../../../components/Input';
+import RadioButtonGroup from '../../../components/RadioButtonGroup';
+import VariationsController from '../../../components/Variations';
+import getValidationErrors from '../../../utils/getValidationErrors';
+
 
 import { FiChevronLeft, FiX } from 'react-icons/fi';
 
 import styles from './styles.module.scss'
-import ImageCard from '@components/ImageCard';
-import Input from '@components/Input';
-import RadioButtonGroup from '@components/RadioButtonGroup';
-import VariationsController from '@components/Variations';
-import getValidationErrors from '@utils/getValidationErrors';
 
 import { productsFromApi } from '../index';
 import { format } from 'date-fns';

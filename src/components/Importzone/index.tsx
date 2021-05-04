@@ -3,7 +3,7 @@ import { useField } from '@unform/core';
 import { useDropzone } from 'react-dropzone'
 
 import styles from './styles.module.scss';
-import { FiCheck, FiX } from 'react-icons/fi';
+import { FiCheck } from 'react-icons/fi';
 
 interface Props {
   name: string;

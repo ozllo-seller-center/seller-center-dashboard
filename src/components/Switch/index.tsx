@@ -1,6 +1,4 @@
-import { FormHandles, SubmitHandler, useField } from '@unform/core';
-import { Form } from '@unform/web';
-import React, { InputHTMLAttributes, useCallback, useEffect, useRef, useState } from 'react';
+import React, { InputHTMLAttributes, useRef, useState } from 'react';
 
 import styles from './styles.module.scss';
 

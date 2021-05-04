@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Sell } from '@pages/sells';
+
 import { FiPaperclip } from 'react-icons/fi';
-import Tooltip from '@components/Tooltip';
+import Tooltip from '../../components/Tooltip';
 
 import styles from './styles.module.scss';
 import { Form } from '@unform/web';

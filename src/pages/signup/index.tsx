@@ -12,12 +12,12 @@ import getValidationErrors from '../../utils/getValidationErrors';
 
 import styles from './styles.module.scss';
 
-import Input from '@components/InputLabeless';
-import Button from '@components/PrimaryButton';
-import AvatarInput from '@components/AvatarInput';
+import Input from '../../components/InputLabeless';
+import Button from '../../components/PrimaryButton';
+import AvatarInput from '../../components/AvatarInput';
 import Link from 'next/link';
 import { FiCheck, FiChevronLeft } from 'react-icons/fi';
-import MessageModal from '@components/MessageModal';
+import MessageModal from '../../components/MessageModal';
 import { FaExclamation } from 'react-icons/fa';
 import { useRouter } from 'next/router';
 import { TIMEOUT } from 'node:dns';

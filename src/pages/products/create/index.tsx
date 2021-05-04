@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import BulletedButton from '@components/BulletedButton';
+import BulletedButton from '../../../components/BulletedButton';
+import Button from '../../../components/PrimaryButton';
+import StateButton from '../../../components/StateButton';
+
 import { useRouter } from 'next/router';
 
 import styles from './styles.module.scss';
-import Button from '@components/PrimaryButton';
-import StateButton from '@components/StateButton';
 import { GetStaticProps } from 'next';
 
 enum ProductStatus {

@@ -1,5 +1,5 @@
 import { useField } from '@unform/core';
-import React, { ClassAttributes, SelectHTMLAttributes, useCallback, useEffect, useRef, useState } from 'react';
+import React, { SelectHTMLAttributes, useCallback, useEffect, useRef, useState } from 'react';
 
 import styles from './styles.module.scss'
 

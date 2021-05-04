@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { FiCheck } from 'react-icons/fi';
 
-import { useAuth } from '@hooks/auth';
+import { useAuth } from '../../hooks/auth';
 
 import styles from './styles.module.scss'
 

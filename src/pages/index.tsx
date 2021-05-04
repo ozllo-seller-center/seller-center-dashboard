@@ -1,19 +1,19 @@
 import React, { useCallback, useRef, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+
 import { useRouter } from 'next/router'
 import { FiUser, FiLock, FiAlertTriangle, FiLogIn } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 
-import { useAuth } from '@hooks/auth';
-import getValidationErrors from '@utils/getValidationErrors';
+import { useAuth } from '../hooks/auth';
+import getValidationErrors from '../utils/getValidationErrors';
 
 import styles from './signin.module.scss';
 
-import Input from '@components/LoginInput';
-import Button from '@components/LoginButton';
+import Input from '../components/LoginInput';
+import Button from '../components/LoginButton';
 
 interface SignInFormData {
   email: string;

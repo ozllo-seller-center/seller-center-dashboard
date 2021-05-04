@@ -1,11 +1,9 @@
-import AddButton from '@components/AddButton';
-import Dropdown from '@components/Dropdown';
-import Input from '@components/Input';
+import AddButton from '../AddButton';
+import Dropdown from '../Dropdown';
+import Input from '../Input';
 import { FormHandles, Scope, useField } from '@unform/core';
-import { Form } from '@unform/web';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
-import { FiPlus } from 'react-icons/fi';
 
 import styles from './styles.module.scss';
 

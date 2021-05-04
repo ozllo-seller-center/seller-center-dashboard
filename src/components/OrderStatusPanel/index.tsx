@@ -1,5 +1,4 @@
-import React, { CanvasHTMLAttributes, HTMLAttributes } from 'react';
-import { FiChevronRight } from 'react-icons/fi';
+import React, { HTMLAttributes } from 'react';
 
 import styles from './styles.module.scss';
 

@@ -12,9 +12,9 @@ import getValidationErrors from '../../utils/getValidationErrors';
 
 import styles from './styles.module.scss';
 
-import Input from '@components/InputLabeless';
-import Button from '@components/PrimaryButton';
-import AvatarInput from '@components/AvatarInput';
+import Input from '../../components/InputLabeless';
+import Button from '../../components/PrimaryButton';
+import AvatarInput from '../../components/AvatarInput';
 
 type ProfileFormData = {
   address: string,

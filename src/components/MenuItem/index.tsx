@@ -1,4 +1,4 @@
-import { IconProps } from '@icons/props/iconInterface'
+import { IconProps } from '../../icons/props/iconInterface'
 import React, { useCallback } from 'react';
 import { IconBaseProps } from 'react-icons';
 import { useRouter } from "next/router";

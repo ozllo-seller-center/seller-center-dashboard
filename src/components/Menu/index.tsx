@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import Image from 'next/image';
 import { FiChevronLeft, FiHome, FiPackage, FiUser, FiShoppingCart } from 'react-icons/fi';
 import { FaRegMoneyBillAlt } from 'react-icons/fa';
-import MenuItem from '@components/MenuItem';
+import MenuItem from '../MenuItem';
 
 import styles from './styles.module.scss';
 

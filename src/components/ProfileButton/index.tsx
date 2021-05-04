@@ -1,6 +1,6 @@
 import React from 'react';
 import { FiLogOut, FiUser } from 'react-icons/fi';
-import { useAuth } from '@hooks/auth';
+import { useAuth } from '../../hooks/auth';
 
 import styles from './styles.module.scss';
 import Link from 'next/link';

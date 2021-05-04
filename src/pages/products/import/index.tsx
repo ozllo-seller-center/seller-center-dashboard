@@ -1,12 +1,12 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 
-import BulletedButton from '@components/BulletedButton';
-import Importzone from '@components/Importzone';
+import BulletedButton from '../../../components/BulletedButton';
+import Importzone from '../../../components/Importzone';
+import MessageModal from '../../../components/MessageModal';
 
 import styles from './styles.module.scss';
 import { FiDownloadCloud, FiUploadCloud } from 'react-icons/fi';
-import MessageModal from '@components/MessageModal';
 import { FaExclamation } from 'react-icons/fa';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';

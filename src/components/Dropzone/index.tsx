@@ -1,8 +1,7 @@
-import { Input } from '@material-ui/core';
 import { useField } from '@unform/core';
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { FiUpload, FiDownload, FiCamera, FiCameraOff, FiAlertCircle } from 'react-icons/fi'
+import { FiCamera, FiAlertCircle } from 'react-icons/fi'
 
 // import './styles.module.css';
 

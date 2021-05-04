@@ -5,7 +5,7 @@ import Menu from '../Menu';
 import { Header } from '../Header';
 
 import styles from './styles.module.scss';
-import { useAuth } from '@hooks/auth';
+import { useAuth } from '../../hooks/auth';
 import { useRouter } from 'next/router';
 
 const Layout: React.FC = ({ children }) => {

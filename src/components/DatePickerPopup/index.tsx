@@ -1,4 +1,4 @@
-import DatePickerInput from '@components/DatePickerInput';
+import DatePickerInput from '../DatePickerInput';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import React, { HTMLAttributes, useCallback, useRef, useState } from 'react';

@@ -1,9 +1,9 @@
 
-import Panel from '@components/Panel';
-import { useAuth } from '@hooks/auth';
+import Panel from '../../components/Panel';
+
 import { GetStaticProps } from 'next';
-import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+
+import React, { useState } from 'react';
 import { FiShoppingCart } from 'react-icons/fi';
 import { MdAttachMoney } from 'react-icons/md';
 

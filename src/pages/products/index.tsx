@@ -5,8 +5,8 @@ import { Form } from '@unform/web';
 import { isSameDay, isSameWeek, isSameMonth, parse, format } from 'date-fns';
 import { FiSearch, FiCameraOff, FiEdit } from 'react-icons/fi';
 
-import BulletedButton from '@components/BulletedButton';
-import FilterInput from '@components/FilterInput';
+import BulletedButton from '../../components/BulletedButton';
+import FilterInput from '../../components/FilterInput';
 
 import { useRouter } from 'next/router';
 

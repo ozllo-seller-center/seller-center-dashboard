@@ -5,15 +5,15 @@ import { GetStaticProps } from 'next';
 import { format, isSameWeek, isSameMonth, isToday, parseISO, parse, toDate, fromUnixTime } from 'date-fns';
 import { Form } from '@unform/web';
 
-import Button from '@components/FilterButton';
-import BulletedButton from '@components/BulletedButton';
-import FilterInput from '@components/FilterInput';
-import StatusPanel from '@components/OrderStatusPanel';
+import Button from '../../components/FilterButton';
+import BulletedButton from '../../components/BulletedButton';
+import FilterInput from '../../components/FilterInput';
+import StatusPanel from '../../components/OrderStatusPanel';
 
 import styles from './styles.module.scss';
-import DatePickerPopup from '@components/DatePickerPopup';
-import Collapsible from '@components/Collapsible';
-import AttachButton from '@components/AttachButton';
+import DatePickerPopup from '../../components/DatePickerPopup';
+import Collapsible from '../../components/Collapsible';
+import AttachButton from '../../components/AttachButton';
 
 enum SellStatus {
   Entregue,
