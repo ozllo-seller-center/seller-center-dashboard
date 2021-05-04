@@ -9,7 +9,7 @@ import { useAuth } from '../../hooks/auth';
 import { useRouter } from 'next/router';
 
 const Layout: React.FC = ({ children }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   const { user, isRegisterCompleted } = useAuth();
   const router = useRouter();
