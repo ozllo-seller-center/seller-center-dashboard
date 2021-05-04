@@ -1,5 +1,4 @@
 import React from 'react';
-import { FiX } from 'react-icons/fi';
 
 import styles from './styles.module.scss';
 
