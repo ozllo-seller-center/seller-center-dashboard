@@ -5,7 +5,7 @@ import '../../public/styles/theme.scss'
 
 import { AuthProvider } from '../hooks/auth';
 
-import Layout from '../components/Layout/layout'
+import Layout from '../components/Layout'
 import SignUp from './signup';
 import SignIn from './index';
 import Verify from './verify';
@@ -26,16 +26,19 @@ function MyApp({ Component, pageProps }: AppProps) {
   )
 }
 
-MyApp.getInitialProps = async (props: AppContext) => {
-
-  const { Component, ctx }: AppContext = props
-  const { req, res }: NextPageContext = ctx
-
-  let pageProps: any = {}
-  if (Component.getInitialProps)
-    pageProps = await Component.getInitialProps(ctx)
-
-  return { pageProps }
-}
-
 export default MyApp
+
+
+// MyApp.getInitialProps = async (props: AppContext) => {
+
+//   const { Component, ctx }: AppContext = props
+//   const { req, res }: NextPageContext = ctx
+
+//   let pageProps: any = {}
+//   if (Component.getInitialProps)
+//     pageProps = await Component.getInitialProps(ctx)
+
+//   return { pageProps }
+// }
+
+// export default MyApp
