@@ -7,9 +7,10 @@ type PanelProps = {
   title: string;
   description: string;
   icon: IconType;
+  onPanelButtonClick: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-const Panel: React.FC<PanelProps> = ({ children, icon: Icon, title, description }) => {
+const Panel: React.FC<PanelProps> = ({ children, icon: Icon, title, description, onPanelButtonClick }) => {
   return (
     <div className={styles.panelContainer}>
       <div className={styles.panelHeader}>
@@ -24,7 +25,7 @@ const Panel: React.FC<PanelProps> = ({ children, icon: Icon, title, description 
         </div>
       </div>
       <div className={styles.panelFooter}>
-        <button type='button'>Ver tudo</button>
+        <button type='button' onClick={onPanelButtonClick}>Ver tudo</button>
       </div>
     </div>
   );
