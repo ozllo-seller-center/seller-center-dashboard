@@ -5,7 +5,7 @@ import '../../public/styles/theme.scss'
 
 import { AuthProvider } from '../hooks/auth';
 
-import Layout from '../components/Layout'
+import Layout from '../components/Screen'
 import SignUp from './signup';
 import SignIn from './index';
 import Verify from './verify';
