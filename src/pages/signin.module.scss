@@ -1,3 +1,23 @@
+@keyframes appearFromLeft {
+  0% {
+     opacity: 0;
+     transform: translateX(-20rem);
+   }
+   100% {
+     opacity: 1;
+     transform: translateX(0);
+   }
+ }
+
+ @keyframes appear {
+   0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
 .container {
   height: 100vh;
 
@@ -19,17 +39,6 @@
   background-color: var(--grafite);
 }
 
-@keyframes appearFromLeft {
- 0% {
-    opacity: 0;
-    transform: translateX(-20rem);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 .AnimationContainer {
   // flex: 1;
   display: flex;
@@ -37,16 +46,18 @@
   align-items: center;
   justify-content: center;
   animation: appearFromLeft 1s;
+  row-gap: 1rem;
 
   img {
     width: 12.5rem;
-    margin-bottom: 7.5rem;
+    margin-top: auto;
+    margin-bottom: 5rem;
   }
 
   > a {
     font-size: 1.2rem;
     color: var(--yellow-300);
-    margin-top: 24px;
+    margin-top: 2rem;
     text-decoration: none;
     transition: filter 0.2s;
 
@@ -64,14 +75,17 @@
 
   form {
     // margin: 80px 0;
-    width: 340px;
-    margin-bottom: 7.5rem;
+    flex: 1;
+
+    margin-bottom: auto;
 
     display: flex;
     flex-direction: column;
     justify-content: space-around;
 
     text-align: center;
+
+    padding: 0 2rem;
 
     .title {
       font-size: 1.3rem;
@@ -101,22 +115,23 @@
         filter: brightness(0.75);
       }
     }
+  }
 
-    .errorContainer {
-      align-items: center;
-      margin: 1rem 0;
-      color: var(--red-100);
+  .errorContainer {
+    align-items: center;
+    margin: 1rem 0;
+    color: var(--red-100);
+    text-align: center;
 
-      .errorMessage {
-        font-size: 1.2rem;
-        font-weight: 500;
-      }
+    .errorMessage {
+      font-size: 1.2rem;
+      font-weight: 500;
+    }
 
-      svg {
-        width: 1rem;
-        height: 1rem;
-        margin-right: 0.2rem;
-      }
+    svg {
+      width: 1rem;
+      height: 1rem;
+      margin-right: 0.2rem;
     }
   }
 }
@@ -126,29 +141,5 @@
   background: url('https://media-exp1.licdn.com/dms/image/C4D1BAQHe7QwF-I2DGA/company-background_10000/0/1612556505453?e=2159024400&v=beta&t=7hGu7xGPv5oMpTZFDqmGGzeJZcpe5-kyeWVv1ete-kc') no-repeat center;
   background-size: cover;
   // filter: grayscale(1);
-}
-
-.buttonStyle {
-  // width: 100%;
-  width: 6rem;
-  height: 3rem;
-
-  margin-top: 1.5rem;
-  padding: 0 0.75rem;
-
-  background: var(--yellow-300);
-  border-radius: 6px;
-  border: 0px;
-
-  align-self: center;
-
-  color: var(--grafite);
-  font-weight: 500;
-
-  transition: filter 0.4s;
-  /* transition: color 2s; */
-
-  &:hover {
-    filter: brightness(0.9);
-  }
+  animation: appear 1s;
 }
