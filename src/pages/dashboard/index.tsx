@@ -4,7 +4,7 @@ import Panel from '../../components/Panel';
 import { GetStaticProps } from 'next';
 
 import React, { useState } from 'react';
-import { FiShoppingCart } from 'react-icons/fi';
+import { FiSend } from 'react-icons/fi';
 import { MdAttachMoney } from 'react-icons/md';
 
 import PanelItem from '../../components/PanelItem';
@@ -34,7 +34,7 @@ const Dashboard: React.FC = () => {
     <div className={styles.dashboardContainer}>
       <div className={styles.dashboardContent}>
         <Panel
-          icon={FiShoppingCart}
+          icon={MdAttachMoney}
           title='Resumo de Vendas'
           description='Confira os status de suas vendas'
           onPanelButtonClick={() => { router.push('/sells') }}>
@@ -44,7 +44,7 @@ const Dashboard: React.FC = () => {
           <PanelItem title='Devolvidos' value='R$ 1.000.000,00' valueColor='orange' />
         </Panel>
         <Panel
-          icon={MdAttachMoney}
+          icon={FiSend}
           title='Status dos Envios'
           description='Confira os status e quantidades referentes aos envios'
           onPanelButtonClick={() => { router.push('/sells') }}>

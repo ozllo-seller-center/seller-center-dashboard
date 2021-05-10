@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, ChangeEvent } from 'react';
+import React, { useCallback, useRef, ChangeEvent, useState } from 'react';
 
 import { FormHandles, Scope } from '@unform/core';
 import { Form } from '@unform/web';
@@ -47,6 +47,7 @@ const endPhoneRegex = /[0-9]{3}\-[0-9]{4}$/
 const completephoneRegex = /^\([1-9]{2}\)(?:[2-8]|9[1-9])[0-9]{3}\-[0-9]{4}$/
 
 const Profile: React.FC = () => {
+  const [flowStep, setFlowStep] = useState(0);
   const formRef = useRef<FormHandles>(null);
 
   const { user, updateUser, isRegisterCompleted } = useAuth();
@@ -203,7 +204,7 @@ const Profile: React.FC = () => {
           </div>
 
           <div className={styles.formsContainer}>
-            <div className={styles.personal}>
+            <div className={styles.personal} style={{ opacity: 1 }}>
               <h3>Seus dados pessoais</h3>
 
               <Input
@@ -265,6 +266,7 @@ const Profile: React.FC = () => {
                   placeholder='Número'
                   autoComplete='off'
                   type='number'
+                  min={0}
                 />
 
                 <Input
@@ -322,6 +324,7 @@ const Profile: React.FC = () => {
                     name='number'
                     placeholder='Número'
                     autoComplete='off'
+                    min={0}
                   />
 
                   <Input

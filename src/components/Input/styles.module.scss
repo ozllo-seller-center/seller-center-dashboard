@@ -1,10 +1,7 @@
 .container {
-  margin: 0.5rem;
+  margin: 0.25rem;
 
-  display: flex;
-  align-items: center;
-
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
 
   background: #FFFFFF;
   border-radius: 4px;
@@ -13,10 +10,7 @@
   transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
 
   div {
-    flex: 1;
-
-    display: flex;
-    flex-direction: column;
+    width: 100%;
 
     label {
       color: var(--gray-250);
@@ -27,8 +21,9 @@
     }
 
     input {
+      width: 100%;
+
       color: var(--grafite);
-      flex: 1;
       background: transparent;
       border: 0;
 
@@ -41,12 +36,9 @@
 }
 
 .containerDisabled {
-  margin: 0.5rem;
+  margin: 0.25rem;
 
-  display: flex;
-  align-items: center;
-
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
 
   background: var(--gray-100);
   border-radius: 4px;
@@ -57,10 +49,7 @@
   transition: border-color 0.5s, color 0.5s, box-shadow 0.5s, opacity 0.5s;
 
   div {
-    flex: 1;
-
-    display: flex;
-    flex-direction: column;
+    width: 100%;
 
     opacity: 0.5;
 
@@ -74,7 +63,7 @@
 
     input {
       color: var(--grafite);
-      flex: 1;
+      width: 100%;
       background: transparent;
       border: 0;
 
@@ -87,12 +76,9 @@
 }
 
 .containerError {
-  margin: 0.5rem;
+  margin: 0.25rem;
 
-  display: flex;
-  align-items: center;
-
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
 
   background: #FFFFFF;
   border-radius: 4px;
@@ -101,10 +87,7 @@
   transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
 
   div {
-    flex: 1;
-
-    display: flex;
-    flex-direction: column;
+    width: 100%;
 
     label {
       color: var(--red-100);
@@ -116,7 +99,7 @@
 
     input {
       color: var(--grafite);
-      flex: 1;
+      width: 100%;
       background: transparent;
       border: 0;
 
@@ -129,12 +112,9 @@
 }
 
 .containerFocused {
-  margin: 0.5rem;
+  margin: 0.25rem;
 
-  display: flex;
-  align-items: center;
-
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
 
   background: #FFFFFF;
   border-radius: 4px;
@@ -143,10 +123,7 @@
   transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
 
   div {
-    flex: 1;
-
-    display: flex;
-    flex-direction: column;
+    width: 100%;
 
     label {
       color: var(--gray-300);
@@ -158,7 +135,7 @@
 
     input {
       color: var(--grafite);
-      flex: 1;
+      width: 100%;
       background: transparent;
       border: 0;
 
@@ -171,13 +148,11 @@
 }
 
 .containerFilled {
-  margin: 0.5rem;
+  margin: 0.25rem;
 
-  display: flex;
-  align-items: center;
   overflow:visible;
 
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
 
   background: #FFFFFF;
   border-radius: 4px;
@@ -187,10 +162,7 @@
   transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
 
   div {
-    flex: 1;
-
-    display: flex;
-    flex-direction: column;
+    width: 100%;
 
     label {
       color: var(--gray-300);
@@ -202,7 +174,7 @@
 
     input {
       color: var(--grafite);
-      flex: 1;
+      width: 100%;
       background: transparent;
       border: 0;
 

@@ -97,3 +97,15 @@
         ]
       },
     }
+
+
+## Alterações pedidas pela Zoe (04/05/2021)
+1) Home: Logo ficou muito pra cima e cortou [X]
+2) Minha conta: cortou os campos também [X]
+3) Produtos: "Editar" não está em botão [X]
+
+Sobre cadastro dos produtos:
+1) Diminuir todas as letras e campos [X]
+2) Preço não é por variação. Preço é por produto. Subir o preço (como falei no video) e adicionar o campo de "Preço cheio" "preço com desconto" [X]
+3) Variações: tirar a opção Medidas. [X]
+4) Fotos: conseguir selecionar várias fotos e subir, em vez de ter que subir 1 a 1 [X]

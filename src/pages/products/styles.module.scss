@@ -166,6 +166,11 @@
               text-decoration: underline;
             }
 
+            #editCell {
+              width: 8rem;
+              cursor: pointer;
+            }
+
             #switchCell {
               width: 3.5rem;
               // display: flex;

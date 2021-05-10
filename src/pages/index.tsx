@@ -1,11 +1,12 @@
 import React, { useCallback, useRef, useState } from 'react';
-import Link from 'next/link';
 
+import Link from 'next/link';
 import { useRouter } from 'next/router'
-import { FiUser, FiLock, FiAlertTriangle, FiLogIn } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
+
+import { FiUser, FiLock, FiAlertTriangle, FiLogIn } from 'react-icons/fi';
 
 import { useAuth } from '../hooks/auth';
 import getValidationErrors from '../utils/getValidationErrors';
@@ -95,17 +96,17 @@ const SignIn: React.FC = () => {
 
             <Button type="submit" className={styles.buttonStyle}>Entrar</Button>
 
-            {
-              error && (
-                <div className={styles.errorContainer}>
-                  <FiAlertTriangle />
-                  <span className={styles.errorMessage}> {error} </span>
-                </div>
-              )
-            }
-
             {/* <Link to="/forgot-password">Esqueci minha senha</Link> */}
           </Form>
+
+          {
+            error && (
+              <div className={styles.errorContainer}>
+                <FiAlertTriangle />
+                <span className={styles.errorMessage}> {error} </span>
+              </div>
+            )
+          }
 
           <Link href="/signup">
             <a>

@@ -1,10 +1,12 @@
 import React, { createContext, useCallback, useState, useContext, useMemo } from 'react';
 import api from '../services/api';
+import dotenv from 'dotenv';
 
 interface User {
   id: string;
   name: string;
   email: string;
+  // password: string;
   avatar_url: string;
   address?: string,
   birthday?: Date,
@@ -91,14 +93,19 @@ const AuthProvider: React.FC = ({ children }) => {
       return;
     }
 
-    const response = await api.post('sessions', { email, password });
+    const response = await api.post('auth/login', { login: email, password });
 
-    const { token, user } = response.data;
+    console.log(`Signin: ${response}`);
+
+    //const { token, user } = response.data;
+    const { token } = response.data;
 
     localStorage.setItem('@SellerCenter:token', token);
-    localStorage.setItem('@SellerCenter:user', JSON.stringify(user));
+    localStorage.setItem('@SellerCenter:user', JSON.stringify({ email } as User));
 
     api.defaults.headers.authorization = `Bearer ${token}`;
+
+    const user = { email } as User;
 
     setData({ token, user });
   }, []);

@@ -59,10 +59,10 @@ const VariationsController: React.FC<VariationsControllerProps> = ({ name }: Var
             <Scope path={`variations[${i}]`}>
               <div className={styles.variationContainer}>
                 <span>Variação {i + 1}</span>
-                <Dropdown
+                {/* <Dropdown
                   name='type'
                   label='Tipo da medida'
-                  options={[{ value: 'number', label: 'Medida' }, { value: 'size', label: 'Tamanho' }]} />
+                  options={[{ value: 'number', label: 'Medida' }, { value: 'size', label: 'Tamanho' }]} /> */}
                 <Input
                   name='size'
                   label={'Tamanho/medida'}
@@ -77,15 +77,8 @@ const VariationsController: React.FC<VariationsControllerProps> = ({ name }: Var
                 />
                 <Dropdown
                   name='color'
-                  label='Escolha a cor da variação'
+                  label='Escolha a cor'
                   options={[{ value: 'blue', label: 'Azul' }, { value: 'yellow', label: 'Amarela' }, { value: 'black', label: 'Preta' }, { value: 'pink', label: 'Rosa' }, { value: 'red', label: 'Vermelha' }, { value: 'Green', label: 'Verde' }, { value: 'other', label: 'Outra' }]} />
-                <Input
-                  name='price'
-                  label='Valor (R$)'
-                  placeholder='Valor'
-                  autoComplete='off'
-                  type='number'
-                />
               </div>
             </Scope>
           )

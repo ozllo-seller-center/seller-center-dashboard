@@ -52,6 +52,22 @@
 
   --chevron-width: 0.5rem;
   --chevron-heigth: 0.5rem;
+
+  @media screen and (max-width: $desktop-small-size) {
+    font-size: 85%;
+  }
+
+  @media screen and (max-width: $tablet_horizontal) {
+    font-size: 80%;
+  }
+
+  @media screen and (max-width: $tablet_vertical) {
+    font-size: 70%;
+  }
+
+  @media screen and (max-width: $cellphone) {
+    font-size: 60%;
+  }
 }
 
 body {
@@ -154,21 +170,17 @@ button {
   cursor: pointer;
 }
 
-.main {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-@media screen and (max-width: $tablet_horizontal) {
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
 
-@media screen and (max-width: $tablet_vertical) {
-}
-
-@media screen and (max-width: $cellphone) {
-}
 
 
 @import '../../src/components/DatePickerInput/datepickerstyles.module.css';

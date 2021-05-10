@@ -7,21 +7,11 @@
   }
 }
 
-.wrapper {
-  display: flex;
-  flex-direction: column;
-
-  height: 100vh;
-  width: 100%;
-
-  overflow: hidden;
-}
-
 .container {
   height: calc(100vh - 10rem);
 
-  display: flex;
-  flex-direction: column;
+  // display: flex;
+  // flex-direction: column;
 
   padding: 2rem;
   padding-left: 2.5rem;
@@ -108,10 +98,12 @@
     }
 
     .doubleInputContainer {
+      // flex: 1;
+
       flex: 1;
 
       display: grid;
-      grid-template-columns: 1fr 2fr;
+      grid-template-columns: 1fr 2fr .5fr .5fr;
       column-gap: .75rem;
 
       margin-top: 2rem;
@@ -157,8 +149,8 @@
 
       .variationsContainerTitle {
         display: grid;
-        grid-template-areas: 'title title free free free';
-        grid-template-columns: .5fr .5fr 1fr 1fr 1fr;
+        grid-template-areas: 'title title title free free';
+        grid-template-columns: .5fr .5fr .5fr 1fr 1fr;
         column-gap: .75rem;
 
         .variationsTitle {

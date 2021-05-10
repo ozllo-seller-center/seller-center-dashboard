@@ -10,6 +10,7 @@ declare global {
     interface ProcessEnv {
       NODE_ENV: 'development' | 'test' | 'production'
       NEXT_PUBLIC_HELLO: string
+      API_URL: string
     }
   }
 }

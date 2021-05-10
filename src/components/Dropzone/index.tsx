@@ -7,7 +7,7 @@ import { FiCamera, FiAlertCircle } from 'react-icons/fi'
 
 interface Props {
   name: string;
-  onFileUploaded: (file: File) => void;
+  onFileUploaded: (file: string[]) => void;
   filesUrl: string[];
   setFilesUrl: React.Dispatch<React.SetStateAction<string[]>>;
 }
@@ -28,15 +28,15 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, filesUrl, setFilesUrl
     setErr(undefined);
     try {
       if (dropZoneRef.current) {
-        const file = acceptedFiles[0];
+        // const file = acceptedFiles[0];
 
-        if (!filesUrl.includes(file)) {
-          const fileUrl = URL.createObjectURL(file);
+        // if (!filesUrl.includes(file)) {
+        let files = acceptedFiles.map((file: File) => URL.createObjectURL(file))
 
-          dropZoneRef.current.acceptedFiles = [...filesUrl, fileUrl];
-          setFilesUrl([...filesUrl, fileUrl]);
-          onFileUploaded(file);
-        }
+        dropZoneRef.current.acceptedFiles = [...filesUrl, ...files];
+        setFilesUrl([...filesUrl, ...files]);
+        onFileUploaded(files);
+        // }
       }
 
     } catch (err) {
@@ -64,6 +64,7 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, filesUrl, setFilesUrl
         setFilesUrl([]);
       },
       setValue: (ref: InputRefProps, value) => {
+        console.log(value);
         ref.acceptedFiles = value;
         setFilesUrl(value);
       },

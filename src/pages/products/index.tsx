@@ -215,8 +215,17 @@ export function Products({ }: ProductsProps) {
                         <span className={styles.switchSubtitle}>{item.status === ProductStatus.Ativado ? 'Ativado' : 'Desativado'}</span>
                       </td>
                       <td id={styles.editCell}>
-                        <FiEdit />
-                        <label> Editar </label>
+                        <div onClick={() => {
+                          router.push({
+                            pathname: 'products/edit',
+                            query: {
+                              id: item.id,
+                            }
+                          })
+                        }}>
+                          <FiEdit />
+                          <span> Editar </span>
+                        </div>
                       </td>
                     </tr>
                   ))

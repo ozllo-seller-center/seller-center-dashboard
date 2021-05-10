@@ -33,6 +33,8 @@ export type Product = {
   more_info?: string,
   ean?: string,
   sku: string,
+  price: number,
+  price_discounted?: number;
   height?: number,
   width?: number,
   length?: number,
@@ -43,7 +45,6 @@ export type Product = {
     value: number | string,
     stock: number,
     color: string,
-    price: number,
   }[],
 
   nationality: {
@@ -84,9 +85,19 @@ export function ProductForm() {
 
   const router = useRouter();
 
+  const handleOnFileUpload = useCallback((file: string[]) => {
+    calcFilledFields(formRef.current?.getData() as Product);
+  }, [filesUrl]);
+
   const handleDeleteFile = useCallback((file: string) => {
     URL.revokeObjectURL(file);
-    setFilesUrl(filesUrl.filter(f => f !== file));
+
+    const filesUpdate = filesUrl.filter(f => f !== file);
+
+    formRef.current?.setFieldValue('images', filesUpdate);
+    setFilesUrl(filesUpdate);
+
+    calcFilledFields(formRef.current?.getData() as Product);
   }, [filesUrl])
 
   const calcTotalFields = useCallback((data: Product) => {
@@ -116,11 +127,15 @@ export function ProductForm() {
       filled++;
     if (data.weight)
       filled++;
+    if (data.price)
+      filled++;
+    if (data.images?.length > 0)
+      filled++;
+
     data.variations.forEach(variation => {
       !!variation.type && filled++;
       !!variation.stock && filled++;
       !!variation.color && filled++;
-      !!variation.value && filled++;
     })
 
     setFilledFields(filled);
@@ -186,7 +201,7 @@ export function ProductForm() {
           brand: data.brand,
           sku: data.sku,
           date: format(new Date(), 'dd/MM/yyyy'),
-          value: v.price,
+          value: data.price,
           stock: v.stock,
           image: data.images[0].url
         };
@@ -239,8 +254,8 @@ export function ProductForm() {
   }, [router])
 
   return (
-    <div className={styles.wrapper}>
-      <main className={styles.container}>
+    <>
+      <div className={styles.container}>
         <section className={styles.header}>
           <Button
             customStyle={{ className: styles.backButton }}
@@ -258,7 +273,7 @@ export function ProductForm() {
           }}>
             <p className={styles.imagesTitle}>Seleciones as fotos do produto</p>
             <div className={styles.imagesContainer}>
-              <Dropzone name='images' filesUrl={filesUrl} setFilesUrl={setFilesUrl} onFileUploaded={() => { }}></Dropzone>
+              <Dropzone name='images' filesUrl={filesUrl} setFilesUrl={setFilesUrl} onFileUploaded={(files) => handleOnFileUpload(files)}></Dropzone>
               {
                 filesUrl.map((file, i) => (
                   <ImageCard key={i} onClick={() => handleDeleteFile(file)} imgUrl={file} />
@@ -289,7 +304,7 @@ export function ProductForm() {
               <Input
                 name='more_info'
                 label='Mais informações (opcional)'
-                placeholder='Informações adicionais do produo'
+                placeholder='Informações adicionais do produto'
                 autoComplete='off'
               />
             </div>
@@ -318,6 +333,22 @@ export function ProductForm() {
                 autoComplete='off'
               // disabled //TODO: gerar automagico o SKU
               />
+              <Input
+                name='price'
+                label='Preço (R$)'
+                placeholder='Preço'
+                autoComplete='off'
+                type='number'
+                min={0}
+              />
+              <Input
+                name='price_discounted'
+                label='Preço com desconto (R$)'
+                placeholder='Preço com desconto'
+                autoComplete='off'
+                type='number'
+                min={0}
+              />
             </div>
             <div className={styles.multipleInputContainer}>
               <Input
@@ -329,19 +360,19 @@ export function ProductForm() {
               <Input
                 name='width'
                 label='Largura (cm)'
-                placeholder='Largura do produo'
+                placeholder='Largura do produto'
                 autoComplete='off'
               />
               <Input
                 name='length'
                 label='Comprimento (cm)'
-                placeholder='Comprimento do produo'
+                placeholder='Comprimento do produto'
                 autoComplete='off'
               />
               <Input
                 name='weight'
                 label='Peso (kg)'
-                placeholder='Peso do produo'
+                placeholder='Peso do produto'
                 autoComplete='off'
               />
             </div>
@@ -356,13 +387,13 @@ export function ProductForm() {
             </div>
           </Form>
         </section>
-      </main>
+      </div>
 
       <div className={styles.footerContainer}>
         <span>{filledFields}/{totalFields} Informações inseridas</span>
         <Button type='submit' onClick={() => { formRef.current?.submitForm() }}>Cadastrar produto</Button>
       </div>
-    </div>
+    </>
   );
 }
 

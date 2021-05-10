@@ -1,14 +1,16 @@
 @import '../../../public/styles/__dimensions.scss';
 
 .menuOpen {
+  z-index: 3;
+
   display: flex;
   flex-direction: column;
   background: var(--grafite);
 
-  border-radius: 0px 4px 4px 0px;
+  border-radius: 0px 6px 6px 0px;
   box-shadow: 16px 0px 52px -28px rgba(0,0,0,0.5);
 
-  width: 20rem;
+  width: 16rem;
   height: 100vh;
 
   text-align: left;
@@ -19,20 +21,26 @@
   transition: transform 0.5s ease-in-out;
   transform: translateX(0);
 
+  @media(min-width: 1400px) {
+    width: 17rem;
+  }
+
   h1 {
     color: #FFFFFF;
   }
 }
 
 .menuClosed {
+  z-index: 3;
+
   display: flex;
   flex-direction: column;
   background: var(--grafite);
 
-  border-radius: 0px 4px 4px 0px;
+  border-radius: 0px 6px 6px 0px;
   box-shadow: 16px 0px 52px -28px rgba(0,0,0,0.5);
 
-  width: 20rem;
+  width: 16rem;
   height: 100vh;
 
   text-align: left;
@@ -42,6 +50,10 @@
 
   transition: transform 0.5s ease-in-out;
   transform: translateX(-150%);
+
+  @media(min-width: 1400px) {
+    width: 17rem;
+  }
 
   h1 {
     color: #FFFFFF;

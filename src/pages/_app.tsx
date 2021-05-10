@@ -26,19 +26,16 @@ function MyApp({ Component, pageProps }: AppProps) {
   )
 }
 
+MyApp.getInitialProps = async (props: AppContext) => {
+
+  const { Component, ctx }: AppContext = props
+  const { req, res }: NextPageContext = ctx
+
+  let pageProps: any = {}
+  if (Component.getInitialProps)
+    pageProps = await Component.getInitialProps(ctx)
+
+  return { pageProps }
+}
+
 export default MyApp
-
-
-// MyApp.getInitialProps = async (props: AppContext) => {
-
-//   const { Component, ctx }: AppContext = props
-//   const { req, res }: NextPageContext = ctx
-
-//   let pageProps: any = {}
-//   if (Component.getInitialProps)
-//     pageProps = await Component.getInitialProps(ctx)
-
-//   return { pageProps }
-// }
-
-// export default MyApp
