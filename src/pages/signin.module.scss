@@ -143,3 +143,28 @@
   // filter: grayscale(1);
   animation: appear 1s;
 }
+
+.buttonStyle {
+  // width: 100%;
+  width: 6rem;
+  height: 3rem;
+
+  margin-top: 1.5rem;
+  padding: 0 0.75rem;
+
+  background: var(--yellow-300);
+  border-radius: 6px;
+  border: 0px;
+
+  align-self: center;
+
+  color: var(--grafite);
+  font-weight: 500;
+
+  transition: filter 0.4s;
+  /* transition: color 2s; */
+
+  &:hover {
+    filter: brightness(0.9);
+  }
+}
