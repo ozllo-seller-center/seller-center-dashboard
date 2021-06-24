@@ -56,6 +56,26 @@
         margin-left: 1.5rem;
       }
     }
+
+    @media screen and (min-width: $tablet_vertical) {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr .5fr;
+      column-gap: 1.5rem;
+
+      button + button {
+        margin-left: 0;
+      }
+    }
+
+    @media screen and (min-width: $desktop-size) {
+      display: flex;
+      flex-direction: row;
+      column-gap: 0;
+
+      button + button {
+        margin-left: 1.5rem;
+      }
+    }
   }
 
   .divider {

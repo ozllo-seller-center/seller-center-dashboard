@@ -1,6 +1,8 @@
 import React, { createContext, useCallback, useState, useContext, useMemo } from 'react';
 import api from '../services/api';
 import jwt_decode from "jwt-decode";
+import { InactiveUserError } from 'src/shared/errors/InactiveUserError';
+import { CompanyInfo, PersonInfo } from 'src/shared/types/personalInfo';
 
 interface ApiToken {
   auth: boolean;
@@ -10,30 +12,48 @@ interface Token {
   data: User;
 }
 export interface User {
-  id: string;
-  name: string;
-  email: string;
-  // password: string;
-  avatar_url: string;
-  address?: string,
-  birthday?: Date,
-  block?: string,
-  role: string,
-  city?: string,
-  commission: number,
-  complement?: string,
-  cpf: string,
-  number?: number,
-  phone: string,
-  rg: string,
-  store: {
-    address?: string,
-    block?: string,
-    city?: string,
-    cnpj: string,
+  email: string,
+  isActive: boolean,
+
+  userType: 'f' | 'j' | '',
+  personalInfo: PersonInfo | CompanyInfo,
+
+  contact: {
+    phone: string,
+  },
+
+  address: {
+    address: string,
+    number: number,
     complement?: string,
-    number?: number,
-  }
+    district: string,
+    city: string,
+  },
+
+  // phone?: string,
+
+  // commission: number,
+  // role: string,
+
+  bankInfo: {
+    bank: string,
+    name: string,
+    account: string,
+    agency: string,
+    pix?: string,
+  },
+
+  shopInfo: {
+    _id?: string,
+    name: string,
+    cnpj: string,
+
+    // address: string,
+    // district: string,
+    // city: string,
+    // complement: string,
+    // number: number,
+  },
 }
 
 interface AuthState {
@@ -48,6 +68,7 @@ interface SignInCredentials {
 
 interface AuthContextData {
   user: User;
+  token: string;
   signIn(credentials: SignInCredentials): Promise<void>;
   signOut(): void;
   updateUser(user: User): void;
@@ -59,16 +80,19 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 const AuthProvider: React.FC = ({ children }) => {
   const [data, setData] = useState<AuthState>(() => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem('@SellerCenter:token');
-      const user = localStorage.getItem('@SellerCenter:user');
+    // if (typeof window !== "undefined") {
+    //   const token = localStorage.getItem('@SellerCenter:token');
+    //   const user = localStorage.getItem('@SellerCenter:user');
 
-      if (token && user) {
-        api.defaults.headers.authorization = `Bearer ${token}`;
+    //   if (token && user) {
 
-        return { token, user: JSON.parse(user) };
-      }
-    }
+    //     api.defaults.headers.authorization = token;
+
+    //     const decodedToken = jwt_decode(token) as Token;
+
+    //     return { token, user: JSON.parse(user) };
+    //   }
+    // }
 
     return {} as AuthState;
   });
@@ -79,14 +103,26 @@ const AuthProvider: React.FC = ({ children }) => {
 
     //const { token, user } = response.data;
     const { token } = response.data;
+
     const decodedToken = jwt_decode(token) as Token;
 
-    const user = decodedToken.data as User;
+    let user: User = decodedToken.data as User;
+
+    api.defaults.headers.authorization = token;
+
+    await api.get('/account/detail').then(response => {
+      console.log({ ...response.data })
+      user = { ...user, ...response.data, userType: !!response.data.personalInfo['isPF'] ? 'f' : 'j' }
+
+      if (!user.isActive) {
+        throw new InactiveUserError("Usuário inativado, login não pode ser realizado.");
+      }
+    }).catch(err => {
+      console.log(err)
+    });
 
     localStorage.setItem('@SellerCenter:token', token);
     localStorage.setItem('@SellerCenter:user', JSON.stringify(user));
-
-    api.defaults.headers.authorization = `Bearer ${token}`;
 
     setData({ token, user });
   }, []);
@@ -122,7 +158,7 @@ const AuthProvider: React.FC = ({ children }) => {
       localStorage.setItem('@SellerCenter:token', apiToken.token);
       localStorage.setItem('@SellerCenter:user', JSON.stringify(user));
 
-      api.defaults.headers.authorization = `Bearer ${apiToken.token}`;
+      api.defaults.headers.authorization = apiToken.token;
 
       setData({ token: apiToken.token, user });
 
@@ -134,7 +170,7 @@ const AuthProvider: React.FC = ({ children }) => {
 
   const isRegisterCompleted = useMemo(() => {
     if (!!data.user) {
-      //return !!data.user.name && !!data.user.cpf && !!data.user.rg && !!data.user.phone
+      // return !!data.user.personalInfo && !!data.user.shopInfo && !!data.user.personalInfo.firstName && !!data.user.personalInfo.lastName && !!data.user.personalInfo.cpf && !!data.user.personalInfo.rg && !!data.user.shopInfo.name
     }
 
     return true
@@ -142,7 +178,7 @@ const AuthProvider: React.FC = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user: data.user, signIn, signOut, updateUser, verifyUser, isRegisterCompleted }}
+      value={{ user: data.user, token: data.token, signIn, signOut, updateUser, verifyUser, isRegisterCompleted }}
     >
       {children}
     </AuthContext.Provider>

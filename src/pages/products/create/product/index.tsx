@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { FormHandles } from '@unform/core';
@@ -13,77 +13,35 @@ import RadioButtonGroup from '../../../../components/RadioButtonGroup';
 import VariationsController from '../../../../components/Variations';
 import getValidationErrors from '../../../../utils/getValidationErrors';
 
-import { FiChevronLeft, FiX } from 'react-icons/fi';
+import { FiChevronLeft } from 'react-icons/fi';
 
 import styles from './styles.module.scss'
 
-import { productsFromApi } from '../../index';
-import { format } from 'date-fns';
-
-export type Product = {
-  images: {
-    id: any,
-    name: string,
-    alt_text: string,
-    url: string,
-  }[],
-  name: string,
-  description: string,
-  brand: string,
-  more_info?: string,
-  ean?: string,
-  sku: string,
-  price: number,
-  price_discounted?: number;
-  height?: number,
-  width?: number,
-  length?: number,
-  weight?: number,
-
-  variations: {
-    type: 'number' | 'size',
-    value: number | string,
-    stock: number,
-    color: string,
-  }[],
-
-  nationality: {
-    id: any,
-    name: string,
-  },
-  category: {
-    id: any,
-    name: string,
-    sub_category: [
-      {
-        id: any,
-        name: string,
-      }
-    ]
-  },
-}
-
-type ProductDTO = {
-  id: string;
-  status: number;
-  name: string;
-  brand: string;
-  sku: string;
-  date: string;
-  value: number;
-  stock: number;
-  image?: string;
-}
+import api from 'src/services/api';
+import { useAuth } from 'src/hooks/auth';
+import { Product } from 'src/shared/types/product';
+import TextArea from 'src/components/Textarea';
 
 export function ProductForm() {
+  const [files, setFiles] = useState<File[]>([]);
   const [filesUrl, setFilesUrl] = useState<string[]>([]);
 
   const [filledFields, setFilledFields] = useState(0);
-  const [totalFields, setTotalFields] = useState(10 + (3 * 4));
+  const [totalFields, setTotalFields] = useState(13);
 
   const formRef = useRef<FormHandles>(null);
 
   const router = useRouter();
+
+  const { user, token, updateUser } = useAuth();
+
+  useEffect(() => {
+    api.get('/account/detail').then(response => {
+      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
+    }).catch(err => {
+      console.log(err)
+    });
+  }, [])
 
   const handleOnFileUpload = useCallback((file: string[]) => {
     calcFilledFields(formRef.current?.getData() as Product);
@@ -101,12 +59,15 @@ export function ProductForm() {
   }, [filesUrl])
 
   const calcTotalFields = useCallback((data: Product) => {
-    setTotalFields(9 + data.variations?.length * 3);
-  }, [totalFields]);
+    if (!!data.variations) {
+      setTotalFields(11 + data.variations?.length * 3);
+      return;
+    }
+
+    setTotalFields(14);
+  }, [totalFields, filledFields]);
 
   const calcFilledFields = useCallback((data: Product) => {
-    console.log(data);
-
     let filled = 0;
 
     if (data.name)
@@ -133,7 +94,7 @@ export function ProductForm() {
       filled++;
 
     data.variations.forEach(variation => {
-      !!variation.type && filled++;
+      !!variation.size && filled++;
       !!variation.stock && filled++;
       !!variation.color && filled++;
     })
@@ -142,6 +103,10 @@ export function ProductForm() {
   }, [filesUrl, filledFields, totalFields])
 
   const handleSubmit = useCallback(async (data: Product) => {
+
+    if (filledFields < totalFields) {
+      return;
+    }
 
     try {
       formRef.current?.setErrors({});
@@ -159,16 +124,17 @@ export function ProductForm() {
         width: Yup.string(),
         length: Yup.string(),
         weight: Yup.string(),
+        gender: Yup.string(),
         variations: Yup.array().required().of(Yup.object().shape({
-          type: Yup.string().equals(['number', 'size']),
-          size: Yup.mixed().when('type', {
-            is: (val: 'number' | 'size') => val === 'number',
-            then: Yup.number().required('Campo obrigatório'),
-            otherwise: Yup.string().required('Campo obrigatório'),
-          }),
+          // type: Yup.string().equals(['number', 'size']),
+          // size: Yup.mixed().when('type', {
+          //   is: (val: 'number' | 'size') => val === 'number',
+          //   then: Yup.number().required('Campo obrigatório'),
+          //   otherwise: Yup.string().required('Campo obrigatório'),
+          // }),
+          size: Yup.string().required('Campo obrigatório'),
           color: Yup.string().required('Campo obrigatório'),
           stock: Yup.number().typeError('Campo obrigatório').required('Campo obrigatório').min(0, 'Valor mínimo 0'),
-          price: Yup.number().typeError('Campo obrigatório').required('Campo obrigatório'),
         })),
 
         // password: Yup.string().when('old_password', {
@@ -189,50 +155,71 @@ export function ProductForm() {
       const {
         category,
         subCategory,
-        nationallity
+        nationality
       } = router.query;
 
-      data.variations.map((v, i) => {
-        let produts = productsFromApi;
-        const produtoDTO: ProductDTO = {
-          id: produts.length.toString(),
-          status: 0,
-          name: data.name,
-          brand: data.brand,
-          sku: data.sku,
-          date: format(new Date(), 'dd/MM/yyyy'),
-          value: data.price,
-          stock: v.stock,
-          image: data.images[0].url
-        };
+      var dataContainer = new FormData();
 
-        produts.push(produtoDTO);
-        localStorage.setItem('@SellerCenter:items', JSON.stringify(produts));
-      })
+      files.forEach(file => {
+        dataContainer.append("images", file, file.name)
+      });
 
+      const imagesUrls = await api.post('/product/upload', dataContainer, {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        }
+      }).then(response => {
+        return response.data.urls
+      });
 
-      // const {
-      //   name,
-      //   email,
-      //   password,
-      //   old_password,
-      //   password_confirmation,
-      // } = data;
+      const {
+        name,
+        description,
+        brand,
+        more_info,
+        ean,
+        sku,
+        gender,
+        height,
+        width,
+        length,
+        weight,
+        price,
+        price_discounted,
+        variations
+      } = data;
 
-      // const formData = {
-      //   name,
-      //   email,
-      //   ...(data.old_password
-      //     ? {
-      //       old_password,
-      //       password,
-      //       password_confirmation,
-      //     }
-      //     : {}),
-      // };
+      const product = {
+        category,
+        subCategory,
+        nationality,
+        name,
+        description,
+        brand,
+        more_info,
+        ean,
+        sku,
+        gender,
+        height,
+        width,
+        length,
+        weight,
+        price,
+        price_discounted,
+        images: imagesUrls,
+        variations
+      }
 
       //TODO: chamada para a API
-      // const response = await api.post('/product', formData);
+      const response = await api.post('/product', product, {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        }
+      }).then(response => {
+        console.log(response.data)
+      });
 
       router.push('/products');
 
@@ -251,7 +238,7 @@ export function ProductForm() {
         return;
       }
     }
-  }, [router])
+  }, [router, token, user, filledFields, totalFields])
 
   return (
     <>
@@ -263,7 +250,7 @@ export function ProductForm() {
             icon={FiChevronLeft}
           >
             Voltar
-        </Button>
+          </Button>
         </section>
         <div className={styles.divider} />
         <section className={styles.content}>
@@ -273,7 +260,14 @@ export function ProductForm() {
           }}>
             <p className={styles.imagesTitle}>Seleciones as fotos do produto</p>
             <div className={styles.imagesContainer}>
-              <Dropzone name='images' filesUrl={filesUrl} setFilesUrl={setFilesUrl} onFileUploaded={(files) => handleOnFileUpload(files)}></Dropzone>
+              <Dropzone
+                name='images'
+                filesUrl={filesUrl}
+                setFilesUrl={setFilesUrl}
+                onFileUploaded={(files) => handleOnFileUpload(files)}
+                files={files}
+                setFiles={setFiles}
+              />
               {
                 filesUrl.map((file, i) => (
                   <ImageCard key={i} onClick={() => handleDeleteFile(file)} imgUrl={file} />
@@ -288,26 +282,23 @@ export function ProductForm() {
                 autoComplete='off'
               />
               <Input
+                name='brand'
+                label='Marca'
+                placeholder='Insira a marca'
+                autoComplete='off'
+              />
+
+            </div>
+
+            <div className={styles.singleInputContainer}>
+              <TextArea
                 name='description'
                 label='Descrição do produto'
                 placeholder='Insira a descrição do produto'
                 autoComplete='off'
               />
             </div>
-            <div className={styles.doubleInputContainer}>
-              <Input
-                name='brand'
-                label='Marca'
-                placeholder='Insira a marca'
-                autoComplete='off'
-              />
-              <Input
-                name='more_info'
-                label='Mais informações (opcional)'
-                placeholder='Informações adicionais do produto'
-                autoComplete='off'
-              />
-            </div>
+
             <div className={styles.titledContainer}>
               <p className={styles.title}>Selecione o gênero</p>
               <RadioButtonGroup
@@ -352,27 +343,27 @@ export function ProductForm() {
             </div>
             <div className={styles.multipleInputContainer}>
               <Input
-                name='heigth'
+                name='height'
                 label='Alturam (cm)'
-                placeholder='Altura do produto'
+                placeholder='Altura da embalagem'
                 autoComplete='off'
               />
               <Input
                 name='width'
                 label='Largura (cm)'
-                placeholder='Largura do produto'
+                placeholder='Largura da embalagem'
                 autoComplete='off'
               />
               <Input
                 name='length'
                 label='Comprimento (cm)'
-                placeholder='Comprimento do produto'
+                placeholder='Comprimento da embalagem'
                 autoComplete='off'
               />
               <Input
                 name='weight'
                 label='Peso (kg)'
-                placeholder='Peso do produto'
+                placeholder='Peso total'
                 autoComplete='off'
               />
             </div>

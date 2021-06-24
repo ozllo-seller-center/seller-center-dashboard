@@ -1,45 +1,26 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { GetStaticProps } from "next";
+import { useRouter } from 'next/router';
+import { MuiThemeProvider, createMuiTheme, Switch } from '@material-ui/core';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import { isSameDay, isSameWeek, isSameMonth, parse, format } from 'date-fns';
-import { FiSearch, FiCameraOff, FiEdit } from 'react-icons/fi';
+import { FiSearch, FiCameraOff } from 'react-icons/fi';
 
+import api from 'src/services/api';
+import { useAuth, User } from 'src/hooks/auth';
 import BulletedButton from '../../components/BulletedButton';
 import FilterInput from '../../components/FilterInput';
 
-import { useRouter } from 'next/router';
-
-import { Switch } from '@material-ui/core';
+import { ProductSummary as Product } from 'src/shared/types/product';
 
 import styles from './styles.module.scss';
 import switchStyles from './switch-styles.module.scss';
-
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core';
-
-enum ProductStatus {
-  Ativado = 0,
-  Desativado = 1,
-}
-
-type Product = {
-  id: string;
-  status: ProductStatus;
-  name: string;
-  brand: string;
-  sku: string;
-  date: string;
-  value: number;
-  stock: number;
-  image?: string;
-}
 
 interface SearchFormData {
   search: string;
 }
 
 interface ProductsProps {
-  products: Product[];
+  userFromApi: User;
 }
 
 const theme = createMuiTheme({
@@ -53,24 +34,19 @@ const theme = createMuiTheme({
   },
 });
 
-export function Products({ }: ProductsProps) {
+export function Products({ userFromApi }: ProductsProps) {
+  const [products, setProducts] = useState([] as Product[]);
   const [items, setItems] = useState([] as Product[]);
   const [search, setSeacrh] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { width } = useMemo(() => {
-    if (typeof window !== 'undefined') {
-      return { width: window.innerWidth }
-    }
+  const { token, user, updateUser } = useAuth();
 
-    return {
-      width: undefined
-    }
-  }, [process.browser]);
+  useEffect(() => {
+    // !!userFromApi && updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: userFromApi.shopInfo._id } })
+  }, [userFromApi])
 
-  let products: Product[] = [];
-
-  // const itemsRef = useMemo(() => Array(items.length).fill(0).map(i => React.createRef<HTMLInputElement>()), [items]);
+  const itemsRef = useMemo(() => Array(items.length).fill(0).map(i => React.createRef<HTMLInputElement>()), [items]);
 
   const formRef = useRef<FormHandles>(null);
   const [error, setError] = useState('');
@@ -78,32 +54,73 @@ export function Products({ }: ProductsProps) {
   const router = useRouter();
 
   useEffect(() => {
-    const items = localStorage.getItem('@SellerCenter:items');
-
-    if (!items) {
-      localStorage.setItem('@SellerCenter:items', JSON.stringify(productsFromApi));
-      products = productsFromApi;
-      return;
-    }
-
-    products = JSON.parse(items);
-  }, [products])
+    setLoading(true);
+    api.get('/account/detail').then(response => {
+      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
+      setLoading(false);
+      // return response.data as User;
+    }).catch(err => {
+      console.log(err)
+      setLoading(false);
+    });
+  }, [])
 
   useEffect(() => {
     setLoading(true);
 
-
     setItems(products.filter(product => {
-      return (search === '' || product.name.toLowerCase().includes(search.toLowerCase()));
+      return (!!product.name && (search === '' || product.name.toLowerCase().includes(search.toLowerCase())));
     }));
 
     setLoading(false);
-  }, [search]);
+  }, [search, products]);
 
+  useEffect(() => {
+    if (!!user) {
+      setLoading(true);
+
+      api.get('/product', {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        }
+      }).then(response => {
+
+        console.log(response.data)
+
+        let productsDto = response.data as Product[];
+
+        productsDto = productsDto.map(product => {
+          let stockCount: number = 0;
+
+          if (!!product.variations) {
+            product.variations.forEach(variation => {
+              stockCount = stockCount + Number(variation.stock);
+            })
+          }
+
+          product.stock = stockCount;
+
+          return product;
+        })
+
+
+        setProducts(productsDto)
+        setItems(productsDto)
+
+        setLoading(false);
+      }).catch((error) => {
+        console.log(error)
+        setProducts([]);
+        setItems([])
+
+        setLoading(false);
+      })
+    }
+  }, [user]);
 
   const handleSubmit = useCallback(
     async (data: SearchFormData) => {
-      console.log(`Search: ${search} | ${data.search}`)
       try {
         formRef.current?.setErrors({});
 
@@ -118,23 +135,20 @@ export function Products({ }: ProductsProps) {
     [search],
   );
 
-  const handleAvailability = useCallback((id: string) => {
-    console.log(id);
+  const handleAvailability = useCallback(async (id: string) => {
+    const index = products.findIndex(product => product._id === id);
 
-    const updatedItems = items.map(i => {
-      if (i.id === id)
-        return { ...i, status: i.status === ProductStatus.Ativado ? ProductStatus.Desativado : ProductStatus.Ativado };
+    console.log(`Id: ${id}`)
 
-      return i;
+    await api.patch(`/product/${id}`, {
+      isActive: !products[index].isActive
+    }).then(response => {
+      console.log(response.data)
+      // products[index].isActive === response.data.isActive;
+    }).catch(err => {
+      console.log(err)
     })
-
-    setItems(updatedItems);
-
-  }, [items]);
-
-  useEffect(() => {
-    console.log(width)
-  }, [width])
+  }, [items, products]);
 
   return (
     <div className={styles.productsContainer}>
@@ -175,18 +189,17 @@ export function Products({ }: ProductsProps) {
                   <th>Nome do produto</th>
                   <th>Marca</th>
                   <th>SKU</th>
-                  <th>Data</th>
                   <th>Valor</th>
                   <th>Estoque</th>
                   <th>Status</th>
-                  <th>Ação</th>
+                  {/* <th>Ação</th> */}
                 </tr>
               </thead>
               <tbody className={styles.tableBody}>
                 {items.map((item, i) => (
-                  <tr className={styles.tableItem} key={item.id}>
+                  <tr className={styles.tableItem} key={i}>
                     <td id={styles.imgCell} >
-                      {item.image ? <img src={item.image} alt={item.name} /> : <FiCameraOff />}
+                      {!!item.images ? <img src={item.images[0]} alt={item.name} /> : <FiCameraOff />}
                     </td>
                     <td id={styles.nameCell}>
                       {item.name}
@@ -197,37 +210,35 @@ export function Products({ }: ProductsProps) {
                     <td>
                       {item.sku}
                     </td>
-                    <td id={styles.dateCell}>
-                      {item.date}
-                    </td>
                     <td id={styles.valueCell}>
                       {
                         new Intl.NumberFormat('pt-BR', {
                           style: 'currency',
                           currency: 'BRL',
                         }
-                        ).format(item.value)
+                        ).format(item.price)
                       }
                     </td>
                     <td className={item.stock <= 0 ? styles.redText : ''}>
-                      {item.stock}
+                      {new Intl.NumberFormat('pt-BR').format(item.stock)}
                     </td>
                     <td id={styles.switchCell}>
                       <MuiThemeProvider theme={theme}>
                         <Switch
-                          checked={item.status === ProductStatus.Ativado}
-                          onChange={() => handleAvailability(item.id)}
+                          inputRef={itemsRef[i]}
+                          checked={item.isActive}
+                          onChange={() => handleAvailability(item._id)}
                           classes={{
                             root: switchStyles.root,
-                            thumb: item.status === ProductStatus.Ativado ? switchStyles.thumb : switchStyles.thumbUnchecked,
-                            track: item.status === ProductStatus.Ativado ? switchStyles.track : switchStyles.trackUnchecked,
+                            thumb: item.isActive ? switchStyles.thumb : switchStyles.thumbUnchecked,
+                            track: item.isActive ? switchStyles.track : switchStyles.trackUnchecked,
                             checked: switchStyles.checked,
                           }}
                         />
                       </MuiThemeProvider>
-                      <span className={styles.switchSubtitle}>{item.status === ProductStatus.Ativado ? 'Ativado' : 'Desativado'}</span>
+                      <span className={styles.switchSubtitle}>{item.isActive ? 'Ativado' : 'Desativado'}</span>
                     </td>
-                    <td id={styles.editCell}>
+                    {/* <td id={styles.editCell}>
                       <div onClick={() => {
                         router.push({
                           pathname: 'products/edit',
@@ -239,7 +250,7 @@ export function Products({ }: ProductsProps) {
                         <FiEdit />
                         <span> Editar </span>
                       </div>
-                    </td>
+                    </td> */}
                   </tr>
                 ))
                 }
@@ -254,190 +265,9 @@ export function Products({ }: ProductsProps) {
   )
 }
 
-export let productsFromApi: Product[] = [
-  {
-    id: '1',
-    status: ProductStatus.Ativado,
-    name: 'Moletom Candy Bloomer...',
-    brand: 'Balenciaga',
-    sku: '3333333',
-    date: format(new Date(), 'dd/MM/yyyy'),
-    value: 299.90,
-    stock: 23,
-    image: 'https://images-americanas.b2w.io/produtos/01/00/img/2608684/5/2608684535_1GG.jpg'
-  },
-  {
-    id: '2',
-    status: ProductStatus.Ativado,
-    name: 'Moletom Candy Bloomer...',
-    brand: 'Balenciaga',
-    sku: '3333333',
-    date: format(new Date(), 'dd/MM/yyyy'),
-    value: 299.90,
-    stock: 23,
-    image: 'https://images-americanas.b2w.io/produtos/01/00/img/2608684/5/2608684535_1GG.jpg'
-  },
-  {
-    id: '3',
-    status: ProductStatus.Ativado,
-    name: 'Moletom Candy Bloomer...',
-    brand: 'Balenciaga',
-    sku: '3333333',
-    date: format(new Date(), 'dd/MM/yyyy'),
-    value: 299.90,
-    stock: 0,
-    image: ''
-  },
-  {
-    id: '4',
-    status: ProductStatus.Ativado,
-    name: 'Moletom Candy Bloomer...',
-    brand: 'Balenciaga',
-    sku: '3333333',
-    date: format(new Date(), 'dd/MM/yyyy'),
-    value: 299.90,
-    stock: 0,
-    image: ''
-  },
-  {
-    id: '5',
-    status: ProductStatus.Ativado,
-    name: 'Moletom Candy Bloomer...',
-    brand: 'Balenciaga',
-    sku: '3333333',
-    date: '01/04/2021',
-    value: 299.90,
-    stock: 0,
-    image: ''
-  },
-  {
-    id: '6',
-    status: ProductStatus.Ativado,
-    name: 'Moletom Candy Bloomer...',
-    brand: 'Balenciaga',
-    sku: '3333333',
-    date: '01/04/2021',
-    value: 299.90,
-    stock: 23,
-    image: ''
-  },
-  {
-    id: '7',
-    status: ProductStatus.Ativado,
-    name: 'Moletom Candy Bloomer...',
-    brand: 'Balenciaga',
-    sku: '3333333',
-    date: '01/04/2021',
-    value: 299.90,
-    stock: 23,
-    image: ''
-  },
-  {
-    id: '8',
-    status: ProductStatus.Ativado,
-    name: 'Moletom Candy Bloomer...',
-    brand: 'Balenciaga',
-    sku: '3333333',
-    date: '01/04/2021',
-    value: 299.90,
-    stock: 23,
-    image: ''
-  },
-  {
-    id: '9',
-    status: ProductStatus.Ativado,
-    name: 'Moletom Candy Bloomer...',
-    brand: 'Balenciaga',
-    sku: '3333333',
-    date: '01/04/2021',
-    value: 299.90,
-    stock: 23,
-    image: ''
-  },
-  {
-    id: '10',
-    status: ProductStatus.Ativado,
-    name: 'Moletom Candy Bloomer...',
-    brand: 'Balenciaga',
-    sku: '3333333',
-    date: '01/04/2021',
-    value: 299.90,
-    stock: 23,
-    image: ''
-  },
-  {
-    id: '11',
-    status: ProductStatus.Ativado,
-    name: 'Moletom Candy Bloomer...',
-    brand: 'Balenciaga',
-    sku: '3333333',
-    date: '01/04/2021',
-    value: 299.90,
-    stock: 23,
-    image: ''
-  },
-  {
-    id: '12',
-    status: ProductStatus.Ativado,
-    name: 'Moletom Candy Bloomer...',
-    brand: 'Balenciaga',
-    sku: '3333333',
-    date: '04/04/2021',
-    value: 299.90,
-    stock: 23,
-    image: ''
-  },
-  {
-    id: '13',
-    status: ProductStatus.Desativado,
-    name: 'Moletom Candy Bloomer...',
-    brand: 'Balenciaga',
-    sku: '3333333',
-    date: '01/04/2021',
-    value: 299.90,
-    stock: 0,
-    image: ''
-  },
-  {
-    id: '14',
-    status: ProductStatus.Desativado,
-    name: 'Moletom Candy Bloomer...',
-    brand: 'Balenciaga',
-    sku: '3333333',
-    date: '04/04/2021',
-    value: 299.90,
-    stock: 0,
-    image: ''
-  },
-  {
-    id: '15',
-    status: ProductStatus.Desativado,
-    name: 'Moletom Candy Bloomer...',
-    brand: 'Balenciaga',
-    sku: '3333333',
-    date: '01/04/2021',
-    value: 299.90,
-    stock: 23,
-    image: ''
-  },
-  {
-    id: '16',
-    status: ProductStatus.Desativado,
-    name: 'Moletom Candy Bloomer...',
-    brand: 'Balenciaga',
-    sku: '3333333',
-    date: '04/04/2021',
-    value: 299.90,
-    stock: 23,
-    image: ''
-  },
-]
-
-export const getStaticProps: GetStaticProps = async () => {
-
+export const getInitialProps = async () => {
   return ({
     props: {
-      products: productsFromApi,
     },
     revalidate: 10
   });

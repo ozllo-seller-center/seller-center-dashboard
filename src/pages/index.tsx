@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import { FiUser, FiLock, FiAlertTriangle, FiLogIn } from 'react-icons/fi';
 
 import { useAuth } from '../hooks/auth';
+import { InactiveUserError } from 'src/shared/errors/InactiveUserError';
 import getValidationErrors from '../utils/getValidationErrors';
 
 import styles from './signin.module.scss';
@@ -30,11 +31,11 @@ const SignIn: React.FC = () => {
 
   const route = useRouter();
 
-  if (user) {
-    route.push('/dashboard');
-  }
-
-  useEffect(() => { console.log(`Loading: ${isLoading}`) }, [isLoading])
+  useEffect(() => {
+    if (!!user) {
+      route.push('/dashboard');
+    }
+  }, [])
 
   const handleSubmit = useCallback(
     async (data: SignInFormData) => {
@@ -64,6 +65,12 @@ const SignIn: React.FC = () => {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
           formRef.current?.setErrors(errors);
+
+          return;
+        }
+
+        if (err instanceof InactiveUserError) {
+          setError(err.getMessage());
 
           return;
         }
