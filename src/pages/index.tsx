@@ -35,7 +35,7 @@ const SignIn: React.FC = () => {
     if (!!user) {
       route.push('/dashboard');
     }
-  }, [user, route])
+  }, [])
 
   const handleSubmit = useCallback(
     async (data: SignInFormData) => {

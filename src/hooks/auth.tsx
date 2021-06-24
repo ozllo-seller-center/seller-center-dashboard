@@ -80,19 +80,19 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 const AuthProvider: React.FC = ({ children }) => {
   const [data, setData] = useState<AuthState>(() => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem('@SellerCenter:token');
-      const user = localStorage.getItem('@SellerCenter:user');
+    // if (typeof window !== "undefined") {
+    //   const token = localStorage.getItem('@SellerCenter:token');
+    //   const user = localStorage.getItem('@SellerCenter:user');
 
-      if (token && user) {
+    //   if (token && user) {
 
-        api.defaults.headers.authorization = token;
+    //     api.defaults.headers.authorization = token;
 
-        const decodedToken = jwt_decode(token) as Token;
+    //     const decodedToken = jwt_decode(token) as Token;
 
-        return { token, user: JSON.parse(user) };
-      }
-    }
+    //     return { token, user: JSON.parse(user) };
+    //   }
+    // }
 
     return {} as AuthState;
   });
