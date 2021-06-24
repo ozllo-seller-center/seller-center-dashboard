@@ -170,7 +170,7 @@ const AuthProvider: React.FC = ({ children }) => {
 
   const isRegisterCompleted = useMemo(() => {
     if (!!data.user) {
-      // return !!data.user.personalInfo && !!data.user.shopInfo && !!data.user.personalInfo.firstName && !!data.user.personalInfo.lastName && !!data.user.personalInfo.cpf && !!data.user.personalInfo.rg && !!data.user.shopInfo.name
+      return !!data.user.personalInfo && !!data.user.shopInfo && !!data.user.bankInfo && !!data.user.contact && !!data.user.address
     }
 
     return true
