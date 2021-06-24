@@ -139,8 +139,7 @@ const Profile: React.FC = () => {
             firstName: Yup.string().required('Nome obrigatório'),
             lastName: Yup.string().required('Sobrenome obrigatório'),
             cpf: Yup.string().required('CPF obrigatório').min(11, 'O CPF deve ter 11 digitos'),
-            rg: Yup.string().required('RG obrigatório').min(9, 'RG deve ter 9 digitos'),
-            birthday: Yup.date(),
+            // birthday: Yup.date(),
           })
 
           //phone: Yup.string().required('Celular obrigatório').min(11, 'O telefone/celular deve ter os 11 digitos'),
@@ -321,18 +320,19 @@ const Profile: React.FC = () => {
               const {
                 firstName,
                 lastName,
-                cpf,
-                birthday } = data.personalInfo as PersonInfo;
+                cpf
+              } = data.personalInfo as PersonInfo;
 
               personalInfo = {
                 isPF: true,
                 firstName,
                 lastName,
                 cpf,
-                birthday, //!!birthday ? format(birthday, 'dd-MM-yyyy') : null,
+                // birthday: !!birthday ? format(new Date(birthday), 'dd-MM-yyyy') : null,
               };
 
               console.log('Calling personalInfo')
+              console.log(personalInfo)
               await api.post('/account/personalInfo', personalInfo).then(response => {
                 const updatedUser = { ...user, ...response.data, userType: !!response.data['isPF'] ? 'f' : 'j' };
 
@@ -349,7 +349,7 @@ const Profile: React.FC = () => {
                   firstName,
                   lastName,
                   cpf,
-                  birthday,
+                  // birthday,
                 }
               });
             }
@@ -637,7 +637,7 @@ const Profile: React.FC = () => {
                           }}
                         />
 
-                        <Input
+                        {/* <Input
                           name='birthday'
                           placeholder='Date de Nascimento'
                           autoComplete='off'
@@ -645,11 +645,11 @@ const Profile: React.FC = () => {
                           onChange={() => {
                             setChanged(true)
                           }}
-                          showYearDropdown
+                          showYearDropdown={true}
                           yearDropdownItemNumber={15}
-                          scrollableYearDropdown
+                          scrollableYearDropdown={true}
                         // defaultValue={!!user?.personalInfo && !!user?.personalInfo.birthday ? user.personalInfo.birthday : ''}
-                        />
+                        /> */}
                       </Scope>
 
                       <Scope path={'personalInfo'}>
@@ -1018,7 +1018,3 @@ const Profile: React.FC = () => {
 };
 
 export default Profile;
-function moment(birthday: Date, arg1: string): string | number | readonly string[] | undefined {
-  throw new Error('Function not implemented.');
-}
-

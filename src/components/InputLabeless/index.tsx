@@ -76,7 +76,7 @@ const InputDefault: React.FC<InputRefProps> = ({ maskRef, inputRef, name, isMask
 }
 
 const InputDatePicker: React.FC<InputRefProps> = ({ dateRef, name, placeholder, disabled, defaultValue, setIsFilled, setIsFocused, showYearDropdown, yearDropdownItemNumber, scrollableYearDropdown }) => {
-  const dateParts = !!defaultValue ? defaultValue.split('-') : null;
+  const dateParts = !!defaultValue ? defaultValue.split('/') : null;
   const [inputDate, setInputDate] = useState(!!dateParts ? new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]) : null);
 
   const handleInputFocused = useCallback(() => {

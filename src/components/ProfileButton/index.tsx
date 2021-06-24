@@ -18,7 +18,7 @@ export const ProfileButton: React.FC = () => {
 
   const userName = useMemo(() => {
     if (!!user) {
-      if (!!user.personalInfo)
+      if (!user.personalInfo)
         return ''
 
       if (user.userType === 'f') {

@@ -111,12 +111,16 @@ const AuthProvider: React.FC = ({ children }) => {
     api.defaults.headers.authorization = token;
 
     await api.get('/account/detail').then(response => {
-      console.log({ ...response.data })
-      user = { ...user, ...response.data, userType: !!response.data.personalInfo['isPF'] ? 'f' : 'j' }
-
-      if (!user.isActive) {
-        throw new InactiveUserError("Usuário inativado, login não pode ser realizado.");
+      if (!user.personalInfo) {
+        user = { ...user, userType: '' }
+        return;
       }
+
+      user = { ...user, ...response.data, userType: !!response.data.personalInfo ? '' : !!response.data.personalInfo['isPF'] ? 'f' : !!response.data.personalInfo['isPJ'] ? 'j' : '' }
+
+      // if (!user.isActive) {
+      //   throw new InactiveUserError("Usuário inativado, login não pode ser realizado.");
+      // }
     }).catch(err => {
       console.log(err)
     });
