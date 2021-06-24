@@ -21,6 +21,7 @@ import api from 'src/services/api';
 import { useAuth } from 'src/hooks/auth';
 import { Product } from 'src/shared/types/product';
 import TextArea from 'src/components/Textarea';
+import { useLoading } from 'src/hooks/loading';
 
 export function ProductForm() {
   const [files, setFiles] = useState<File[]>([]);
@@ -34,6 +35,7 @@ export function ProductForm() {
   const router = useRouter();
 
   const { user, token, updateUser } = useAuth();
+  const { setLoading } = useLoading();
 
   useEffect(() => {
     api.get('/account/detail').then(response => {
@@ -109,6 +111,7 @@ export function ProductForm() {
     }
 
     try {
+      setLoading(true)
       formRef.current?.setErrors({});
 
       const schema = Yup.object().shape({
@@ -221,6 +224,8 @@ export function ProductForm() {
         console.log(response.data)
       });
 
+      setLoading(false)
+
       router.push('/products');
 
       // addToast({
@@ -230,6 +235,7 @@ export function ProductForm() {
       //     'Suas informações do perfil foram alteradas com sucesso!',
       // });
     } catch (err) {
+      setLoading(false)
       console.log(err)
       if (err instanceof Yup.ValidationError) {
         const errors = getValidationErrors(err);
