@@ -100,6 +100,8 @@ const Profile: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
+    console.log('Step - User')
+    console.log(user)
     if (flowStep === -1) {
       setFlowStep(!!user && !!user.personalInfo ? 0 : -1);
     }
@@ -108,7 +110,11 @@ const Profile: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     api.get('/account/detail').then(response => {
-      updateUser({ ...user, ...response.data })
+      console.log('Profile User')
+      console.log(response.data)
+      console.log({ ...user, ...response.data, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' });
+
+      updateUser({ ...user, ...response.data, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' })
 
       formRef.current?.setData({ ...user, ...response.data });
 
@@ -174,11 +180,7 @@ const Profile: React.FC = () => {
         if (!!user.personalInfo && user.userType === 'f')
           return {
             contact: Yup.object().shape({
-              phone: Yup.mixed().when('phone', {
-                is: (val: string) => val.length > 0,
-                then: Yup.string().min(10, 'O telefone/celular deve ter pelo menos 10 digitos'),
-                otherwise: Yup.string()
-              }),
+              phone: Yup.string().min(10, 'O telefone/celular deve ter pelo menos 10 digitos'),
             })
           }
 

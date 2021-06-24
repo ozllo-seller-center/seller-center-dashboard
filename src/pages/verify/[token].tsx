@@ -22,7 +22,6 @@ const Verify: React.FC = () => {
     }
 
     api.get(`/auth/activate/${token}`).then((response) => {
-      console.log(response.data);
 
       if (verifyUser(response.data)) {
         setVerifying(false);

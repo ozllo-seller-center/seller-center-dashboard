@@ -116,7 +116,9 @@ const AuthProvider: React.FC = ({ children }) => {
         return;
       }
 
-      user = { ...user, ...response.data, userType: !!response.data.personalInfo ? '' : !!response.data.personalInfo['isPF'] ? 'f' : !!response.data.personalInfo['isPJ'] ? 'j' : '' }
+      const isActive = user.isActive
+
+      user = { ...user, ...response.data, isActive, userType: !!response.data.personalInfo ? '' : !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' }
 
       // if (!user.isActive) {
       //   throw new InactiveUserError("Usuário inativado, login não pode ser realizado.");
@@ -174,10 +176,11 @@ const AuthProvider: React.FC = ({ children }) => {
 
   const isRegisterCompleted = useMemo(() => {
     if (!!data.user) {
-      return !!data.user.personalInfo && !!data.user.shopInfo && !!data.user.bankInfo && !!data.user.contact && !!data.user.address
+      // return !!data.user.personalInfo && !!data.user.shopInfo && !!data.user.bankInfo && !!data.user.contact && !!data.user.address
+      return !!data.user.shopInfo
     }
 
-    return true
+    return false
   }, [data]);
 
   return (
