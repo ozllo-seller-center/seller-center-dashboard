@@ -100,6 +100,8 @@ const Profile: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
+    console.log('Step - User')
+    console.log(user)
     if (flowStep === -1) {
       setFlowStep(!!user && !!user.personalInfo ? 0 : -1);
     }
@@ -108,7 +110,11 @@ const Profile: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     api.get('/account/detail').then(response => {
-      updateUser({ ...user, ...response.data })
+      console.log('Profile User')
+      console.log(response.data)
+      console.log({ ...user, ...response.data, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' });
+
+      updateUser({ ...user, ...response.data, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' })
 
       formRef.current?.setData({ ...user, ...response.data });
 
@@ -139,8 +145,7 @@ const Profile: React.FC = () => {
             firstName: Yup.string().required('Nome obrigatório'),
             lastName: Yup.string().required('Sobrenome obrigatório'),
             cpf: Yup.string().required('CPF obrigatório').min(11, 'O CPF deve ter 11 digitos'),
-            rg: Yup.string().required('RG obrigatório').min(9, 'RG deve ter 9 digitos'),
-            birthday: Yup.date(),
+            // birthday: Yup.date(),
           })
 
           //phone: Yup.string().required('Celular obrigatório').min(11, 'O telefone/celular deve ter os 11 digitos'),
@@ -175,11 +180,7 @@ const Profile: React.FC = () => {
         if (!!user.personalInfo && user.userType === 'f')
           return {
             contact: Yup.object().shape({
-              phone: Yup.mixed().when('phone', {
-                is: (val: string) => val.length > 0,
-                then: Yup.string().min(10, 'O telefone/celular deve ter pelo menos 10 digitos'),
-                otherwise: Yup.string()
-              }),
+              phone: Yup.string().min(10, 'O telefone/celular deve ter pelo menos 10 digitos'),
             })
           }
 
@@ -321,18 +322,19 @@ const Profile: React.FC = () => {
               const {
                 firstName,
                 lastName,
-                cpf,
-                birthday } = data.personalInfo as PersonInfo;
+                cpf
+              } = data.personalInfo as PersonInfo;
 
               personalInfo = {
                 isPF: true,
                 firstName,
                 lastName,
                 cpf,
-                birthday, //!!birthday ? format(birthday, 'dd-MM-yyyy') : null,
+                // birthday: !!birthday ? format(new Date(birthday), 'dd-MM-yyyy') : null,
               };
 
               console.log('Calling personalInfo')
+              console.log(personalInfo)
               await api.post('/account/personalInfo', personalInfo).then(response => {
                 const updatedUser = { ...user, ...response.data, userType: !!response.data['isPF'] ? 'f' : 'j' };
 
@@ -349,7 +351,7 @@ const Profile: React.FC = () => {
                   firstName,
                   lastName,
                   cpf,
-                  birthday,
+                  // birthday,
                 }
               });
             }
@@ -637,7 +639,7 @@ const Profile: React.FC = () => {
                           }}
                         />
 
-                        <Input
+                        {/* <Input
                           name='birthday'
                           placeholder='Date de Nascimento'
                           autoComplete='off'
@@ -645,11 +647,11 @@ const Profile: React.FC = () => {
                           onChange={() => {
                             setChanged(true)
                           }}
-                          showYearDropdown
+                          showYearDropdown={true}
                           yearDropdownItemNumber={15}
-                          scrollableYearDropdown
+                          scrollableYearDropdown={true}
                         // defaultValue={!!user?.personalInfo && !!user?.personalInfo.birthday ? user.personalInfo.birthday : ''}
-                        />
+                        /> */}
                       </Scope>
 
                       <Scope path={'personalInfo'}>
@@ -1018,7 +1020,3 @@ const Profile: React.FC = () => {
 };
 
 export default Profile;
-function moment(birthday: Date, arg1: string): string | number | readonly string[] | undefined {
-  throw new Error('Function not implemented.');
-}
-
