@@ -6,10 +6,10 @@ import { useState } from 'react';
 import styles from './styles.module.scss';
 
 interface AutocompleteProps extends InputHTMLAttributes<HTMLInputElement> {
-  name: string;
+  name: string,
   label?: string,
-  items: Array<string>;
-  setSelectedItem?: Function;
+  items: Array<string>,
+  setSelectedItem?: Function,
 }
 
 const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, items, setSelectedItem, ...rest }) => {
@@ -68,7 +68,7 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, ite
     setSelectedSuggestion(-1);
     setShowSuggestions(false);
     setFilteredSuggestions([]);
-  }, [isFocused, selectedSuggestion, showSuggestions, filteredSuggestions]);
+  }, [items]);
 
   const handleOnClick = useCallback((value: string) => {
     const selectedIndex = items.findIndex(suggestion => suggestion === value);
@@ -87,7 +87,7 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, ite
     setIsFocused(false);
     setShowSuggestions(false)
     setFilteredSuggestions([]);
-  }, [selectedSuggestion]);
+  }, [items, inputRef]);
 
   useEffect(() => {
     registerField({
@@ -157,6 +157,11 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, ite
           </ul>
         )
       }
+      {error && (
+        <p className={styles.error}>
+          {error}
+        </p>
+      )}
     </div>
   )
 }

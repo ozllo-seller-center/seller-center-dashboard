@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { MuiThemeProvider, createMuiTheme, Switch } from '@material-ui/core';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import { FiSearch, FiCameraOff } from 'react-icons/fi';
+import { FiSearch, FiCameraOff, FiCheck, FiX } from 'react-icons/fi';
 
 import api from 'src/services/api';
 import { useAuth, User } from 'src/hooks/auth';
@@ -14,6 +14,10 @@ import { ProductSummary as Product } from 'src/shared/types/product';
 
 import styles from './styles.module.scss';
 import switchStyles from './switch-styles.module.scss';
+import { useLoading } from 'src/hooks/loading';
+import { useModalMessage } from 'src/hooks/message';
+import { Loader } from 'src/components/Loader';
+import MessageModal from 'src/components/MessageModal';
 
 interface SearchFormData {
   search: string;
@@ -38,7 +42,9 @@ export function Products({ userFromApi }: ProductsProps) {
   const [products, setProducts] = useState([] as Product[]);
   const [items, setItems] = useState([] as Product[]);
   const [search, setSeacrh] = useState('');
-  const [loading, setLoading] = useState(false);
+
+  const { isLoading, setLoading } = useLoading();
+  const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
 
   const { token, user, updateUser } = useAuth();
 
@@ -150,6 +156,10 @@ export function Products({ userFromApi }: ProductsProps) {
     })
   }, [items, products]);
 
+  const handleModalVisibility = useCallback(() => {
+    handleModalMessage(false);
+  }, [])
+
   return (
     <div className={styles.productsContainer}>
       <div className={styles.productsHeader}>
@@ -227,7 +237,7 @@ export function Products({ userFromApi }: ProductsProps) {
                         <Switch
                           inputRef={itemsRef[i]}
                           checked={item.isActive}
-                          onChange={() => handleAvailability(item._id)}
+                          onClick={() => { handleAvailability(item._id) }}
                           classes={{
                             root: switchStyles.root,
                             thumb: item.isActive ? switchStyles.thumb : switchStyles.thumbUnchecked,
@@ -261,6 +271,24 @@ export function Products({ userFromApi }: ProductsProps) {
           )}
         </div>
       </div>
+      {
+        isLoading && (
+          <div className={styles.loadingContainer}>
+            <Loader />
+          </div>
+        )
+      }
+      {
+        showMessage && (
+          <MessageModal handleVisibility={handleModalVisibility}>
+            <div className={styles.modalContent}>
+              {modalMessage.type === 'success' ? <FiCheck style={{ color: 'var(--green-100)' }} /> : <FiX style={{ color: 'var(--red-100)' }} />}
+              <p>{modalMessage.title}</p>
+              <p>{modalMessage.message}</p>
+            </div>
+          </MessageModal>
+        )
+      }
     </div>
   )
 }

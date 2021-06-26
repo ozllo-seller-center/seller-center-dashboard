@@ -12,6 +12,7 @@ import { Loader } from '../Loader';
 import { useModalMessage } from 'src/hooks/message';
 import MessageModal from '../MessageModal';
 import { FiCheck, FiX } from 'react-icons/fi';
+import { useLoading } from 'src/hooks/loading';
 
 const Layout: React.FC = ({ children }) => {
   const { width } = useMemo(() => {
@@ -28,7 +29,10 @@ const Layout: React.FC = ({ children }) => {
   const [open, setOpen] = useState(true);
 
   const { user, isRegisterCompleted, signOut, token } = useAuth();
+  const { isLoading } = useLoading();
   const { showModalMessage, modalMessage, handleModalMessage } = useModalMessage();
+
+  const [showMessage, setShowMessage] = useState(showModalMessage);
 
   const router = useRouter();
 
@@ -39,6 +43,12 @@ const Layout: React.FC = ({ children }) => {
   useEffect(() => {
     setOpen(!!width && width >= 1152)
   }, [width])
+
+  useEffect(() => {
+    console.log(`Showing? ${showModalMessage}`)
+    console.log(modalMessage)
+    setShowMessage(showModalMessage)
+  }, [showModalMessage])
 
   useEffect(() => {
     if (!user) {
@@ -79,13 +89,16 @@ const Layout: React.FC = ({ children }) => {
           {/* {isLoading && ( */}
           {/* )} */}
         </main>
-        <div className={styles.loadingContainer}>
-          <Loader />
-        </div>
         {/* <Footer /> */}
       </div>
-      {
-        showModalMessage && (
+      {/* {
+        isLoading &&
+        (<div className={styles.loadingContainer}>
+          <Loader />
+        </div>)
+      } */}
+      {/* {
+        showMessage && (
           <MessageModal handleVisibility={handleModalVisibility}>
             <div className={styles.modalContent}>
               {modalMessage.type === 'success' ? <FiCheck style={{ color: 'var(--green-100)' }} /> : <FiX style={{ color: 'var(--red-100)' }} />}
@@ -94,7 +107,7 @@ const Layout: React.FC = ({ children }) => {
             </div>
           </MessageModal>
         )
-      }
+      } */}
     </>
   );
 }

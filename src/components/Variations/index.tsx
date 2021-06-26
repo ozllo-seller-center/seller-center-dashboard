@@ -10,26 +10,25 @@ import api from 'src/services/api';
 import { useLoading } from 'src/hooks/loading';
 import Autocomplete from '../Autocomplete';
 
-type Variation = {
+type VariationDTO = {
   size?: number | string,
   stock?: number,
   color?: string,
 }
-
 interface VariationsControllerProps {
   name: string;
-  initial_vars?: Variation[];
+  variations: VariationDTO[];
+  setVariations: React.Dispatch<React.SetStateAction<VariationDTO[]>>;
 }
 
 interface VariationRefProps extends FormHandles {
-  variations: Variation[];
+  variations: VariationDTO[];
 }
 
-const VariationsController: React.FC<VariationsControllerProps> = ({ name, initial_vars }: VariationsControllerProps) => {
+const VariationsController: React.FC<VariationsControllerProps> = ({ name, variations, setVariations }: VariationsControllerProps) => {
   const variationsRef = useRef<VariationRefProps>(null);
   const { fieldName, registerField, defaultValue = [{}] } = useField(name);
 
-  const [variations, setVariations] = useState<Variation[]>((!!initial_vars && initial_vars.length) > 0 ? initial_vars : defaultValue);
   const [sizes, setSizes] = useState<string[]>([]);
   const [colors, setColors] = useState<string[]>([]);
 
@@ -99,7 +98,7 @@ const VariationsController: React.FC<VariationsControllerProps> = ({ name, initi
                     <Autocomplete
                       name={'size'}
                       items={sizes}
-                      placeholder='Tamalho/medida'
+                      placeholder='Tamanho/medida'
                       autoComplete='off'
                     />
                     <Input
@@ -121,7 +120,7 @@ const VariationsController: React.FC<VariationsControllerProps> = ({ name, initi
                       name={'size'}
                       items={sizes}
                       label='Tamanho/medida'
-                      placeholder='Tamalho/medida'
+                      placeholder='Tamanho/medida'
                       autoComplete='off'
                     />
                     <Input
@@ -152,7 +151,3 @@ const VariationsController: React.FC<VariationsControllerProps> = ({ name, initi
 }
 
 export default VariationsController;
-function registerField(arg0: { name: any; ref: any; getValue: (ref: any) => any; clearValue: (ref: any) => void; setValue: (ref: any, value: any) => void; }) {
-  throw new Error('Function not implemented.');
-}
-

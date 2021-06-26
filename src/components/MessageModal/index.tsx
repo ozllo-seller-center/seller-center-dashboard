@@ -9,13 +9,13 @@ interface MessageModalProps {
 
 const MessageModal: React.FC<MessageModalProps> = ({ handleVisibility, alterStyle, children }) => {
   return (
-    <>
+    <div>
       <div onClick={handleVisibility} className={styles.modalBackground} />
       <div className={styles.modalContainer} style={{ backgroundColor: !alterStyle ? 'var(--white)' : 'var(--yellow-300)' }}>
         <button onClick={handleVisibility} type='button'>X</button>
         {children}
       </div>
-    </>
+    </div>
   )
 }
 

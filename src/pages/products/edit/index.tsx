@@ -322,7 +322,7 @@ export function ProductEdit() {
                   <span>Preencha <b>todos</b> os campos</span>
                 </div>
               </div>
-              <VariationsController name='variations' />
+              <VariationsController name='variations' variations={[]} setVariations={() => { }} />
             </div>
           </Form>
         </section>

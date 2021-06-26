@@ -13,7 +13,7 @@ import RadioButtonGroup from '../../../../components/RadioButtonGroup';
 import VariationsController from '../../../../components/Variations';
 import getValidationErrors from '../../../../utils/getValidationErrors';
 
-import { FiChevronLeft } from 'react-icons/fi';
+import { FiCheck, FiChevronLeft, FiX } from 'react-icons/fi';
 
 import styles from './styles.module.scss'
 
@@ -22,20 +22,32 @@ import { useAuth } from 'src/hooks/auth';
 import { Product } from 'src/shared/types/product';
 import TextArea from 'src/components/Textarea';
 import { useLoading } from 'src/hooks/loading';
+import { useModalMessage } from 'src/hooks/message';
+import { Loader } from 'src/components/Loader';
+import MessageModal from 'src/components/MessageModal';
+
+type VariationDTO = {
+  size?: number | string,
+  stock?: number,
+  color?: string,
+}
 
 export function ProductForm() {
   const [files, setFiles] = useState<File[]>([]);
   const [filesUrl, setFilesUrl] = useState<string[]>([]);
 
   const [filledFields, setFilledFields] = useState(0);
-  const [totalFields, setTotalFields] = useState(13);
+  const [totalFields, setTotalFields] = useState(14);
+
+  const [variations, setVariations] = useState<VariationDTO[]>([{}]);
 
   const formRef = useRef<FormHandles>(null);
 
   const router = useRouter();
 
   const { user, token, updateUser } = useAuth();
-  const { setLoading } = useLoading();
+  const { isLoading, setLoading } = useLoading();
+  const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
 
   useEffect(() => {
     api.get('/account/detail').then(response => {
@@ -60,14 +72,14 @@ export function ProductForm() {
     calcFilledFields(formRef.current?.getData() as Product);
   }, [filesUrl])
 
-  const calcTotalFields = useCallback((data: Product) => {
-    if (!!data.variations) {
-      setTotalFields(11 + data.variations?.length * 3);
+  useEffect(() => {
+    if (variations.length > 0) {
+      setTotalFields(11 + variations.length * 3)
       return;
     }
 
-    setTotalFields(14);
-  }, [totalFields, filledFields]);
+    setTotalFields(14)
+  }, [variations])
 
   const calcFilledFields = useCallback((data: Product) => {
     let filled = 0;
@@ -104,9 +116,13 @@ export function ProductForm() {
     setFilledFields(filled);
   }, [filesUrl, filledFields, totalFields])
 
-  const handleSubmit = useCallback(async (data: Product) => {
+  const handleModalVisibility = useCallback(() => {
+    handleModalMessage(false);
+  }, [])
 
+  const handleSubmit = useCallback(async (data: Product) => {
     if (filledFields < totalFields) {
+      handleModalMessage(true, { type: 'error', title: 'Formulário incompleto', message: 'Preencha todas as informações obrigatórias antes de continuar.' })
       return;
     }
 
@@ -261,7 +277,7 @@ export function ProductForm() {
         <div className={styles.divider} />
         <section className={styles.content}>
           <Form ref={formRef} onSubmit={handleSubmit} onChange={(e) => {
-            calcTotalFields(formRef.current?.getData() as Product);
+            // calcTotalFields(formRef.current?.getData() as Product);
             calcFilledFields(formRef.current?.getData() as Product);
           }}>
             <p className={styles.imagesTitle}>Seleciones as fotos do produto</p>
@@ -380,7 +396,7 @@ export function ProductForm() {
                   <span>Preencha <b>todos</b> os campos</span>
                 </div>
               </div>
-              <VariationsController name='variations' />
+              <VariationsController name='variations' variations={variations} setVariations={setVariations} />
             </div>
           </Form>
         </section>
@@ -388,8 +404,27 @@ export function ProductForm() {
 
       <div className={styles.footerContainer}>
         <span>{filledFields}/{totalFields} Informações inseridas</span>
-        <Button type='submit' onClick={() => { formRef.current?.submitForm() }}>Cadastrar produto</Button>
+        {filledFields >= totalFields && <Button type='submit' onClick={() => { formRef.current?.submitForm() }}>Cadastrar produto</Button>}
       </div>
+
+      {
+        isLoading && (
+          <div className={styles.loadingContainer}>
+            <Loader />
+          </div>
+        )
+      }
+      {
+        showMessage && (
+          <MessageModal handleVisibility={handleModalVisibility}>
+            <div className={styles.modalContent}>
+              {modalMessage.type === 'success' ? <FiCheck style={{ color: 'var(--green-100)' }} /> : <FiX style={{ color: 'var(--red-100)' }} />}
+              <p>{modalMessage.title}</p>
+              <p>{modalMessage.message}</p>
+            </div>
+          </MessageModal>
+        )
+      }
     </>
   );
 }

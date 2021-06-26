@@ -12,14 +12,9 @@ const LoadingContext = createContext<LoadingContextData>({} as LoadingContextDat
 const LoadingProvider: React.FC = ({ children }) => {
   const [isLoading, setLoading] = useState(false);
 
-  const handleLoading = useCallback((loading: boolean) => {
-    setLoading(loading);
-  }, [])
-
-
   return (
     <LoadingContext.Provider
-      value={{ isLoading, setLoading: handleLoading }}
+      value={{ isLoading, setLoading }}
     >
       {children}
     </LoadingContext.Provider>
