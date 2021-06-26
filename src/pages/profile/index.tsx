@@ -3,7 +3,7 @@ import React, { useCallback, useRef, ChangeEvent, useState, useMemo } from 'reac
 import { FormHandles, Scope } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
-import { cnpj as cnpjValidator } from 'cpf-cnpj-validator';
+import { cnpj as cnpjValidator, cpf } from 'cpf-cnpj-validator';
 import { InactiveUserError } from 'src/shared/errors/InactiveUserError';
 
 import { useAuth } from '../../hooks/auth';
@@ -27,9 +27,24 @@ import { banks } from 'src/shared/consts/banks';
 import { CompanyInfo, PersonInfo } from 'src/shared/types/personalInfo';
 import UserTypeButton from 'src/components/UserTypeButton';
 import { FaUserTie, FaStore } from 'react-icons/fa';
+import { useModalMessage } from 'src/hooks/message';
+import { AppError, findError, getErrorField } from 'src/shared/errors/api/errors';
+import MessageModal from 'src/components/MessageModal';
+import { FiCheck, FiX } from 'react-icons/fi';
+
+interface PersonalInfoDTO {
+  isPF: boolean,
+  firstName: string,
+  lastName: string,
+  cpf: string,
+  birthday?: string,
+  day: number,
+  month: number,
+  year: number,
+}
 
 type ProfileFormData = {
-  personalInfo: PersonInfo | CompanyInfo,
+  personalInfo: PersonalInfoDTO | CompanyInfo,
 
   address: {
     cep: string,
@@ -89,11 +104,21 @@ const Profile: React.FC = () => {
   const { user, updateUser } = useAuth();
   const { isLoading, setLoading } = useLoading();
 
+  const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
+
   const [flowIntent, setFlowIntent] = useState(true);
   const [flowStep, setFlowStep] = useState(-1);
   const [flowPrevious, setFlowPrevious] = useState(0);
   const [isStepCompleted, setStepCompleted] = useState(false);
   const [isChanged, setChanged] = useState(false);
+
+  const [typeClassName, setTypeClassName] = useState(styles.flowUnset);
+  const [personalClassName, setPersonalClassName] = useState(styles.flowUnset);
+  const [addressClassName, setAddressClassName] = useState(styles.flowUnset);
+  const [contactClassName, setContactClassName] = useState(styles.flowUnset);
+  const [sellerClassName, setSellerClassName] = useState(styles.flowUnset);
+  const [shopClassName, setShopClassName] = useState(styles.flowUnset);
+
 
   const formRef = useRef<FormHandles>(null);
 
@@ -110,9 +135,9 @@ const Profile: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     api.get('/account/detail').then(response => {
-      console.log('Profile User')
-      console.log(response.data)
-      console.log({ ...user, ...response.data, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' });
+      // console.log('Profile User')
+      // console.log(response.data)
+      // console.log({ ...user, ...response.data, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' });1
 
       updateUser({ ...user, ...response.data, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' })
 
@@ -125,6 +150,120 @@ const Profile: React.FC = () => {
       setLoading(false);
     });
   }, [])
+
+  useEffect(() => {
+    if (flowStep === TYPE_INDEX) {
+      if (flowPrevious < flowStep) {
+        setTypeClassName(styles.flowAppearFromRight)
+        return;
+      }
+
+      if (flowPrevious > flowStep) {
+        setTypeClassName(styles.flowAppearFromLeft)
+        return;
+      }
+
+      setTypeClassName(styles.flow)
+      return;
+    }
+
+    setTypeClassName(styles.flowUnset)
+  }, [TYPE_INDEX, flowStep, flowPrevious])
+
+  useEffect(() => {
+    if (flowStep === PERSONAL_INDEX) {
+      if (flowPrevious < flowStep) {
+        setPersonalClassName(styles.flowAppearFromRight)
+        return;
+      }
+
+      if (flowPrevious > flowStep) {
+        setPersonalClassName(styles.flowAppearFromLeft)
+        return;
+      }
+
+      setPersonalClassName(styles.flow)
+      return;
+    }
+
+    setPersonalClassName(styles.flowUnset)
+  }, [PERSONAL_INDEX, flowStep, flowPrevious])
+
+  useEffect(() => {
+    if (flowStep === ADDRESS_INDEX) {
+      if (flowPrevious < flowStep) {
+        setAddressClassName(styles.flowAppearFromRight)
+        return;
+      }
+
+      if (flowPrevious > flowStep) {
+        setAddressClassName(styles.flowAppearFromLeft)
+        return;
+      }
+
+      setAddressClassName(styles.flow)
+      return;
+    }
+
+    setAddressClassName(styles.flowUnset)
+  }, [ADDRESS_INDEX, flowStep, flowPrevious])
+
+  useEffect(() => {
+    if (flowStep === CONTACT_INDEX) {
+      if (flowPrevious < flowStep) {
+        setContactClassName(styles.flowAppearFromRight)
+        return;
+      }
+
+      if (flowPrevious > flowStep) {
+        setContactClassName(styles.flowAppearFromLeft)
+        return;
+      }
+
+      setContactClassName(styles.flow)
+      return;
+    }
+
+    setContactClassName(styles.flowUnset)
+  }, [CONTACT_INDEX, flowStep, flowPrevious])
+
+  useEffect(() => {
+    if (flowStep === SELLER_INDEX) {
+      if (flowPrevious < flowStep) {
+        setSellerClassName(styles.flowAppearFromRight)
+        return;
+      }
+
+      if (flowPrevious > flowStep) {
+        setSellerClassName(styles.flowAppearFromLeft)
+        return;
+      }
+
+      setSellerClassName(styles.flow)
+      return;
+    }
+
+    setSellerClassName(styles.flowUnset)
+  }, [SELLER_INDEX, flowStep, flowPrevious])
+
+  useEffect(() => {
+    if (flowStep === STORE_INDEX) {
+      if (flowPrevious < flowStep) {
+        setShopClassName(styles.flowAppearFromRight)
+        return;
+      }
+
+      if (flowPrevious > flowStep) {
+        setShopClassName(styles.flowAppearFromLeft)
+        return;
+      }
+
+      setShopClassName(styles.flow)
+      return;
+    }
+
+    setShopClassName(styles.flowUnset)
+  }, [STORE_INDEX, flowStep, flowPrevious])
 
   const yupValidationSchema = useMemo((): object => {
     switch (flowStep) {
@@ -146,6 +285,9 @@ const Profile: React.FC = () => {
             lastName: Yup.string().required('Sobrenome obrigatório'),
             cpf: Yup.string().required('CPF obrigatório').min(11, 'O CPF deve ter 11 digitos'),
             // birthday: Yup.date(),
+            year: Yup.number().min(1900, '').max(2021, 'O ano não pode ser maior que o ano atual').required('').typeError(''),
+            month: Yup.number().min(1, '1-12').max(12, '1-12').required('').typeError(''),
+            day: Yup.number().min(1, '1-31').max(31, '31').required('Data de nascimento obrigatória').typeError(''),
           })
 
           //phone: Yup.string().required('Celular obrigatório').min(11, 'O telefone/celular deve ter os 11 digitos'),
@@ -180,20 +322,20 @@ const Profile: React.FC = () => {
         if (!!user.personalInfo && user.userType === 'f')
           return {
             contact: Yup.object().shape({
-              phone: Yup.string().min(10, 'O telefone/celular deve ter pelo menos 10 digitos'),
+              phone: Yup.string().min(10, 'O telefone/celular deve ter pelo menos 10 digitos').required('O telefone/celular deve ser preenchido'),
             })
           }
 
         return {
           contact: Yup.object().shape({
-            phone: Yup.string().min(10, 'O telefone/celular deve ter pelo menos 10 digitos').required(),
-            url: Yup.string().url(),
+            phone: Yup.string().min(10, 'O telefone/celular deve ter pelo menos 10 digitos').required('O telefone/celular deve ser preenchido'),
+            url: Yup.string().url('A URL deve seguir o padrão: http://<url>.<domínio(s)> ou https://<url>.<domínio(s)>'),
           })
         }
       case SELLER_INDEX:
         return {
           bankInfo: Yup.object().shape({
-            bank: Yup.string().min(3, 'O banco deve ter pelo menos 3 digitos').required('Banco obrigatório'),
+            bank: Yup.string().min(3, 'O banco deve ter pelo menos 3 digitos').required(''),
             name: Yup.string().required('Banco obrigatório'),
             account: Yup.string().min(6, 'A conta deve ter pelo menos 6 digitos').required('Conta obrigatório'),
             agency: Yup.string().min(5, 'A agência deve ter pelo menos 5 digitos').required('Agência obrigatório'),
@@ -234,7 +376,31 @@ const Profile: React.FC = () => {
     //   }),
   }, [flowStep, user]);
 
-  const handleFlowStep = useCallback(() => {
+  // const handleFlowStep = useCallback(() => {
+  //   console.log(`StepCompleted: ${isStepCompleted}`)
+  //   console.log(`Flow Intent: ${flowIntent}`)
+  //   console.log(`Flow Step: ${flowStep}`)
+
+  //   if (isStepCompleted) {
+  //     setChanged(false);
+
+  //     setFlowPrevious(flowStep >= 0 ? flowStep : 0);
+
+  //     if (flowIntent === true && flowStep + 1 <= STORE_INDEX) {
+  //       setFlowStep(flowStep + 1);
+  //     }
+
+  //     if (flowIntent === false && flowStep > PERSONAL_INDEX) {
+  //       setFlowStep(flowStep - 1);
+  //     }
+
+  //     if (flowIntent === true && flowStep === STORE_INDEX) {
+  //       router.push('/dashboard');
+  //     }
+  //   }
+  // }, [flowStep, flowIntent, isStepCompleted]);
+
+  useEffect(() => {
     if (isStepCompleted) {
       setChanged(false);
 
@@ -252,24 +418,7 @@ const Profile: React.FC = () => {
         router.push('/dashboard');
       }
     }
-  }, [flowIntent, flowStep, isStepCompleted]);
-
-  const stepClassName = useCallback((st: number) => {
-    if (flowStep === st) {
-      if (flowPrevious < flowStep)
-        return styles.flowAppearFromRight
-
-      if (flowPrevious > flowStep)
-        return styles.flowAppearFromLeft
-
-      if (flowStep === TYPE_INDEX || flowStep === PERSONAL_INDEX)
-        return styles.flowAppearFromLeft
-
-      return styles.flow
-    }
-
-    return styles.flowUnset
-  }, [flowStep, flowPrevious]);
+  }, [isStepCompleted, flowIntent])
 
   const handlePersonType = useCallback((personType: string) => {
     console.log(`PersonType: ${personType}`)
@@ -292,10 +441,9 @@ const Profile: React.FC = () => {
 
   const handleSubmit = useCallback(
     async (data: ProfileFormData) => {
+      console.log('Ué - 1')
       setStepCompleted(false);
       setLoading(true);
-
-      console.log(`Intent: ${flowIntent}`)
 
       try {
         formRef.current?.setErrors({});
@@ -305,33 +453,39 @@ const Profile: React.FC = () => {
         await schema.validate(data, { abortEarly: false });
 
         if (!isChanged) {
+
+          console.log('Ué - 2')
           setStepCompleted(true);
           setLoading(false);
 
-          handleFlowStep();
+          // handleFlowStep();
 
           return;
         }
 
-        console.log(`switch - flowStep: ${flowStep}`)
         switch (flowStep) {
           case PERSONAL_INDEX:
             var personalInfo;
-            console.log('? - 1')
+
             if (user.userType === 'f') {
               const {
                 firstName,
                 lastName,
-                cpf
-              } = data.personalInfo as PersonInfo;
+                cpf,
+                day,
+                month,
+                year,
+              } = data.personalInfo as PersonalInfoDTO;
 
               personalInfo = {
                 isPF: true,
                 firstName,
                 lastName,
                 cpf,
+                rg: '11',
+                birthday: `${day < 10 ? `0${day}` : day}-${month < 10 ? `0${month}` : month}-${year}`
                 // birthday: !!birthday ? format(new Date(birthday), 'dd-MM-yyyy') : null,
-              };
+              } as PersonInfo;
 
               console.log('Calling personalInfo')
               console.log(personalInfo)
@@ -340,61 +494,79 @@ const Profile: React.FC = () => {
 
                 updateUser(updatedUser);
               }).catch(err => {
-                console.log(err);
+                console.log(err.response.data);
+
                 setStepCompleted(false);
-              });
+                setLoading(false);
 
-              updateUser({
-                ...user,
-                personalInfo: {
-                  isPF: true,
-                  firstName,
-                  lastName,
-                  cpf,
-                  // birthday,
-                }
-              });
-            }
+                err.response.data.errors.forEach((error: AppError) => {
+                  const apiError = findError(error.errorCode);
+                  const errorField = getErrorField(error.errorCode);
 
-            console.log('? - 2')
+                  console.log(apiError);
 
-            const {
-              name,
-              razaoSocial,
-              cnpj,
-              inscricaoEstadual,
-              inscricaoMunicipal } = data.personalInfo as CompanyInfo;
+                  if (!!errorField) {
 
-            personalInfo = {
-              isPJ: true,
-              name,
-              razaoSocial,
-              cnpj,
-              inscricaoEstadual,
-              inscricaoMunicipal
-            };
+                    if (errorField.errorField === 'personalInfo.birthday') {
+                      formRef.current?.setFieldError('personalInfo.day', 'Informe uma data de nascimento válida')
+                      formRef.current?.setFieldError('personalInfo.month', ' ')
+                      formRef.current?.setFieldError('personalInfo.year', ' ')
+                      return;
+                    }
 
-            console.log('Calling personalInfo')
-            await api.post('/account/personalInfo', personalInfo).then(response => {
-              const updatedUser = { ...user, ...response.data, userType: !!response.data['isPF'] ? 'f' : 'j' };
+                    formRef.current?.setFieldError(errorField.errorField, !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
+                  } else {
+                    handleModalMessage(true, { title: 'Erro', message: 'Ocorreu um erro inesperado', type: 'error' })
+                  }
 
-              updateUser(updatedUser);
-              setStepCompleted(true);
-            }).catch(err => {
-              console.log(err);
-            });
+                });
 
-            updateUser({
-              ...user,
-              personalInfo: {
-                isPJ: true,
+              })
+
+            } else {
+              const {
                 name,
                 razaoSocial,
                 cnpj,
                 inscricaoEstadual,
+                inscricaoMunicipal } = data.personalInfo as CompanyInfo;
+
+              personalInfo = {
+                isPJ: true,
+                name,
+                razaoSocial,
+                cnpj: cnpjValidator.format(cnpj),
+                inscricaoEstadual,
                 inscricaoMunicipal
-              }
-            });
+              };
+
+              await api.post('/account/personalInfo', personalInfo).then(response => {
+                const updatedUser = { ...user, ...response.data, userType: !!response.data['isPF'] ? 'f' : 'j' };
+
+                updateUser(updatedUser);
+                setStepCompleted(true);
+              }).catch(err => {
+                console.log(err.response.data);
+
+                setStepCompleted(false);
+                setLoading(false);
+
+                err.response.data.errors.forEach((error: AppError) => {
+                  const apiError = findError(error.errorCode);
+                  const errorField = getErrorField(error.errorCode);
+
+                  console.log(apiError);
+
+                  if (!!errorField) {
+                    formRef.current?.setFieldError(errorField.errorField, !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
+                  } else {
+                    handleModalMessage(true, { title: 'Erro', message: 'Ocorreu um erro inesperado', type: 'error' })
+                  }
+
+                });
+
+              })
+            }
 
             break;
           case ADDRESS_INDEX:
@@ -422,7 +594,26 @@ const Profile: React.FC = () => {
             await api.post('/account/address', addressInfo).then(response => {
               updateUser({ ...user, address: { ...response.data } });
               setStepCompleted(true);
-            });
+            }).catch(err => {
+              console.log(err.response.data);
+
+              setStepCompleted(false);
+              setLoading(false);
+
+              err.response.data.errors.forEach((error: AppError) => {
+                const apiError = findError(error.errorCode);
+                const errorField = getErrorField(error.errorCode);
+                handleModalMessage(true, { title: 'Erro', message: '', type: 'error' })
+
+                console.log(apiError);
+
+                if (!!errorField) {
+                  formRef.current?.setFieldError(errorField.errorField, !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
+                }
+
+              });
+
+            })
 
             break;
           case CONTACT_INDEX:
@@ -440,8 +631,25 @@ const Profile: React.FC = () => {
               updateUser({ ...user, contact: { ...response.data } });
               setStepCompleted(true);
             }).catch(err => {
-              console.log(err);
-            });
+              console.log(err.response.data);
+
+              setStepCompleted(false);
+              setLoading(false);
+
+              err.response.data.errors.forEach((error: AppError) => {
+                const apiError = findError(error.errorCode);
+                const errorField = getErrorField(error.errorCode);
+                handleModalMessage(true, { title: 'Erro', message: '', type: 'error' })
+
+                console.log(apiError);
+
+                if (!!errorField) {
+                  formRef.current?.setFieldError(errorField.errorField, !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
+                }
+
+              });
+
+            })
 
             break;
           case SELLER_INDEX:
@@ -464,7 +672,26 @@ const Profile: React.FC = () => {
             await api.post('/account/bankInfo', bankInfo).then(response => {
               updateUser({ ...user, address: { ...response.data } });
               setStepCompleted(true);
-            });
+            }).catch(err => {
+              console.log(err.response.data);
+
+              setStepCompleted(false);
+              setLoading(false);
+
+              err.response.data.errors.forEach((error: AppError) => {
+                const apiError = findError(error.errorCode);
+                const errorField = getErrorField(error.errorCode);
+                handleModalMessage(true, { title: 'Erro', message: '', type: 'error' })
+
+                console.log(apiError);
+
+                if (!!errorField) {
+                  formRef.current?.setFieldError(errorField.errorField, !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
+                }
+
+              });
+
+            })
 
             updateUser({ ...user, ...bankInfo })
 
@@ -477,7 +704,26 @@ const Profile: React.FC = () => {
             await api.post('/account/shopInfo', shopInfo).then(response => {
               updateUser({ ...user, shopInfo: { ...response.data } });
               setStepCompleted(true);
-            });
+            }).catch(err => {
+              console.log(err.response.data);
+
+              setStepCompleted(false);
+              setLoading(false);
+
+              err.response.data.errors.forEach((error: AppError) => {
+                const apiError = findError(error.errorCode);
+                const errorField = getErrorField(error.errorCode);
+                handleModalMessage(true, { title: 'Erro', message: '', type: 'error' })
+
+                console.log(apiError);
+
+                if (!!errorField) {
+                  formRef.current?.setFieldError(errorField.errorField, !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
+                }
+
+              });
+
+            })
 
             // updateUser({ ...user, shopInfo: { ...shopInfo } });
 
@@ -486,7 +732,7 @@ const Profile: React.FC = () => {
 
         setLoading(false);
 
-        handleFlowStep();
+        // handleFlowStep();
 
         // addToast({
         //   type: 'success',
@@ -495,7 +741,6 @@ const Profile: React.FC = () => {
         //     'Suas informações do perfil foram alteradas com sucesso!',
         // });
       } catch (err) {
-        console.log(err)
 
         setStepCompleted(false);
         setLoading(false);
@@ -515,7 +760,7 @@ const Profile: React.FC = () => {
         // });
       }
     },
-    [flowStep, flowPrevious, flowIntent, isChanged, isStepCompleted],
+    [isChanged, isStepCompleted],
   );
 
   const handleAvatarChange = useCallback(
@@ -555,21 +800,25 @@ const Profile: React.FC = () => {
     formRef.current?.setFieldValue('bankInfo.name', '');
   }, []);
 
-  const handleAdvance = useCallback(() => {
-    setFlowIntent(true);
-    console.log(`Pré-intent: ${flowIntent}`)
+  const handleReturn = useCallback(() => {
+    setFlowIntent(false);
     formRef.current?.submitForm();
   }, [])
 
-  const handleReturn = useCallback(() => {
-    setFlowIntent(false);
-    console.log(`Pré-intent: ${flowIntent}`)
+  const handleAdvance = useCallback(() => {
+    setFlowIntent(true);
     formRef.current?.submitForm();
+  }, [])
+
+  const handleModalVisibility = useCallback(() => {
+    handleModalMessage(false);
   }, [])
 
   // useEffect(() => {
   //   formRef.current?.setData({ ...user })
   // }, [formRef, user])
+
+  useEffect(() => { }, [])
 
   return (
     <div className={styles.profileContainer}>
@@ -584,7 +833,7 @@ const Profile: React.FC = () => {
           <div className={styles.controllerContainer}>
             <div className={styles.formsContainer}>
               <div
-                className={stepClassName(TYPE_INDEX)}
+                className={typeClassName}
               >
                 <div className={styles.typeButtonsContainer} style={{ height: '100%' }}>
                   <h3>Tipo de cadastro</h3>
@@ -613,7 +862,7 @@ const Profile: React.FC = () => {
                 </div>
               </div>
               <div
-                className={stepClassName(PERSONAL_INDEX)}
+                className={personalClassName}
               >
                 {
                   !!user && user.userType === 'f' ? (
@@ -621,6 +870,7 @@ const Profile: React.FC = () => {
                       <h3>Seus dados pessoais</h3>
 
                       <Scope path={'personalInfo'}>
+
                         <Input
                           name='firstName'
                           placeholder='Nome'
@@ -652,6 +902,43 @@ const Profile: React.FC = () => {
                           scrollableYearDropdown={true}
                         // defaultValue={!!user?.personalInfo && !!user?.personalInfo.birthday ? user.personalInfo.birthday : ''}
                         /> */}
+
+                        <div className={styles.dateField}>
+                          <Input
+                            name='day'
+                            placeholder='Dia'
+                            autoComplete='off'
+                            onChange={() => {
+                              setChanged(true)
+                            }}
+                            type='numeric'
+                            maxLength={2}
+                          />
+
+                          <Input
+                            name='month'
+                            placeholder='Mês'
+                            autoComplete='off'
+                            onChange={() => {
+                              setChanged(true)
+                            }}
+                            type='numeric'
+                            maxLength={2}
+                          />
+
+                          <Input
+                            name='year'
+                            placeholder='Ano'
+                            autoComplete='off'
+                            onChange={() => {
+                              setChanged(true)
+                            }}
+                            type='numeric'
+                            minLength={4}
+                            maxLength={4}
+                          />
+                        </div>
+
                       </Scope>
 
                       <Scope path={'personalInfo'}>
@@ -736,7 +1023,7 @@ const Profile: React.FC = () => {
                 }
               </div>
 
-              <div className={stepClassName(CONTACT_INDEX)}>
+              <div className={contactClassName}>
                 <h3>Seus dados de contato</h3>
 
                 <Input
@@ -772,7 +1059,7 @@ const Profile: React.FC = () => {
               </div>
 
               <Scope path={'address'}>
-                <div className={stepClassName(ADDRESS_INDEX)}>
+                <div className={addressClassName}>
                   <h3>Seu endereço</h3>
 
                   <Input
@@ -840,7 +1127,7 @@ const Profile: React.FC = () => {
               </Scope>
 
               <Scope path={'bankInfo'}>
-                <div className={stepClassName(SELLER_INDEX)}>
+                <div className={sellerClassName}>
                   <h3>Seus dados de bancários</h3>
 
                   <div className={styles.doubleField}>
@@ -919,7 +1206,7 @@ const Profile: React.FC = () => {
               </Scope>
 
               <Scope path='shopInfo'>
-                <div className={stepClassName(STORE_INDEX)}>
+                <div className={shopClassName}>
                   <h3>Os dados da sua loja</h3>
 
                   <Input
@@ -972,11 +1259,12 @@ const Profile: React.FC = () => {
               <div className={styles.buttonsContainer}>
                 <Button
                   type="submit"
-                  onClick={async (e) => {
+                  onClick={(e) => {
                     e.preventDefault();
 
+                    console.log('Voltando')
                     handleReturn()
-                    // formRef.current?.submitForm();
+
                     // handleFlowStep();
                   }}
                   customStyle={{ className: styles.backButton }}
@@ -987,10 +1275,12 @@ const Profile: React.FC = () => {
                 <Button
                   type="submit"
                   customStyle={{ className: styles.nextButton }}
-                  onClick={async (e) => {
+                  onClick={(e) => {
                     e.preventDefault();
 
+                    console.log('Avançando')
                     handleAdvance()
+
                     // handleFlowStep();
                   }}
                 >
@@ -1013,6 +1303,17 @@ const Profile: React.FC = () => {
           <div className={styles.loadingContainer}>
             <Loader />
           </div>
+        )
+      }
+      {
+        showMessage && (
+          <MessageModal handleVisibility={handleModalVisibility}>
+            <div className={styles.modalContent}>
+              {modalMessage.type === 'success' ? <FiCheck style={{ color: 'var(--green-100)' }} /> : <FiX style={{ color: 'var(--red-100)' }} />}
+              <p>{modalMessage.title}</p>
+              <p>{modalMessage.message}</p>
+            </div>
+          </MessageModal>
         )
       }
     </div >

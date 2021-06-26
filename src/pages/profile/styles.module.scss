@@ -136,6 +136,22 @@
   }
 }
 
+.dateField {
+  display: grid;
+  grid-template-columns: 0.5fr 0.5fr 1fr;
+  column-gap: 1rem;
+
+  @media (max-width: 1250px) {
+    display: inline-block;
+
+    width: 100%;
+
+    > div + div {
+      margin-top: .75rem;
+    }
+  }
+}
+
 .typeButtonsContainer {
   align-self: center;
   justify-self: center;

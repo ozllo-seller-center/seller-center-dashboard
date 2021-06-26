@@ -15,7 +15,11 @@ const ModalMessageProvider: React.FC = ({ children }) => {
   const [modalMessage, setModalMessage] = useState<ModalMessage>({ type: 'error', title: '', message: '' });
 
   const handleMessage = useCallback((show: boolean, modal?: ModalMessage) => {
+    console.log(`Show Message: ${show}`)
     setShowingModalMessage(show);
+
+    console.log('Modal Message:')
+    console.log(modal);
 
     if (!!modal)
       setModalMessage(modal);
