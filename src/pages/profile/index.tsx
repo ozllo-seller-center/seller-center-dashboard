@@ -37,7 +37,7 @@ interface PersonalInfoDTO {
   firstName: string,
   lastName: string,
   cpf: string,
-  birthday?: string,
+  // birthday?: string,
   day: number,
   month: number,
   year: number,
@@ -125,8 +125,6 @@ const Profile: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    console.log('Step - User')
-    console.log(user)
     if (flowStep === -1) {
       setFlowStep(!!user && !!user.personalInfo ? 0 : -1);
     }
@@ -135,11 +133,25 @@ const Profile: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     api.get('/account/detail').then(response => {
-      // console.log('Profile User')
-      // console.log(response.data)
-      // console.log({ ...user, ...response.data, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' });1
-
       updateUser({ ...user, ...response.data, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' })
+
+      if (user.userType === 'f') {
+        var parts = !!response.data.personalInfo.birthday ? response.data.personalInfo.birthday.split("-") : [];
+        const dateRaw = !!response.data.personalInfo.birthday ? new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10)) : undefined;
+
+        formRef.current?.setData({
+          ...user, ...response.data, personalInfo: {
+            ...response.data.personalInfo,
+            day: !!dateRaw ? dateRaw.getDate() : '',
+            month: !!dateRaw ? dateRaw.getMonth() + 1 : '',
+            year: !!dateRaw ? dateRaw.getFullYear() : '',
+          }
+        } as ProfileFormData);
+
+        setLoading(false);
+
+        return;
+      }
 
       formRef.current?.setData({ ...user, ...response.data });
 
@@ -351,54 +363,7 @@ const Profile: React.FC = () => {
     }
 
     return {};
-    // comission: Yup.number().required('Comissão obrigatória').min(0, 'Não pode ser inferior a 0').max(99, 'Máximo de 99%'),
-    // category: Yup.string().required('Categoria obrigatória'),
-
-    // address: Yup.string(),
-    // number: Yup.mixed()
-    //   .when('address', {
-    //     is: (val: string) => !!val.length,
-    //     then: Yup.number().required('Número obrigaório'),
-    //     otherwise: Yup.string()
-    //   }),
-    // complement: Yup.string(),
-    // district: Yup.string()
-    //   .when('address', {
-    //     is: (val: string) => !!val.length,
-    //     then: Yup.string().required('Bairro obrigaório'),
-    //     otherwise: Yup.string()
-    //   }),
-    // city: Yup.string()
-    //   .when('address', {
-    //     is: (val: string) => !!val.length,
-    //     then: Yup.string().required('Cidade obrigaória'),
-    //     otherwise: Yup.string()
-    //   }),
   }, [flowStep, user]);
-
-  // const handleFlowStep = useCallback(() => {
-  //   console.log(`StepCompleted: ${isStepCompleted}`)
-  //   console.log(`Flow Intent: ${flowIntent}`)
-  //   console.log(`Flow Step: ${flowStep}`)
-
-  //   if (isStepCompleted) {
-  //     setChanged(false);
-
-  //     setFlowPrevious(flowStep >= 0 ? flowStep : 0);
-
-  //     if (flowIntent === true && flowStep + 1 <= STORE_INDEX) {
-  //       setFlowStep(flowStep + 1);
-  //     }
-
-  //     if (flowIntent === false && flowStep > PERSONAL_INDEX) {
-  //       setFlowStep(flowStep - 1);
-  //     }
-
-  //     if (flowIntent === true && flowStep === STORE_INDEX) {
-  //       router.push('/dashboard');
-  //     }
-  //   }
-  // }, [flowStep, flowIntent, isStepCompleted]);
 
   useEffect(() => {
     if (isStepCompleted) {
@@ -421,7 +386,6 @@ const Profile: React.FC = () => {
   }, [isStepCompleted, flowIntent])
 
   const handlePersonType = useCallback((personType: string) => {
-    console.log(`PersonType: ${personType}`)
     if (personType === 'j') {
       updateUser({
         ...user,
@@ -441,7 +405,6 @@ const Profile: React.FC = () => {
 
   const handleSubmit = useCallback(
     async (data: ProfileFormData) => {
-      console.log('Ué - 1')
       setStepCompleted(false);
       setLoading(true);
 
@@ -453,12 +416,8 @@ const Profile: React.FC = () => {
         await schema.validate(data, { abortEarly: false });
 
         if (!isChanged) {
-
-          console.log('Ué - 2')
           setStepCompleted(true);
           setLoading(false);
-
-          // handleFlowStep();
 
           return;
         }
@@ -483,12 +442,10 @@ const Profile: React.FC = () => {
                 lastName,
                 cpf,
                 rg: '11',
-                birthday: `${day < 10 ? `0${day}` : day}-${month < 10 ? `0${month}` : month}-${year}`
+                birthday: format(new Date(year, (month - 1), day), 'dd-MM-yyyy')
                 // birthday: !!birthday ? format(new Date(birthday), 'dd-MM-yyyy') : null,
               } as PersonInfo;
 
-              console.log('Calling personalInfo')
-              console.log(personalInfo)
               await api.post('/account/personalInfo', personalInfo).then(response => {
                 const updatedUser = { ...user, ...response.data, userType: !!response.data['isPF'] ? 'f' : 'j' };
 
@@ -844,7 +801,6 @@ const Profile: React.FC = () => {
                       subtitle='Seu usuário será registrado como uma pessoa física'
                       icon={FaUserTie}
                       onClick={(e) => {
-                        console.log('Setting PersonType as f')
                         handlePersonType('f')
                       }}
                     />
@@ -854,7 +810,6 @@ const Profile: React.FC = () => {
                       subtitle='Seu usuário será registrado como uma pessoa jurídica'
                       icon={FaStore}
                       onClick={(e) => {
-                        console.log('Setting PersonType as j')
                         handlePersonType('j')
                       }}
                     />
@@ -911,8 +866,8 @@ const Profile: React.FC = () => {
                             onChange={() => {
                               setChanged(true)
                             }}
-                            type='numeric'
-                            maxLength={2}
+                          // type='numeric'
+                          // maxLength={2}
                           />
 
                           <Input
@@ -922,8 +877,8 @@ const Profile: React.FC = () => {
                             onChange={() => {
                               setChanged(true)
                             }}
-                            type='numeric'
-                            maxLength={2}
+                          // type='numeric'
+                          // maxLength={2}
                           />
 
                           <Input
@@ -1262,7 +1217,6 @@ const Profile: React.FC = () => {
                   onClick={(e) => {
                     e.preventDefault();
 
-                    console.log('Voltando')
                     handleReturn()
 
                     // handleFlowStep();
@@ -1278,7 +1232,6 @@ const Profile: React.FC = () => {
                   onClick={(e) => {
                     e.preventDefault();
 
-                    console.log('Avançando')
                     handleAdvance()
 
                     // handleFlowStep();

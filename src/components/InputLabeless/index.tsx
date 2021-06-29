@@ -50,7 +50,7 @@ const InputDefault: React.FC<InputRefProps> = ({ maskRef, inputRef, name, isMask
 
   return isMasked ? (
     <InputMask
-      type='text'
+      // type='text'
       name={name}
       ref={inputRef}
       mask={!!mask ? mask : ''}
@@ -62,7 +62,7 @@ const InputDefault: React.FC<InputRefProps> = ({ maskRef, inputRef, name, isMask
 
   ) : (
     <input
-      type="text"
+      // type="text"
       name={name}
       placeholder={placeholder}
       onFocus={handleInputFocused}
@@ -143,18 +143,8 @@ const Input: React.FC<InputProps> = ({
   useEffect(() => {
     registerField({
       name: fieldName,
-      ref: !isDatePicker ? inputRef.current : dateRef.current,
-      path: !isDatePicker ? 'value' : 'props.selected',
-      // clearValue: (ref: any) => {
-      //   isMasked ? ref.setInputValue('') : ref.current.value = ''
-      // },
-      clearValue: (ref: any) => {
-        ref.clear();
-      },
-      setValue: (ref, value) => {
-        if (!!ref && !!ref.current)
-          !isDatePicker ? ref.current.value = value : ref.current.props.selected = value
-      },
+      ref: inputRef.current,
+      path: 'value',
     });
   }, [fieldName, registerField]);
 
