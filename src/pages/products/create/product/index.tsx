@@ -25,6 +25,7 @@ import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
 import { Loader } from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
+import { AppError, findError, getErrorField } from 'src/shared/errors/api/errors';
 
 type VariationDTO = {
   size?: number | string,
@@ -122,7 +123,7 @@ export function ProductForm() {
 
   const handleSubmit = useCallback(async (data: Product) => {
     if (filledFields < totalFields) {
-      handleModalMessage(true, { type: 'error', title: 'Formulário incompleto', message: 'Preencha todas as informações obrigatórias antes de continuar.' })
+      handleModalMessage(true, { type: 'error', title: 'Formulário incompleto', message: ['Preencha todas as informações obrigatórias antes de continuar.'] })
       return;
     }
 
@@ -238,11 +239,16 @@ export function ProductForm() {
         }
       }).then(response => {
         console.log(response.data)
+        setLoading(false)
+
+        router.push('/products');
+      }).catch(err => {
+        console.log(err.response.data);
+
+        handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
       });
 
       setLoading(false)
-
-      router.push('/products');
 
       // addToast({
       //   type: 'success',
