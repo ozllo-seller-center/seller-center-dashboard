@@ -16,6 +16,7 @@ import styles from './signin.module.scss';
 
 import Input from '../components/LoginInput';
 import Button from '../components/LoginButton';
+import api from 'src/services/api';
 
 interface SignInFormData {
   email: string;
@@ -27,7 +28,7 @@ const SignIn: React.FC = () => {
   const [error, setError] = useState('');
   const [isLoading, setLoading] = useState(false);
 
-  const { user, signIn } = useAuth();
+  const { user, signIn, updateUser } = useAuth();
 
   const route = useRouter();
 
@@ -55,6 +56,14 @@ const SignIn: React.FC = () => {
           email: data.email,
           password: data.password,
         });
+
+        // await api.get('/account/detail').then(response => {
+        //   updateUser({ ...user, ...response.data, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' })
+        // }).catch(err => {
+        //   console.log(err)
+
+        //   setError('Ocorreu um erro ao fazer login, cheque as credenciais.');
+        // });
 
         setLoading(false);
 

@@ -36,8 +36,6 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, ite
     setFilteredSuggestions([]);
 
     if (selectedSuggestion === -1 && !!isFilled) {
-      console.log(`Uepa ${selectedSuggestion}`);
-
       if (!!inputRef.current)
         inputRef.current.value = ''
     }

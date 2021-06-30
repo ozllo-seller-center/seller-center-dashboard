@@ -21,6 +21,10 @@ import { FiCheck, FiChevronLeft, FiX } from 'react-icons/fi';
 import MessageModal from '../../components/MessageModal';
 import { FaExclamation } from 'react-icons/fa';
 import { useRouter } from 'next/router';
+import { Loader } from 'src/components/Loader';
+import { useLoading } from 'src/hooks/loading';
+import { ApiError } from 'next/dist/next-server/server/api-utils';
+import { AppError } from 'src/shared/errors/api/errors';
 
 type SignUpFormData = {
   name: string,
@@ -30,6 +34,8 @@ type SignUpFormData = {
 }
 
 const SignUp: React.FC = () => {
+  const { isLoading, setLoading } = useLoading();
+
   const [isModalVisible, setModalVisibility] = useState(false);
   const [successfull, setSuccessfull] = useState(false);
   const [title, setTitle] = useState<string>();
@@ -44,6 +50,7 @@ const SignUp: React.FC = () => {
 
   const handleSubmit = useCallback(
     async (data: SignUpFormData) => {
+      setLoading(true);
       try {
         formRef.current?.setErrors({});
 
@@ -64,7 +71,7 @@ const SignUp: React.FC = () => {
             .required('Senha obrigatória')
             .min(8, 'No mínimo 8 digitos')
             .test('password-validation',
-              'A senha, além de caracteres minúsculos, deve conter pelo menos um caractere maiúsculo, um número e um caractere especial',
+              'A senha, além de 8 caracteres, deve conter pelo menos um caractere minúsculo, um caractere maiúsculo, um número e um caractere especial',
               (value) => (
                 !!value && isPasswordSecure(value)
               )),
@@ -83,13 +90,26 @@ const SignUp: React.FC = () => {
 
         setModalVisibility(true);
         setSuccessfull(true);
+        setLoading(false);
         setTitle('Cadastro realizado com sucesso!');
         setMessage('Cheque seu e-mail para autenticar sua conta.');
       } catch (err) {
+        setLoading(false);
+
+        console.log(err.response.data)
+
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
           formRef.current?.setErrors(errors);
 
+          return;
+        }
+
+        if (err.response.data.errors.findIndex((er: AppError) => er.errorCode === 4) >= 0) {
+          setModalVisibility(true);
+          setSuccessfull(false);
+          setTitle('Usuário já existe');
+          setMessage('Tente realizar o login ou recuperar sua senha.');
           return;
         }
 
@@ -193,6 +213,13 @@ const SignUp: React.FC = () => {
 
         </Form>
       </div>
+      {
+        isLoading && (
+          <div className={styles.loadingContainer}>
+            <Loader />
+          </div>
+        )
+      }
       {
         isModalVisible && (
           <MessageModal handleVisibility={handleModalVisibility} alterStyle={successfull}>

@@ -130,14 +130,43 @@ const Profile: React.FC = () => {
     }
   }, [user])
 
+  const userData = useMemo(() => {
+    const userDTO = { ...user } as any;
+    if (!!userDTO.personalInfo && !!userDTO.personalInfo['cpf']) {
+      var parts = !!userDTO.personalInfo.birthday ? userDTO.personalInfo.birthday.split("-") : [];
+      const dateRaw = !!userDTO.personalInfo.birthday ? new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10)) : undefined;
+
+      return {
+        ...userDTO,
+        personalInfo: {
+          ...userDTO.personalInfo,
+          day: !!dateRaw ? dateRaw.getDate() : '',
+          month: !!dateRaw ? dateRaw.getMonth() + 1 : '',
+          year: !!dateRaw ? dateRaw.getFullYear() : '',
+        }
+      }
+    }
+
+    return { ...user }
+  }, [user])
+
   useEffect(() => {
     setLoading(true);
     api.get('/account/detail').then(response => {
       updateUser({ ...user, ...response.data, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' })
 
-      if (user.userType === 'f') {
+      console.log({ ...user, ...response.data, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' })
+
+      if (!!response.data.personalInfo['cpf']) {
+        console.log("Pessoa")
+
         var parts = !!response.data.personalInfo.birthday ? response.data.personalInfo.birthday.split("-") : [];
         const dateRaw = !!response.data.personalInfo.birthday ? new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10)) : undefined;
+
+        console.log('Parts:')
+        console.log(parts)
+        console.log('DateRaw: ')
+        console.log(dateRaw)
 
         formRef.current?.setData({
           ...user, ...response.data, personalInfo: {
@@ -152,6 +181,8 @@ const Profile: React.FC = () => {
 
         return;
       }
+
+      console.log("Empresarial")
 
       formRef.current?.setData({ ...user, ...response.data });
 
@@ -278,6 +309,10 @@ const Profile: React.FC = () => {
   }, [STORE_INDEX, flowStep, flowPrevious])
 
   const yupValidationSchema = useMemo((): object => {
+    console.log(`Flow - Step - Validation: ${flowStep}`)
+    console.log('User - Validation:')
+    console.log(user)
+
     switch (flowStep) {
       case PERSONAL_INDEX:
         if (!!user && user.userType === 'j')
@@ -297,9 +332,9 @@ const Profile: React.FC = () => {
             lastName: Yup.string().required('Sobrenome obrigatório'),
             cpf: Yup.string().required('CPF obrigatório').min(11, 'O CPF deve ter 11 digitos'),
             // birthday: Yup.date(),
-            year: Yup.number().min(1900, '').max(2021, 'O ano não pode ser maior que o ano atual').required('').typeError(''),
-            month: Yup.number().min(1, '1-12').max(12, '1-12').required('').typeError(''),
-            day: Yup.number().min(1, '1-31').max(31, '31').required('Data de nascimento obrigatória').typeError(''),
+            year: Yup.number().min(1900, 'O ano mínimo aceito é 1900').max(2021, 'O ano não pode ser maior que o ano atual').required('').typeError(''),
+            month: Yup.number().min(1, 'Mês validos vão de 1-12').max(12, 'Mês validos vão de 1-12').required('').typeError(''),
+            day: Yup.number().min(1, 'Dia válidos vão de 1-31').max(31, 'Dia válidos vão de 1-31').required('Data de nascimento obrigatória').typeError(''),
           })
 
           //phone: Yup.string().required('Celular obrigatório').min(11, 'O telefone/celular deve ter os 11 digitos'),
@@ -307,27 +342,12 @@ const Profile: React.FC = () => {
       case ADDRESS_INDEX:
         return {
           address: Yup.object().shape({
-            cep: Yup.string().required('CEP deve ser preenchido').min(7, 'CEP deve ter pelo menos 7 digitos'),
+            cep: Yup.string().required('CEP deve ser preenchido').min(7, 'CEP deve ter pelo menos 7 digitos').max(9, 'CEP não pode passar de 9 digitos'),
             address: Yup.string().required('Endereço deve ser preenchido'),
-            number: Yup.mixed()
-              .when('address', {
-                is: (val: string) => !!val.length,
-                then: Yup.number().typeError('Número obrigatório').required('Número obrigaório'),
-                otherwise: Yup.string()
-              }),
+            number: Yup.string().required('Número obrigaório'), //.typeError('Número obrigatório')
             complement: Yup.string(),
-            district: Yup.string()
-              .when('address', {
-                is: (val: string) => !!val.length,
-                then: Yup.string().required('Bairro obrigaório'),
-                otherwise: Yup.string()
-              }),
-            city: Yup.string()
-              .when('address', {
-                is: (val: string) => !!val.length,
-                then: Yup.string().required('Cidade obrigaória'),
-                otherwise: Yup.string()
-              }),
+            district: Yup.string().required('Bairro obrigaório'),
+            city: Yup.string().required('Cidade obrigaória'),
           })
         }
       case CONTACT_INDEX:
@@ -349,8 +369,8 @@ const Profile: React.FC = () => {
           bankInfo: Yup.object().shape({
             bank: Yup.string().min(3, 'O banco deve ter pelo menos 3 digitos').required(''),
             name: Yup.string().required('Banco obrigatório'),
-            account: Yup.string().min(6, 'A conta deve ter pelo menos 6 digitos').required('Conta obrigatório'),
-            agency: Yup.string().min(5, 'A agência deve ter pelo menos 5 digitos').required('Agência obrigatório'),
+            account: Yup.string().min(2, 'A conta deve ter pelo menos 2 caracteres').required('Conta obrigatório'),
+            agency: Yup.string().min(4, 'A agência deve ter pelo menos 4 digitos').required('Agência obrigatório'),
             pix: Yup.string(),
           })
         }
@@ -368,6 +388,10 @@ const Profile: React.FC = () => {
   useEffect(() => {
     if (isStepCompleted) {
       setChanged(false);
+
+      console.log(`Flow intent: ${flowIntent}`)
+      console.log(`Flow: ${flowStep}`)
+      console.log(`Previous flow: ${flowPrevious}`)
 
       setFlowPrevious(flowStep >= 0 ? flowStep : 0);
 
@@ -447,14 +471,15 @@ const Profile: React.FC = () => {
               } as PersonInfo;
 
               await api.post('/account/personalInfo', personalInfo).then(response => {
-                const updatedUser = { ...user, ...response.data, userType: !!response.data['isPF'] ? 'f' : 'j' };
+
+                const updatedUser = { ...user, personalInfo: { ...response.data } };
 
                 updateUser(updatedUser);
+
+                setStepCompleted(true);
               }).catch(err => {
-                console.log(err.response.data);
 
                 setStepCompleted(false);
-                setLoading(false);
 
                 err.response.data.errors.forEach((error: AppError) => {
                   const apiError = findError(error.errorCode);
@@ -472,8 +497,9 @@ const Profile: React.FC = () => {
                     }
 
                     formRef.current?.setFieldError(errorField.errorField, !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
+                    handleModalMessage(true, { title: !!apiError.description ? apiError.description : 'Erro', message: !!apiError.example ? apiError.example : ['Erro indefinido'], type: 'error' })
                   } else {
-                    handleModalMessage(true, { title: 'Erro', message: 'Ocorreu um erro inesperado', type: 'error' })
+                    handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
                   }
 
                 });
@@ -498,7 +524,7 @@ const Profile: React.FC = () => {
               };
 
               await api.post('/account/personalInfo', personalInfo).then(response => {
-                const updatedUser = { ...user, ...response.data, userType: !!response.data['isPF'] ? 'f' : 'j' };
+                const updatedUser = { ...user, personalInfo: { ...response.data } };
 
                 updateUser(updatedUser);
                 setStepCompleted(true);
@@ -506,7 +532,6 @@ const Profile: React.FC = () => {
                 console.log(err.response.data);
 
                 setStepCompleted(false);
-                setLoading(false);
 
                 err.response.data.errors.forEach((error: AppError) => {
                   const apiError = findError(error.errorCode);
@@ -516,8 +541,9 @@ const Profile: React.FC = () => {
 
                   if (!!errorField) {
                     formRef.current?.setFieldError(errorField.errorField, !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
+                    handleModalMessage(true, { title: !!apiError.description ? apiError.description : 'Erro', message: !!apiError.example ? apiError.example : ['Erro indefinido'], type: 'error' })
                   } else {
-                    handleModalMessage(true, { title: 'Erro', message: 'Ocorreu um erro inesperado', type: 'error' })
+                    handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
                   }
 
                 });
@@ -555,17 +581,18 @@ const Profile: React.FC = () => {
               console.log(err.response.data);
 
               setStepCompleted(false);
-              setLoading(false);
 
               err.response.data.errors.forEach((error: AppError) => {
                 const apiError = findError(error.errorCode);
                 const errorField = getErrorField(error.errorCode);
-                handleModalMessage(true, { title: 'Erro', message: '', type: 'error' })
 
                 console.log(apiError);
 
                 if (!!errorField) {
-                  formRef.current?.setFieldError(errorField.errorField, !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
+                  formRef.current?.setFieldError(errorField.errorField, !!errorField.errorBrief ? errorField.errorBrief : !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
+                  handleModalMessage(true, { title: !!apiError.description ? apiError.description : 'Erro', message: !!apiError.example ? apiError.example : ['Erro indefinido'], type: 'error' })
+                } else {
+                  handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
                 }
 
               });
@@ -591,17 +618,18 @@ const Profile: React.FC = () => {
               console.log(err.response.data);
 
               setStepCompleted(false);
-              setLoading(false);
 
               err.response.data.errors.forEach((error: AppError) => {
                 const apiError = findError(error.errorCode);
                 const errorField = getErrorField(error.errorCode);
-                handleModalMessage(true, { title: 'Erro', message: '', type: 'error' })
 
                 console.log(apiError);
 
                 if (!!errorField) {
-                  formRef.current?.setFieldError(errorField.errorField, !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
+                  formRef.current?.setFieldError(errorField.errorField, !!errorField.errorBrief ? errorField.errorBrief : !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
+                  handleModalMessage(true, { title: !!apiError.description ? apiError.description : 'Erro', message: !!apiError.example ? apiError.example : ['Erro indefinido'], type: 'error' })
+                } else {
+                  handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
                 }
 
               });
@@ -627,30 +655,29 @@ const Profile: React.FC = () => {
             };
 
             await api.post('/account/bankInfo', bankInfo).then(response => {
-              updateUser({ ...user, address: { ...response.data } });
+              updateUser({ ...user, bankInfo: { ...response.data } });
               setStepCompleted(true);
             }).catch(err => {
               console.log(err.response.data);
 
               setStepCompleted(false);
-              setLoading(false);
 
               err.response.data.errors.forEach((error: AppError) => {
                 const apiError = findError(error.errorCode);
                 const errorField = getErrorField(error.errorCode);
-                handleModalMessage(true, { title: 'Erro', message: '', type: 'error' })
 
                 console.log(apiError);
 
                 if (!!errorField) {
-                  formRef.current?.setFieldError(errorField.errorField, !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
+                  formRef.current?.setFieldError(errorField.errorField, !!errorField.errorBrief ? errorField.errorBrief : !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
+                  handleModalMessage(true, { title: !!apiError.description ? apiError.description : 'Erro', message: !!apiError.example ? apiError.example : ['Erro indefinido'], type: 'error' })
+                } else {
+                  handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
                 }
 
               });
 
             })
-
-            updateUser({ ...user, ...bankInfo })
 
             break;
           case STORE_INDEX:
@@ -665,17 +692,18 @@ const Profile: React.FC = () => {
               console.log(err.response.data);
 
               setStepCompleted(false);
-              setLoading(false);
 
               err.response.data.errors.forEach((error: AppError) => {
                 const apiError = findError(error.errorCode);
                 const errorField = getErrorField(error.errorCode);
-                handleModalMessage(true, { title: 'Erro', message: '', type: 'error' })
 
                 console.log(apiError);
 
                 if (!!errorField) {
-                  formRef.current?.setFieldError(errorField.errorField, !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
+                  formRef.current?.setFieldError(errorField.errorField, !!errorField.errorBrief ? errorField.errorBrief : !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
+                  handleModalMessage(true, { title: !!apiError.description ? apiError.description : 'Erro', message: !!apiError.example ? apiError.example : ['Erro indefinido'], type: 'error' })
+                } else {
+                  handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
                 }
 
               });
@@ -704,6 +732,9 @@ const Profile: React.FC = () => {
 
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
+
+          console.log(errors)
+
           formRef.current?.setErrors(errors);
 
           return;
@@ -775,7 +806,11 @@ const Profile: React.FC = () => {
   //   formRef.current?.setData({ ...user })
   // }, [formRef, user])
 
-  useEffect(() => { }, [])
+  useEffect(() => {
+    console.log('(2) User:')
+    console.log(user)
+    console.log(`(2) Flow Step: ${flowStep}`)
+  }, [user, flowStep])
 
   return (
     <div className={styles.profileContainer}>
@@ -783,7 +818,7 @@ const Profile: React.FC = () => {
         <Form
           ref={formRef}
           initialData={{
-            ...user
+            ...userData
           }}
           onSubmit={handleSubmit}
         >
@@ -861,7 +896,7 @@ const Profile: React.FC = () => {
                         <div className={styles.dateField}>
                           <Input
                             name='day'
-                            placeholder='Dia'
+                            placeholder='Dia de nascimento'
                             autoComplete='off'
                             onChange={() => {
                               setChanged(true)
@@ -872,7 +907,7 @@ const Profile: React.FC = () => {
 
                           <Input
                             name='month'
-                            placeholder='Mês'
+                            placeholder='Mês de nascimento'
                             autoComplete='off'
                             onChange={() => {
                               setChanged(true)
@@ -883,7 +918,7 @@ const Profile: React.FC = () => {
 
                           <Input
                             name='year'
-                            placeholder='Ano'
+                            placeholder='Ano de nascimento'
                             autoComplete='off'
                             onChange={() => {
                               setChanged(true)
@@ -1027,7 +1062,7 @@ const Profile: React.FC = () => {
                       setChanged(true)
                     }}
                     // type={'numer'}
-                    maxLength={8}
+                    maxLength={9}
                   />
 
                   <Input
@@ -1264,7 +1299,8 @@ const Profile: React.FC = () => {
             <div className={styles.modalContent}>
               {modalMessage.type === 'success' ? <FiCheck style={{ color: 'var(--green-100)' }} /> : <FiX style={{ color: 'var(--red-100)' }} />}
               <p>{modalMessage.title}</p>
-              <p>{modalMessage.message}</p>
+              {modalMessage.message.map((msg, i) => <span key={i}>{msg}</span>)}
+              {/* <p>{modalMessage.message}</p> */}
             </div>
           </MessageModal>
         )
