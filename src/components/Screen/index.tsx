@@ -45,8 +45,6 @@ const Layout: React.FC = ({ children }) => {
   }, [width])
 
   useEffect(() => {
-    console.log(`Showing? ${showModalMessage}`)
-    console.log(modalMessage)
     setShowMessage(showModalMessage)
   }, [showModalMessage])
 

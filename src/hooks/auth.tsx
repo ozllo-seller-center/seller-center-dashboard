@@ -111,14 +111,12 @@ const AuthProvider: React.FC = ({ children }) => {
     api.defaults.headers.authorization = token;
 
     await api.get('/account/detail').then(response => {
-      if (!user.personalInfo) {
-        user = { ...user, userType: '' }
-        return;
-      }
-
       const isActive = user.isActive
 
-      user = { ...user, ...response.data, isActive, userType: !!response.data.personalInfo ? '' : !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' }
+      // console.log('Auth data')
+      // console.log(response.data);
+
+      user = { ...user, ...response.data, isActive, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' };
 
       // if (!user.isActive) {
       //   throw new InactiveUserError("Usuário inativado, login não pode ser realizado.");
@@ -176,8 +174,8 @@ const AuthProvider: React.FC = ({ children }) => {
 
   const isRegisterCompleted = useMemo(() => {
     if (!!data.user) {
-      // return !!data.user.personalInfo && !!data.user.shopInfo && !!data.user.bankInfo && !!data.user.contact && !!data.user.address
-      return !!data.user.shopInfo
+      return !!data.user.personalInfo && !!data.user.shopInfo && !!data.user.bankInfo && !!data.user.contact && !!data.user.address
+      // return !!data.user.shopInfo
     }
 
     return false

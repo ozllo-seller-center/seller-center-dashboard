@@ -138,7 +138,7 @@
 
 .dateField {
   display: grid;
-  grid-template-columns: 0.5fr 0.5fr 1fr;
+  grid-template-columns: 0.75fr 0.75fr 1fr;
   column-gap: 1rem;
 
   @media (max-width: 1250px) {
@@ -424,5 +424,44 @@
       }
 
     }
+  }
+}
+
+.modalContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  .loader {
+    align-self: center;
+    border: 1rem solid var(--gray-100);
+    border-top: 1rem solid var(--grafite);
+    border-radius: 50%;
+    width: 6.5rem;
+    height: 6.5rem;
+    animation: spin 2s linear infinite;
+  }
+
+  p {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--grafite);
+
+    margin-bottom: 0.5rem;
+  }
+
+  span {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--grafite);
+  }
+
+  > svg {
+    width: 5rem;
+    height: 5rem;
+
+    margin-bottom: 1rem;
   }
 }

@@ -17,7 +17,9 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <AuthProvider>
       {Component === SignIn || Component === SignUp || Component === Verify ? (
-        <Component {...pageProps} />
+        <LoadingProvider>
+          <Component {...pageProps} />
+        </LoadingProvider>
       ) : (
         <Layout>
           <LoadingProvider>

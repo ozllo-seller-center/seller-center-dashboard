@@ -92,8 +92,6 @@ export function Products({ userFromApi }: ProductsProps) {
         }
       }).then(response => {
 
-        console.log(response.data)
-
         let productsDto = response.data as Product[];
 
         productsDto = productsDto.map(product => {
@@ -143,8 +141,6 @@ export function Products({ userFromApi }: ProductsProps) {
 
   const handleAvailability = useCallback(async (id: string) => {
     const index = products.findIndex(product => product._id === id);
-
-    console.log(`Id: ${id}`)
 
     await api.patch(`/product/${id}`, {
       isActive: !products[index].isActive
