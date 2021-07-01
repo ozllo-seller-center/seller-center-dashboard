@@ -126,21 +126,23 @@ export const nowInSeconds = () => {
   return Math.floor(Date.now() / 1000)
 }
 
-export const isTokenValid = (token: string | undefined): boolean => {
+import api from '../services/api'
+
+export const isTokenValid = async (token: string | undefined): Promise<Boolean> => {
 
   if (!token) return false
 
   let decoded: any
 
-  try {
-    decoded = jwt.verify(token, 'lI@D2zeg$e6mKY!5', {})
-  } catch (error) {
-    if (error instanceof Error)
-      console.log(error.message, 'EVENT', 'JWT Verification', 'ERROR')
-    return false
-  }
+  // decoded = jwt.verify(token, 'lI@D2zeg$e6mKY!5', {})
 
-  if (!decoded || !decoded.exp) return false
+  await api.get('/account/decode').then(response => {
+    decoded = { ...response.data };
+  }).catch(err => {
+    decoded = undefined
+  })
+
+  if (!decoded) return false
 
   const now = nowInSeconds()
 

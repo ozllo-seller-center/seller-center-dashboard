@@ -53,28 +53,30 @@ const Layout: React.FC = ({ children }) => {
       router.push('/');
     }
 
-    if (!isTokenValid(token)) {
-      api.get(`auth/token/${token}`).then(response => {
-        const { isValid } = response.data;
+    isTokenValid(token).then(valid => {
+      if (valid) {
+        api.get(`auth/token/${token}`).then(response => {
+          const { isValid } = response.data;
 
-        if (!isValid) {
+          if (!isValid) {
+            signOut();
+            router.push('/');
+            return;
+          }
+
+        }).catch((error) => {
           signOut();
           router.push('/');
           return;
-        }
+        })
 
-      }).catch((error) => {
-        signOut();
-        router.push('/');
         return;
-      })
+      }
 
-      return;
-    }
-
-    if (!isRegisterCompleted && !router.pathname.includes('profile')) {
-      router.push('/profile');
-    }
+      if (!isRegisterCompleted && !router.pathname.includes('profile')) {
+        router.push('/profile');
+      }
+    })
   }, [user, router]);
 
   return (
