@@ -1,0 +1,235 @@
+.signupContainer {
+  height: 100vh;
+
+  padding: 2rem;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  > header {
+    justify-self: start;
+    display: flex;
+    align-items: center;
+
+    div {
+      width: 100%;
+
+      .backButton {
+        display: flex;
+        align-items: center;
+
+        border: 1.25px var(--grafite) solid;
+        border-radius: 4px;
+        background-color: transparent;
+
+        padding: 0.25rem 0;
+        padding-right: 0.5rem;
+        padding-left: 0.1rem;
+
+        transition: color 0.2s, border-color 0.2s;
+
+        > svg {
+          width: 1.5rem;
+          height: 1.5rem;
+          color: var(--grafite);
+
+          margin-right: 0.25rem;
+
+          transition: color 0.2s;
+        }
+
+        &:hover {
+          border-color: var(--yellow-300);
+          color: var(--yellow-300);
+
+          > svg {
+            color: var(--yellow-300);
+          }
+        }
+      }
+    }
+  }
+
+  .recoveryContent {
+
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    form {
+      flex: 1;
+
+      text-align: center;
+
+      display: flex;
+      flex-direction: column;
+
+      .saveButton {
+        margin-top: 2.5rem;
+        padding: 1rem;
+
+        align-self: center;
+
+        border: none;
+        border-radius: 4px;
+        background-color: var(--yellow-300);
+
+        color: var(--grafite);
+
+        transition: background-color 0.5s, color 0.5s;
+
+        &:hover {
+          background-color: var(--grafite);
+          color: var(--white);
+        }
+      }
+
+      .avatarInput {
+        align-self: center;
+      }
+
+      .formsContainer {
+        display: grid;
+        grid-template-areas: '. personal .';
+        grid-template-columns: 1fr 1fr 1fr;
+        column-gap: 3rem;
+
+        h3 {
+          font-weight: bold;
+          margin-bottom: 2rem;
+        }
+
+        .personal {
+          grid-area: personal;
+
+          display: flex;
+          flex-direction: column;
+
+          > div + div {
+            margin-top: .75rem;
+          }
+
+          .passwordPanel {
+            margin-top: 1.5rem;
+
+            display: flex;
+            flex-direction: column;
+
+            width: fit-content;
+
+            align-self: center;
+            align-items: center;
+            // justify-content: space-between;
+
+            padding: 0.5rem 1rem;
+            background-color: var(--white);
+
+            border-radius: 6px;
+
+            > span {
+              width: 100%;
+
+              font-size: 1.05rem;
+              font-weight: bold;
+              color: var(--grafite);
+
+              margin-bottom: 0.5rem;
+            }
+
+            > div {
+              // width: 100%;
+
+              display: grid;
+              grid-template-columns: 0.8rem 1fr;
+              column-gap: 0.5rem;
+              row-gap: 0.25rem;
+
+              padding: 0 0.5rem;
+
+              svg {
+                width: 1rem;
+                height: 1rem;
+
+                align-self: center;
+
+                .empty {
+                  width: 0.85rem;
+                height: 0.85rem;
+                }
+              }
+
+              span {
+                text-align: left;
+                font-size: 0.95rem;
+
+                font-weight: bold;
+                // margin-left: 0.5rem;
+              }
+            }
+
+            .check {
+              color: var(--green-100)
+            }
+
+            .error {
+              color: var(--red-100);
+            }
+
+            .empty {
+              color: var(--blue-100)
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .modalContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+
+    .loader {
+      align-self: center;
+      border: 1rem solid var(--gray-100); /* Light grey */
+      border-top: 1rem solid var(--grafite); /* Blue */
+      border-radius: 50%;
+      width: 6.5rem;
+      height: 6.5rem;
+      animation: spin 2s linear infinite;
+    }
+
+    p {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--grafite);
+    }
+
+    > svg {
+      width: 5rem;
+      height: 5rem;
+
+      margin-bottom: 2rem;
+    }
+  }
+}
+
+.loadingContainer {
+  position: absolute;
+
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  // background: radial-gradient(var(--gray-250), transparent 75%, transparent);
+  background: var(--gray-100);
+  opacity: 0.75;
+
+  z-index: 10;
+}

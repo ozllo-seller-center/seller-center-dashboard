@@ -11,12 +11,14 @@ import SignUp from './signup'
 import SignIn from './index'
 import Verify from './verify/[token]'
 import { ModalMessageProvider } from 'src/hooks/message'
+import ForgotPassword from './forgot-password'
+import ResetPassword from './resetPassword/[token]'
 
 function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <AuthProvider>
-      {Component === SignIn || Component === SignUp || Component === Verify ? (
+      {Component === SignIn || Component === SignUp || Component === Verify || Component === ResetPassword || Component === ForgotPassword ? (
         <LoadingProvider>
           <Component {...pageProps} />
         </LoadingProvider>
