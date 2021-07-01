@@ -2,7 +2,11 @@ import React, { useCallback, useRef, ChangeEvent, useState } from 'react';
 
 import { FormHandles, Scope } from '@unform/core';
 import { Form } from '@unform/web';
+import { useRouter } from 'next/router';
 import * as Yup from 'yup';
+import Link from 'next/link';
+import { FiCheck, FiChevronLeft, FiX } from 'react-icons/fi';
+import { VscCircleFilled } from 'react-icons/vsc';
 
 import { useAuth } from '../../hooks/auth';
 
@@ -15,15 +19,9 @@ import styles from './styles.module.scss';
 import { isEmailValid, isPasswordSecure } from '../../utils/util';
 import Input from '../../components/InputLabeless';
 import Button from '../../components/PrimaryButton';
-import AvatarInput from '../../components/AvatarInput';
-import Link from 'next/link';
-import { FiCheck, FiChevronLeft, FiX } from 'react-icons/fi';
 import MessageModal from '../../components/MessageModal';
-import { FaExclamation } from 'react-icons/fa';
-import { useRouter } from 'next/router';
 import { Loader } from 'src/components/Loader';
 import { useLoading } from 'src/hooks/loading';
-import { ApiError } from 'next/dist/next-server/server/api-utils';
 import { AppError } from 'src/shared/errors/api/errors';
 
 type SignUpFormData = {
@@ -41,6 +39,7 @@ const SignUp: React.FC = () => {
   const [title, setTitle] = useState<string>();
   const [message, setMessage] = useState<string>();
   const [userAvatar, setUserAvatar] = useState<string>();
+  const [passwordCheck, setPasswordCheck] = useState('');
 
   const formRef = useRef<FormHandles>(null);
 
@@ -71,12 +70,17 @@ const SignUp: React.FC = () => {
             .required('Senha obrigatória')
             .min(8, 'No mínimo 8 digitos')
             .test('password-validation',
-              'A senha, além de 8 caracteres, deve conter pelo menos um caractere minúsculo, um caractere maiúsculo, um número e um caractere especial',
+              'A senha não cumpre os critérios de segurança indicados abaixo',
               (value) => (
                 !!value && isPasswordSecure(value)
               )),
           password_confirmation: Yup.string()
             .required('Confirme sua senha')
+            .test('password-validation',
+              ' ',
+              (value) => (
+                !!value && isPasswordSecure(value)
+              ))
             .oneOf([Yup.ref('password')], 'A confirmação deve ser igual a senha'),
         });
         await schema.validate(data, { abortEarly: false });
@@ -96,14 +100,14 @@ const SignUp: React.FC = () => {
       } catch (err) {
         setLoading(false);
 
-        console.log(err.response.data)
-
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
           formRef.current?.setErrors(errors);
 
           return;
         }
+
+        console.log(err.response.data)
 
         if (err.response.data.errors.findIndex((er: AppError) => er.errorCode === 4) >= 0) {
           setModalVisibility(true);
@@ -198,6 +202,9 @@ const SignUp: React.FC = () => {
                 name="password"
                 type="password"
                 placeholder="Senha"
+                onChange={(e) => {
+                  setPasswordCheck(e.target.value)
+                }}
               />
 
               <Input
@@ -205,6 +212,54 @@ const SignUp: React.FC = () => {
                 type="password"
                 placeholder="Confirme a senha"
               />
+
+              <div className={styles.passwordPanel}>
+                <span>
+                  A senha deve cumprir os seguintes critérios
+                </span>
+                <div>
+                  {
+                    passwordCheck === '' ?
+                      <VscCircleFilled className={styles.empty} />
+                      :
+                      passwordCheck.length >= 8 ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                  }
+                  <span className={passwordCheck === '' ? styles.empty : passwordCheck.length >= 8 ? styles.check : styles.error}>
+                    A senha deve conter pelo menos 8 caractéres
+                  </span>
+
+                  {
+                    passwordCheck === '' ?
+                      <VscCircleFilled className={styles.empty} />
+                      :
+                      (/[a-z]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                  }
+                  <span className={passwordCheck === '' ? styles.empty : (/[a-z]/.test(passwordCheck)) ? styles.check : styles.error}>
+                    Deve conter pelo menos uma letra minúscula
+                  </span>
+
+                  {
+                    passwordCheck === '' ?
+                      <VscCircleFilled className={styles.empty} />
+                      :
+                      (/[A-Z]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                  }
+                  <span className={passwordCheck === '' ? styles.empty : (/[A-Z]/.test(passwordCheck)) ? styles.check : styles.error}>
+                    Deve conter pelo menos uma letra maiúscula
+                  </span>
+
+                  {
+                    passwordCheck === '' ?
+                      <VscCircleFilled className={styles.empty} />
+                      :
+                      (/[0-9]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                  }
+                  <span className={passwordCheck === '' ? styles.empty : (/[0-9]/.test(passwordCheck)) ? styles.check : styles.error}>
+                    Deve conter pelo menos um digito numérico
+                  </span>
+
+                </div>
+              </div>
 
             </div>
           </div>
