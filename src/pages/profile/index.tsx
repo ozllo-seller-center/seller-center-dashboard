@@ -1141,19 +1141,6 @@ const Profile: React.FC = () => {
                   </div>
 
                   <Input
-                    name='account'
-                    placeholder='Conta'
-                    autoComplete='off'
-                    // isMasked
-                    // mask={'99999-9'}
-                    onChange={() => {
-                      setChanged(true)
-                    }}
-                    // type={'number'}
-                    maxLength={10}
-                  />
-
-                  <Input
                     name='agency'
                     placeholder='Agencia'
                     autoComplete='off'
@@ -1164,6 +1151,19 @@ const Profile: React.FC = () => {
                     }}
                     // type={'number'}
                     maxLength={5}
+                  />
+
+                  <Input
+                    name='account'
+                    placeholder='Conta'
+                    autoComplete='off'
+                    // isMasked
+                    // mask={'99999-9'}
+                    onChange={() => {
+                      setChanged(true)
+                    }}
+                    // type={'number'}
+                    maxLength={10}
                   />
 
                   <Input
