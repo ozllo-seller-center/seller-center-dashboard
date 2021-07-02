@@ -239,6 +239,16 @@ const ResetPassword: React.FC = () => {
                         Deve conter pelo menos um digito numérico
                       </span>
 
+                      {
+                        passwordCheck === '' ?
+                          <VscCircleFilled className={styles.empty} />
+                          :
+                          (/[!@#\$%\^&\*]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                      }
+                      <span className={passwordCheck === '' ? styles.empty : (/[!@#\$%\^&\*]/.test(passwordCheck)) ? styles.check : styles.error}>
+                        Deve conter pelo menos um caractére especial
+                      </span>
+
                     </div>
                   </div>
 
