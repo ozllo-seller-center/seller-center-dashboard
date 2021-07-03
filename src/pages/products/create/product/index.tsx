@@ -140,10 +140,10 @@ export function ProductForm() {
         more_info: Yup.string(),
         ean: Yup.string().required('Campo obrigatório'),
         sku: Yup.string(),
-        height: Yup.string(),
-        width: Yup.string(),
-        length: Yup.string(),
-        weight: Yup.string(),
+        height: Yup.number().min(10, 'Mínimo de 10cm'),
+        width: Yup.number().min(10, 'Mínimo de 10cm'),
+        length: Yup.number().min(10, 'Mínimo de 10cm'),
+        weight: Yup.number(),
         gender: Yup.string(),
         variations: Yup.array().required().of(Yup.object().shape({
           // type: Yup.string().equals(['number', 'size']),
@@ -375,18 +375,21 @@ export function ProductForm() {
                 label='Alturam (cm)'
                 placeholder='Altura da embalagem'
                 autoComplete='off'
+                type='number'
               />
               <Input
                 name='width'
                 label='Largura (cm)'
                 placeholder='Largura da embalagem'
                 autoComplete='off'
+                type='number'
               />
               <Input
                 name='length'
                 label='Comprimento (cm)'
                 placeholder='Comprimento da embalagem'
                 autoComplete='off'
+                type='number'
               />
               <Input
                 name='weight'
