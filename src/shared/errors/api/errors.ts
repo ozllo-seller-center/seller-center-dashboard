@@ -245,12 +245,12 @@ export const invalidAddressNumber: AppError = {
  * ERROR - Invalid CNPJ
  */
 export const invalidCNPJ: AppError = {
-  errorCode: 17,
+  errorCode: 19,
   description: 'CNPJ é inválido.',
   tip: 'Cheque o campo de CNPJ.',
   example: [
     `Deve-se possuir um CNPJ válido para o cadastro.`,
-    `O CNPJ deve ter pelo 14 digitos.`
+    `O CNPJ deve ter pelo menos 14 digitos.`
   ]
 }
 
@@ -270,7 +270,7 @@ export const invalidShopName: AppError = {
  * ERROR - Invalid Bank Code
  */
 export const invalidBankCode: AppError = {
-  errorCode: 19,
+  errorCode: 17,
   description: 'Código de banco inválido.',
   tip: 'Cheque o campo de bawnco.',
   example: [`
@@ -376,9 +376,9 @@ const errorField = [
   { errorCode: 14, errorField: 'address.complement', errorBrief: 'Entre 4 a 24 caracteres' },
   { errorCode: 15, errorField: 'address.district', errorBrief: '' },
   { errorCode: 16, errorField: 'address.number', errorBrief: '' },
-  { errorCode: 17, errorField: 'personalInfo.cnpj', errorBrief: '' },
+  { errorCode: 19, errorField: 'personalInfo.cnpj', errorBrief: '' },
   { errorCode: 18, errorField: 'shopInfo.name', errorBrief: '' },
-  { errorCode: 19, errorField: 'bankInfo.bank', errorBrief: '' },
+  { errorCode: 17, errorField: 'bankInfo.bank', errorBrief: '' },
   { errorCode: 20, errorField: 'bankInfo.account', errorBrief: '' },
   { errorCode: 21, errorField: 'bankInfo.agency', errorBrief: '' },
 ]
