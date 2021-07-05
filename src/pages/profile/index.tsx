@@ -465,7 +465,6 @@ const Profile: React.FC = () => {
                 firstName,
                 lastName,
                 cpf,
-                rg: '11',
                 birthday: format(new Date(year, (month - 1), day), 'dd-MM-yyyy')
                 // birthday: !!birthday ? format(new Date(birthday), 'dd-MM-yyyy') : null,
               } as PersonInfo;

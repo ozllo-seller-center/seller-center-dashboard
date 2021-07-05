@@ -9,8 +9,8 @@
 
   .variationContainer {
     display: grid;
-    grid-template-areas: 'item item item';  //item';
-    grid-template-columns: .35fr 1fr 1fr 1fr; //.6fr .75fr .75fr .6fr;
+    // grid-template-areas: 'item item item button';  //item';
+    grid-template-columns: .35fr 1fr 1fr 1fr .25fr; //.6fr .75fr .75fr .6fr;
     column-gap: .75rem;
 
     > span {
@@ -18,6 +18,24 @@
       text-align: left;
       font-size: 1.1rem;
       font-weight: bold;
+    }
+
+    > button {
+      border: none;
+      background: none;
+
+      svg {
+        width: 2rem;
+        height: 2rem;
+
+        color: var(--red-100);
+
+        transition: color 0.5s;
+
+        &:hover {
+          color: var(--red-400);
+        }
+      }
     }
   }
 
@@ -43,9 +61,27 @@
 
     .fieldsContainer {
       display: grid;
-      grid-template-areas: 'item item item';  //item';
-      grid-template-columns: 1fr 1fr 1fr; //.6fr .75fr .75fr .6fr;
+      // grid-template-areas: 'item item item';  //item';
+      grid-template-columns: 1fr 1fr 1fr .5fr; //.6fr .75fr .75fr .6fr;
       column-gap: .75rem;
+
+      > button {
+        border: none;
+        background: none;
+
+        svg {
+          width: 2rem;
+          height: 2rem;
+
+          color: var(--red-100);
+
+          transition: color 0.5s;
+
+          &:hover {
+            color: var(--red-400);
+          }
+        }
+      }
     }
   }
 

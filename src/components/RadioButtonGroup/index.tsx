@@ -19,42 +19,47 @@ interface InputRefProps extends HTMLInputElement {
   selectedRadio: string;
 }
 
+interface RadioRefProps extends HTMLDivElement {
+  selectedRadio: string;
+}
+
 const RadioButtonGroup: React.FC<RadioButtonGroupProps> = ({ radios, name, defaultRadio, ...rest }: RadioButtonGroupProps) => {
-  const inputRef = useRef<InputRefProps>(null);
+  const radioRef = useRef<RadioRefProps>(null);
   const { fieldName, registerField, defaultValue = defaultRadio } = useField(name);
 
   const [radioValue, setRadioValue] = useState(defaultValue);
   const itemsRef = useMemo(() => Array(radios.length).fill(0).map(i => React.createRef<InputRefProps>()), [radios]);
 
-  const handleRadioCheck = useCallback((value: string) => {
-    setRadioValue(value);
-
-    if (!!inputRef.current)
-      inputRef.current.selectedRadio = value;
-  }, [radioValue, inputRef])
-
+  useEffect(() => {
+    console.log(`Radio: ${radioValue}`)
+    if (!!radioRef.current)
+      radioRef.current.selectedRadio = radioValue;
+  }, [radioValue])
 
   useEffect(() => {
     registerField({
       name: fieldName,
-      ref: inputRef.current,
+      ref: radioRef.current,
       getValue: (ref: InputRefProps) => {
-        return radioValue || '';
+        return ref.selectedRadio || '';
       },
       clearValue: (ref: InputRefProps) => {
-        ref.selectedRadio = '';
+        if (!!ref)
+          ref.selectedRadio = '';
         setRadioValue('');
       },
       setValue: (ref: InputRefProps, value) => {
-        ref.selectedRadio = value;
+        if (!!ref)
+          ref.selectedRadio = value;
+        console.log(`Gender: ${value}`)
         setRadioValue(value);
       },
     });
-  }, [fieldName, registerField]);
+  }, [fieldName, registerField, radioValue]);
 
   return (
     <>
-      <div className={styles.radioContainer}>
+      <div className={styles.radioContainer} ref={radioRef}>
         {
           radios.map((radio, i) => {
             return (
@@ -66,7 +71,10 @@ const RadioButtonGroup: React.FC<RadioButtonGroupProps> = ({ radios, name, defau
                     value={radio.value}
                     ref={itemsRef[i]}
                     className={styles.radiol}
-                    onChange={() => handleRadioCheck(radio.value)}
+                    onChange={() => {
+                      console.log(radio.value)
+                      setRadioValue(radio.value)
+                    }}
                     checked={radioValue === radio.value} />
                   <span className={styles.radioControl}></span>
                 </span>

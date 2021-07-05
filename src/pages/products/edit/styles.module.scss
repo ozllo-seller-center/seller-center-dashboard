@@ -103,9 +103,13 @@
       }
     }
 
-    .doubleInputContainer {
-      // flex: 1;
+    .singleInputContainer {
+      flex: 1;
 
+      margin-top: 1rem;
+    }
+
+    .doubleInputContainer {
       flex: 1;
 
       display: flex;
@@ -184,7 +188,7 @@
           margin-left: 0.7rem;
           padding-bottom: 1rem;
 
-          h3 {
+          > h3 {
             color: var(--grafite);
             font-size: 1.2rem;
             font-weight: bold;
@@ -192,9 +196,30 @@
             margin-bottom: 1rem;
           }
 
-          span {
+          > span {
             font-size: 0.9rem;
             color: var(--grafite);
+          }
+
+          .underConstruction {
+            margin-top: 1rem;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: space-around;
+
+            svg {
+              width: 2rem;
+              height: 2rem;
+              color: var(--yellow-300);
+            }
+
+            span {
+              font-size: 1rem;
+              color: var(--yellow-300);
+              font-weight: bold;
+            }
           }
         }
 
@@ -231,5 +256,52 @@
     @media screen and (min-width: $desktop-size) {
       font-size: 1.25rem;
     }
+  }
+}
+
+.loadingContainer {
+  width: 100%;
+  height: 100%;
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  background: var(--gray-100);
+  opacity: 0.75;
+
+  z-index: 10;
+}
+
+.modalContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  .loader {
+    align-self: center;
+    border: 1rem solid var(--gray-100);
+    border-top: 1rem solid var(--grafite);
+    border-radius: 50%;
+    width: 6.5rem;
+    height: 6.5rem;
+    animation: spin 2s linear infinite;
+  }
+
+  p {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--grafite);
+  }
+
+  > svg {
+    width: 5rem;
+    height: 5rem;
+
+    margin-bottom: 2rem;
   }
 }

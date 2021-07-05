@@ -148,3 +148,13 @@ export const isTokenValid = async (token: string | undefined): Promise<Boolean> 
 
   return decoded.exp >= now
 }
+
+export function getFilename(url: string) {
+  if (url) {
+    var m = url.toString().match(/.*\/(.+?)\./);
+    if (m && m.length > 1) {
+      return m[1];
+    }
+  }
+  return "";
+}
