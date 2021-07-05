@@ -188,7 +188,7 @@
           margin-left: 0.7rem;
           padding-bottom: 1rem;
 
-          h3 {
+          > h3 {
             color: var(--grafite);
             font-size: 1.2rem;
             font-weight: bold;
@@ -196,9 +196,30 @@
             margin-bottom: 1rem;
           }
 
-          span {
+          > span {
             font-size: 0.9rem;
             color: var(--grafite);
+          }
+
+          .underConstruction {
+            margin-top: 1rem;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: space-around;
+
+            svg {
+              width: 2rem;
+              height: 2rem;
+              color: var(--yellow-300);
+            }
+
+            span {
+              font-size: 1rem;
+              color: var(--yellow-300);
+              font-weight: bold;
+            }
           }
         }
 

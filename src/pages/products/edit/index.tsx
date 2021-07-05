@@ -5,7 +5,7 @@ import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 
-import Dropzone from '../../../components/Dropzone';
+// import Dropzone from '../../../components/Dropzone';
 import Button from '../../../components/PrimaryButton';
 import ImageCard from '../../../components/ImageCard';
 import Input from '../../../components/Input';
@@ -13,7 +13,7 @@ import RadioButtonGroup from '../../../components/RadioButtonGroup';
 import VariationsController from '../../../components/VariationsController';
 import getValidationErrors from '../../../utils/getValidationErrors';
 
-import { FiCheck, FiChevronLeft, FiX } from 'react-icons/fi';
+import { FiAlertTriangle, FiCheck, FiChevronLeft, FiX } from 'react-icons/fi';
 
 import styles from './styles.module.scss'
 
@@ -489,6 +489,11 @@ export function EditProductForm() {
                 <div className={styles.variationsTitle}>
                   <h3>Informações das variações do produto</h3>
                   <span>Preencha <b>todos</b> os campos</span>
+                  <div className={styles.underConstruction}>
+                    <FiAlertTriangle />
+                    <span>Sessão sobre construção, alterações não serão salvas</span>
+                    <FiAlertTriangle />
+                  </div>
                 </div>
               </div>
               <VariationsController name='variations' variations={variationsController} handleAddVariation={handleAddVariation} handleDeleteVariation={handleDeleteVariation} />
