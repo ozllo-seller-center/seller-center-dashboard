@@ -15,7 +15,7 @@ import FilterInput from '../../components/FilterInput';
 import { ProductSummary as Product } from 'src/shared/types/product';
 
 import styles from './styles.module.scss';
-import switchStyles from './switch-styles.module.scss';
+import ProductItemCard from 'src/components/ProductItemCard';
 interface SearchFormData {
   search: string;
 }
@@ -26,17 +26,6 @@ interface ProductsProps {
 interface ProductsProps {
   userFromApi: User;
 }
-
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: '#E2E2E2'
-    },
-    secondary: {
-      main: '#FFFFFF'
-    }
-  },
-});
 
 export function Products({ userFromApi }: ProductsProps) {
   const [products, setProducts] = useState([] as Product[]);
@@ -127,7 +116,7 @@ export function Products({ userFromApi }: ProductsProps) {
     console.log(`Id: ${id}`)
 
     await api.patch(`/product/${id}`, {
-      isActive: !products[index].isActive
+      isActive: !products[index].is_active
     }).then(response => {
       console.log(response.data)
       // products[index].isActive === response.data.isActive;
@@ -168,64 +157,12 @@ export function Products({ userFromApi }: ProductsProps) {
         </div>
         {items.length > 0 ? (
           items.map((item, i) => (
-            <div className={styles.itemCard} key={i}>
-              <div className={styles.cardBody}>
-                <div className={styles.cardImg}>
-                  {!!item.images ? <img src={item.images[0]} alt={item.name} /> : <FiCameraOff />}
-                </div>
-                <div className={styles.itemInfo}>
-                  <span className={styles.itemName}>{item.name}</span>
-                  <div>
-                    SKU: <b>{item.sku}</b>
-                  </div>
-                  <div>
-                    Marca: <b>{item.brand}</b>
-                  </div>
-                  <div className={styles.value}>
-                    <span>Valor: {
-                      new Intl.NumberFormat('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL',
-                      }
-                      ).format(item.price)
-                    }</span>
-                  </div>
-                </div>
-                <div className={styles.switchContainer}>
-                  <MuiThemeProvider theme={theme}>
-                    <Switch
-                      checked={item.isActive}
-                      onChange={() => handleAvailability(item._id)}
-                      classes={{
-                        root: switchStyles.root,
-                        thumb: item.isActive ? switchStyles.thumb : switchStyles.thumbUnchecked,
-                        track: item.isActive ? switchStyles.track : switchStyles.trackUnchecked,
-                        checked: switchStyles.checked,
-                      }}
-                    />
-                  </MuiThemeProvider>
-                  <span className={styles.switchSubtitle}>{item.isActive ? 'Ativado' : 'Desativado'}</span>
-                  <div className={styles.stockContainer}>
-                    <span className={item.stock > 0 ? styles.stock : styles.outStock}>{new Intl.NumberFormat('pt-BR').format(item.stock)}</span>
-                    <span>Em estoque</span>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.cardDivider} />
-              <div className={styles.cardFooter}>
-                {/* <div onClick={() => {
-                  router.push({
-                    pathname: 'products/edit',
-                    query: {
-                      id: item.id,
-                    }
-                  })
-                }}>
-                  <FiEdit />
-                  <span> Editar </span>
-                </div> */}
-              </div>
-            </div>
+            <ProductItemCard
+              products={products}
+              setProducts={setProducts}
+              item={item}
+              userInfo={{ token, shop_id: !!user ? !!user.shopInfo._id ? user.shopInfo._id : '' : '' }}
+            />
           ))
         ) : (
           <span className={styles.emptyList}> Nenhum item foi encontrado </span>

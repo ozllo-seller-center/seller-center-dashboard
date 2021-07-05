@@ -60,6 +60,7 @@ const Variation: React.FC<VariationProps> = ({ variation, index, sizes, colors, 
             <Autocomplete
               name={'size'}
               items={sizes}
+              label='Tamanho/medida'
               placeholder='Tamanho/medida'
               autoComplete='off'
               defaultValue={variation.size}
@@ -74,6 +75,7 @@ const Variation: React.FC<VariationProps> = ({ variation, index, sizes, colors, 
             <Autocomplete
               name={'color'}
               items={colors}
+              label='Cor'
               placeholder='Escolha a cor'
               autoComplete='off'
               defaultValue={variation.color}
