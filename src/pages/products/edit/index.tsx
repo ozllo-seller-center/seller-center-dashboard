@@ -269,19 +269,19 @@ export function EditProductForm() {
       console.log("Final Vars:")
       console.log(variations)
 
-      await variations.forEach(async (variation: VariationDTO) => {
-        if (!!variation._id) {
-          console.log(`/product/${id}/variation/${variation._id}`)
-          await api.patch(`/product/${id}/variation/${variation._id}`, variation, {
-            headers: {
-              authorization: token,
-              shop_id: user.shopInfo._id,
-            }
-          }).then(response => {
+      // await variations.forEach(async (variation: VariationDTO) => {
+      //   if (!!variation._id) {
+      //     console.log(`/product/${id}/variation/${variation._id}`)
+      //     await api.patch(`/product/${id}/variation/${variation._id}`, variation, {
+      //       headers: {
+      //         authorization: token,
+      //         shop_id: user.shopInfo._id,
+      //       }
+      //     }).then(response => {
 
-          })
-        }
-      })
+      //     })
+      //   }
+      // })
 
       await api.patch(`/product/${id}`, product, {
         headers: {
