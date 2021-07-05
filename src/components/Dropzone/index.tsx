@@ -2,6 +2,7 @@ import { useField } from '@unform/core';
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { FiCamera, FiAlertCircle } from 'react-icons/fi'
+import { getFilename } from 'src/utils/util';
 
 // import './styles.module.css';
 
@@ -68,6 +69,12 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, filesUrl, setFilesUrl
       },
       setValue: (ref: InputRefProps, value) => {
         ref.acceptedFiles = value;
+        value.forEach(async (url) => {
+          await fetch(url).then(r => r.blob()).then(blobFile => new File([blobFile], getFilename(url), { type: "image/png/jpg/jpeg" })).then(f => {
+            setFiles([...files, f])
+          });
+        })
+
         setFilesUrl(value);
       },
     });

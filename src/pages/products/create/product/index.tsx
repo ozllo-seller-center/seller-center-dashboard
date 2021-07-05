@@ -10,7 +10,7 @@ import Button from '../../../../components/PrimaryButton';
 import ImageCard from '../../../../components/ImageCard';
 import Input from '../../../../components/Input';
 import RadioButtonGroup from '../../../../components/RadioButtonGroup';
-import VariationsController from '../../../../components/Variations';
+import VariationsController from '../../../../components/VariationsController';
 import getValidationErrors from '../../../../utils/getValidationErrors';
 
 import { FiCheck, FiChevronLeft, FiX } from 'react-icons/fi';
@@ -75,11 +75,11 @@ export function ProductForm() {
 
   useEffect(() => {
     if (variations.length > 0) {
-      setTotalFields(11 + variations.length * 3)
+      setTotalFields(10 + variations.length * 3)
       return;
     }
 
-    setTotalFields(14)
+    setTotalFields(13)
   }, [variations])
 
   const calcFilledFields = useCallback((data: Product) => {
@@ -90,8 +90,6 @@ export function ProductForm() {
     if (data.brand)
       filled++;
     if (data.description)
-      filled++;
-    if (data.ean)
       filled++;
     if (data.sku)
       filled++;
@@ -121,10 +119,14 @@ export function ProductForm() {
     handleModalMessage(false);
   }, [])
 
-  const handleSubmit = useCallback(async (data: Product) => {
+  const handleSubmit = useCallback(async (data) => {
     if (filledFields < totalFields) {
       handleModalMessage(true, { type: 'error', title: 'Formulário incompleto', message: ['Preencha todas as informações obrigatórias antes de continuar.'] })
       return;
+    }
+
+    if (data.price_discounted === "") {
+      data.price_discounted = data.price;
     }
 
     try {
@@ -137,14 +139,15 @@ export function ProductForm() {
         description: Yup.string()
           .required('Campo obrigatório'),
         brand: Yup.string().required('Campo obrigatório'),
-        more_info: Yup.string(),
-        ean: Yup.string().required('Campo obrigatório'),
-        sku: Yup.string(),
+        ean: Yup.string(),
+        sku: Yup.string().required('Campo obrigatório'),
         height: Yup.number().min(10, 'Mínimo de 10cm'),
         width: Yup.number().min(10, 'Mínimo de 10cm'),
         length: Yup.number().min(10, 'Mínimo de 10cm'),
-        weight: Yup.number(),
+        weight: Yup.number().required('Campo obrigatório'),
         gender: Yup.string(),
+        price: Yup.number().required('Campo obrigatório'),
+        price_discounted: Yup.number().nullable().min(0, 'Valor mínimo de R$ 0').max(data.price, `Valor máximo de R$ ${data.price}`),
         variations: Yup.array().required().of(Yup.object().shape({
           // type: Yup.string().equals(['number', 'size']),
           // size: Yup.mixed().when('type', {
@@ -156,20 +159,8 @@ export function ProductForm() {
           color: Yup.string().required('Campo obrigatório'),
           stock: Yup.number().typeError('Campo obrigatório').required('Campo obrigatório').min(0, 'Valor mínimo 0'),
         })),
-
-        // password: Yup.string().when('old_password', {
-        //   is: val => !!val.length,
-        //   then: Yup.string().required('Campo obrigatório'),
-        //   otherwise: Yup.string(),
-        // }),
-        // password_confirmation: Yup.string()
-        //   .when('old_password', {
-        //     is: val => !!val.length,
-        //     then: Yup.string().required('Campo obrigatório'),
-        //     otherwise: Yup.string(),
-        //   })
-        //   .oneOf([Yup.ref('password')], 'Confirmação incorreta'),
       });
+
       await schema.validate(data, { abortEarly: false });
 
       const {
@@ -197,7 +188,6 @@ export function ProductForm() {
         name,
         description,
         brand,
-        more_info,
         ean,
         sku,
         gender,
@@ -210,14 +200,20 @@ export function ProductForm() {
         variations
       } = data;
 
+      // let formatedValidations = variations as Omit<VariationDTO, '_id'>[];
+      variations.map((vars: any) => {
+        delete vars._id;
+      })
+
+      console.log(variations)
+
       const product = {
         category,
-        subCategory,
+        subcategory: subCategory,
         nationality,
         name,
         description,
         brand,
-        more_info,
         ean,
         sku,
         gender,
@@ -230,6 +226,8 @@ export function ProductForm() {
         images: imagesUrls,
         variations
       }
+
+      console.log(product)
 
       //TODO: chamada para a API
       const response = await api.post('/product', product, {
@@ -268,6 +266,22 @@ export function ProductForm() {
     }
   }, [router, token, user, filledFields, totalFields])
 
+  const variationsController = useMemo(() => {
+    return variations
+  }, [variations])
+
+  function handleDeleteVariation(deletedIndex: number) {
+    setVariations(formRef.current?.getData().variations)
+
+    const tempVars = variations.filter((vars, i) => i !== deletedIndex);
+
+    setVariations(tempVars)
+  }
+
+  const handleAddVariation = useCallback(() => {
+    setVariations([...variations, {}])
+  }, [variations]);
+
   return (
     <>
       <div className={styles.container}>
@@ -283,8 +297,9 @@ export function ProductForm() {
         <div className={styles.divider} />
         <section className={styles.content}>
           <Form ref={formRef} onSubmit={handleSubmit} onChange={(e) => {
-            // calcTotalFields(formRef.current?.getData() as Product);
             calcFilledFields(formRef.current?.getData() as Product);
+            // const formData = formRef.current?.getData() as Product;
+            // setVariations(formData.variations);
           }}>
             <p className={styles.imagesTitle}>Seleciones as fotos do produto</p>
             <div className={styles.imagesContainer}>
@@ -342,7 +357,7 @@ export function ProductForm() {
               <Input
                 name='ean'
                 label='EAN'
-                placeholder='Código EAN do produto'
+                placeholder='EAN do produto (opcional)'
                 autoComplete='off'
               />
               <Input
@@ -363,7 +378,7 @@ export function ProductForm() {
               <Input
                 name='price_discounted'
                 label='Preço com desconto (R$)'
-                placeholder='Preço com desconto'
+                placeholder='Preço com desconto (opcional)'
                 autoComplete='off'
                 type='number'
                 min={0}
@@ -393,7 +408,7 @@ export function ProductForm() {
               />
               <Input
                 name='weight'
-                label='Peso (kg)'
+                label='Peso (g)'
                 placeholder='Peso total'
                 autoComplete='off'
               />
@@ -405,7 +420,7 @@ export function ProductForm() {
                   <span>Preencha <b>todos</b> os campos</span>
                 </div>
               </div>
-              <VariationsController name='variations' variations={variations} setVariations={setVariations} />
+              <VariationsController name='variations' variations={variationsController} handleAddVariation={handleAddVariation} handleDeleteVariation={handleDeleteVariation} />
             </div>
           </Form>
         </section>

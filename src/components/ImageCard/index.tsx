@@ -6,14 +6,15 @@ import styles from './styles.module.scss';
 interface ImageCardProps {
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   imgUrl: string;
+  showOnly?: boolean;
 }
 
-const ImageCard: React.FC<ImageCardProps> = ({ onClick, imgUrl, ...rest }) => {
+const ImageCard: React.FC<ImageCardProps> = ({ onClick, imgUrl, showOnly, ...rest }) => {
   return (
     <div className={styles.imageCard}>
       <img src={imgUrl} alt="Product Image" />
       <div className={styles.imageDelete} onClick={onClick}>
-        <FiX />
+        {!showOnly && <FiX />}
       </div>
     </div>
   )

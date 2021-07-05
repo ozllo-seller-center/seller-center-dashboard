@@ -14,7 +14,6 @@ export type Product = {
   name: string,
   description: string,
   brand: string,
-  more_info?: string,
   ean?: string,
   sku: string,
   gender: string,
@@ -29,12 +28,12 @@ export type Product = {
 
   nationality: string,
   category: string,
-  sub_category: string,
+  subcategory: string,
 }
 
 export type ProductSummary = {
   _id: string;
-  isActive: boolean;
+  is_active: boolean;
   name: string;
   brand: string;
   sku: string;

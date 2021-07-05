@@ -13,11 +13,12 @@ import FilterInput from '../../components/FilterInput';
 import { ProductSummary as Product } from 'src/shared/types/product';
 
 import styles from './styles.module.scss';
-import switchStyles from './switch-styles.module.scss';
+
 import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
 import { Loader } from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
+import ProductTableItem from 'src/components/ProductTableItem';
 
 interface SearchFormData {
   search: string;
@@ -26,17 +27,6 @@ interface SearchFormData {
 interface ProductsProps {
   userFromApi: User;
 }
-
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: '#E2E2E2'
-    },
-    secondary: {
-      main: '#FFFFFF'
-    }
-  },
-});
 
 export function Products({ userFromApi }: ProductsProps) {
   const [products, setProducts] = useState([] as Product[]);
@@ -52,7 +42,7 @@ export function Products({ userFromApi }: ProductsProps) {
     // !!userFromApi && updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: userFromApi.shopInfo._id } })
   }, [userFromApi])
 
-  const itemsRef = useMemo(() => Array(items.length).fill(0).map(i => React.createRef<HTMLInputElement>()), [items]);
+  // const itemsRef = useMemo(() => Array(items.length).fill(0).map(i => React.createRef<HTMLInputElement>()), [items]);
 
   const formRef = useRef<FormHandles>(null);
   const [error, setError] = useState('');
@@ -139,19 +129,6 @@ export function Products({ userFromApi }: ProductsProps) {
     [search],
   );
 
-  const handleAvailability = useCallback(async (id: string) => {
-    const index = products.findIndex(product => product._id === id);
-
-    await api.patch(`/product/${id}`, {
-      isActive: !products[index].isActive
-    }).then(response => {
-      console.log(response.data)
-      // products[index].isActive === response.data.isActive;
-    }).catch(err => {
-      console.log(err)
-    })
-  }, [items, products]);
-
   const handleModalVisibility = useCallback(() => {
     handleModalMessage(false);
   }, [])
@@ -198,68 +175,22 @@ export function Products({ userFromApi }: ProductsProps) {
                   <th>Valor</th>
                   <th>Estoque</th>
                   <th>Status</th>
-                  {/* <th>Ação</th> */}
+                  <th>Ação</th>
                 </tr>
               </thead>
               <tbody className={styles.tableBody}>
                 {items.map((item, i) => (
-                  <tr className={styles.tableItem} key={i}>
-                    <td id={styles.imgCell} >
-                      {!!item.images ? <img src={item.images[0]} alt={item.name} /> : <FiCameraOff />}
-                    </td>
-                    <td id={styles.nameCell}>
-                      {item.name}
-                    </td>
-                    <td>
-                      {item.brand}
-                    </td>
-                    <td>
-                      {item.sku}
-                    </td>
-                    <td id={styles.valueCell}>
-                      {
-                        new Intl.NumberFormat('pt-BR', {
-                          style: 'currency',
-                          currency: 'BRL',
-                        }
-                        ).format(item.price)
-                      }
-                    </td>
-                    <td className={item.stock <= 0 ? styles.redText : ''}>
-                      {new Intl.NumberFormat('pt-BR').format(item.stock)}
-                    </td>
-                    <td id={styles.switchCell}>
-                      <MuiThemeProvider theme={theme}>
-                        <Switch
-                          inputRef={itemsRef[i]}
-                          checked={item.isActive}
-                          onClick={() => { handleAvailability(item._id) }}
-                          classes={{
-                            root: switchStyles.root,
-                            thumb: item.isActive ? switchStyles.thumb : switchStyles.thumbUnchecked,
-                            track: item.isActive ? switchStyles.track : switchStyles.trackUnchecked,
-                            checked: switchStyles.checked,
-                          }}
-                        />
-                      </MuiThemeProvider>
-                      <span className={styles.switchSubtitle}>{item.isActive ? 'Ativado' : 'Desativado'}</span>
-                    </td>
-                    {/* <td id={styles.editCell}>
-                      <div onClick={() => {
-                        router.push({
-                          pathname: 'products/edit',
-                          query: {
-                            id: item.id,
-                          }
-                        })
-                      }}>
-                        <FiEdit />
-                        <span> Editar </span>
-                      </div>
-                    </td> */}
-                  </tr>
-                ))
-                }
+                  <ProductTableItem
+                    key={i}
+                    item={item}
+                    products={products}
+                    setProducts={setProducts}
+                    userInfo={{
+                      token,
+                      shop_id: !user ? '' : !!user.shopInfo._id ? user.shopInfo._id : '',
+                    }}
+                  />
+                ))}
               </tbody>
             </table>
           ) : (
