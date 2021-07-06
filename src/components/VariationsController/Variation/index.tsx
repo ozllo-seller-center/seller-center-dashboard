@@ -8,19 +8,17 @@ import Autocomplete from '../../Autocomplete';
 import Input from '../../Input';
 import { useEffect } from 'react';
 
+import styles from './styles.module.scss'
 interface VariationProps {
   variation: VariationDTO;
   index: number;
   sizes: string[];
   colors: string[];
   handleDeleteVariation: Function;
-  styles: {
-    readonly [key: string]: string;
-  }
   allowDelete?: boolean;
 }
 
-const Variation: React.FC<VariationProps> = ({ variation, index, sizes, colors, allowDelete, handleDeleteVariation, styles }) => {
+const Variation: React.FC<VariationProps> = ({ variation, index, sizes, colors, allowDelete, handleDeleteVariation }) => {
   const idRef = useRef(null);
   const { registerField, fieldName, defaultValue = variation._id } = useField('_id');
 

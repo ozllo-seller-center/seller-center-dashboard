@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 
-import { FormHandles } from '@unform/core';
+import { FormHandles, Scope } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 
@@ -26,6 +26,7 @@ import { useModalMessage } from 'src/hooks/message';
 import { Loader } from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
 import { AppError, findError, getErrorField } from 'src/shared/errors/api/errors';
+import Variation from 'src/components/VariationsController/Variation';
 
 type VariationDTO = {
   size?: number | string,
@@ -50,12 +51,31 @@ export function ProductForm() {
   const { isLoading, setLoading } = useLoading();
   const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
 
+  const [sizes, setSizes] = useState<string[]>([]);
+  const [colors, setColors] = useState<string[]>([]);
+
   useEffect(() => {
     api.get('/account/detail').then(response => {
       updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
     }).catch(err => {
       console.log(err)
     });
+
+    setLoading(true)
+
+    api.get('/size/all').then(response => {
+      setSizes(response.data)
+    }).catch((err) => {
+      console.log(err);
+    })
+
+    api.get('/color/all').then(response => {
+      setColors(response.data)
+      setLoading(false)
+    }).catch((err) => {
+      console.log(err)
+      setLoading(false)
+    })
   }, [])
 
   const handleOnFileUpload = useCallback((file: string[]) => {
@@ -135,10 +155,10 @@ export function ProductForm() {
 
       const schema = Yup.object().shape({
         images: Yup.array().min(1, 'Escolha pelo menos \numa imagem'),
-        name: Yup.string().required('Campo obrigatório'),
+        name: Yup.string().required('Campo obrigatório').min(2, "Deve conter pelo menos 2 caracteres"),
         description: Yup.string()
-          .required('Campo obrigatório'),
-        brand: Yup.string().required('Campo obrigatório'),
+          .required('Campo obrigatório').min(2, "Deve conter pelo menos 2 caracteres"),
+        brand: Yup.string().required('Campo obrigatório').min(2, "Deve conter pelo menos 2 caracteres"),
         ean: Yup.string(),
         sku: Yup.string().required('Campo obrigatório'),
         height: Yup.number().min(10, 'Mínimo de 10cm'),
@@ -227,10 +247,8 @@ export function ProductForm() {
         variations
       }
 
-      console.log(product)
-
       //TODO: chamada para a API
-      const response = await api.post('/product', product, {
+      await api.post('/product', product, {
         headers: {
           authorization: token,
           shop_id: user.shopInfo._id,
@@ -270,13 +288,23 @@ export function ProductForm() {
     return variations
   }, [variations])
 
-  function handleDeleteVariation(deletedIndex: number) {
+  async function handleDeleteVariation(deletedIndex: number): Promise<void> {
     setVariations(formRef.current?.getData().variations)
 
-    const tempVars = variations.filter((vars, i) => i !== deletedIndex);
+    console.log(`(${deletedIndex}) pré-delete:`)
+    console.log(formRef.current?.getData().variations)
+
+    const tempVars = formRef.current?.getData().variations;
+    tempVars.splice(deletedIndex, 1);
 
     setVariations(tempVars)
+
+    // formRef.current?.setFieldValue('variations', tempVars);
+    formRef.current?.setData({ ...formRef.current?.getData(), variations: tempVars })
+    calcFilledFields({ ...formRef.current?.getData(), variations: tempVars } as Product)
+    setTotalFields(10 + tempVars.length * 3)
   }
+
 
   const handleAddVariation = useCallback(() => {
     setVariations([...variations, {}])
@@ -420,7 +448,24 @@ export function ProductForm() {
                   <span>Preencha <b>todos</b> os campos</span>
                 </div>
               </div>
-              <VariationsController name='variations' variations={variationsController} handleAddVariation={handleAddVariation} handleDeleteVariation={handleDeleteVariation} />
+              <VariationsController handleAddVariation={handleAddVariation}>
+                {
+                  variations.map((variation, i) => {
+                    return (
+                      <Scope key={i} path={`variations[${i}]`}>
+                        <Variation
+                          variation={variation}
+                          index={i}
+                          handleDeleteVariation={() => handleDeleteVariation(i)}
+                          colors={colors}
+                          sizes={sizes}
+                          allowDelete={variations.length > 1}
+                        />
+                      </Scope>
+                    )
+                  })
+                }
+              </VariationsController>
             </div>
           </Form>
         </section>
