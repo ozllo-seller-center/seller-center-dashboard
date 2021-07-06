@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 
-import { FormHandles } from '@unform/core';
+import { FormHandles, Scope } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 
@@ -25,6 +25,7 @@ import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
 import { Loader } from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
+import Variation from 'src/components/VariationsController/Variation';
 
 type VariationDTO = {
   _id?: string;
@@ -53,6 +54,27 @@ export function EditProductForm() {
   const { user, token, updateUser } = useAuth();
   const { isLoading, setLoading } = useLoading();
   const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
+
+  const [sizes, setSizes] = useState<string[]>([]);
+  const [colors, setColors] = useState<string[]>([]);
+
+  useEffect(() => {
+    // setLoading(true)
+
+    api.get('/size/all').then(response => {
+      setSizes(response.data)
+    }).catch((err) => {
+      console.log(err);
+    })
+
+    api.get('/color/all').then(response => {
+      setColors(response.data)
+      // setLoading(false)
+    }).catch((err) => {
+      console.log(err)
+      // setLoading(false)
+    })
+  }, [])
 
   useEffect(() => {
     // api.get('/account/detail').then(response => {
@@ -176,10 +198,10 @@ export function EditProductForm() {
 
       const schema = Yup.object().shape({
         images: Yup.array().min(1, 'Escolha pelo menos \numa imagem'),
-        name: Yup.string().required('Campo obrigatório'),
+        name: Yup.string().required('Campo obrigatório').min(2, "Deve conter pelo menos 2 caracteres"),
         description: Yup.string()
-          .required('Campo obrigatório'),
-        brand: Yup.string().required('Campo obrigatório'),
+          .required('Campo obrigatório').min(2, "Deve conter pelo menos 2 caracteres"),
+        brand: Yup.string().required('Campo obrigatório').min(2, "Deve conter pelo menos 2 caracteres"),
         ean: Yup.string(),
         sku: Yup.string().required('Campo obrigatório'),
         height: Yup.number().min(10, 'Mínimo de 10cm'),
@@ -269,19 +291,23 @@ export function EditProductForm() {
       console.log("Final Vars:")
       console.log(variations)
 
-      // await variations.forEach(async (variation: VariationDTO) => {
-      //   if (!!variation._id) {
-      //     console.log(`/product/${id}/variation/${variation._id}`)
-      //     await api.patch(`/product/${id}/variation/${variation._id}`, variation, {
-      //       headers: {
-      //         authorization: token,
-      //         shop_id: user.shopInfo._id,
-      //       }
-      //     }).then(response => {
+      await variations.forEach(async (variation: VariationDTO) => {
+        if (!!variation._id) {
+          console.log(`/product/${id}/variation/${variation._id}`)
+          const variationId = variation._id
 
-      //     })
-      //   }
-      // })
+          delete variation._id
+
+          await api.patch(`/product/${id}/variation/${variation._id}`, variation, {
+            headers: {
+              authorization: token,
+              shop_id: user.shopInfo._id,
+            }
+          }).then(response => {
+
+          })
+        }
+      })
 
       await api.patch(`/product/${id}`, product, {
         headers: {
@@ -332,15 +358,30 @@ export function EditProductForm() {
     return variations
   }, [variations])
 
-  function handleDeleteVariation(deletedIndex: number) {
+  async function handleDeleteVariation(deletedIndex: number): Promise<void> {
     setVariations(formRef.current?.getData().variations)
 
+    console.log('Pré-delete:')
+    console.log(formRef.current?.getData().variations)
+
     const tempVars = variations.filter((vars, i) => i !== deletedIndex);
+    const deletedVariation = variations[deletedIndex];
 
     setVariations(tempVars)
-    tempVars.forEach((v, i) => {
-      formRef.current?.setFieldValue(`variations[${i}]`, v)
-    })
+
+    formRef.current?.setFieldValue('variations', tempVars);
+    formRef.current?.setData({ ...formRef.current?.getData(), variations: tempVars })
+
+    console.log('Pós-delete:')
+    console.log(formRef.current?.getData().variations)
+
+    // const { id } = router.query;
+    // await api.delete(`/product/${id}/variation/${deletedVariation._id}`, {
+    //   headers: {
+    //     authorization: token,
+    //     shop_id: user.shopInfo._id,
+    //   },
+    // }).then(response => { })
   }
 
   const handleAddVariation = useCallback(() => {
@@ -368,7 +409,7 @@ export function EditProductForm() {
             // console.log(formData.variations);
             // setVariations(formData.variations);
           }}>
-            <p className={styles.imagesTitle}>Seleciones as fotos do produto</p>
+            <p className={styles.imagesTitle}>Fotos do produto</p>
             <div className={styles.imagesContainer}>
               {/* <Dropzone
                 name='images'
@@ -496,7 +537,24 @@ export function EditProductForm() {
                   </div>
                 </div>
               </div>
-              <VariationsController name='variations' variations={variationsController} handleAddVariation={handleAddVariation} handleDeleteVariation={handleDeleteVariation} />
+              <VariationsController handleAddVariation={handleAddVariation}>
+                {
+                  variations.map((variation, i) => {
+                    return (
+                      <Scope key={i} path={`variations[${i}]`}>
+                        <Variation
+                          variation={variation}
+                          index={i}
+                          handleDeleteVariation={() => handleDeleteVariation(i)}
+                          colors={colors}
+                          sizes={sizes}
+                          allowDelete={variations.length > 1}
+                        />
+                      </Scope>
+                    )
+                  })
+                }
+              </VariationsController>
             </div>
           </Form>
         </section>

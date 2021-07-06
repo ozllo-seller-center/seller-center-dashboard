@@ -316,6 +316,19 @@ export const invalidProduct: AppError = {
 }
 
 /**
+ * ERROR - Invalid Product Name
+ */
+export const invalidProductName: AppError = {
+  errorCode: 32,
+  description: 'Nome do produto é inválido.',
+  tip: 'Cheque o campo de nome.',
+  example: [`
+        O nome do produto deve conter pelo menos 2 caracteres.
+    `]
+}
+
+
+/**
  * Lista com todos os erros relacionados a Client
  */
 export const errorsList: AppError[] = [

@@ -7,6 +7,7 @@ import styles from './styles.module.scss';
 import api from 'src/services/api';
 import { useLoading } from 'src/hooks/loading';
 import Variation from './Variation';
+import { HTMLAttributes } from 'react';
 
 export type VariationDTO = {
   _id?: string;
@@ -15,42 +16,12 @@ export type VariationDTO = {
   color?: string,
 }
 
-interface VariationsControllerProps {
-  name: string;
-  variations: VariationDTO[];
+interface VariationsControllerProps extends HTMLAttributes<HTMLDivElement> {
   handleAddVariation: Function;
-  handleDeleteVariation(deletedIndex: number): void;
 }
 
-interface VariationRefProps extends FormHandles {
-  variations: VariationDTO[];
-}
-
-const VariationsController: React.FC<VariationsControllerProps> = ({ name, handleAddVariation, handleDeleteVariation, variations }: VariationsControllerProps) => {
+const VariationsController: React.FC<VariationsControllerProps> = ({ handleAddVariation, children }: VariationsControllerProps) => {
   // const { fieldName, registerField, defaultValue = [{}] } = useField(name);
-
-  const [sizes, setSizes] = useState<string[]>([]);
-  const [colors, setColors] = useState<string[]>([]);
-
-  const { setLoading } = useLoading();
-
-  useEffect(() => {
-    setLoading(true)
-
-    api.get('/size/all').then(response => {
-      setSizes(response.data)
-    }).catch((err) => {
-      console.log(err);
-    })
-
-    api.get('/color/all').then(response => {
-      setColors(response.data)
-      setLoading(false)
-    }).catch((err) => {
-      console.log(err)
-      setLoading(false)
-    })
-  }, [])
 
   // useEffect(() => {
   //   registerField({
@@ -74,23 +45,7 @@ const VariationsController: React.FC<VariationsControllerProps> = ({ name, handl
 
   return (
     <div className={styles.controllerContainer}>
-      {
-        variations.map((variation, i) => {
-          return (
-            <Scope key={i} path={`variations[${i}]`}>
-              <Variation
-                variation={variation}
-                index={i}
-                handleDeleteVariation={() => handleDeleteVariation(i)}
-                colors={colors}
-                sizes={sizes}
-                styles={styles}
-                allowDelete={i > 0}
-              />
-            </Scope>
-          )
-        })
-      }
+      {children}
       <div className={styles.addButtonContainer}>
         <AddButton icon={FaPlus} onClick={() => { handleAddVariation() }} type='button'><span>Adicionar variação</span></AddButton>
       </div>
