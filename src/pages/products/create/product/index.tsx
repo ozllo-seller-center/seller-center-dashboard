@@ -155,12 +155,12 @@ export function ProductForm() {
 
       const schema = Yup.object().shape({
         images: Yup.array().min(1, 'Escolha pelo menos \numa imagem'),
-        name: Yup.string().required('Campo obrigatório').min(2, "Deve conter pelo menos 2 caracteres"),
+        name: Yup.string().required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres'),
         description: Yup.string()
-          .required('Campo obrigatório').min(2, "Deve conter pelo menos 2 caracteres"),
-        brand: Yup.string().required('Campo obrigatório').min(2, "Deve conter pelo menos 2 caracteres"),
+          .required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres'),
+        brand: Yup.string().required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres'),
         ean: Yup.string(),
-        sku: Yup.string().required('Campo obrigatório'),
+        sku: Yup.string().required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres'),
         height: Yup.number().min(10, 'Mínimo de 10cm'),
         width: Yup.number().min(10, 'Mínimo de 10cm'),
         length: Yup.number().min(10, 'Mínimo de 10cm'),
