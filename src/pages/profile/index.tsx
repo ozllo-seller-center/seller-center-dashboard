@@ -315,8 +315,8 @@ const Profile: React.FC = () => {
 
         return {
           personalInfo: Yup.object().shape({
-            firstName: Yup.string().required('Nome obrigatório'),
-            lastName: Yup.string().required('Sobrenome obrigatório'),
+            firstName: Yup.string().required('Nome obrigatório').min(2, 'Mínimo de 2 caracteres'),
+            lastName: Yup.string().required('Sobrenome obrigatório').min(2, 'Mínimo de 2 caracteres'),
             cpf: Yup.string().required('CPF obrigatório').min(11, 'O CPF deve ter 11 digitos'),
             // birthday: Yup.date(),
             year: Yup.number().min(1900, 'O ano mínimo aceito é 1900').max(2021, 'O ano não pode ser maior que o ano atual').required('').typeError(''),
@@ -330,11 +330,11 @@ const Profile: React.FC = () => {
         return {
           address: Yup.object().shape({
             cep: Yup.string().required('CEP deve ser preenchido').min(7, 'CEP deve ter pelo menos 7 digitos').max(9, 'CEP não pode passar de 9 digitos'),
-            address: Yup.string().required('Endereço deve ser preenchido'),
+            address: Yup.string().required('Endereço deve ser preenchido').min(2, 'Mínimo de 2 caracteres'),
             number: Yup.string().required('Número obrigaório'), //.typeError('Número obrigatório')
             complement: Yup.string(),
-            district: Yup.string().required('Bairro obrigaório'),
-            city: Yup.string().required('Cidade obrigaória'),
+            district: Yup.string().required('Bairro obrigaório').min(2, 'Mínimo de 2 caracteres'),
+            city: Yup.string().required('Cidade obrigaória').min(2, 'Mínimo de 2 caracteres'),
           })
         }
       case CONTACT_INDEX:
@@ -364,7 +364,7 @@ const Profile: React.FC = () => {
       case STORE_INDEX:
         return {
           shopInfo: Yup.object().shape({
-            name: Yup.string().required('Nome obrigatório'),
+            name: Yup.string().required('Nome obrigatório').min(2, 'Mínimo de 2 caracteres'),
           })
         }
     }
@@ -544,6 +544,15 @@ const Profile: React.FC = () => {
 
             var cepFormatted = cep.replaceAll("-", "");
             cepFormatted = cepFormatted.slice(0, 5) + "-" + cepFormatted.slice(5, cep.length)
+
+            if (!!complement) {
+              if (complement.length < 4) {
+                setStepCompleted(false);
+                setLoading(false);
+                formRef?.current?.setFieldError('address.complement', 'Mínimo de 4 caracteres')
+                return;
+              }
+            }
 
             const addressInfo = {
               cep: cepFormatted,
@@ -1067,6 +1076,7 @@ const Profile: React.FC = () => {
                       onChange={() => {
                         setChanged(true)
                       }}
+                      maxLength={24}
                     />
                   </div>
 
