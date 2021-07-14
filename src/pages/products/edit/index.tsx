@@ -94,7 +94,6 @@ export function EditProductForm() {
           shop_id: user.shopInfo._id,
         }
       }).then(response => {
-        console.log(response.data)
 
         setNationality(response.data.nationality)
         setCategory(response.data.category)
@@ -288,17 +287,13 @@ export function EditProductForm() {
         //variations
       }
 
-      console.log("Final Vars:")
-      console.log(variations)
-
       await variations.forEach(async (variation: VariationDTO) => {
-        if (!!variation._id) {
-          console.log(`/product/${id}/variation/${variation._id}`)
+        if (!!variation._id && variation._id !== '') {
           const variationId = variation._id
 
           delete variation._id
 
-          await api.patch(`/product/${id}/variation/${variation._id}`, variation, {
+          await api.patch(`/product/${id}/variation/${variationId}`, variation, {
             headers: {
               authorization: token,
               shop_id: user.shopInfo._id,
@@ -351,18 +346,15 @@ export function EditProductForm() {
   //   setVariations(tempVars)
   // }, [variations])
 
-  const variationsController = useMemo(() => {
-    console.log('Memo:')
-    console.log(variations)
+  // const variationsController = useMemo(() => {
+  //   console.log('Memo:')
+  //   console.log(variations)
 
-    return variations
-  }, [variations])
+  //   return variations
+  // }, [variations])
 
   async function handleDeleteVariation(deletedIndex: number): Promise<void> {
     setVariations(formRef.current?.getData().variations)
-
-    console.log('Pré-delete:')
-    console.log(formRef.current?.getData().variations)
 
     const tempVars = variations.filter((vars, i) => i !== deletedIndex);
     const deletedVariation = variations[deletedIndex];
@@ -371,9 +363,6 @@ export function EditProductForm() {
 
     formRef.current?.setFieldValue('variations', tempVars);
     formRef.current?.setData({ ...formRef.current?.getData(), variations: tempVars })
-
-    console.log('Pós-delete:')
-    console.log(formRef.current?.getData().variations)
 
     // const { id } = router.query;
     // await api.delete(`/product/${id}/variation/${deletedVariation._id}`, {

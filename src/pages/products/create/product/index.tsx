@@ -225,8 +225,6 @@ export function ProductForm() {
         delete vars._id;
       })
 
-      console.log(variations)
-
       const product = {
         category,
         subcategory: subCategory,
@@ -254,7 +252,6 @@ export function ProductForm() {
           shop_id: user.shopInfo._id,
         }
       }).then(response => {
-        console.log(response.data)
         setLoading(false)
 
         router.push('/products');
@@ -290,9 +287,6 @@ export function ProductForm() {
 
   async function handleDeleteVariation(deletedIndex: number): Promise<void> {
     setVariations(formRef.current?.getData().variations)
-
-    console.log(`(${deletedIndex}) pré-delete:`)
-    console.log(formRef.current?.getData().variations)
 
     const tempVars = formRef.current?.getData().variations;
     tempVars.splice(deletedIndex, 1);

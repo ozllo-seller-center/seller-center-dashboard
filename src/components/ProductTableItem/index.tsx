@@ -59,11 +59,7 @@ const ProductTableItem: React.FC<ProductItemProps> = ({ item, products, setProdu
         shop_id: userInfo.shop_id,
       }
     }).then(response => {
-      console.log(response.data);
-
       item.is_active = response.data.is_active;
-
-      console.log(item.is_active)
 
       setIsAvailable(response.data.is_active)
     }).catch(err => {

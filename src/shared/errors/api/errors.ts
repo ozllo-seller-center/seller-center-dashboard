@@ -365,7 +365,6 @@ export const errorsList: AppError[] = [
  * @param errorCode
  */
 export const findError = (errorCode: errorCode) => {
-  console.log(`Error CPF: ${errorCode}`)
   return errorsList.find(error => error.errorCode === errorCode) || voidError
 }
 

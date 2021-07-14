@@ -22,11 +22,6 @@ const Variation: React.FC<VariationProps> = ({ variation, index, sizes, colors, 
   const idRef = useRef(null);
   const { registerField, fieldName, defaultValue = variation._id } = useField('_id');
 
-  useEffect(() => {
-    console.log('Variation Fields:')
-    console.log(variation)
-  }, [variation])
-
   const { width } = useMemo(() => {
     if (typeof window !== 'undefined') {
       return { width: window.innerWidth, height: window.innerHeight }

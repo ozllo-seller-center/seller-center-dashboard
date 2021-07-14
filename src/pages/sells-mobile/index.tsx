@@ -198,12 +198,6 @@ export function Sells({ sells }: SellsProps) {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    sells.map(sell => {
-      console.log({
-        ...sell,
-        date: format(sell.date, 'dd/MM/yyyy')
-      });
-    });
 
     setItems(sells.filter(sell => {
       if (status === SellStatus.Todos)
@@ -230,15 +224,11 @@ export function Sells({ sells }: SellsProps) {
   );
 
   const handleAttachment = useCallback(async (data: any) => {
-    console.log(data);
+
   }, [items]);
 
   const datePickerRef = useRef<FormHandles>(null);
   const [datePickerVisibility, setDatePickerVisibility] = useState(false);
-
-  useEffect(() => {
-    console.log(`Status: ${status}`);
-  }, [status]);
 
   return (
     <>

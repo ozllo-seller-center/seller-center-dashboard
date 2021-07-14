@@ -130,7 +130,6 @@ export function Sells({ sells }: SellsProps) {
         return isSameMonth(order.date, new Date());
 
       case Filter.Custom:
-        console.log(order.order_number);
         return format(order.date, 'yyyy/MM/dd') <= format(toDateFilter, 'yyyy/MM/dd') && format(order.date, 'yyyy/MM/dd') >= format(fromDateFilter, 'yyyy/MM/dd');
 
       default:
@@ -196,13 +195,6 @@ export function Sells({ sells }: SellsProps) {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    sells.map(sell => {
-      console.log({
-        ...sell,
-        date: format(sell.date, 'dd/MM/yyyy')
-      });
-    });
-
     setItems(sells.filter(sell => {
       if (status === SellStatus.Todos)
         return inInterval(sell) && InOrderStatus(sell, orderStatus) && (search === '' || OrderContainsProduct(sell, search));
@@ -228,15 +220,10 @@ export function Sells({ sells }: SellsProps) {
   );
 
   const handleAttachment = useCallback(async (data: any) => {
-    console.log(data);
   }, [items]);
 
   const datePickerRef = useRef<FormHandles>(null);
   const [datePickerVisibility, setDatePickerVisibility] = useState(false);
-
-  useEffect(() => {
-    console.log(`Alterou data: ${fromDateFilter}`);
-  }, []);
 
   return (
     <div className={styles.sellsContainer}>
