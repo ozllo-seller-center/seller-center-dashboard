@@ -171,7 +171,7 @@ export const invalidBirthday: AppError = {
  * ERROR - Invalid CEP
  */
 export const invalidCEP: AppError = {
-  errorCode: 11,
+  errorCode: 13,
   description: 'CEP é inválido.',
   tip: 'Cheque o campo de CEP.',
   example: [
@@ -196,7 +196,7 @@ export const invalidAddress: AppError = {
  * ERROR - Invalid City
  */
 export const invalidCity: AppError = {
-  errorCode: 13,
+  errorCode: 11,
   description: 'Cidade é inválida.',
   tip: 'Cheque o campo de cidade.',
   example: [`
@@ -382,9 +382,9 @@ const errorField = [
   { errorCode: 16, errorField: 'personalInfo.cpf', errorBrief: '' },
   // { errorCode: 22, errorField: 'personalInfo.rg', errorBrief: '' },
   { errorCode: 10, errorField: 'personalInfo.birthday', errorBrief: '' },
-  { errorCode: 11, errorField: 'address.cep', errorBrief: '' },
+  { errorCode: 13, errorField: 'address.cep', errorBrief: '' },
   { errorCode: 12, errorField: 'address.address', errorBrief: '' },
-  { errorCode: 13, errorField: 'address.city', errorBrief: '' },
+  { errorCode: 11, errorField: 'address.city', errorBrief: '' },
   { errorCode: 14, errorField: 'address.complement', errorBrief: 'Entre 4 a 24 caracteres' },
   { errorCode: 15, errorField: 'address.district', errorBrief: '' },
   { errorCode: 16, errorField: 'address.number', errorBrief: '' },
