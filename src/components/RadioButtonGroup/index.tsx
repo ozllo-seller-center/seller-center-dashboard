@@ -31,7 +31,6 @@ const RadioButtonGroup: React.FC<RadioButtonGroupProps> = ({ radios, name, defau
   const itemsRef = useMemo(() => Array(radios.length).fill(0).map(i => React.createRef<InputRefProps>()), [radios]);
 
   useEffect(() => {
-    console.log(`Radio: ${radioValue}`)
     if (!!radioRef.current)
       radioRef.current.selectedRadio = radioValue;
   }, [radioValue])
@@ -46,12 +45,13 @@ const RadioButtonGroup: React.FC<RadioButtonGroupProps> = ({ radios, name, defau
       clearValue: (ref: InputRefProps) => {
         if (!!ref)
           ref.selectedRadio = '';
+
         setRadioValue('');
       },
       setValue: (ref: InputRefProps, value) => {
         if (!!ref)
           ref.selectedRadio = value;
-        console.log(`Gender: ${value}`)
+
         setRadioValue(value);
       },
     });
@@ -72,7 +72,6 @@ const RadioButtonGroup: React.FC<RadioButtonGroupProps> = ({ radios, name, defau
                     ref={itemsRef[i]}
                     className={styles.radiol}
                     onChange={() => {
-                      console.log(radio.value)
                       setRadioValue(radio.value)
                     }}
                     checked={radioValue === radio.value} />

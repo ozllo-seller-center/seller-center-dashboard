@@ -50,8 +50,6 @@ const ForgotPassword: React.FC = () => {
       try {
         formRef.current?.setErrors({});
 
-        console.log(data)
-
         const schema = Yup.object().shape({
           email: Yup.string()
             .required('E-mail obrigatório')

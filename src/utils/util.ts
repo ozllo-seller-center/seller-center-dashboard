@@ -117,8 +117,6 @@ export const isPasswordSecure = (password: string): boolean => {
 
   const strongPasswordRegex = new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})')
 
-  console.log(`(${strongPasswordRegex.test(password)}) - ${password}`);
-
   return strongPasswordRegex.test(password)
 }
 

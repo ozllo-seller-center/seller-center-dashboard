@@ -95,7 +95,6 @@ export function Products({ userFromApi }: ProductsProps) {
 
   const handleSubmit = useCallback(
     async (data: SearchFormData) => {
-      console.log(`Search: ${search} | ${data.search}`)
       try {
         formRef.current?.setErrors({});
 
@@ -113,12 +112,9 @@ export function Products({ userFromApi }: ProductsProps) {
   const handleAvailability = useCallback(async (id: string) => {
     const index = products.findIndex(product => product._id === id);
 
-    console.log(`Id: ${id}`)
-
     await api.patch(`/product/${id}`, {
       isActive: !products[index].is_active
     }).then(response => {
-      console.log(response.data)
       // products[index].isActive === response.data.isActive;
     }).catch(err => {
       console.log(err)

@@ -155,18 +155,10 @@ const Profile: React.FC = () => {
     api.get('/account/detail').then(response => {
       updateUser({ ...user, ...response.data, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' })
 
-      console.log({ ...user, ...response.data, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' })
-
       if (!!response.data.personalInfo['cpf']) {
-        console.log("Pessoa")
 
         var parts = !!response.data.personalInfo.birthday ? response.data.personalInfo.birthday.split("-") : [];
         const dateRaw = !!response.data.personalInfo.birthday ? new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10)) : undefined;
-
-        console.log('Parts:')
-        console.log(parts)
-        console.log('DateRaw: ')
-        console.log(dateRaw)
 
         formRef.current?.setData({
           ...user, ...response.data, personalInfo: {
@@ -181,8 +173,6 @@ const Profile: React.FC = () => {
 
         return;
       }
-
-      console.log("Empresarial")
 
       formRef.current?.setData({ ...user, ...response.data });
 
@@ -309,9 +299,6 @@ const Profile: React.FC = () => {
   }, [STORE_INDEX, flowStep, flowPrevious])
 
   const yupValidationSchema = useMemo((): object => {
-    console.log(`Flow - Step - Validation: ${flowStep}`)
-    console.log('User - Validation:')
-    console.log(user)
 
     switch (flowStep) {
       case PERSONAL_INDEX:
@@ -388,10 +375,6 @@ const Profile: React.FC = () => {
   useEffect(() => {
     if (isStepCompleted) {
       setChanged(false);
-
-      console.log(`Flow intent: ${flowIntent}`)
-      console.log(`Flow: ${flowStep}`)
-      console.log(`Previous flow: ${flowPrevious}`)
 
       setFlowPrevious(flowStep >= 0 ? flowStep : 0);
 
@@ -483,8 +466,6 @@ const Profile: React.FC = () => {
                 err.response.data.errors.forEach((error: AppError) => {
                   const apiError = findError(error.errorCode);
                   const errorField = getErrorField(error.errorCode);
-
-                  console.log(apiError);
 
                   if (!!errorField) {
 
@@ -804,12 +785,6 @@ const Profile: React.FC = () => {
   // useEffect(() => {
   //   formRef.current?.setData({ ...user })
   // }, [formRef, user])
-
-  useEffect(() => {
-    console.log('(2) User:')
-    console.log(user)
-    console.log(`(2) Flow Step: ${flowStep}`)
-  }, [user, flowStep])
 
   return (
     <div className={styles.profileContainer}>
