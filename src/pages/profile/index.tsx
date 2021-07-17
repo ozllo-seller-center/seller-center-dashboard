@@ -31,6 +31,7 @@ import { useModalMessage } from 'src/hooks/message';
 import { AppError, findError, getErrorField } from 'src/shared/errors/api/errors';
 import MessageModal from 'src/components/MessageModal';
 import { FiCheck, FiX } from 'react-icons/fi';
+import MaskedInput from 'src/components/MaskedInput';
 
 interface PersonalInfoDTO {
   isPF: boolean,
@@ -118,7 +119,6 @@ const Profile: React.FC = () => {
   const [contactClassName, setContactClassName] = useState(styles.flowUnset);
   const [sellerClassName, setSellerClassName] = useState(styles.flowUnset);
   const [shopClassName, setShopClassName] = useState(styles.flowUnset);
-
 
   const formRef = useRef<FormHandles>(null);
 
@@ -341,7 +341,7 @@ const Profile: React.FC = () => {
         if (!!user.personalInfo && user.userType === 'f')
           return {
             contact: Yup.object().shape({
-              phone: Yup.string().min(10, 'O telefone/celular deve ter pelo menos 10 digitos').required('O telefone/celular deve ser preenchido'),
+              phone: Yup.string().min(12, 'O telefone/celular deve ter pelo menos 10 digitos').required('O telefone/celular deve ser preenchido'),
             })
           }
 
@@ -415,11 +415,18 @@ const Profile: React.FC = () => {
       setStepCompleted(false);
       setLoading(true);
 
+      if (!!data.contact.phone)
+        data.contact.phone = data.contact.phone.replaceAll('_', '');
+
+      data.bankInfo.agency = data.bankInfo.agency.replaceAll('_', '').replace('-', '');
+      data.bankInfo.account = data.bankInfo.account.replaceAll('_', '').replace('-', '');
+
       try {
         formRef.current?.setErrors({});
         // setStepCompleted(false);
 
         const schema = Yup.object().shape({ ...yupValidationSchema });
+
         await schema.validate(data, { abortEarly: false });
 
         if (!isChanged) {
@@ -517,8 +524,6 @@ const Profile: React.FC = () => {
                   const apiError = findError(error.errorCode);
                   const errorField = getErrorField(error.errorCode);
 
-                  console.log(apiError);
-
                   if (!!errorField) {
                     formRef.current?.setFieldError(errorField.errorField, !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
                     handleModalMessage(true, { title: !!apiError.description ? apiError.description : 'Erro', message: !!apiError.example ? apiError.example : ['Erro indefinido'], type: 'error' })
@@ -542,8 +547,8 @@ const Profile: React.FC = () => {
               number,
             } = data.address;
 
-            var cepFormatted = cep.replaceAll("-", "");
-            cepFormatted = cepFormatted.slice(0, 5) + "-" + cepFormatted.slice(5, cep.length)
+            // var cepFormatted = cep.replaceAll("-", "");
+            // cepFormatted = cepFormatted.slice(0, 5) + "-" + cepFormatted.slice(5, cep.length)
 
             if (!!complement) {
               if (complement.length < 4) {
@@ -555,7 +560,7 @@ const Profile: React.FC = () => {
             }
 
             const addressInfo = {
-              cep: cepFormatted,
+              cep,
               address,
               city,
               complement,
@@ -737,7 +742,7 @@ const Profile: React.FC = () => {
         // });
       }
     },
-    [isChanged, isStepCompleted],
+    [isChanged, flowIntent],
   );
 
   const handleAvatarChange = useCallback(
@@ -895,8 +900,8 @@ const Profile: React.FC = () => {
                             onChange={() => {
                               setChanged(true)
                             }}
-                          // type='numeric'
-                          // maxLength={2}
+                            type='numeric'
+                            maxLength={2}
                           />
 
                           <Input
@@ -915,7 +920,7 @@ const Profile: React.FC = () => {
                       </Scope>
 
                       <Scope path={'personalInfo'}>
-                        <Input
+                        {/* <Input
                           name='cpf'
                           placeholder='CPF'
                           autoComplete='off'
@@ -926,6 +931,16 @@ const Profile: React.FC = () => {
                           }}
                           maxLength={11}
                         // value={!!user?.cpf ? user.cpf : ''}
+                        /> */}
+                        <MaskedInput
+                          name='cpf'
+                          placeholder='CPF'
+                          mask='999.999.999-99'
+                          // maskChar="_"
+                          autoComplete='off'
+                          onChange={() => {
+                            setChanged(true)
+                          }}
                         />
                       </Scope>
                     </>
@@ -952,16 +967,16 @@ const Profile: React.FC = () => {
                           }}
                         />
 
-                        <Input
+                        <MaskedInput
                           name='cnpj'
                           placeholder='CNPJ'
                           autoComplete='off'
                           // isMasked
-                          // mask={'999.999.999-99'}
+                          mask={'999.999.999-99'}
                           onChange={() => {
                             setChanged(true)
                           }}
-                          maxLength={14}
+                        // maxLength={14}
                         // value={!!user?.cpf ? user.cpf : ''}
                         />
 
@@ -1007,17 +1022,15 @@ const Profile: React.FC = () => {
                 />
 
                 <Scope path={'contact'}>
-                  <Input
+                  <MaskedInput
                     name='phone'
                     placeholder='Telefone/celular'
                     autoComplete='off'
-                    // isMasked
-                    // mask={'99999-999'}
+                    mask={'99 99999-9999'}
                     onChange={() => {
                       setChanged(true)
                     }}
-                    // type={'numer'}
-                    maxLength={11}
+                  // maxLength={11}
                   />
 
                   {!!user && user.userType === 'j' &&
@@ -1035,17 +1048,14 @@ const Profile: React.FC = () => {
                 <div className={addressClassName}>
                   <h3>Seu endereço</h3>
 
-                  <Input
+                  <MaskedInput
                     name='cep'
                     placeholder='CEP'
                     autoComplete='off'
-                    // isMasked
-                    // mask={'99999-999'}
+                    mask='99999-999'
                     onChange={() => {
                       setChanged(true)
                     }}
-                    // type={'numer'}
-                    maxLength={9}
                   />
 
                   <Input
@@ -1124,30 +1134,33 @@ const Profile: React.FC = () => {
                     />
                   </div>
 
-                  <Input
+                  <MaskedInput
                     name='agency'
                     placeholder='Agencia'
                     autoComplete='off'
                     // isMasked
-                    // mask={'9999-9'}
-                    onChange={() => {
+                    mask={'9999-9'}
+                    maskChar='0'
+                    alwaysShowMask
+                    onChange={(e) => {
                       setChanged(true)
+                      // setAgencyMask(e.target.value.length <= 4 ? '999-9' : '9999-9')
                     }}
-                    // type={'number'}
-                    maxLength={5}
+                  // type={'number'}
+                  // maxLength={5}
                   />
 
-                  <Input
+                  <MaskedInput
                     name='account'
                     placeholder='Conta'
                     autoComplete='off'
                     // isMasked
-                    // mask={'99999-9'}
-                    onChange={() => {
+                    mask={'99999-9'}
+                    onChange={(e) => {
                       setChanged(true)
                     }}
-                    // type={'number'}
-                    maxLength={10}
+                  // type={'number'}
+                  // maxLength={10}
                   />
 
                   <Input
