@@ -36,6 +36,7 @@ type VariationDTO = {
 
 export function EditProductForm() {
   // const [files, setFiles] = useState<File[]>([]);
+  // const [formData, setFormData] = useState<Product>();
   const [filesUrl, setFilesUrl] = useState<string[]>([]);
 
   const [filledFields, setFilledFields] = useState(0);
@@ -55,26 +56,17 @@ export function EditProductForm() {
   const { isLoading, setLoading } = useLoading();
   const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
 
-  const [sizes, setSizes] = useState<string[]>([]);
-  const [colors, setColors] = useState<string[]>([]);
+  const [attributes, setAttributes] = useState([]);
 
   useEffect(() => {
     // setLoading(true)
-
-    api.get('/size/all').then(response => {
-      setSizes(response.data)
-    }).catch((err) => {
-      console.log(err);
-    })
-
-    api.get('/color/all').then(response => {
-      setColors(response.data)
-      // setLoading(false)
-    }).catch((err) => {
+    api.get('/account/detail').then(response => {
+      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
+    }).catch(err => {
       console.log(err)
-      // setLoading(false)
-    })
+    });
   }, [])
+
 
   useEffect(() => {
     // api.get('/account/detail').then(response => {
@@ -85,7 +77,7 @@ export function EditProductForm() {
 
     setLoading(true);
 
-    if (!!formRef.current) {
+    if (!!formRef.current && !!user) {
       const { id } = router.query;
 
       api.get(`/product/${id}`, {
@@ -95,18 +87,17 @@ export function EditProductForm() {
         }
       }).then(response => {
 
-        setNationality(response.data.nationality)
-        setCategory(response.data.category)
-        setSubCategory(response.data.subcategory)
-
         setFilesUrl(response.data.images)
         setGenderRadio(response.data.gender)
 
         setVariations(response.data.variations)
 
-        formRef.current?.setData(response.data)
+        setNationality(response.data.nationality)
+        setCategory(response.data.category)
+        setSubCategory(response.data.subcategory)
 
-        setFilledFields(10 + response.data.variations.length * 3)
+        formRef.current?.setData(response.data)
+        // setFormData(response.data);
 
         setLoading(false)
       }).catch(err => {
@@ -116,7 +107,33 @@ export function EditProductForm() {
         handleModalMessage(true, { title: 'Erro', message: ['Erro ao carregar o produto'], type: 'error' })
       })
     }
-  }, [formRef])
+  }, [user, formRef])
+
+  useEffect(() => {
+    setLoading(true)
+
+    if (!!category && category.length > 0) {
+      api.get(`/category/${category}/attributes`).then(response => {
+        setAttributes(response.data)
+
+        console.log(response.data)
+        console.log(`Total Fields: ${10 + variations.length * (Object.keys(response.data).length + 1)}`)
+        console.log(`Variation.length: ${variations.length}`)
+        setFilledFields(10 + variations.length * (Object.keys(response.data).length + 1))
+
+        setLoading(false)
+      }).catch(err => {
+        console.log(err)
+
+        setLoading(false)
+      })
+    }
+  }, [category])
+
+  // useEffect(() => {
+  //   if (!!formData)
+  //     formRef.current?.setData(formData)
+  // }, [formRef, formData, attributes])
 
   // const handleOnFileUpload = useCallback((file: string[]) => {
   //   calcFilledFields(formRef.current?.getData() as Product);
@@ -135,17 +152,30 @@ export function EditProductForm() {
 
   useEffect(() => {
     if (variations.length > 0) {
-      setTotalFields(10 + variations.length * 3)
+      setTotalFields(10 + variations.length * (Object.keys(attributes).length + 1))
       return;
     }
 
-    setTotalFields(13)
-    setFilledFields(13)
-  }, [variations])
+    setTotalFields(10 + (Object.keys(attributes).length + 1))
+    setFilledFields(10 + (Object.keys(attributes).length + 1))
+  }, [variations, attributes])
 
   const calcFilledFields = useCallback((data: Product) => {
 
     let filled = 0;
+
+    const keys = Object.keys(attributes);
+
+    keys.map(key => {
+      switch (key) {
+        case 'gluten_free':
+          filled++;
+          break;
+        case 'lactose_free':
+          filled++;
+          break;
+      }
+    })
 
     if (data.name)
       filled++;
@@ -172,14 +202,36 @@ export function EditProductForm() {
       !!variation.size && filled++;
       !!variation.stock && filled++;
       !!variation.color && filled++;
+      !!variation.flavor && filled++;
     })
 
     setFilledFields(filled);
-  }, [filesUrl, filledFields, totalFields])
+  }, [filesUrl, filledFields, totalFields, attributes])
 
   const handleModalVisibility = useCallback(() => {
     handleModalMessage(false);
   }, [])
+
+  const yupVariationSchema = useCallback((): object => {
+    const keys = Object.keys(attributes);
+
+    return keys.includes('flavors') ?
+      {
+        variations: Yup.array().required().of(Yup.object().shape({
+          size: Yup.string().required('Campo obrigatório'),
+          flavor: Yup.string().required('Campo obrigatório'),
+          stock: Yup.number().typeError('Campo obrigatório').required('Campo obrigatório').min(0, 'Valor mínimo 0'),
+        }))
+      }
+      :
+      {
+        variations: Yup.array().required().of(Yup.object().shape({
+          size: Yup.string().required('Campo obrigatório'),
+          color: Yup.string().required('Campo obrigatório'),
+          stock: Yup.number().typeError('Campo obrigatório').required('Campo obrigatório').min(0, 'Valor mínimo 0'),
+        }))
+      }
+  }, [attributes])
 
   const handleSubmit = useCallback(async (data) => {
     if (filledFields < totalFields) {
@@ -210,17 +262,7 @@ export function EditProductForm() {
         gender: Yup.string(),
         price: Yup.number().required('Campo obrigatório'),
         price_discounted: Yup.number().nullable().min(0, 'Valor mínimo de R$ 0').max(data.price, `Valor máximo de R$ ${data.price}`),
-        variations: Yup.array().required().of(Yup.object().shape({
-          // type: Yup.string().equals(['number', 'size']),
-          // size: Yup.mixed().when('type', {
-          //   is: (val: 'number' | 'size') => val === 'number',
-          //   then: Yup.number().required('Campo obrigatório'),
-          //   otherwise: Yup.string().required('Campo obrigatório'),
-          // }),
-          size: Yup.string().required('Campo obrigatório'),
-          color: Yup.string().required('Campo obrigatório'),
-          stock: Yup.number().typeError('Campo obrigatório').required('Campo obrigatório').min(0, 'Valor mínimo 0'),
-        })),
+        ...yupVariationSchema(),
       });
 
       await schema.validate(data, { abortEarly: false });
@@ -535,8 +577,7 @@ export function EditProductForm() {
                           variation={variation}
                           index={i}
                           handleDeleteVariation={() => handleDeleteVariation(i)}
-                          colors={colors}
-                          sizes={sizes}
+                          attributes={attributes}
                           allowDelete={variations.length > 1}
                         />
                       </Scope>

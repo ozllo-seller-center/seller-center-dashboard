@@ -302,3 +302,13 @@
     }
   }
 }
+
+.loadingContainer {
+  flex: 1;
+
+  // background: radial-gradient(var(--gray-250), transparent 75%, transparent);
+  // background: var(--gray-100);
+  opacity: 0.75;
+
+  z-index: 10;
+}
