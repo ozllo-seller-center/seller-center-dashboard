@@ -1,7 +1,10 @@
 export type Variation = {
   size: number | string,
-  stock: number,
-  color: string,
+  stock?: number,
+  color?: string,
+  flavor?: string,
+  gluten_free?: boolean,
+  lactose_free?: boolean,
 }
 
 export type Product = {

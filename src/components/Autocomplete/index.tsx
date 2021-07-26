@@ -61,7 +61,7 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, ite
     }
 
     if (!!setSelectedItem)
-      setSelectedItem(-1);
+      setSelectedItem(undefined);
 
     setSelectedSuggestion(-1);
     setShowSuggestions(false);
@@ -74,7 +74,7 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, ite
     setSelectedSuggestion(selectedIndex);
 
     if (!!setSelectedItem)
-      setSelectedItem(selectedIndex);
+      setSelectedItem(items[selectedIndex]);
 
     if (!!inputRef.current)
       inputRef.current.value = value;
@@ -139,7 +139,7 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, ite
               filteredSuggestions.map((suggestion, i) => (
                 <>
                   <li
-                    key={suggestion}
+                    key={i}
                     className={(i >= 0 && i < filteredSuggestions.length - 1) ? styles.divider : ''}
                     onMouseDown={(e) => {
                       e.preventDefault();
