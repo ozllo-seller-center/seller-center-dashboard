@@ -75,3 +75,19 @@
 .variationContainer + .variationContainer {
   margin-top: 1rem;
 }
+
+.grid3{
+  grid-template-columns: .35fr 1fr 1fr 1fr 1fr .25fr;
+}
+
+.grid4{
+  grid-template-columns: .35fr 1fr 1fr .35fr .35fr 1fr .25fr;
+}
+
+.gridMobile3{
+  grid-template-columns: 1fr 1fr 1fr 1fr .5fr;
+}
+
+.gridMobile4{
+  grid-template-columns: 1fr 1fr .25fr .25fr 1fr 1fr 1fr .5fr;
+}

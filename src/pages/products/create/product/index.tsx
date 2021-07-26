@@ -32,6 +32,9 @@ type VariationDTO = {
   size?: number | string,
   stock?: number,
   color?: string,
+  flavor?: string;
+  gluten_free?: boolean;
+  lactose_free?: boolean;
 }
 
 export function ProductForm() {
@@ -51,28 +54,22 @@ export function ProductForm() {
   const { isLoading, setLoading } = useLoading();
   const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
 
-  const [sizes, setSizes] = useState<string[]>([]);
-  const [colors, setColors] = useState<string[]>([]);
+  const [attributes, setAttributes] = useState([]);
 
   useEffect(() => {
+    setLoading(true)
+
     api.get('/account/detail').then(response => {
       updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
     }).catch(err => {
       console.log(err)
     });
 
-    setLoading(true)
+    api.get(`/category/${router.query.category}/attributes`).then(response => {
+      setAttributes(response.data)
 
-    api.get('/size/all').then(response => {
-      setSizes(response.data)
-    }).catch((err) => {
-      console.log(err);
-    })
-
-    api.get('/color/all').then(response => {
-      setColors(response.data)
       setLoading(false)
-    }).catch((err) => {
+    }).catch(err => {
       console.log(err)
       setLoading(false)
     })
@@ -95,15 +92,28 @@ export function ProductForm() {
 
   useEffect(() => {
     if (variations.length > 0) {
-      setTotalFields(10 + variations.length * 3)
+      setTotalFields(10 + variations.length * (Object.keys(attributes).length + 1))
       return;
     }
 
-    setTotalFields(13)
-  }, [variations])
+    setTotalFields(10 + (Object.keys(attributes).length + 1))
+  }, [variations, attributes])
 
   const calcFilledFields = useCallback((data: Product) => {
+    const keys = Object.keys(attributes);
+
     let filled = 0;
+
+    keys.map(key => {
+      switch (key) {
+        case 'gluten_free':
+          filled++;
+          break;
+        case 'lactose_free':
+          filled++;
+          break;
+      }
+    })
 
     if (data.name)
       filled++;
@@ -130,14 +140,36 @@ export function ProductForm() {
       !!variation.size && filled++;
       !!variation.stock && filled++;
       !!variation.color && filled++;
+      !!variation.flavor && filled++;
     })
 
     setFilledFields(filled);
-  }, [filesUrl, filledFields, totalFields])
+  }, [filesUrl, filledFields, totalFields, attributes])
 
   const handleModalVisibility = useCallback(() => {
     handleModalMessage(false);
   }, [])
+
+  const yupVariationSchema = useCallback((): object => {
+    const keys = Object.keys(attributes);
+
+    return keys.includes('flavors') ?
+      {
+        variations: Yup.array().required().of(Yup.object().shape({
+          size: Yup.string().required('Campo obrigatório'),
+          flavor: Yup.string().required('Campo obrigatório'),
+          stock: Yup.number().typeError('Campo obrigatório').required('Campo obrigatório').min(0, 'Valor mínimo 0'),
+        }))
+      }
+      :
+      {
+        variations: Yup.array().required().of(Yup.object().shape({
+          size: Yup.string().required('Campo obrigatório'),
+          color: Yup.string().required('Campo obrigatório'),
+          stock: Yup.number().typeError('Campo obrigatório').required('Campo obrigatório').min(0, 'Valor mínimo 0'),
+        }))
+      }
+  }, [attributes])
 
   const handleSubmit = useCallback(async (data) => {
     if (filledFields < totalFields) {
@@ -168,17 +200,7 @@ export function ProductForm() {
         gender: Yup.string(),
         price: Yup.number().required('Campo obrigatório'),
         price_discounted: Yup.number().nullable().min(0, 'Valor mínimo de R$ 0').max(data.price, `Valor máximo de R$ ${data.price}`),
-        variations: Yup.array().required().of(Yup.object().shape({
-          // type: Yup.string().equals(['number', 'size']),
-          // size: Yup.mixed().when('type', {
-          //   is: (val: 'number' | 'size') => val === 'number',
-          //   then: Yup.number().required('Campo obrigatório'),
-          //   otherwise: Yup.string().required('Campo obrigatório'),
-          // }),
-          size: Yup.string().required('Campo obrigatório'),
-          color: Yup.string().required('Campo obrigatório'),
-          stock: Yup.number().typeError('Campo obrigatório').required('Campo obrigatório').min(0, 'Valor mínimo 0'),
-        })),
+        ...yupVariationSchema()
       });
 
       await schema.validate(data, { abortEarly: false });
@@ -274,16 +296,13 @@ export function ProductForm() {
       console.log(err)
       if (err instanceof Yup.ValidationError) {
         const errors = getValidationErrors(err);
+        console.log(errors)
         formRef.current?.setErrors(errors);
 
         return;
       }
     }
   }, [router, token, user, filledFields, totalFields])
-
-  const variationsController = useMemo(() => {
-    return variations
-  }, [variations])
 
   async function handleDeleteVariation(deletedIndex: number): Promise<void> {
     setVariations(formRef.current?.getData().variations)
@@ -316,14 +335,21 @@ export function ProductForm() {
             Voltar
           </Button>
         </section>
+
         <div className={styles.divider} />
+
         <section className={styles.content}>
-          <Form ref={formRef} onSubmit={handleSubmit} onChange={(e) => {
-            calcFilledFields(formRef.current?.getData() as Product);
-            // const formData = formRef.current?.getData() as Product;
-            // setVariations(formData.variations);
-          }}>
+          <Form
+            ref={formRef}
+            onSubmit={handleSubmit}
+            onChange={(e) => {
+              calcFilledFields(formRef.current?.getData() as Product);
+              // const formData = formRef.current?.getData() as Product;
+              // setVariations(formData.variations);
+            }}
+          >
             <p className={styles.imagesTitle}>Seleciones as fotos do produto</p>
+
             <div className={styles.imagesContainer}>
               <Dropzone
                 name='images'
@@ -333,12 +359,14 @@ export function ProductForm() {
                 files={files}
                 setFiles={setFiles}
               />
+
               {
                 filesUrl.map((file, i) => (
                   <ImageCard key={i} onClick={() => handleDeleteFile(file)} imgUrl={file} />
                 ))
               }
             </div>
+
             <div className={styles.doubleInputContainer}>
               <Input
                 name='name'
@@ -346,13 +374,13 @@ export function ProductForm() {
                 placeholder='Insira o nome do produto'
                 autoComplete='off'
               />
+
               <Input
                 name='brand'
                 label='Marca'
                 placeholder='Insira a marca'
                 autoComplete='off'
               />
-
             </div>
 
             <div className={styles.singleInputContainer}>
@@ -366,6 +394,7 @@ export function ProductForm() {
 
             <div className={styles.titledContainer}>
               <p className={styles.title}>Selecione o gênero</p>
+
               <RadioButtonGroup
                 name='gender'
                 defaultRadio='M'
@@ -375,6 +404,7 @@ export function ProductForm() {
                   { name: 'unissex', value: 'U', label: 'Unissex' }]}
               />
             </div>
+
             <div className={styles.multipleInputContainer}>
               <Input
                 name='ean'
@@ -382,6 +412,7 @@ export function ProductForm() {
                 placeholder='EAN do produto (opcional)'
                 autoComplete='off'
               />
+
               <Input
                 name='sku'
                 label='SKU'
@@ -389,6 +420,7 @@ export function ProductForm() {
                 autoComplete='off'
               // disabled //TODO: gerar automagico o SKU
               />
+
               <Input
                 name='price'
                 label='Preço (R$)'
@@ -397,6 +429,7 @@ export function ProductForm() {
                 type='number'
                 min={0}
               />
+
               <Input
                 name='price_discounted'
                 label='Preço com desconto (R$)'
@@ -406,6 +439,7 @@ export function ProductForm() {
                 min={0}
               />
             </div>
+
             <div className={styles.multipleInputContainer}>
               <Input
                 name='height'
@@ -414,6 +448,7 @@ export function ProductForm() {
                 autoComplete='off'
                 type='number'
               />
+
               <Input
                 name='width'
                 label='Largura (cm)'
@@ -421,6 +456,7 @@ export function ProductForm() {
                 autoComplete='off'
                 type='number'
               />
+
               <Input
                 name='length'
                 label='Comprimento (cm)'
@@ -428,6 +464,7 @@ export function ProductForm() {
                 autoComplete='off'
                 type='number'
               />
+
               <Input
                 name='weight'
                 label='Peso (g)'
@@ -435,6 +472,7 @@ export function ProductForm() {
                 autoComplete='off'
               />
             </div>
+
             <div className={styles.variationsContainer}>
               <div className={styles.variationsContainerTitle}>
                 <div className={styles.variationsTitle}>
@@ -442,6 +480,7 @@ export function ProductForm() {
                   <span>Preencha <b>todos</b> os campos</span>
                 </div>
               </div>
+
               <VariationsController handleAddVariation={handleAddVariation}>
                 {
                   variations.map((variation, i) => {
@@ -451,8 +490,7 @@ export function ProductForm() {
                           variation={variation}
                           index={i}
                           handleDeleteVariation={() => handleDeleteVariation(i)}
-                          colors={colors}
-                          sizes={sizes}
+                          attributes={attributes}
                           allowDelete={variations.length > 1}
                         />
                       </Scope>

@@ -4,7 +4,6 @@ import { FormHandles, Scope } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 import { cnpj as cnpjValidator, cpf } from 'cpf-cnpj-validator';
-import { InactiveUserError } from 'src/shared/errors/InactiveUserError';
 
 import { useAuth } from '../../hooks/auth';
 
@@ -16,14 +15,12 @@ import styles from './styles.module.scss';
 
 import Input from '../../components/InputLabeless';
 import Button from '../../components/PrimaryButton';
-import AvatarInput from '../../components/AvatarInput';
 import { format } from 'date-fns';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useLoading } from 'src/hooks/loading';
 import { Loader } from 'src/components/Loader';
 import Autocomplete from 'src/components/Autocomplete';
-import { banks } from 'src/shared/consts/banks';
 import { CompanyInfo, PersonInfo } from 'src/shared/types/personalInfo';
 import UserTypeButton from 'src/components/UserTypeButton';
 import { FaUserTie, FaStore } from 'react-icons/fa';
@@ -32,6 +29,7 @@ import { AppError, findError, getErrorField } from 'src/shared/errors/api/errors
 import MessageModal from 'src/components/MessageModal';
 import { FiCheck, FiX } from 'react-icons/fi';
 import MaskedInput from 'src/components/MaskedInput';
+import { Bank } from 'src/shared/types/bank';
 
 interface PersonalInfoDTO {
   isPF: boolean,
@@ -120,6 +118,8 @@ const Profile: React.FC = () => {
   const [sellerClassName, setSellerClassName] = useState(styles.flowUnset);
   const [shopClassName, setShopClassName] = useState(styles.flowUnset);
 
+  const [banks, setBanks] = useState<Bank[]>([]);
+
   const formRef = useRef<FormHandles>(null);
 
   const router = useRouter();
@@ -183,6 +183,18 @@ const Profile: React.FC = () => {
       setLoading(false);
     });
   }, [])
+
+  useEffect(() => {
+    if (!!user) {
+      api.get('/bank/all').then(response => {
+        setBanks(response.data.map((bank: any) => {
+          return { code: bank.value, name: bank.name }
+        }))
+      }).catch(err => {
+        console.log(err)
+      })
+    }
+  }, [user])
 
   useEffect(() => {
     if (flowStep === TYPE_INDEX) {
@@ -776,22 +788,27 @@ const Profile: React.FC = () => {
     [updateUser],
   );
 
-  const handleSetBankCode = useCallback((index: number) => {
-    if (index >= 0) {
+  const handleSetBankCode = useCallback((bank: string) => {
+    if (!!bank) {
+      setChanged(true)
+      const index = banks.findIndex(b => bank === b.name);
       formRef.current?.setFieldValue('bankInfo.bank', banks[index].code);
       return;
     }
 
     formRef.current?.setFieldValue('bankInfo.bank', '');
-  }, []);
+  }, [banks]);
 
-  const handleSetBankName = useCallback((index: number) => {
-    if (index >= 0) {
+  const handleSetBankName = useCallback((code: string) => {
+    if (!!code) {
+      setChanged(true)
+      const index = banks.findIndex(b => code === b.code);
       formRef.current?.setFieldValue('bankInfo.name', banks[index].name);
+      return;
     }
 
     formRef.current?.setFieldValue('bankInfo.name', '');
-  }, []);
+  }, [banks]);
 
   const handleReturn = useCallback(() => {
     setFlowIntent(false);
@@ -1166,7 +1183,7 @@ const Profile: React.FC = () => {
                     placeholder='Conta'
                     autoComplete='off'
                     // isMasked
-                    mask={'99999-9'}
+                    mask={'99999999-9'}
                     onChange={(e) => {
                       setChanged(true)
                     }}

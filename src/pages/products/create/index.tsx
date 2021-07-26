@@ -9,12 +9,11 @@ import { useRouter } from 'next/router';
 import styles from './styles.module.scss';
 import { GetStaticProps } from 'next';
 import { Nationality } from 'src/shared/types/nationality';
-import { Category, SubCategory } from 'src/shared/types/category';
+import { Category, SubCategory, DefaultAttribute, FoodAttribute } from 'src/shared/types/category';
 
 import api from 'src/services/api';
 import { useLoading } from 'src/hooks/loading';
-import { useAuth } from 'src/hooks/auth';
-import { sub_categories } from 'src/shared/consts/category';
+import { Loader } from 'src/components/Loader';
 
 interface CategoriesDTO {
   nationalities: Nationality[];
@@ -30,7 +29,7 @@ export function NewProduct({ nationalities: nationalitiesFromApi }: CategoriesDT
   const [categories, setCategories] = useState([] as Category[]);
   const [subCategories, setSubCategories] = useState([] as SubCategory[]);
 
-  const { setLoading } = useLoading();
+  const { setLoading, isLoading } = useLoading();
 
   const router = useRouter();
 
@@ -65,18 +64,20 @@ export function NewProduct({ nationalities: nationalitiesFromApi }: CategoriesDT
   useEffect(() => {
     if (!!category) {
       setLoading(true);
-      setSubCategories(sub_categories.filter((sc: SubCategory) => sc.categoryCode === category.code))
-      setLoading(false);
+      // setSubCategories(sub_categories.filter((sc: SubCategory) => sc.categoryCode === category.code))
+      // setLoading(false);
 
-      // api.get(`/category/${category._id}/subcategory`).then(response => {
-      //   setSubCategories(response.data)
+      api.get(`/category/${category.code}/subcategories`).then(response => {
+        setSubCategories(response.data)
 
-      //   setLoading(false)
-      // }).catch(err => {
-
-      //   setLoading(false)
-      // })
+        setLoading(false)
+      }).catch(err => {
+        console.log(err)
+        setLoading(false)
+      })
     }
+
+    setSubCategories([])
   }, [category])
 
   const handleNationality = useCallback((n: Nationality) => {
@@ -97,14 +98,14 @@ export function NewProduct({ nationalities: nationalitiesFromApi }: CategoriesDT
       query: {
         nationality: nationality?.id,
         category: category?.code,
-        subCategory: subCategory?.code
-      }
+        subCategory: subCategory?.code,
+      },
     })
   }, [nationality, category, subCategory])
 
   return (
-    <main className={styles.container}>
-      <section className={styles.header}>
+    <div className={styles.container}>
+      <div className={styles.header}>
         <BulletedButton
           onClick={() => { router.push((!!width && width < 768) ? '/products-mobile' : '/products') }}>
           Meus produtos
@@ -119,9 +120,9 @@ export function NewProduct({ nationalities: nationalitiesFromApi }: CategoriesDT
           onClick={() => { router.push('/products/import') }}>
           Importar ou exportar
         </BulletedButton>
-      </section>
+      </div>
       <div className={styles.divider} />
-      <section className={styles.content}>
+      <div className={styles.content}>
         <div className={styles.contentHeader}>
           <h4>Suas categorias</h4>
           <Button disabled>Nova categoria</Button>
@@ -160,7 +161,7 @@ export function NewProduct({ nationalities: nationalitiesFromApi }: CategoriesDT
                   }
                 </div>
                 {
-                  !!category && (
+                  (!!category && !isLoading) && (
                     <div className={styles.subcategoryContainer}>
                       {
                         (!!subCategories && subCategories.length > 0) && (
@@ -189,12 +190,19 @@ export function NewProduct({ nationalities: nationalitiesFromApi }: CategoriesDT
                     </div>
                   )
                 }
+                {
+                  (!!category && isLoading) && (
+                    <div className={styles.loadingContainer}>
+                      <Loader />
+                    </div>
+                  )
+                }
               </div>
             )
           }
         </div>
-      </section>
-    </main >
+      </div>
+    </div >
   )
 }
 

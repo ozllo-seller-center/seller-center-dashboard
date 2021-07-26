@@ -9,13 +9,6 @@ import { useLoading } from 'src/hooks/loading';
 import Variation from './Variation';
 import { HTMLAttributes } from 'react';
 
-export type VariationDTO = {
-  _id?: string;
-  size?: number | string,
-  stock?: number,
-  color?: string,
-}
-
 interface VariationsControllerProps extends HTMLAttributes<HTMLDivElement> {
   handleAddVariation: Function;
 }
