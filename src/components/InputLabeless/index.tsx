@@ -61,7 +61,7 @@ const Input: React.FC<InputProps> = ({
   const { fieldName, defaultValue, error, registerField } = useField(name);
 
   const [isFocused, setIsFocused] = useState(false);
-  const [isFilled, setIsFilled] = useState(false);
+  const [isFilled, setIsFilled] = useState(!!defaultValue);
 
   useEffect(() => {
     registerField({
