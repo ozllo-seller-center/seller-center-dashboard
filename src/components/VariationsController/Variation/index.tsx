@@ -10,6 +10,7 @@ import styles from './styles.module.scss'
 import { useCallback } from 'react';
 import { boolean } from 'yup';
 import Checkbox from 'src/components/Checkbox';
+import { Attribute } from 'src/shared/types/category';
 
 interface DefaultVariationDTO {
   _id?: string;
@@ -26,7 +27,7 @@ interface VariationAttributes {
   label: string;
   placeholder: string;
   type: string;
-  valueAt: string;
+  // valueAt: string;
 }
 interface VariationProps {
   variation: any;
@@ -66,27 +67,25 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
     if (!!attributes) {
       let attributeDefs: VariationAttributes[];
 
-      const keys = Object.keys(attributes);
-
-      attributeDefs = keys.map(key => {
-        let valueAt;
+      attributeDefs = attributes.map((attribute: Attribute) => {
+        // let valueAt;
         let label;
         let placeholder;
 
-        switch (key) {
-          case 'colors':
+        switch (attribute.name) {
+          case 'color':
             label = 'Cor'
             placeholder = 'Escolha a cor'
             break;
-          case 'sizes':
+          case 'size':
             label = 'Tamanho/medida'
             placeholder = 'Tamanho/medida'
             break;
-          case 'flavors':
+          case 'flavor':
             label = 'Sabor'
             placeholder = 'Escolha o sabor'
             break;
-          case 'voltages':
+          case 'voltage':
             label = 'Voltagens'
             placeholder = 'Escolha o voltagem'
             break;
@@ -104,22 +103,22 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
             break;
         }
 
-        switch (key) {
-          case 'colors':
-          case 'sizes':
-          case 'flavors':
-          case 'voltages':
-            valueAt = key.substring(0, key.length - 1)
-            break;
-          default:
-            valueAt = key
-            break;
-        }
+        // switch (attribute.name) {
+        //   case 'color':
+        //   case 'size':
+        //   case 'flavor':
+        //   case 'voltag':
+        //     valueAt = key.substring(0, key.length - 1)
+        //     break;
+        //   default:
+        //     valueAt = key
+        //     break;
+        // }
 
         return {
-          name: key,
-          type: (typeof attributes[key][0]) as string,
-          valueAt,
+          name: attribute.name,
+          type: attribute.type,
+          // valueAt,
           label,
           placeholder,
         }
@@ -169,39 +168,39 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
         {(!!width && width < 768) ? (
           <div className={mobileContainerStyle}>
             {
-              variationAttributes.map(variationAttribute => {
+              variationAttributes.map((variationAttribute, i) => {
                 switch (variationAttribute.type) {
                   case 'boolean':
                     return (
                       <Checkbox
                         key={variationAttribute.name}
-                        name={variationAttribute.valueAt}
+                        name={variationAttribute.name}
                         label={variationAttribute.label}
-                        defaultValue={variation[variationAttribute.valueAt]}
-                        defaultChecked={variation[variationAttribute.valueAt]}
+                        defaultValue={variation[variationAttribute.name]}
+                        defaultChecked={variation[variationAttribute.name]}
                       />
                     )
                   case 'number':
                     return (
                       <Input
                         key={variationAttribute.name}
-                        name={variationAttribute.valueAt}
+                        name={variationAttribute.name}
                         label={variationAttribute.label}
                         placeholder={variationAttribute.placeholder}
                         autoComplete='off'
-                        defaultValue={variation[variationAttribute.valueAt]}
+                        defaultValue={variation[variationAttribute.name]}
                       />
                     )
                   default:
                     return (
                       <Autocomplete
                         key={variationAttribute.name}
-                        name={variationAttribute.valueAt}
-                        items={attributes[variationAttribute.valueAt]}
+                        name={variationAttribute.name}
+                        items={attributes[i].values}
                         label={variationAttribute.label}
                         placeholder={variationAttribute.placeholder}
                         autoComplete='off'
-                        defaultValue={variation[variationAttribute.valueAt]}
+                        defaultValue={variation[variationAttribute.name]}
                       />
                     )
                 }
@@ -232,39 +231,39 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
         ) : (
           <>
             {
-              variationAttributes.map(variationAttribute => {
+              variationAttributes.map((variationAttribute, i) => {
                 switch (variationAttribute.type) {
                   case 'boolean':
                     return (
                       <Checkbox
                         key={variationAttribute.name}
-                        name={variationAttribute.valueAt}
+                        name={variationAttribute.name}
                         label={variationAttribute.label}
                         placeholder={variationAttribute.placeholder}
-                        defaultChecked={variation[variationAttribute.valueAt]}
+                        defaultChecked={variation[variationAttribute.name]}
                       />
                     )
                   case 'number':
                     return (
                       <Input
                         key={variationAttribute.name}
-                        name={variationAttribute.valueAt}
+                        name={variationAttribute.name}
                         label={variationAttribute.label}
                         placeholder={variationAttribute.placeholder}
                         autoComplete='off'
-                        defaultValue={variation[variationAttribute.valueAt]}
+                        defaultValue={variation[variationAttribute.name]}
                       />
                     )
                   default:
                     return (
                       <Autocomplete
                         key={variationAttribute.name}
-                        name={variationAttribute.valueAt}
-                        items={attributes[variationAttribute.name]}
+                        name={variationAttribute.name}
+                        items={attributes[i].values}
                         label={variationAttribute.label}
                         placeholder={variationAttribute.placeholder}
                         autoComplete='off'
-                        defaultValue={variation[variationAttribute.valueAt]}
+                        defaultValue={variation[variationAttribute.name]}
                       />
                     )
                 }

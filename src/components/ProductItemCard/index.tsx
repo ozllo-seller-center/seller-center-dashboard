@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { createMuiTheme, MuiThemeProvider, Switch } from '@material-ui/core';
+import { createTheme, MuiThemeProvider, Switch } from '@material-ui/core';
 
 import styles from './styles.module.scss'
 import switchStyles from './switch-styles.module.scss';
@@ -8,7 +8,7 @@ import { FiCameraOff, FiEdit } from 'react-icons/fi';
 import { useRouter } from 'next/router';
 import api from 'src/services/api';
 
-const theme = createMuiTheme({
+const theme = createTheme({
   palette: {
     primary: {
       main: '#E2E2E2'

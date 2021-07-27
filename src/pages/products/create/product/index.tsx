@@ -27,6 +27,7 @@ import { Loader } from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
 import { AppError, findError, getErrorField } from 'src/shared/errors/api/errors';
 import Variation from 'src/components/VariationsController/Variation';
+import { Attribute } from 'src/shared/types/category';
 
 type VariationDTO = {
   size?: number | string,
@@ -54,7 +55,7 @@ export function ProductForm() {
   const { isLoading, setLoading } = useLoading();
   const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
 
-  const [attributes, setAttributes] = useState([]);
+  const [attributes, setAttributes] = useState<Attribute[]>([]);
 
   useEffect(() => {
     setLoading(true)
@@ -66,7 +67,8 @@ export function ProductForm() {
     });
 
     api.get(`/category/${router.query.category}/attributes`).then(response => {
-      setAttributes(response.data)
+      console.log(response.data)
+      setAttributes(response.data[0].attributes)
 
       setLoading(false)
     }).catch(err => {
@@ -92,20 +94,19 @@ export function ProductForm() {
 
   useEffect(() => {
     if (variations.length > 0) {
-      setTotalFields(10 + variations.length * (Object.keys(attributes).length + 1))
+      setTotalFields(10 + variations.length * (attributes.length + 1))
       return;
     }
 
-    setTotalFields(10 + (Object.keys(attributes).length + 1))
+    setTotalFields(10 + (attributes.length + 1))
   }, [variations, attributes])
 
   const calcFilledFields = useCallback((data: Product) => {
-    const keys = Object.keys(attributes);
 
     let filled = 0;
 
-    keys.map(key => {
-      switch (key) {
+    attributes.map(attribute => {
+      switch (attribute.name) {
         case 'gluten_free':
           filled++;
           break;
@@ -151,9 +152,8 @@ export function ProductForm() {
   }, [])
 
   const yupVariationSchema = useCallback((): object => {
-    const keys = Object.keys(attributes);
 
-    return keys.includes('flavors') ?
+    return attributes.findIndex(attribute => attribute.name ==='flavors') >= 0 ?
       {
         variations: Yup.array().required().of(Yup.object().shape({
           size: Yup.string().required('Campo obrigatório'),

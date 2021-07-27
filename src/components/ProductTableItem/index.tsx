@@ -1,4 +1,4 @@
-import { createMuiTheme, MuiThemeProvider, Switch } from '@material-ui/core';
+import { createTheme, MuiThemeProvider, Switch } from '@material-ui/core';
 import React, { useCallback, useState } from 'react';
 import { useEffect } from 'react';
 import { useRef } from 'react';
@@ -12,7 +12,7 @@ import { ProductSummary } from 'src/shared/types/product';
 import styles from './styles.module.scss'
 import switchStyles from './switch-styles.module.scss'
 
-const theme = createMuiTheme({
+const theme = createTheme({
   palette: {
     primary: {
       main: '#E2E2E2'
