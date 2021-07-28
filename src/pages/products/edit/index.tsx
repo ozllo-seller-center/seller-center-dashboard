@@ -117,7 +117,7 @@ export function EditProductForm() {
       api.get(`/category/${category}/attributes`).then(response => {
         setAttributes(response.data[0].attributes)
 
-        setFilledFields(10 + variations.length * (attributes.length + 1))
+        setFilledFields(10 + variations.length * (response.data[0].attributes.length + 1))
 
         setLoading(false)
       }).catch(err => {
@@ -149,6 +149,7 @@ export function EditProductForm() {
   // }, [filesUrl])
 
   useEffect(() => {
+    console.log(`Attributes Length: ${attributes.length}`)
     if (variations.length > 0) {
       setTotalFields(10 + variations.length * (attributes.length + 1))
       return;
