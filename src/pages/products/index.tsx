@@ -137,7 +137,7 @@ export function Products({ userFromApi }: ProductsProps) {
     <div className={styles.productsContainer}>
       <div className={styles.productsHeader}>
         <BulletedButton
-          onClick={() => { router.push('/products') }}
+          onClick={() => { }}
           isActive>
           Meus produtos
         </BulletedButton>

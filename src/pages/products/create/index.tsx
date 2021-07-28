@@ -111,7 +111,7 @@ export function NewProduct({ nationalities: nationalitiesFromApi }: CategoriesDT
           Meus produtos
         </BulletedButton>
         <BulletedButton
-          onClick={() => { router.push('/products/new') }}
+          onClick={() => { }}
           isActive
         >
           Criar novo produto

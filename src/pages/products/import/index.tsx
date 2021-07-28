@@ -59,7 +59,7 @@ function Import() {
           Criar novo produto
         </BulletedButton>
         <BulletedButton
-          onClick={() => { router.push('/products/import') }}
+          onClick={() => { }}
           isActive>
           Importar ou exportar
         </BulletedButton>
