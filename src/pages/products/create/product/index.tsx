@@ -105,17 +105,6 @@ export function ProductForm() {
 
     let filled = 0;
 
-    attributes.map(attribute => {
-      switch (attribute.name) {
-        case 'gluten_free':
-          filled++;
-          break;
-        case 'lactose_free':
-          filled++;
-          break;
-      }
-    })
-
     if (data.name)
       filled++;
     if (data.brand)
@@ -142,6 +131,17 @@ export function ProductForm() {
       !!variation.stock && filled++;
       !!variation.color && filled++;
       !!variation.flavor && filled++;
+
+      attributes.map(attribute => {
+        switch (attribute.name) {
+          case 'gluten_free':
+            filled++;
+            break;
+          case 'lactose_free':
+            filled++;
+            break;
+        }
+      })
     })
 
     setFilledFields(filled);
@@ -153,7 +153,7 @@ export function ProductForm() {
 
   const yupVariationSchema = useCallback((): object => {
 
-    return attributes.findIndex(attribute => attribute.name ==='flavor') >= 0 ?
+    return attributes.findIndex(attribute => attribute.name === 'flavor') >= 0 ?
       {
         variations: Yup.array().required().of(Yup.object().shape({
           size: Yup.string().required('Campo obrigatório'),

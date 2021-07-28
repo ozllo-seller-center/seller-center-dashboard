@@ -162,17 +162,6 @@ export function EditProductForm() {
 
     let filled = 0;
 
-    attributes.map(attribute => {
-      switch (attribute.name) {
-        case 'gluten_free':
-          filled++;
-          break;
-        case 'lactose_free':
-          filled++;
-          break;
-      }
-    })
-
     if (data.name)
       filled++;
     if (data.brand)
@@ -199,6 +188,17 @@ export function EditProductForm() {
       !!variation.stock && filled++;
       !!variation.color && filled++;
       !!variation.flavor && filled++;
+
+      attributes.map(attribute => {
+        switch (attribute.name) {
+          case 'gluten_free':
+            filled++;
+            break;
+          case 'lactose_free':
+            filled++;
+            break;
+        }
+      })
     })
 
     setFilledFields(filled);
