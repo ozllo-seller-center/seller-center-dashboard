@@ -149,7 +149,6 @@ export function EditProductForm() {
   // }, [filesUrl])
 
   useEffect(() => {
-    console.log(`Attributes Length: ${attributes.length}`)
     if (variations.length > 0) {
       setTotalFields(10 + variations.length * (attributes.length + 1))
       return;
@@ -210,9 +209,7 @@ export function EditProductForm() {
   }, [])
 
   const yupVariationSchema = useCallback((): object => {
-    const keys = Object.keys(attributes);
-
-    return keys.includes('flavors') ?
+    return attributes.findIndex(attribute => attribute.name === 'flavor') >= 0 ?
       {
         variations: Yup.array().required().of(Yup.object().shape({
           size: Yup.string().required('Campo obrigatório'),
@@ -349,11 +346,15 @@ export function EditProductForm() {
           shop_id: user.shopInfo._id,
         }
       }).then(response => {
+        setLoading(false)
 
+        if (window.innerWidth >= 768) {
+          router.push('/products');
+          return;
+        }
+
+        router.push('/products-mobile');
       })
-
-      setLoading(false)
-      router.push('/products');
 
       // addToast({
       //   type: 'success',
