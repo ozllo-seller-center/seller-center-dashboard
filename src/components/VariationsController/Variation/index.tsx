@@ -150,9 +150,9 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
 
     switch (variationAttributes.length) {
       case 3:
-        return className = className.concat(' ').concat(styles.gridMobile3)
+        return className = styles.gridMobile3
       case 4:
-        return className = className.concat(' ').concat(styles.gridMobile4)
+        return className = styles.gridMobile4
     }
 
     return className;
@@ -166,6 +166,7 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
         <input name='_id' style={{ display: 'none' }} ref={idRef} defaultValue={defaultValue} value={variation._id} />
 
         {(!!width && width < 768) ? (
+        <div className={styles.mobileDivisor}>
           <div className={mobileContainerStyle}>
             {
               variationAttributes.map((variationAttribute, i) => {
@@ -215,19 +216,20 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
               defaultValue={variation.stock}
             />
 
-            {
-              allowDelete && (
-                <button
-                  type='button'
-                  onClick={() => {
-                    handleDeleteVariation(index)
-                  }}
-                >
-                  <FiXCircle />
-                </button>
-              )
-            }
           </div>
+          {
+            allowDelete && (
+              <button
+                type='button'
+                onClick={() => {
+                  handleDeleteVariation(index)
+                }}
+              >
+                <FiXCircle />
+              </button>
+            )
+          }
+        </div>
         ) : (
           <>
             {

@@ -153,7 +153,7 @@ export function ProductForm() {
 
   const yupVariationSchema = useCallback((): object => {
 
-    return attributes.findIndex(attribute => attribute.name ==='flavors') >= 0 ?
+    return attributes.findIndex(attribute => attribute.name ==='flavor') >= 0 ?
       {
         variations: Yup.array().required().of(Yup.object().shape({
           size: Yup.string().required('Campo obrigatório'),
@@ -276,7 +276,12 @@ export function ProductForm() {
       }).then(response => {
         setLoading(false)
 
-        router.push('/products');
+        if (window.innerWidth >= 768) {
+          router.push('/products');
+          return;
+        }
+
+        router.push('/products-mobile');
       }).catch(err => {
         console.log(err.response.data);
 
