@@ -35,7 +35,7 @@
   flex-direction: column;
 
   > span {
-    text-align: left;
+    text-align: center;
     font-size: 1.1rem;
     font-weight: bold;
 
@@ -45,26 +45,8 @@
   .fieldsContainer {
     display: grid;
     // grid-template-areas: 'item item item';  //item';
-    grid-template-columns: 1fr 1fr 1fr .5fr; //.6fr .75fr .75fr .6fr;
+    grid-template-columns: 1fr 1fr 1fr; //.6fr .75fr .75fr .6fr;
     column-gap: .75rem;
-
-    > button {
-      border: none;
-      background: none;
-
-      svg {
-        width: 2rem;
-        height: 2rem;
-
-        color: var(--red-100);
-
-        transition: color 0.5s;
-
-        &:hover {
-          color: var(--red-400);
-        }
-      }
-    }
   }
 }
 
@@ -85,9 +67,42 @@
 }
 
 .gridMobile3{
-  grid-template-columns: 1fr 1fr 1fr 1fr .5fr;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: .75rem;
+  row-gap: .75rem;
 }
 
 .gridMobile4{
-  grid-template-columns: 1fr 1fr .25fr .25fr 1fr 1fr 1fr .5fr;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: .75rem;
+  row-gap: .75rem;
+}
+
+.mobileDivisor {
+  display: flex;
+  flex-direction: row;
+  // grid-template-columns: 1fr 2.5rem;
+  column-gap: .75rem;
+
+  > button {
+    border: none;
+    background: none;
+
+    align-self: center;
+
+    svg {
+      width: 2.5rem;
+      height: 2.5rem;
+
+      color: var(--red-100);
+
+      transition: color 0.5s;
+
+      &:hover {
+        color: var(--red-400);
+      }
+    }
+  }
 }

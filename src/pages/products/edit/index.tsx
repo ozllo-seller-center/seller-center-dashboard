@@ -26,6 +26,7 @@ import { useModalMessage } from 'src/hooks/message';
 import { Loader } from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
 import Variation from 'src/components/VariationsController/Variation';
+import { Attribute } from 'src/shared/types/category';
 
 type VariationDTO = {
   _id?: string;
@@ -56,7 +57,7 @@ export function EditProductForm() {
   const { isLoading, setLoading } = useLoading();
   const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
 
-  const [attributes, setAttributes] = useState([]);
+  const [attributes, setAttributes] = useState<Attribute[]>([]);
 
   useEffect(() => {
     // setLoading(true)
@@ -114,12 +115,9 @@ export function EditProductForm() {
 
     if (!!category && category.length > 0) {
       api.get(`/category/${category}/attributes`).then(response => {
-        setAttributes(response.data)
+        setAttributes(response.data[0].attributes)
 
-        console.log(response.data)
-        console.log(`Total Fields: ${10 + variations.length * (Object.keys(response.data).length + 1)}`)
-        console.log(`Variation.length: ${variations.length}`)
-        setFilledFields(10 + variations.length * (Object.keys(response.data).length + 1))
+        setFilledFields(10 + variations.length * (response.data[0].attributes.length + 1))
 
         setLoading(false)
       }).catch(err => {
@@ -152,30 +150,17 @@ export function EditProductForm() {
 
   useEffect(() => {
     if (variations.length > 0) {
-      setTotalFields(10 + variations.length * (Object.keys(attributes).length + 1))
+      setTotalFields(10 + variations.length * (attributes.length + 1))
       return;
     }
 
-    setTotalFields(10 + (Object.keys(attributes).length + 1))
-    setFilledFields(10 + (Object.keys(attributes).length + 1))
+    setTotalFields(10 + (attributes.length + 1))
+    setFilledFields(10 + (attributes.length + 1))
   }, [variations, attributes])
 
   const calcFilledFields = useCallback((data: Product) => {
 
     let filled = 0;
-
-    const keys = Object.keys(attributes);
-
-    keys.map(key => {
-      switch (key) {
-        case 'gluten_free':
-          filled++;
-          break;
-        case 'lactose_free':
-          filled++;
-          break;
-      }
-    })
 
     if (data.name)
       filled++;
@@ -203,6 +188,17 @@ export function EditProductForm() {
       !!variation.stock && filled++;
       !!variation.color && filled++;
       !!variation.flavor && filled++;
+
+      attributes.map(attribute => {
+        switch (attribute.name) {
+          case 'gluten_free':
+            filled++;
+            break;
+          case 'lactose_free':
+            filled++;
+            break;
+        }
+      })
     })
 
     setFilledFields(filled);
@@ -213,9 +209,7 @@ export function EditProductForm() {
   }, [])
 
   const yupVariationSchema = useCallback((): object => {
-    const keys = Object.keys(attributes);
-
-    return keys.includes('flavors') ?
+    return attributes.findIndex(attribute => attribute.name === 'flavor') >= 0 ?
       {
         variations: Yup.array().required().of(Yup.object().shape({
           size: Yup.string().required('Campo obrigatório'),
@@ -352,11 +346,15 @@ export function EditProductForm() {
           shop_id: user.shopInfo._id,
         }
       }).then(response => {
+        setLoading(false)
 
+        if (window.innerWidth >= 768) {
+          router.push('/products');
+          return;
+        }
+
+        router.push('/products-mobile');
       })
-
-      setLoading(false)
-      router.push('/products');
 
       // addToast({
       //   type: 'success',

@@ -78,6 +78,7 @@ const CheckboxInput: React.FC<CheckBoxProps> = ({
           style={{ display: 'none' }}
           type='checkbox'
           ref={inputRef}
+          checked={isChecked}
         />
         <button
 

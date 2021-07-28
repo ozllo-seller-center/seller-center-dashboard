@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 import styles from './styles.module.scss';
 import { GetStaticProps } from 'next';
 import { Nationality } from 'src/shared/types/nationality';
-import { Category, SubCategory, DefaultAttribute, FoodAttribute } from 'src/shared/types/category';
+import { Category, SubCategory } from 'src/shared/types/category';
 
 import api from 'src/services/api';
 import { useLoading } from 'src/hooks/loading';
@@ -111,7 +111,7 @@ export function NewProduct({ nationalities: nationalitiesFromApi }: CategoriesDT
           Meus produtos
         </BulletedButton>
         <BulletedButton
-          onClick={() => { router.push('/products/new') }}
+          onClick={() => { }}
           isActive
         >
           Criar novo produto

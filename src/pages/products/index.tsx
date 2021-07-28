@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import { MuiThemeProvider, createMuiTheme, Switch } from '@material-ui/core';
+import { MuiThemeProvider, createTheme, Switch } from '@material-ui/core';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { FiSearch, FiCameraOff, FiCheck, FiX } from 'react-icons/fi';
@@ -137,7 +137,7 @@ export function Products({ userFromApi }: ProductsProps) {
     <div className={styles.productsContainer}>
       <div className={styles.productsHeader}>
         <BulletedButton
-          onClick={() => { router.push('/products') }}
+          onClick={() => { }}
           isActive>
           Meus produtos
         </BulletedButton>

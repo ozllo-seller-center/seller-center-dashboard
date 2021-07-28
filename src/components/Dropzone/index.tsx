@@ -69,11 +69,14 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, filesUrl, setFilesUrl
       },
       setValue: (ref: InputRefProps, value) => {
         ref.acceptedFiles = value;
-        value.forEach(async (url) => {
-          await fetch(url).then(r => r.blob()).then(blobFile => new File([blobFile], getFilename(url), { type: "image/png/jpg/jpeg" })).then(f => {
-            setFiles([...files, f])
-          });
-        })
+
+        if (!!value) {
+          value.forEach(async (url) => {
+            await fetch(url).then(r => r.blob()).then(blobFile => new File([blobFile], getFilename(url), { type: "image/png/jpg/jpeg" })).then(f => {
+              setFiles([...files, f])
+            });
+          })
+        }
 
         setFilesUrl(value);
       },
