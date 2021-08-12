@@ -163,73 +163,73 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
       <div key={index} className={containerStyle}>
         <span>Variação {index + 1}</span>
 
-        <input name='_id' style={{ display: 'none' }} ref={idRef} defaultValue={defaultValue} value={variation._id} />
+        <input name='_id' style={{ display: 'none' }} ref={idRef} defaultValue={variation._id} />
 
         {(!!width && width < 768) ? (
-        <div className={styles.mobileDivisor}>
-          <div className={mobileContainerStyle}>
+          <div className={styles.mobileDivisor}>
+            <div className={mobileContainerStyle}>
+              {
+                variationAttributes.map((variationAttribute, i) => {
+                  switch (variationAttribute.type) {
+                    case 'boolean':
+                      return (
+                        <Checkbox
+                          key={variationAttribute.name}
+                          name={variationAttribute.name}
+                          label={variationAttribute.label}
+                          defaultValue={variation[variationAttribute.name]}
+                          defaultChecked={variation[variationAttribute.name]}
+                        />
+                      )
+                    case 'number':
+                      return (
+                        <Input
+                          key={variationAttribute.name}
+                          name={variationAttribute.name}
+                          label={variationAttribute.label}
+                          placeholder={variationAttribute.placeholder}
+                          autoComplete='off'
+                          defaultValue={variation[variationAttribute.name]}
+                        />
+                      )
+                    default:
+                      return (
+                        <Autocomplete
+                          key={variationAttribute.name}
+                          name={variationAttribute.name}
+                          items={attributes[i].values}
+                          label={variationAttribute.label}
+                          placeholder={variationAttribute.placeholder}
+                          autoComplete='off'
+                          defaultValue={variation[variationAttribute.name]}
+                        />
+                      )
+                  }
+                })
+              }
+
+              <Input
+                name='stock'
+                label={'Estoque'}
+                placeholder='Quantidade em estoque'
+                autoComplete='off'
+                defaultValue={variation.stock}
+              />
+
+            </div>
             {
-              variationAttributes.map((variationAttribute, i) => {
-                switch (variationAttribute.type) {
-                  case 'boolean':
-                    return (
-                      <Checkbox
-                        key={variationAttribute.name}
-                        name={variationAttribute.name}
-                        label={variationAttribute.label}
-                        defaultValue={variation[variationAttribute.name]}
-                        defaultChecked={variation[variationAttribute.name]}
-                      />
-                    )
-                  case 'number':
-                    return (
-                      <Input
-                        key={variationAttribute.name}
-                        name={variationAttribute.name}
-                        label={variationAttribute.label}
-                        placeholder={variationAttribute.placeholder}
-                        autoComplete='off'
-                        defaultValue={variation[variationAttribute.name]}
-                      />
-                    )
-                  default:
-                    return (
-                      <Autocomplete
-                        key={variationAttribute.name}
-                        name={variationAttribute.name}
-                        items={attributes[i].values}
-                        label={variationAttribute.label}
-                        placeholder={variationAttribute.placeholder}
-                        autoComplete='off'
-                        defaultValue={variation[variationAttribute.name]}
-                      />
-                    )
-                }
-              })
+              allowDelete && (
+                <button
+                  type='button'
+                  onClick={() => {
+                    handleDeleteVariation(index)
+                  }}
+                >
+                  <FiXCircle />
+                </button>
+              )
             }
-
-            <Input
-              name='stock'
-              label={'Estoque'}
-              placeholder='Quantidade em estoque'
-              autoComplete='off'
-              defaultValue={variation.stock}
-            />
-
           </div>
-          {
-            allowDelete && (
-              <button
-                type='button'
-                onClick={() => {
-                  handleDeleteVariation(index)
-                }}
-              >
-                <FiXCircle />
-              </button>
-            )
-          }
-        </div>
         ) : (
           <>
             {

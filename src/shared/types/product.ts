@@ -1,3 +1,8 @@
+export type ProductImage = {
+  file?: File,
+  url?: string,
+}
+
 export type Variation = {
   size: number | string,
   stock?: number,

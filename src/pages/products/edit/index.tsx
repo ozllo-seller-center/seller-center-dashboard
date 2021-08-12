@@ -19,7 +19,7 @@ import styles from './styles.module.scss'
 
 import api from 'src/services/api';
 import { useAuth } from 'src/hooks/auth';
-import { Product } from 'src/shared/types/product';
+import { Product, ProductImage } from 'src/shared/types/product';
 import TextArea from 'src/components/Textarea';
 import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
@@ -27,6 +27,7 @@ import { Loader } from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
 import Variation from 'src/components/VariationsController/Variation';
 import { Attribute } from 'src/shared/types/category';
+import Dropzone from 'src/components/Dropzone';
 
 type VariationDTO = {
   _id?: string;
@@ -36,8 +37,7 @@ type VariationDTO = {
 }
 
 export function EditProductForm() {
-  // const [files, setFiles] = useState<File[]>([]);
-  // const [formData, setFormData] = useState<Product>();
+  const [files, setFiles] = useState<ProductImage[]>([]);
   const [filesUrl, setFilesUrl] = useState<string[]>([]);
 
   const [filledFields, setFilledFields] = useState(0);
@@ -87,8 +87,18 @@ export function EditProductForm() {
           shop_id: user.shopInfo._id,
         }
       }).then(response => {
+        const urls = response.data.images.filter((url: string) => (!!url && url !== null));
+        setFilesUrl(urls)
 
-        setFilesUrl(response.data.images)
+        let files: ProductImage[]
+        files = urls.map((url: string) => {
+          return {
+            url
+          } as ProductImage
+        })
+
+        setFiles(files);
+
         setGenderRadio(response.data.gender)
 
         setVariations(response.data.variations)
@@ -133,20 +143,53 @@ export function EditProductForm() {
   //     formRef.current?.setData(formData)
   // }, [formRef, formData, attributes])
 
-  // const handleOnFileUpload = useCallback((file: string[]) => {
-  //   calcFilledFields(formRef.current?.getData() as Product);
-  // }, [filesUrl]);
+  const handleOnFileUpload = useCallback((acceptedFiles: File[], dropZoneRef: React.RefObject<any>) => {
+    calcFilledFields(formRef.current?.getData() as Product);
 
-  // const handleDeleteFile = useCallback((file: string) => {
-  //   URL.revokeObjectURL(file);
+    acceptedFiles.filter(f => {
+      if (f.size / 1024 / 1024 > 5) {
+        handleModalMessage(true, {
+          type: 'error',
+          title: 'Arquivo muito pesado!',
+          message: [`O arquivo ${f.name} excede o tamanho máximo de 5mb`]
+        })
 
-  //   const filesUpdate = filesUrl.filter(f => f !== file);
+        return false;
+      }
 
-  //   formRef.current?.setFieldValue('images', filesUpdate);
-  //   setFilesUrl(filesUpdate);
+      return true;
+    })
 
-  //   calcFilledFields(formRef.current?.getData() as Product);
-  // }, [filesUrl])
+    const newFiles = acceptedFiles.map(f => {
+      return {
+        file: f
+      } as ProductImage
+    })
+
+    let urls: string[] = [];
+    newFiles.forEach(f => {
+      urls.push(URL.createObjectURL(f.file))
+    })
+
+    dropZoneRef.current.acceptedFiles = [...files, ...newFiles].map(f => f.url);
+    setFiles([...files, ...newFiles]);
+    setFilesUrl([...filesUrl, ...urls]);
+  }, [files]);
+
+  const handleDeleteFile = useCallback((url: string) => {
+    URL.revokeObjectURL(url);
+
+    const deletedIndex = files.findIndex(f => f.url === url);
+
+    const urlsUpdate = filesUrl.filter((f, i) => i !== deletedIndex);
+    const filesUpdate = files.filter((f, i) => i !== deletedIndex);
+
+    formRef.current?.setFieldValue('images', filesUpdate);
+    setFilesUrl(urlsUpdate);
+    setFiles(filesUpdate);
+
+    calcFilledFields(formRef.current?.getData() as Product);
+  }, [filesUrl])
 
   useEffect(() => {
     if (variations.length > 0) {
@@ -265,27 +308,26 @@ export function EditProductForm() {
         id
       } = router.query;
 
-      // var dataContainer = new FormData();
+      var dataContainer = new FormData();
 
-      // console.log(files)
+      files.forEach((f, i) => (!!f.file && !f.url) && dataContainer.append("images", f.file, f.file.name));
 
-      // files.forEach(file => {
-      //   dataContainer.append("images", file, file.name)
-      // });
+      const oldImages = files.map(f => {
+        if (!!f.url && !f.file)
+          return f.url
+      })
 
-      // console.log('Data Container: ')
-      // console.log(dataContainer)
+      let newImages = await api.post('/product/upload', dataContainer, {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        }
+      }).then(response => {
+        return response.data.urls as string[]
+      });
 
-      // const imagesUrls = await api.post('/product/upload', dataContainer, {
-      //   headers: {
-      //     authorization: token,
-      //     shop_id: user.shopInfo._id,
-      //   }
-      // }).then(response => {
-      //   return response.data.urls
-      // });
-
-      const imagesUrls = filesUrl;
+      if (!!oldImages)
+        newImages = [...oldImages as string[], ...newImages];
 
       const {
         name,
@@ -319,7 +361,7 @@ export function EditProductForm() {
         weight,
         price,
         price_discounted,
-        images: imagesUrls,
+        images: newImages,
         //variations
       }
 
@@ -372,7 +414,7 @@ export function EditProductForm() {
         return;
       }
     }
-  }, [router, token, user, filesUrl, filledFields, totalFields])
+  }, [router, token, user, files, filesUrl, filledFields, totalFields])
 
   // const handleDeleteVariation = useCallback((deletedIndex: number) => {
   //   console.log('Pré-delete')
@@ -440,22 +482,16 @@ export function EditProductForm() {
           }}>
             <p className={styles.imagesTitle}>Fotos do produto</p>
             <div className={styles.imagesContainer}>
-              {/* <Dropzone
+              <Dropzone
                 name='images'
-                filesUrl={filesUrl}
-                setFilesUrl={setFilesUrl}
-                onFileUploaded={(files) => handleOnFileUpload(files)}
-                files={files}
-                setFiles={setFiles}
+                onFileUploaded={handleOnFileUpload}
               />
-              { */}
               {
                 filesUrl.map((file, i) => (
-                  // <ImageCard key={i} onClick={() => handleDeleteFile(file)} imgUrl={file}/>
-                  <ImageCard key={i} onClick={() => { }} imgUrl={file} showOnly />
+                  <ImageCard key={i} onClick={() => handleDeleteFile(file)} imgUrl={file} />
+                  // <ImageCard key={i} onClick={() => { }} imgUrl={file} showOnly />
                 ))
               }
-              {/* } */}
             </div>
             <div className={styles.doubleInputContainer}>
               <Input
