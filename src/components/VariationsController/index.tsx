@@ -11,9 +11,10 @@ import { HTMLAttributes } from 'react';
 
 interface VariationsControllerProps extends HTMLAttributes<HTMLDivElement> {
   handleAddVariation: Function;
+  disableAdd?: boolean;
 }
 
-const VariationsController: React.FC<VariationsControllerProps> = ({ handleAddVariation, children }: VariationsControllerProps) => {
+const VariationsController: React.FC<VariationsControllerProps> = ({ handleAddVariation, disableAdd, children }: VariationsControllerProps) => {
   // const { fieldName, registerField, defaultValue = [{}] } = useField(name);
 
   // useEffect(() => {
@@ -39,9 +40,13 @@ const VariationsController: React.FC<VariationsControllerProps> = ({ handleAddVa
   return (
     <div className={styles.controllerContainer}>
       {children}
-      <div className={styles.addButtonContainer}>
-        <AddButton icon={FaPlus} onClick={() => { handleAddVariation() }} type='button'><span>Adicionar variação</span></AddButton>
-      </div>
+      {
+        !disableAdd && (
+          <div className={styles.addButtonContainer}>
+            <AddButton icon={FaPlus} onClick={() => { handleAddVariation() }} type='button'><span>Adicionar variação</span></AddButton>
+          </div>
+        )
+      }
     </div >
   )
 }

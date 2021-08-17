@@ -595,14 +595,9 @@ export function EditProductForm() {
                 <div className={styles.variationsTitle}>
                   <h3>Informações das variações do produto</h3>
                   <span>Preencha <b>todos</b> os campos</span>
-                  <div className={styles.underConstruction}>
-                    <FiAlertTriangle />
-                    <span>Sessão sobre construção, alterações não serão salvas</span>
-                    <FiAlertTriangle />
-                  </div>
                 </div>
               </div>
-              <VariationsController handleAddVariation={handleAddVariation}>
+              <VariationsController handleAddVariation={() => { }} disableAdd={true}>
                 {
                   variations.map((variation, i) => {
                     return (
@@ -610,9 +605,9 @@ export function EditProductForm() {
                         <Variation
                           variation={variation}
                           index={i}
-                          handleDeleteVariation={() => handleDeleteVariation(i)}
+                          handleDeleteVariation={() => { }}
                           attributes={attributes}
-                          allowDelete={variations.length > 1}
+                          allowDelete={false}
                         />
                       </Scope>
                     )
