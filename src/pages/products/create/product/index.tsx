@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { FormHandles, Scope } from '@unform/core';
@@ -19,13 +19,12 @@ import styles from './styles.module.scss'
 
 import api from 'src/services/api';
 import { useAuth } from 'src/hooks/auth';
-import { Product } from 'src/shared/types/product';
+import { Product, ProductImage } from 'src/shared/types/product';
 import TextArea from 'src/components/Textarea';
 import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
 import { Loader } from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
-import { AppError, findError, getErrorField } from 'src/shared/errors/api/errors';
 import Variation from 'src/components/VariationsController/Variation';
 import { Attribute } from 'src/shared/types/category';
 
@@ -39,8 +38,7 @@ type VariationDTO = {
 }
 
 export function ProductForm() {
-  const [files, setFiles] = useState<File[]>([]);
-  const [filesUrl, setFilesUrl] = useState<string[]>([]);
+  const [files, setFiles] = useState<ProductImage[]>([]);
 
   const [filledFields, setFilledFields] = useState(0);
   const [totalFields, setTotalFields] = useState(14);
@@ -77,20 +75,46 @@ export function ProductForm() {
     })
   }, [])
 
-  const handleOnFileUpload = useCallback((file: string[]) => {
+  const handleOnFileUpload = useCallback((acceptedFiles: File[], dropZoneRef: React.RefObject<any>) => {
     calcFilledFields(formRef.current?.getData() as Product);
-  }, [filesUrl]);
+
+    acceptedFiles.filter(f => {
+      if (f.size / 1024 / 1024 > 5) {
+        handleModalMessage(true, {
+          type: 'error',
+          title: 'Arquivo muito pesado!',
+          message: [`O arquivo ${f.name} excede o tamanho máximo de 5mb`]
+        })
+
+        return false;
+      }
+
+      return true;
+    })
+
+    const newFiles = acceptedFiles.map(f => {
+      return {
+        file: f,
+        url: URL.createObjectURL(f)
+      } as ProductImage
+    })
+
+    dropZoneRef.current.acceptedFiles = [...files, ...newFiles].map(f => f.url);
+    setFiles([...files, ...newFiles]);
+  }, [files]);
 
   const handleDeleteFile = useCallback((file: string) => {
     URL.revokeObjectURL(file);
 
-    const filesUpdate = filesUrl.filter(f => f !== file);
+    const deletedIndex = files.findIndex(f => f.url === file);
+
+    const filesUpdate = files.filter((f, i) => i !== deletedIndex);
 
     formRef.current?.setFieldValue('images', filesUpdate);
-    setFilesUrl(filesUpdate);
+    setFiles(filesUpdate);
 
     calcFilledFields(formRef.current?.getData() as Product);
-  }, [filesUrl])
+  }, [files])
 
   useEffect(() => {
     if (variations.length > 0) {
@@ -145,7 +169,7 @@ export function ProductForm() {
     })
 
     setFilledFields(filled);
-  }, [filesUrl, filledFields, totalFields, attributes])
+  }, [files, filledFields, totalFields, attributes])
 
   const handleModalVisibility = useCallback(() => {
     handleModalMessage(false);
@@ -213,8 +237,9 @@ export function ProductForm() {
 
       var dataContainer = new FormData();
 
-      files.forEach(file => {
-        dataContainer.append("images", file, file.name)
+      files.forEach(f => {
+        if (!!f.file)
+          dataContainer.append("images", f.file, f.file.name)
       });
 
       const imagesUrls = await api.post('/product/upload', dataContainer, {
@@ -358,17 +383,14 @@ export function ProductForm() {
             <div className={styles.imagesContainer}>
               <Dropzone
                 name='images'
-                filesUrl={filesUrl}
-                setFilesUrl={setFilesUrl}
-                onFileUploaded={(files) => handleOnFileUpload(files)}
-                files={files}
-                setFiles={setFiles}
+                onFileUploaded={handleOnFileUpload}
               />
 
               {
-                filesUrl.map((file, i) => (
-                  <ImageCard key={i} onClick={() => handleDeleteFile(file)} imgUrl={file} />
-                ))
+                files.map((f, i) => {
+                  if (!!f.url)
+                    return <ImageCard key={i} onClick={() => handleDeleteFile(f.url as string)} imgUrl={f.url} />
+                })
               }
             </div>
 

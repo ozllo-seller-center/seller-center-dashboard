@@ -2,17 +2,14 @@ import { useField } from '@unform/core';
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { FiCamera, FiAlertCircle } from 'react-icons/fi'
+import { useModalMessage } from 'src/hooks/message';
 import { getFilename } from 'src/utils/util';
 
 // import './styles.module.css';
 
 interface Props {
   name: string;
-  onFileUploaded: (file: string[]) => void;
-  filesUrl: string[];
-  setFilesUrl: React.Dispatch<React.SetStateAction<string[]>>;
-  files: File[];
-  setFiles: React.Dispatch<React.SetStateAction<File[]>>;
+  onFileUploaded: (acceptedFiles: File[], dropZoneRef: React.RefObject<any>) => void;
 }
 
 interface InputRefProps extends HTMLInputElement {
@@ -20,36 +17,29 @@ interface InputRefProps extends HTMLInputElement {
 }
 
 // TODO: Passar a lista de imagens para dentro deste componente (externalizar como outro componente se preicsar)
-const Dropzone: React.FC<Props> = ({ name, onFileUploaded, filesUrl, setFilesUrl, files, setFiles }) => {
+const Dropzone: React.FC<Props> = ({ name, onFileUploaded }) => {
   // const [selectedFileUrl, setselectedFileUrl] = useState<string[]>([]);
   const [err, setErr] = useState();
 
   const dropZoneRef = useRef<InputRefProps>(null);
-  const { fieldName, registerField, defaultValue = [], error } = useField(name);
+  const { fieldName, registerField, defaultValue, error } = useField(name);
 
   const onDrop = useCallback(acceptedFiles => {
     setErr(undefined);
     try {
       if (dropZoneRef.current) {
         // const file = acceptedFiles[0];
-
-        // if (!filesUrl.includes(file)) {
-        setFiles([...files, ...acceptedFiles]);
-        let f = acceptedFiles.map((file: File) => URL.createObjectURL(file))
-
-        dropZoneRef.current.acceptedFiles = [...filesUrl, ...f];
-        setFilesUrl([...filesUrl, ...f]);
-        onFileUploaded(f);
-        // }
+        onFileUploaded(acceptedFiles, dropZoneRef)
       }
-
     } catch (err) {
+      console.log(err)
+
       setErr(err);
       setTimeout(() => {
         setErr(undefined);
       }, 3000);
     }
-  }, [files, filesUrl, onFileUploaded])
+  }, [onFileUploaded])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -65,20 +55,11 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, filesUrl, setFilesUrl
       },
       clearValue: (ref: InputRefProps) => {
         ref.acceptedFiles = [];
-        setFilesUrl([]);
+        // setFilesUrl([]);
       },
       setValue: (ref: InputRefProps, value) => {
         ref.acceptedFiles = value;
-
-        if (!!value) {
-          value.forEach(async (url) => {
-            await fetch(url).then(r => r.blob()).then(blobFile => new File([blobFile], getFilename(url), { type: "image/png/jpg/jpeg" })).then(f => {
-              setFiles([...files, f])
-            });
-          })
-        }
-
-        setFilesUrl(value);
+        // setFilesUrl(defaultValue);
       },
     });
   }, [fieldName, registerField]);
