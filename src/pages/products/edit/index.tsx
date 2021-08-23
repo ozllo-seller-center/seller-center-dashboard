@@ -87,6 +87,8 @@ export function EditProductForm() {
           shop_id: user.shopInfo._id,
         }
       }).then(response => {
+        console.log(response.data)
+
         const urls = response.data.images.filter((url: string) => (!!url && url !== null));
         setFilesUrl(urls)
 
@@ -137,11 +139,6 @@ export function EditProductForm() {
       })
     }
   }, [category])
-
-  // useEffect(() => {
-  //   if (!!formData)
-  //     formRef.current?.setData(formData)
-  // }, [formRef, formData, attributes])
 
   const handleOnFileUpload = useCallback((acceptedFiles: File[], dropZoneRef: React.RefObject<any>) => {
     calcFilledFields(formRef.current?.getData() as Product);
@@ -379,7 +376,20 @@ export function EditProductForm() {
           }).then(response => {
 
           })
+
+          return;
         }
+
+        delete variation._id
+
+        await api.post(`/product/${id}/variation`, variation, {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          }
+        }).then(response => {
+
+        })
       })
 
       await api.patch(`/product/${id}`, product, {
@@ -446,13 +456,13 @@ export function EditProductForm() {
     formRef.current?.setFieldValue('variations', tempVars);
     formRef.current?.setData({ ...formRef.current?.getData(), variations: tempVars })
 
-    // const { id } = router.query;
-    // await api.delete(`/product/${id}/variation/${deletedVariation._id}`, {
-    //   headers: {
-    //     authorization: token,
-    //     shop_id: user.shopInfo._id,
-    //   },
-    // }).then(response => { })
+    const { id } = router.query;
+    await api.delete(`/product/${id}/variation/${deletedVariation._id}`, {
+      headers: {
+        authorization: token,
+        shop_id: user.shopInfo._id,
+      },
+    }).then(response => { })
   }
 
   const handleAddVariation = useCallback(() => {
@@ -470,6 +480,32 @@ export function EditProductForm() {
           >
             Voltar
           </Button>
+
+          {/* TODO: Definir api para recuperar os dados das categorias */}
+
+          {/* <div className={styles.breadCumbs}>
+            {
+              !!nationality && (
+                <span className={!!category ? styles.crumb : styles.activeCrumb}>{nationality}</span>
+              )
+            }
+            {
+              !!category && (
+                <>
+                  <span className={styles.separator}>/</span>
+                  <span className={!!subCategory ? styles.crumb : styles.activeCrumb}>{category}</span>
+                </>
+              )
+            }
+            {
+              !!subCategory && (
+                <>
+                  <span className={styles.separator}>/</span>
+                  <span className={styles.activeCrumb}>{subCategory}</span>
+                </>
+              )
+            }
+          </div> */}
         </section>
         <div className={styles.divider} />
         <section className={styles.content}>
@@ -563,29 +599,29 @@ export function EditProductForm() {
             <div className={styles.multipleInputContainer}>
               <Input
                 name='height'
-                label='Alturam (cm)'
-                placeholder='Altura da embalagem'
+                label='Alturam da embalagem (cm)'
+                placeholder='Altura'
                 autoComplete='off'
                 type='number'
               />
               <Input
                 name='width'
-                label='Largura (cm)'
-                placeholder='Largura da embalagem'
+                label='Largura da embalagem (cm)'
+                placeholder='Largura'
                 autoComplete='off'
                 type='number'
               />
               <Input
                 name='length'
-                label='Comprimento (cm)'
-                placeholder='Comprimento da embalagem'
+                label='Comprimento da embalagem (cm)'
+                placeholder='Comprimento'
                 autoComplete='off'
                 type='number'
               />
               <Input
                 name='weight'
-                label='Peso (g)'
-                placeholder='Peso total'
+                label='Peso total (g)'
+                placeholder='Peso'
                 autoComplete='off'
                 type='number'
               />
@@ -597,7 +633,7 @@ export function EditProductForm() {
                   <span>Preencha <b>todos</b> os campos</span>
                 </div>
               </div>
-              <VariationsController handleAddVariation={() => { }} disableAdd={true}>
+              <VariationsController handleAddVariation={handleAddVariation}>
                 {
                   variations.map((variation, i) => {
                     return (
@@ -605,9 +641,9 @@ export function EditProductForm() {
                         <Variation
                           variation={variation}
                           index={i}
-                          handleDeleteVariation={() => { }}
+                          handleDeleteVariation={handleDeleteVariation}
                           attributes={attributes}
-                          allowDelete={false}
+                          allowDelete={i >= 1}
                         />
                       </Scope>
                     )

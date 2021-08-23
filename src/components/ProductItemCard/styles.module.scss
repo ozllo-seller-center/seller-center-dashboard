@@ -33,16 +33,16 @@
       align-items: center;
       justify-content: center;
 
-      background-color: var(--gray-50);
+      // background-color: var(--gray-50);
       border-radius: 50%;
 
       img {
         width: 6rem;
         height: 6rem;
 
-        object-fit: fill;
+        object-fit: cover;
 
-        background-color: var(--gray-50);
+        // background-color: var(--gray-50);
         border-radius: 50%;
       }
 

@@ -65,6 +65,40 @@
         }
       }
     }
+
+    .breadCumbs {
+      flex: 1;
+
+      display: flex;
+
+      justify-content: center;
+      align-items: center;
+
+      .separator {
+        padding: 0.5rem;
+
+        margin: 0 0.25rem;
+
+        color: var(--gray-300);
+        font-weight: bold;
+      }
+
+      .crumb {
+        padding: 0.5rem;
+
+        color: var(--gray-300);
+      }
+
+      .activeCrumb {
+        padding: 0.5rem;
+
+        color: var(--grafite);
+        background-color: var(--yellow-300);
+        opacity: 0.75;
+
+        border-radius: 4px;
+      }
+    }
   }
 
   .divider {

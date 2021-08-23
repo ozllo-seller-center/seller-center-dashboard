@@ -22,10 +22,12 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded }) => {
   const [err, setErr] = useState();
 
   const dropZoneRef = useRef<InputRefProps>(null);
-  const { fieldName, registerField, defaultValue, error } = useField(name);
+  const { fieldName, registerField, defaultValue, error, clearError } = useField(name);
 
   const onDrop = useCallback(acceptedFiles => {
     setErr(undefined);
+    clearError();
+
     try {
       if (dropZoneRef.current) {
         // const file = acceptedFiles[0];

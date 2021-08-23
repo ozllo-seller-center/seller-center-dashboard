@@ -99,6 +99,8 @@ export function NewProduct({ nationalities: nationalitiesFromApi }: CategoriesDT
         nationality: nationality?.id,
         category: category?.code,
         subCategory: subCategory?.code,
+        categoryName: category?.value,
+        subCategoryName: subCategory?.value,
       },
     })
   }, [nationality, category, subCategory])
