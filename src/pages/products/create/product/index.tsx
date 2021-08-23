@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { FormHandles, Scope } from '@unform/core';
@@ -55,6 +55,14 @@ export function ProductForm() {
 
   const [attributes, setAttributes] = useState<Attribute[]>([]);
 
+  const breadCrumbs = useMemo(() => {
+    return {
+      category: router.query.categoryName,
+      subCategory: router.query.subCategoryName,
+      nationality: router.query.nationality === '1' ? 'Nacional' : 'Internacional'
+    }
+  }, [router])
+
   useEffect(() => {
     setLoading(true)
 
@@ -76,14 +84,26 @@ export function ProductForm() {
   }, [])
 
   const handleOnFileUpload = useCallback((acceptedFiles: File[], dropZoneRef: React.RefObject<any>) => {
+
     calcFilledFields(formRef.current?.getData() as Product);
 
-    acceptedFiles.filter(f => {
-      if (f.size / 1024 / 1024 > 5) {
+    acceptedFiles = acceptedFiles.filter((f, i) => {
+
+      if (files.length + (i + 1) > 8) {
+        handleModalMessage(true, {
+          type: 'error',
+          title: 'Muitas fotos!',
+          message: ['Um produto pode ter no máximo 8 fotos']
+        })
+
+        return false;
+      }
+
+      if (f.size / 1024 / 1024 > 2) {
         handleModalMessage(true, {
           type: 'error',
           title: 'Arquivo muito pesado!',
-          message: [`O arquivo ${f.name} excede o tamanho máximo de 5mb`]
+          message: [`O arquivo ${f.name} excede o tamanho máximo de 2mb`]
         })
 
         return false;
@@ -101,6 +121,7 @@ export function ProductForm() {
 
     dropZoneRef.current.acceptedFiles = [...files, ...newFiles].map(f => f.url);
     setFiles([...files, ...newFiles]);
+
   }, [files]);
 
   const handleDeleteFile = useCallback((file: string) => {
@@ -210,7 +231,7 @@ export function ProductForm() {
       formRef.current?.setErrors({});
 
       const schema = Yup.object().shape({
-        images: Yup.array().min(1, 'Escolha pelo menos \numa imagem'),
+        images: Yup.array().min(2, 'Escolha pelo menos duas imagens').max(8, 'Pode atribuir no máximo 8 imagens'),
         name: Yup.string().required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres'),
         description: Yup.string()
           .required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres'),
@@ -329,6 +350,14 @@ export function ProductForm() {
         console.log(errors)
         formRef.current?.setErrors(errors);
 
+        if (err.name = 'images') {
+          handleModalMessage(true, {
+            type: 'error',
+            title: 'Erro!',
+            message: [err.message]
+          })
+        }
+
         return;
       }
     }
@@ -364,6 +393,30 @@ export function ProductForm() {
           >
             Voltar
           </Button>
+
+          <div className={styles.breadCumbs}>
+            {
+              !!breadCrumbs.nationality && (
+                <span className={!!breadCrumbs.category ? styles.crumb : styles.activeCrumb}>{breadCrumbs.nationality}</span>
+              )
+            }
+            {
+              !!breadCrumbs.category && (
+                <>
+                  <span className={styles.separator}>/</span>
+                  <span className={!!breadCrumbs.subCategory ? styles.crumb : styles.activeCrumb}>{breadCrumbs.category}</span>
+                </>
+              )
+            }
+            {
+              !!breadCrumbs.subCategory && (
+                <>
+                  <span className={styles.separator}>/</span>
+                  <span className={styles.activeCrumb}>{breadCrumbs.subCategory}</span>
+                </>
+              )
+            }
+          </div>
         </section>
 
         <div className={styles.divider} />
@@ -470,15 +523,15 @@ export function ProductForm() {
             <div className={styles.multipleInputContainer}>
               <Input
                 name='height'
-                label='Alturam (cm)'
-                placeholder='Altura da embalagem'
+                label='Alturam da embalagem (cm)'
+                placeholder='Altura'
                 autoComplete='off'
                 type='number'
               />
 
               <Input
                 name='width'
-                label='Largura (cm)'
+                label='Largura da embalagem (cm)'
                 placeholder='Largura da embalagem'
                 autoComplete='off'
                 type='number'
@@ -486,7 +539,7 @@ export function ProductForm() {
 
               <Input
                 name='length'
-                label='Comprimento (cm)'
+                label='Comprimento da embalagem (cm)'
                 placeholder='Comprimento da embalagem'
                 autoComplete='off'
                 type='number'
@@ -494,7 +547,7 @@ export function ProductForm() {
 
               <Input
                 name='weight'
-                label='Peso (g)'
+                label='Peso total (g)'
                 placeholder='Peso total'
                 autoComplete='off'
               />

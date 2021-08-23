@@ -214,6 +214,7 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
                 placeholder='Quantidade em estoque'
                 autoComplete='off'
                 defaultValue={variation.stock}
+                type='number'
               />
 
             </div>
@@ -278,6 +279,7 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
               placeholder='Quantidade em estoque'
               autoComplete='off'
               defaultValue={variation.stock}
+              type='number'
             />
 
             {

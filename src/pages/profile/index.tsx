@@ -319,9 +319,9 @@ const Profile: React.FC = () => {
             personalInfo: Yup.object().shape({
               name: Yup.string().required('Nome obrigatório'),
               razaoSocial: Yup.string().required('Razão Social obrigatório'),
-              cnpj: Yup.string().required('CNPJ obrigatório').min(14, 'O CNPJ deve ter 14 digitos'),
-              inscricaoMunicipal: Yup.string(),
-              inscricaoEstadual: Yup.string(),
+              cnpj: Yup.string().required('CNPJ obrigatório').min(14, 'CNPJ deve ter 14 digitos'),
+              inscricaoMunicipal: Yup.string().required('Inscição Municipal obrigatória').min(2, 'Inscição Municipal deve ter no mínimo 2 caracteres'),
+              inscricaoEstadual: Yup.string().required('Inscição Estadual obrigatória').min(2, 'Inscição Estadual deve ter no mínimo 2 caracteres').max(9, 'Inscrição Estadual pode ter no máximo 9 caracteres'),
             })
           }
 
