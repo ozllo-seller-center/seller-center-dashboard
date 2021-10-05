@@ -79,9 +79,11 @@ const CheckboxInput: React.FC<CheckBoxProps> = ({
           type='checkbox'
           ref={inputRef}
           checked={isChecked}
+          onChange={(e) => {
+            e.currentTarget.checked = !isChecked
+          }}
         />
         <button
-
           className={isChecked ? styles.checked : styles.unchecked}
           onClick={handleChecked}
           type='button'

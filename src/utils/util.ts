@@ -156,3 +156,41 @@ export function getFilename(url: string) {
   }
   return "";
 }
+
+
+export function matchingWords(source: string, comparTo: string) {
+  if (!source || source.length === 0)
+    return false
+
+  if (!comparTo || comparTo.length === 0)
+    return false
+
+  const sourceWords = source.split(' ')
+
+  const compareToWords = comparTo.split(' ')
+
+  const matchWords = compareToWords.map(comparingWord => {
+    let match = false
+
+    sourceWords.forEach(sourceWord => {
+      if (match)
+        return
+
+      match = sourceWord.toLowerCase() === comparingWord.toLowerCase()
+    })
+
+    console.log(`Word ${comparingWord} matched? ${match}`)
+
+    return match
+  })
+
+  const matchCount = matchWords.reduce((acc, value) => {
+    acc += value ? 1 : 0
+
+    return acc
+  }, 0)
+
+  console.log(`Matching? ${matchCount} | ${compareToWords.length}`)
+
+  return matchCount === compareToWords.length;
+}

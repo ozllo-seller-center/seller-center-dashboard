@@ -41,6 +41,7 @@
     "react-icons": "^4.2.0",
     "react-input-mask": "^3.0.0-alpha.2",
     "react-select": "^4.3.0",
+    "react-tooltip": "^4.2.21",
     "sass": "^1.32.8",
     "yup": "^0.32.9"
   },

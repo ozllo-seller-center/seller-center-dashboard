@@ -1,0 +1,79 @@
+.icon {
+    width: 1rem;
+    color: var(--yellow-300);
+}
+
+.iconError {
+  width: 1rem;
+  color: var(--red-300);
+}
+
+.container {
+  box-shadow: 0 0 24px rgba(0,0,0,0.1), 0 0 6px rgba(0,0,0,0.2) !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  padding: 1rem !important;
+}
+
+.titleContainer {
+  color: var(--grafite) !important;
+
+  margin-bottom: 0.5rem;
+
+  > span {
+    font-size: 1rem;
+    font-weight: bold;
+  }
+
+  .divider {
+    height: 1px;
+
+    margin: 0.5rem 0;
+
+    background: var(--grafite);
+  }
+}
+
+.rulesContainer {
+  flex: 1;
+  display: flex;
+
+  align-items: center;
+
+  color: var(--grafite);
+
+  & + .rulesContainer {
+    margin-top: 0.25rem;
+  }
+
+  svg {
+    width: 1.5rem;
+  }
+
+  span {
+    margin-left: 0.5rem;
+  }
+}
+
+.example {
+  flex: 1;
+
+  border-top: 1px solid var(--gray-300);
+
+  color: var(--grafite);
+
+  opacity: 0.5;
+
+  margin-top: 0.5rem;
+  padding-top: 0.25rem;
+}
+
+.green {
+  color: var(--green-100);
+}
+
+.red {
+  color: var(--red-100);
+}

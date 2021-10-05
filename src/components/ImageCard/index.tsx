@@ -3,15 +3,16 @@ import { FiX } from 'react-icons/fi';
 
 import styles from './styles.module.scss';
 
-interface ImageCardProps {
+interface ImageCardProps extends React.HTMLAttributes<HTMLDivElement> {
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   imgUrl: string;
   showOnly?: boolean;
+  highlight?: boolean;
 }
 
-const ImageCard: React.FC<ImageCardProps> = ({ onClick, imgUrl, showOnly, ...rest }) => {
+const ImageCard: React.FC<ImageCardProps> = ({ onClick, highlight, imgUrl, showOnly, ...rest }) => {
   return (
-    <div className={styles.imageCard}>
+    <div className={styles.imageCard} {...rest}>
       <img src={imgUrl} alt="Product Image" />
       <div className={styles.imageDelete} onClick={onClick}>
         {!showOnly && <FiX />}

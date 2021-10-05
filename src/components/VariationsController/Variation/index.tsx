@@ -103,18 +103,6 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
             break;
         }
 
-        // switch (attribute.name) {
-        //   case 'color':
-        //   case 'size':
-        //   case 'flavor':
-        //   case 'voltag':
-        //     valueAt = key.substring(0, key.length - 1)
-        //     break;
-        //   default:
-        //     valueAt = key
-        //     break;
-        // }
-
         return {
           name: attribute.name,
           type: attribute.type,
