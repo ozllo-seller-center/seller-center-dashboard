@@ -19,7 +19,7 @@ interface InputRefProps extends HTMLInputElement {
 // TODO: Passar a lista de imagens para dentro deste componente (externalizar como outro componente se preicsar)
 const Dropzone: React.FC<Props> = ({ name, onFileUploaded }) => {
   // const [selectedFileUrl, setselectedFileUrl] = useState<string[]>([]);
-  const [err, setErr] = useState();
+  const [err, setErr] = useState<string>();
 
   const dropZoneRef = useRef<InputRefProps>(null);
   const { fieldName, registerField, defaultValue, error, clearError } = useField(name);
@@ -36,7 +36,7 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded }) => {
     } catch (err) {
       console.log(err)
 
-      setErr(err);
+      setErr(err as string);
       setTimeout(() => {
         setErr(undefined);
       }, 3000);

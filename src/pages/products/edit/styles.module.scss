@@ -154,7 +154,7 @@
 
       @media screen and (min-width: $tablet_vertical) {
         display: grid;
-        grid-template-columns: 1fr 2fr .5fr .5fr;
+        grid-template-columns: 1fr 0.75fr;
         column-gap: .75rem;
       }
     }
@@ -326,9 +326,16 @@
     animation: spin 2s linear infinite;
   }
 
-  p {
-    font-size: 1.25rem;
+  .title {
+    font-size: 1.5rem;
     font-weight: bold;
+    color: var(--grafite);
+
+    margin-bottom: 0.5rem;
+  }
+
+  .messages {
+    font-size: 1.25rem;
     color: var(--grafite);
   }
 
@@ -336,6 +343,6 @@
     width: 5rem;
     height: 5rem;
 
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   }
 }

@@ -120,9 +120,9 @@ const AuthProvider: React.FC = ({ children }) => {
 
       user = { ...user, ...response.data, isActive, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' };
 
-      // if (!user.isActive) {
-      //   throw new InactiveUserError("Usuário inativado, login não pode ser realizado.");
-      // }
+      if (!user.isActive) {
+        throw new InactiveUserError("Usuário inativado, login não pode ser realizado.");
+      }
     }).catch(err => {
       console.log(err)
     });

@@ -136,3 +136,6 @@ dist
 
 # Build folder
 build
+
+# Todo File
+./todo.mkd

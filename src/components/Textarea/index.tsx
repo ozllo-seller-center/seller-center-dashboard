@@ -48,21 +48,19 @@ const TextArea: React.FC<TextAreaProps> = ({
   }, [fieldName, registerField]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div className={styles.parent}>
       <div
         className={disabled ? styles.containerDisabled : !!error ? styles.containerError : isFocused ? styles.containerFocused : isFilled ? styles.containerFilled : styles.container} >
-        <div>
-          <label>{label}</label>
-          <textarea
-            name={name}
-            onFocus={handleInputFocused}
-            onBlur={handleInputBlur}
-            defaultValue={defaultValue}
-            ref={inputRef}
-            disabled={disabled}
-            {...rest}
-          />
-        </div>
+        <label className={styles.inputLabel}>{label}</label>
+        <textarea
+          name={name}
+          onFocus={handleInputFocused}
+          onBlur={handleInputBlur}
+          defaultValue={defaultValue}
+          ref={inputRef}
+          disabled={disabled}
+          {...rest}
+        />
       </div>
       {error && (
         <p className={styles.error}>

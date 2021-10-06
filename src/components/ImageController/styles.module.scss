@@ -1,0 +1,44 @@
+@keyframes dividerAppear {
+  0% {
+    opacity: 0;
+    padding: 0;
+  }
+  100% {
+    opacity: 1;
+    padding: 1rem;
+  }
+}
+
+.imagesContainer {
+  flex: 1;
+  display: flex;
+
+  padding-top: 1.25rem;
+  padding-bottom: 0.2rem;
+
+  overflow-y: auto;
+
+  > div + div {
+    margin-left: 1rem;
+  }
+
+  .dragLeftDivider {
+    border: 0;
+
+    animation: divideAppear 2s;
+
+    padding: 1rem;
+
+    background-image: linear-gradient(to right, var(--yellow-300-00), var(--yellow-300-40));
+  }
+
+  .dragRightDivider {
+    border: 0;
+
+    animation: divideAppear 2s;
+
+    padding: 1rem;
+
+    background-image: linear-gradient(to left, var(--yellow-300-00), var(--yellow-300-40));
+  }
+}

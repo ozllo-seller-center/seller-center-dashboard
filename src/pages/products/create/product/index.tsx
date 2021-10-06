@@ -5,15 +5,13 @@ import { FormHandles, Scope } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 
-import Dropzone from '../../../../components/Dropzone';
 import Button from '../../../../components/PrimaryButton';
-import ImageCard from '../../../../components/ImageCard';
 import Input from '../../../../components/Input';
 import RadioButtonGroup from '../../../../components/RadioButtonGroup';
 import VariationsController from '../../../../components/VariationsController';
 import getValidationErrors from '../../../../utils/getValidationErrors';
 
-import { FiCheck, FiChevronLeft, FiX } from 'react-icons/fi';
+import { FiCheck, FiChevronLeft, FiInfo, FiX } from 'react-icons/fi';
 
 import styles from './styles.module.scss'
 
@@ -27,6 +25,9 @@ import { Loader } from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
 import Variation from 'src/components/VariationsController/Variation';
 import { Attribute } from 'src/shared/types/category';
+import ImageController from 'src/components/ImageController';
+import RuledHintbox, { Rule } from 'src/components/RuledHintbox';
+import { matchingWords } from 'src/utils/util';
 
 type VariationDTO = {
   size?: number | string,
@@ -42,6 +43,9 @@ export function ProductForm() {
 
   const [filledFields, setFilledFields] = useState(0);
   const [totalFields, setTotalFields] = useState(14);
+  const [isHintDisabled, setHintDisabled] = useState(false);
+  const [brandInName, setBrandInName] = useState(false);
+  const [colorInName, setColorInName] = useState(false);
 
   const [variations, setVariations] = useState<VariationDTO[]>([{}]);
 
@@ -63,6 +67,22 @@ export function ProductForm() {
     }
   }, [router])
 
+  const hintRules = useMemo(() => {
+    if (isHintDisabled)
+      return []
+
+    const rules = [
+      { state: !brandInName, descr: 'Não deve conter o nome da marca' },
+      { descr: 'Identifique o produto' },
+      { descr: 'Use palavras chave' }
+    ] as Rule[]
+
+    if (attributes.findIndex(attr => attr.name === 'color') >= 0)
+      rules.splice(1, 0, { state: !colorInName, descr: 'Não deve conter cor' })
+
+    return rules
+  }, [attributes, brandInName, colorInName, isHintDisabled])
+
   useEffect(() => {
     setLoading(true)
 
@@ -73,8 +93,13 @@ export function ProductForm() {
     });
 
     api.get(`/category/${router.query.category}/attributes`).then(response => {
-      console.log(response.data)
       setAttributes(response.data[0].attributes)
+
+      response.data[0].attributes.map((attr: Attribute) => {
+        if (attr.name === 'flavor') {
+          setHintDisabled(true);
+        }
+      })
 
       setLoading(false)
     }).catch(err => {
@@ -83,13 +108,48 @@ export function ProductForm() {
     })
   }, [])
 
+  const setNameChecks = useCallback((name: string) => {
+
+    if (!name || name.length === 0 || !formRef.current?.getFieldValue('brand') || isHintDisabled) {
+      setBrandInName(false)
+      setColorInName(false)
+      return;
+    }
+
+    let brandCheck = matchingWords(name, formRef.current?.getFieldValue('brand'))
+
+    setBrandInName(brandCheck);
+
+    let colorCheck = false;
+
+    attributes.map(async attr => {
+      if (attr.name === 'color') {
+        attr.values?.map(color => {
+          if (colorCheck)
+            return
+
+          colorCheck = matchingWords(name, color)
+        })
+      }
+    })
+
+    setColorInName(colorCheck);
+
+    if (brandCheck || colorCheck) {
+      formRef.current?.setFieldError('name', brandCheck ? 'Não insira a marca no nome do produto' : 'Não informe a cor no nome do produto')
+      return
+    }
+
+    formRef.current?.setFieldError('name', '');
+  }, [attributes, isHintDisabled])
+
   const handleOnFileUpload = useCallback((acceptedFiles: File[], dropZoneRef: React.RefObject<any>) => {
 
     calcFilledFields(formRef.current?.getData() as Product);
 
     acceptedFiles = acceptedFiles.filter((f, i) => {
 
-      if (files.length + (i + 1) > 8) {
+      if (files.length + (i + 1) > 6) {
         handleModalMessage(true, {
           type: 'error',
           title: 'Muitas fotos!',
@@ -135,6 +195,21 @@ export function ProductForm() {
     setFiles(filesUpdate);
 
     calcFilledFields(formRef.current?.getData() as Product);
+  }, [files])
+
+  const handleFileOrder = useCallback((draggedFile: number, droppedAt: number) => {
+    if (draggedFile === droppedAt)
+      return
+
+    let newFiles = [...files]
+
+    const auxFile = newFiles[draggedFile]
+
+    newFiles = newFiles.filter((item, i) => i != draggedFile)
+
+    newFiles.splice(droppedAt, 0, auxFile);
+
+    setFiles([...newFiles])
   }, [files])
 
   useEffect(() => {
@@ -222,6 +297,11 @@ export function ProductForm() {
       return;
     }
 
+    if (colorInName || brandInName) {
+      handleModalMessage(true, { type: 'error', title: 'Nome de produto inválido', message: [brandInName ? 'Remova a marca do nome do produto.' : 'Remova a cor do nome do produto.', 'Quando necessário o sistema adicionará essas informações ao nome do produto.'] })
+      return;
+    }
+
     if (data.price_discounted === "") {
       data.price_discounted = data.price;
     }
@@ -234,7 +314,7 @@ export function ProductForm() {
         images: Yup.array().min(2, 'Escolha pelo menos duas imagens').max(8, 'Pode atribuir no máximo 8 imagens'),
         name: Yup.string().required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres'),
         description: Yup.string()
-          .required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres'),
+          .required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres').max(2000, 'Deve conter no máximo 2000 caracteres'),
         brand: Yup.string().required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres'),
         ean: Yup.string(),
         sku: Yup.string().required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres'),
@@ -288,7 +368,6 @@ export function ProductForm() {
         variations
       } = data;
 
-      // let formatedValidations = variations as Omit<VariationDTO, '_id'>[];
       variations.map((vars: any) => {
         delete vars._id;
       })
@@ -313,7 +392,6 @@ export function ProductForm() {
         variations
       }
 
-      //TODO: chamada para a API
       await api.post('/product', product, {
         headers: {
           authorization: token,
@@ -335,13 +413,6 @@ export function ProductForm() {
       });
 
       setLoading(false)
-
-      // addToast({
-      //   type: 'success',
-      //   title: 'Perfil atualizado!',
-      //   description:
-      //     'Suas informações do perfil foram alteradas com sucesso!',
-      // });
     } catch (err) {
       setLoading(false)
       console.log(err)
@@ -361,7 +432,7 @@ export function ProductForm() {
         return;
       }
     }
-  }, [router, token, user, filledFields, totalFields])
+  }, [router, token, user, filledFields, totalFields, colorInName, brandInName])
 
   async function handleDeleteVariation(deletedIndex: number): Promise<void> {
     setVariations(formRef.current?.getData().variations)
@@ -371,7 +442,6 @@ export function ProductForm() {
 
     setVariations(tempVars)
 
-    // formRef.current?.setFieldValue('variations', tempVars);
     formRef.current?.setData({ ...formRef.current?.getData(), variations: tempVars })
     calcFilledFields({ ...formRef.current?.getData(), variations: tempVars } as Product)
     setTotalFields(10 + tempVars.length * 3)
@@ -426,26 +496,18 @@ export function ProductForm() {
             ref={formRef}
             onSubmit={handleSubmit}
             onChange={(e) => {
-              calcFilledFields(formRef.current?.getData() as Product);
-              // const formData = formRef.current?.getData() as Product;
-              // setVariations(formData.variations);
+              calcFilledFields(formRef.current?.getData() as Product)
+              setNameChecks(formRef.current?.getFieldValue('name'))
             }}
           >
             <p className={styles.imagesTitle}>Seleciones as fotos do produto</p>
 
-            <div className={styles.imagesContainer}>
-              <Dropzone
-                name='images'
-                onFileUploaded={handleOnFileUpload}
-              />
-
-              {
-                files.map((f, i) => {
-                  if (!!f.url)
-                    return <ImageCard key={i} onClick={() => handleDeleteFile(f.url as string)} imgUrl={f.url} />
-                })
-              }
-            </div>
+            <ImageController
+              files={files}
+              handleFileOrder={handleFileOrder}
+              handleOnFileUpload={handleOnFileUpload}
+              handleDeleteFile={handleDeleteFile}
+            />
 
             <div className={styles.doubleInputContainer}>
               <Input
@@ -453,6 +515,15 @@ export function ProductForm() {
                 label='Nome do produto'
                 placeholder='Insira o nome do produto'
                 autoComplete='off'
+                maxLength={100}
+                hint={!isHintDisabled && (
+                  <RuledHintbox
+                    title={'Orientações para nomeação'}
+                    rules={hintRules}
+                    example='Ex.: Sapato Cano Alto Fit'
+                    icon={FiInfo}
+                  />
+                )}
               />
 
               <Input
@@ -469,6 +540,7 @@ export function ProductForm() {
                 label='Descrição do produto'
                 placeholder='Insira a descrição do produto'
                 autoComplete='off'
+                maxLength={2000}
               />
             </div>
 
@@ -600,8 +672,8 @@ export function ProductForm() {
           <MessageModal handleVisibility={handleModalVisibility}>
             <div className={styles.modalContent}>
               {modalMessage.type === 'success' ? <FiCheck style={{ color: 'var(--green-100)' }} /> : <FiX style={{ color: 'var(--red-100)' }} />}
-              <p>{modalMessage.title}</p>
-              <p>{modalMessage.message}</p>
+              <p className={styles.title}>{modalMessage.title}</p>
+              {modalMessage.message.map((message, i) => <p key={i} className={styles.messages}>{message}</p>)}
             </div>
           </MessageModal>
         )

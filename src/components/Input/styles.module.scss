@@ -1,199 +1,97 @@
-.container {
-  margin: 0.25rem;
+.parent {
+  display: flex;
+  flex-direction: column;
 
-  padding: 0.75rem 1rem;
+  > div {
+    flex: 1;
 
-  background: #FFFFFF;
-  border-radius: 4px;
-  box-shadow: 0 0 24px rgba(0,0,0,0.05), 0 0 6px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
 
-  transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
+    margin: 0.25rem;
+    padding: 0.75rem 1rem;
 
-  div {
-    width: 100%;
+    background: #FFFFFF;
+    border-radius: 4px;
 
-    label {
-      color: var(--gray-250);
-      font-size: .73rem;
+    transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
+  }
 
-      margin-top: -.5rem;
-      margin-bottom: 0.25rem;
-    }
+  .inputLabel {
+    font-size: .73rem;
 
-    input {
-      width: 100%;
-      height: 100%;
+    margin-bottom: 0.25rem;
+  }
 
+  input {
+    flex: 1;
+
+    border: 0;
+
+    color: var(--grafite);
+
+    background: transparent;
+
+    &::placeholder {
       color: var(--grafite);
-      background: transparent;
-      border: 0;
-
-      &::placeholder {
-        color: var(--grafite);
-        opacity: .75;
-      }
+      opacity: .75;
     }
   }
 }
 
+.hintedContainer {
+  flex: 1;
+
+  display: flex;
+}
+
+.container {
+  box-shadow: 0 0 24px rgba(0,0,0,0.05), 0 0 6px rgba(0,0,0,0.1);
+
+  .inputLabel {
+    color: var(--gray-250);
+  }
+}
+
 .containerDisabled {
-  margin: 0.25rem;
-
-  padding: 0.75rem 1rem;
-
-  background: var(--gray-100);
-  border-radius: 4px;
   box-shadow: 0 0 24px rgba(0,0,0,0.05), 0 0 6px rgba(0,0,0,0.1);
 
   opacity: 0.9;
 
   transition: border-color 0.5s, color 0.5s, box-shadow 0.5s, opacity 0.5s;
 
-  div {
-    width: 100%;
+  .inputLabel {
+    color: var(--gray-250);
 
     opacity: 0.5;
+  }
 
-    label {
-      color: var(--gray-250);
-      font-size: .73rem;
-
-      margin-top: -.5rem;
-      margin-bottom: 0.25rem;
-    }
-
-    input {
-      color: var(--grafite);
-
-      width: 100%;
-      height: 100%;
-
-      background: transparent;
-      border: 0;
-
-      &::placeholder {
-        color: var(--grafite);
-        opacity: .75;
-      }
-    }
+  input {
+    opacity: 0.5;
   }
 }
 
 .containerError {
-  margin: 0.25rem;
-
-  padding: 0.75rem 1rem;
-
-  background: #FFFFFF;
-  border-radius: 4px;
   box-shadow: 0 0 24px var(--red-100-40), 0 0 6px var(--red-100-60);
 
-  transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
-
-  div {
-    width: 100%;
-
-    label {
-      color: var(--red-100);
-      font-size: .73rem;
-
-      margin-top: -.5rem;
-      margin-bottom: 0.25rem;
-    }
-
-    input {
-      color: var(--grafite);
-
-      width: 100%;
-      height: 100%;
-
-      background: transparent;
-      border: 0;
-
-      &::placeholder {
-        color: var(--grafite);
-        opacity: .75;
-      }
-    }
+  .inputLabel {
+    color: var(--red-100);
   }
 }
 
 .containerFocused {
-  margin: 0.25rem;
-
-  padding: 0.75rem 1rem;
-
-  background: #FFFFFF;
-  border-radius: 4px;
   box-shadow: 0 0 20px var(--yellow-300-40), 0 0 6px var(--yellow-300-60);
 
-  transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
-
-  div {
-    width: 100%;
-
-    label {
-      color: var(--gray-300);
-      font-size: .73rem;
-
-      margin-top: -.5rem;
-      margin-bottom: 0.25rem;
-    }
-
-    input {
-      color: var(--grafite);
-
-      width: 100%;
-      height: 100%;
-
-      background: transparent;
-      border: 0;
-
-      &::placeholder {
-        color: var(--grafite);
-        opacity: .75;
-      }
-    }
+  .inputLabel {
+    color: var(--gray-300);
   }
 }
 
 .containerFilled {
-  margin: 0.25rem;
-
-  padding: 0.75rem 1rem;
-
-  background: #FFFFFF;
-  border-radius: 4px;
-
   box-shadow: 0 0 20px var(--green-100-40), 0 0 6px var(--green-100-40);
 
-  transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
-
-  div {
-    width: 100%;
-
-    label {
-      color: var(--gray-300);
-      font-size: .73rem;
-
-      margin-top: -.5rem;
-      margin-bottom: 0.25rem;
-    }
-
-    input {
-      color: var(--grafite);
-
-      width: 100%;
-      height: 100%;
-
-      background: transparent;
-      border: 0;
-
-      &::placeholder {
-        color: var(--grafite);
-        opacity: .75;
-      }
-    }
+  .inputLabel {
+    color: var(--gray-300);
   }
 }
 
