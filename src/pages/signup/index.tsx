@@ -94,7 +94,7 @@ const SignUp: React.FC = () => {
         setSuccessfull(true);
         setLoading(false);
         setTitle('Cadastro realizado com sucesso!');
-        setMessagess(['Cheque seu e-mail para autenticar sua conta.', 'Caso a conta não seja autenticada em algumas horas, o cadastro será cancelado.']);
+        setMessages(['Cheque seu e-mail para autenticar sua conta.', 'Caso a conta não seja autenticada em algumas horas, o cadastro será cancelado.']);
       } catch (err) {
         setLoading(false);
 
@@ -111,14 +111,14 @@ const SignUp: React.FC = () => {
           setModalVisibility(true);
           setSuccessfull(false);
           setTitle('Usuário já existe');
-          setMessagess(['Tente realizar o login ou recuperar sua senha.']);
+          setMessages(['Tente realizar o login ou recuperar sua senha.']);
           return;
         }
 
         setModalVisibility(true);
         setSuccessfull(false);
         setTitle('Oops...');
-        setMessagess(['Ocorreu um erro durante o cadastro, tente novamente em alguns instantes.']);
+        setMessages(['Ocorreu um erro durante o cadastro, tente novamente em alguns instantes.']);
         // addToast({
         //   type: 'error',
         //   title: 'Erro na atualização',
