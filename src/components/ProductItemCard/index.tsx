@@ -26,10 +26,12 @@ interface ProductItemCardProps {
   userInfo: {
     token: string,
     shop_id: string,
-  }
+  },
+  disabledActions?: boolean,
+  setDisabledActions?: Function,
 }
 
-const ProductItemCard: React.FC<ProductItemCardProps> = ({ item, products, setProducts, userInfo }) => {
+const ProductItemCard: React.FC<ProductItemCardProps> = ({ item, products, setProducts, userInfo, disabledActions, setDisabledActions }) => {
   const [isAvailable, setIsAvailable] = useState(item.is_active);
 
   const itemRef = useRef<HTMLInputElement>(null);
@@ -92,13 +94,33 @@ const ProductItemCard: React.FC<ProductItemCardProps> = ({ item, products, setPr
             <Switch
               inputRef={itemRef}
               checked={item.is_active}
-              onChange={() => handleAvailability(item._id)}
-              classes={{
-                root: switchStyles.root,
-                thumb: isAvailable ? switchStyles.thumb : switchStyles.thumbUnchecked,
-                track: isAvailable ? switchStyles.track : switchStyles.trackUnchecked,
-                checked: switchStyles.checked,
+              onClick={() => {
+                handleAvailability(item._id)
+
+                if (!disabledActions && !!setDisabledActions) {
+                  setDisabledActions(true)
+
+                  setTimeout(() => {
+                    setDisabledActions(false)
+                  }, 1500)
+                }
               }}
+              classes={
+                disabledActions ?
+                  {
+                    root: switchStyles.root,
+                    thumb: switchStyles.thumbDisabled,
+                    track: switchStyles.trackDisabled,
+                    checked: switchStyles.checked,
+                  }
+                  :
+                  {
+                    root: switchStyles.root,
+                    thumb: isAvailable ? switchStyles.thumb : switchStyles.thumbUnchecked,
+                    track: isAvailable ? switchStyles.track : switchStyles.trackUnchecked,
+                    checked: switchStyles.checked,
+                  }
+              }
             />
           </MuiThemeProvider>
           <span className={styles.switchSubtitle}>{isAvailable ? 'Ativado' : 'Desativado'}</span>

@@ -1,35 +1,36 @@
-import React, { useCallback, useRef, ChangeEvent, useState, useMemo } from 'react';
+import React, { useCallback, useRef, ChangeEvent, useState, useMemo } from 'react'
 
-import { FormHandles, Scope } from '@unform/core';
-import { Form } from '@unform/web';
-import * as Yup from 'yup';
-import { cnpj as cnpjValidator, cpf } from 'cpf-cnpj-validator';
+import { FormHandles, Scope } from '@unform/core'
+import { Form } from '@unform/web'
+import * as Yup from 'yup'
+import { cnpj as cnpjValidator } from 'cpf-cnpj-validator'
 
-import { useAuth } from '../../hooks/auth';
+import { useAuth } from '../../hooks/auth'
 
-import api from '../../services/api';
+import api from '../../services/api'
 
-import getValidationErrors from '../../utils/getValidationErrors';
+import getValidationErrors from '../../utils/getValidationErrors'
 
-import styles from './styles.module.scss';
+import styles from './styles.module.scss'
 
-import Input from '../../components/InputLabeless';
-import Button from '../../components/PrimaryButton';
-import { format } from 'date-fns';
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { useLoading } from 'src/hooks/loading';
-import { Loader } from 'src/components/Loader';
-import Autocomplete from 'src/components/Autocomplete';
-import { CompanyInfo, PersonInfo } from 'src/shared/types/personalInfo';
-import UserTypeButton from 'src/components/UserTypeButton';
-import { FaUserTie, FaStore } from 'react-icons/fa';
-import { useModalMessage } from 'src/hooks/message';
-import { AppError, findError, getErrorField } from 'src/shared/errors/api/errors';
-import MessageModal from 'src/components/MessageModal';
-import { FiCheck, FiX } from 'react-icons/fi';
-import MaskedInput from 'src/components/MaskedInput';
-import { Bank } from 'src/shared/types/bank';
+import Input from '../../components/InputLabeless'
+import Button from '../../components/PrimaryButton'
+import { format } from 'date-fns'
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { useLoading } from 'src/hooks/loading'
+import { Loader } from 'src/components/Loader'
+import Autocomplete from 'src/components/Autocomplete'
+import { CompanyInfo, PersonInfo } from 'src/shared/types/personalInfo'
+import UserTypeButton from 'src/components/UserTypeButton'
+import { FaUserTie, FaStore } from 'react-icons/fa'
+import { useModalMessage } from 'src/hooks/message'
+import { AppError, findError, getErrorField } from 'src/shared/errors/api/errors'
+import MessageModal from 'src/components/MessageModal'
+import { FiCheck, FiX } from 'react-icons/fi'
+import MaskedInput from 'src/components/MaskedInput'
+import { Bank } from 'src/shared/types/bank'
+import { isTokenValid } from 'src/utils/util'
 
 interface PersonalInfoDTO {
   isPF: boolean,
@@ -92,49 +93,76 @@ const endPhoneRegex = /[0-9]{3}\-[0-9]{4}$/
 
 const completephoneRegex = /^\([1-9]{2}\)(?:[2-8]|9[1-9])[0-9]{3}\-[0-9]{4}$/
 
-const TYPE_INDEX = -1;
-const PERSONAL_INDEX = 0;
-const ADDRESS_INDEX = 1;
-const CONTACT_INDEX = 2;
-const SELLER_INDEX = 3;
-const STORE_INDEX = 4;
+const letterRegex = /[a-zA-Z]/g
+
+const TYPE_INDEX = -1
+const PERSONAL_INDEX = 0
+const ADDRESS_INDEX = 1
+const CONTACT_INDEX = 2
+const SELLER_INDEX = 3
+const STORE_INDEX = 4
 
 const Profile: React.FC = () => {
-  const { user, updateUser } = useAuth();
-  const { isLoading, setLoading } = useLoading();
+  const { user, updateUser, token, signOut } = useAuth()
+  const { isLoading, setLoading } = useLoading()
 
-  const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
+  const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage()
 
-  const [flowIntent, setFlowIntent] = useState(true);
-  const [flowStep, setFlowStep] = useState(-1);
-  const [flowPrevious, setFlowPrevious] = useState(0);
-  const [isStepCompleted, setStepCompleted] = useState(false);
-  const [isChanged, setChanged] = useState(false);
+  const [flowIntent, setFlowIntent] = useState(true)
+  const [flowStep, setFlowStep] = useState(-1)
+  const [flowPrevious, setFlowPrevious] = useState(0)
+  const [isStepCompleted, setStepCompleted] = useState(false)
+  const [isChanged, setChanged] = useState(false)
 
-  const [typeClassName, setTypeClassName] = useState(styles.flowUnset);
-  const [personalClassName, setPersonalClassName] = useState(styles.flowUnset);
-  const [addressClassName, setAddressClassName] = useState(styles.flowUnset);
-  const [contactClassName, setContactClassName] = useState(styles.flowUnset);
-  const [sellerClassName, setSellerClassName] = useState(styles.flowUnset);
-  const [shopClassName, setShopClassName] = useState(styles.flowUnset);
+  const [typeClassName, setTypeClassName] = useState(styles.flowUnset)
+  const [personalClassName, setPersonalClassName] = useState(styles.flowUnset)
+  const [addressClassName, setAddressClassName] = useState(styles.flowUnset)
+  const [contactClassName, setContactClassName] = useState(styles.flowUnset)
+  const [sellerClassName, setSellerClassName] = useState(styles.flowUnset)
+  const [shopClassName, setShopClassName] = useState(styles.flowUnset)
 
-  const [banks, setBanks] = useState<Bank[]>([]);
+  const [ieMask, setIeMask] = useState('***.***.***-**')
+  const [imMask, setImMask] = useState('***.***.***-**')
 
-  const formRef = useRef<FormHandles>(null);
 
-  const router = useRouter();
+  const [banks, setBanks] = useState<Bank[]>([])
+
+  const formRef = useRef<FormHandles>(null)
+
+  const router = useRouter()
 
   useEffect(() => {
     if (flowStep === -1) {
-      setFlowStep(!!user && !!user.personalInfo ? 0 : -1);
+      setFlowStep(!!user && !!user.personalInfo ? 0 : -1)
     }
-  }, [user])
+
+    isTokenValid(token).then(valid => {
+      if (valid) {
+        api.get(`auth/token/${token}`).then(response => {
+          const { isValid } = response.data
+
+          if (!isValid) {
+            signOut()
+            router.push('/')
+            return
+          }
+
+        }).catch((error) => {
+          signOut()
+          router.push('/')
+          return
+        })
+
+        return
+      }
+    })
+  }, [user, token])
 
   const userData = useMemo(() => {
-    const userDTO = { ...user } as any;
+    const userDTO = { ...user } as any
     if (!!userDTO.personalInfo && !!userDTO.personalInfo['cpf']) {
-      var parts = !!userDTO.personalInfo.birthday ? userDTO.personalInfo.birthday.split("-") : [];
-      const dateRaw = !!userDTO.personalInfo.birthday ? new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10)) : undefined;
+      var parts = !!userDTO.personalInfo.birthday ? userDTO.personalInfo.birthday.split("-") : []
+      const dateRaw = !!userDTO.personalInfo.birthday ? new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10)) : undefined
 
       return {
         ...userDTO,
@@ -151,37 +179,51 @@ const Profile: React.FC = () => {
   }, [user])
 
   useEffect(() => {
-    setLoading(true);
+    setLoading(true)
     api.get('/account/detail').then(response => {
       updateUser({ ...user, ...response.data, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' })
 
-      if (!!response.data.personalInfo['cpf']) {
+      const userInfo = { ...response.data }
 
-        var parts = !!response.data.personalInfo.birthday ? response.data.personalInfo.birthday.split("-") : [];
-        const dateRaw = !!response.data.personalInfo.birthday ? new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10)) : undefined;
+      if (!!userInfo.personalInfo['cpf']) {
+
+        var parts = !!userInfo.personalInfo.birthday ? userInfo.personalInfo.birthday.split("-") : []
+        const dateRaw = !!userInfo.personalInfo.birthday ? new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10)) : undefined
 
         formRef.current?.setData({
-          ...user, ...response.data, personalInfo: {
-            ...response.data.personalInfo,
+          ...user, ...userInfo, personalInfo: {
+            ...userInfo.personalInfo,
             day: !!dateRaw ? dateRaw.getDate() : '',
             month: !!dateRaw ? dateRaw.getMonth() + 1 : '',
             year: !!dateRaw ? dateRaw.getFullYear() : '',
           }
-        } as ProfileFormData);
+        } as ProfileFormData)
 
-        setLoading(false);
+        setLoading(false)
 
-        return;
+        return
       }
 
-      formRef.current?.setData({ ...user, ...response.data });
+      formRef.current?.setData({ ...user, ...userInfo })
 
-      setLoading(false);
+      if (letterRegex.test(userInfo.personalInfo.inscricaoEstadual)) {
+        setIeMask('******')
+      } else {
+        setIeMask('***.***.***-**')
+      }
+
+      if (letterRegex.test(userInfo.personalInfo.inscricaoMunicipal)) {
+        setImMask('******')
+      } else {
+        setImMask('***.***.***-**')
+      }
+
+      setLoading(false)
     }).catch(err => {
       console.log(err)
 
-      setLoading(false);
-    });
+      setLoading(false)
+    })
   }, [])
 
   useEffect(() => {
@@ -200,16 +242,16 @@ const Profile: React.FC = () => {
     if (flowStep === TYPE_INDEX) {
       if (flowPrevious < flowStep) {
         setTypeClassName(styles.flowAppearFromRight)
-        return;
+        return
       }
 
       if (flowPrevious > flowStep) {
         setTypeClassName(styles.flowAppearFromLeft)
-        return;
+        return
       }
 
       setTypeClassName(styles.flow)
-      return;
+      return
     }
 
     setTypeClassName(styles.flowUnset)
@@ -219,16 +261,16 @@ const Profile: React.FC = () => {
     if (flowStep === PERSONAL_INDEX) {
       if (flowPrevious < flowStep) {
         setPersonalClassName(styles.flowAppearFromRight)
-        return;
+        return
       }
 
       if (flowPrevious > flowStep) {
         setPersonalClassName(styles.flowAppearFromLeft)
-        return;
+        return
       }
 
       setPersonalClassName(styles.flow)
-      return;
+      return
     }
 
     setPersonalClassName(styles.flowUnset)
@@ -238,16 +280,16 @@ const Profile: React.FC = () => {
     if (flowStep === ADDRESS_INDEX) {
       if (flowPrevious < flowStep) {
         setAddressClassName(styles.flowAppearFromRight)
-        return;
+        return
       }
 
       if (flowPrevious > flowStep) {
         setAddressClassName(styles.flowAppearFromLeft)
-        return;
+        return
       }
 
       setAddressClassName(styles.flow)
-      return;
+      return
     }
 
     setAddressClassName(styles.flowUnset)
@@ -257,16 +299,16 @@ const Profile: React.FC = () => {
     if (flowStep === CONTACT_INDEX) {
       if (flowPrevious < flowStep) {
         setContactClassName(styles.flowAppearFromRight)
-        return;
+        return
       }
 
       if (flowPrevious > flowStep) {
         setContactClassName(styles.flowAppearFromLeft)
-        return;
+        return
       }
 
       setContactClassName(styles.flow)
-      return;
+      return
     }
 
     setContactClassName(styles.flowUnset)
@@ -276,16 +318,16 @@ const Profile: React.FC = () => {
     if (flowStep === SELLER_INDEX) {
       if (flowPrevious < flowStep) {
         setSellerClassName(styles.flowAppearFromRight)
-        return;
+        return
       }
 
       if (flowPrevious > flowStep) {
         setSellerClassName(styles.flowAppearFromLeft)
-        return;
+        return
       }
 
       setSellerClassName(styles.flow)
-      return;
+      return
     }
 
     setSellerClassName(styles.flowUnset)
@@ -295,16 +337,16 @@ const Profile: React.FC = () => {
     if (flowStep === STORE_INDEX) {
       if (flowPrevious < flowStep) {
         setShopClassName(styles.flowAppearFromRight)
-        return;
+        return
       }
 
       if (flowPrevious > flowStep) {
         setShopClassName(styles.flowAppearFromLeft)
-        return;
+        return
       }
 
       setShopClassName(styles.flow)
-      return;
+      return
     }
 
     setShopClassName(styles.flowUnset)
@@ -381,25 +423,25 @@ const Profile: React.FC = () => {
         }
     }
 
-    return {};
-  }, [flowStep, user]);
+    return {}
+  }, [flowStep, user])
 
   useEffect(() => {
     if (isStepCompleted) {
-      setChanged(false);
+      setChanged(false)
 
-      setFlowPrevious(flowStep >= 0 ? flowStep : 0);
+      setFlowPrevious(flowStep >= 0 ? flowStep : 0)
 
       if (flowIntent === true && flowStep + 1 <= STORE_INDEX) {
-        setFlowStep(flowStep + 1);
+        setFlowStep(flowStep + 1)
       }
 
       if (flowIntent === false && flowStep > PERSONAL_INDEX) {
-        setFlowStep(flowStep - 1);
+        setFlowStep(flowStep - 1)
       }
 
       if (flowIntent === true && flowStep === STORE_INDEX) {
-        router.push('/dashboard');
+        router.push('/dashboard')
       }
     }
   }, [isStepCompleted, flowIntent])
@@ -409,59 +451,59 @@ const Profile: React.FC = () => {
       updateUser({
         ...user,
         userType: 'j'
-      });
+      })
     } else {
       updateUser({
         ...user,
         userType: 'f'
-      });
+      })
     }
 
-    setFlowStep(flowStep + 1);
+    setFlowStep(flowStep + 1)
 
-    return;
+    return
   }, [flowStep])
 
   const handleSubmit = useCallback(
     async (data: ProfileFormData) => {
-      setStepCompleted(false);
-      setLoading(true);
+      setStepCompleted(false)
+      setLoading(true)
 
       if (!!data.contact.phone)
-        data.contact.phone = data.contact.phone.replaceAll('_', '');
+        data.contact.phone = data.contact.phone.replaceAll('_', '')
 
-      data.bankInfo.agency = data.bankInfo.agency.replaceAll('_', '').replace('-', '');
-      data.bankInfo.account = data.bankInfo.account.replaceAll('_', '').replace('-', '');
+      data.bankInfo.agency = data.bankInfo.agency.replaceAll('_', '').replace('-', '')
+      data.bankInfo.account = data.bankInfo.account.replaceAll('_', '').replace('-', '')
 
       if (user.userType !== 'f') {
-        data.personalInfo = data.personalInfo as CompanyInfo;
+        data.personalInfo = data.personalInfo as CompanyInfo
 
-        data.personalInfo.cnpj = data.personalInfo.cnpj.replaceAll('_', '').replaceAll('.', '').replace('/', '').replace('-', '');
+        data.personalInfo.cnpj = data.personalInfo.cnpj.replaceAll('_', '').replaceAll('.', '').replace('/', '').replace('-', '')
 
       } else {
-        data.personalInfo = data.personalInfo as PersonalInfoDTO;
+        data.personalInfo = data.personalInfo as PersonalInfoDTO
 
-        data.personalInfo.cpf = data.personalInfo.cpf.replaceAll('_', '').replaceAll('.', '').replace('-', '');
+        data.personalInfo.cpf = data.personalInfo.cpf.replaceAll('_', '').replaceAll('.', '').replace('-', '')
       }
 
       try {
-        formRef.current?.setErrors({});
-        // setStepCompleted(false);
+        formRef.current?.setErrors({})
+        // setStepCompleted(false)
 
-        const schema = Yup.object().shape({ ...yupValidationSchema });
+        const schema = Yup.object().shape({ ...yupValidationSchema })
 
-        await schema.validate(data, { abortEarly: false });
+        await schema.validate(data, { abortEarly: false })
 
         if (!isChanged) {
-          setStepCompleted(true);
-          setLoading(false);
+          setStepCompleted(true)
+          setLoading(false)
 
-          return;
+          return
         }
 
         switch (flowStep) {
           case PERSONAL_INDEX:
-            var personalInfo;
+            var personalInfo
 
             if (user.userType === 'f') {
               const {
@@ -471,7 +513,7 @@ const Profile: React.FC = () => {
                 day,
                 month,
                 year,
-              } = data.personalInfo as PersonalInfoDTO;
+              } = data.personalInfo as PersonalInfoDTO
 
               personalInfo = {
                 isPF: true,
@@ -480,22 +522,22 @@ const Profile: React.FC = () => {
                 cpf,
                 birthday: format(new Date(year, (month - 1), day), 'dd-MM-yyyy')
                 // birthday: !!birthday ? format(new Date(birthday), 'dd-MM-yyyy') : null,
-              } as PersonInfo;
+              } as PersonInfo
 
               await api.post('/account/personalInfo', personalInfo).then(response => {
 
-                const updatedUser = { ...user, personalInfo: { ...response.data } };
+                const updatedUser = { ...user, personalInfo: { ...response.data } }
 
-                updateUser(updatedUser);
+                updateUser(updatedUser)
 
-                setStepCompleted(true);
+                setStepCompleted(true)
               }).catch(err => {
 
-                setStepCompleted(false);
+                setStepCompleted(false)
 
                 err.response.data.errors.forEach((error: AppError) => {
-                  const apiError = findError(error.errorCode);
-                  const errorField = getErrorField(error.errorCode);
+                  const apiError = findError(error.errorCode)
+                  const errorField = getErrorField(error.errorCode)
 
                   if (!!errorField) {
 
@@ -503,7 +545,7 @@ const Profile: React.FC = () => {
                       formRef.current?.setFieldError('personalInfo.day', 'Informe uma data de nascimento válida')
                       formRef.current?.setFieldError('personalInfo.month', ' ')
                       formRef.current?.setFieldError('personalInfo.year', ' ')
-                      return;
+                      return
                     }
 
                     formRef.current?.setFieldError(errorField.errorField, !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
@@ -512,7 +554,7 @@ const Profile: React.FC = () => {
                     handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
                   }
 
-                });
+                })
 
               })
 
@@ -522,7 +564,7 @@ const Profile: React.FC = () => {
                 razaoSocial,
                 cnpj,
                 inscricaoEstadual,
-                inscricaoMunicipal } = data.personalInfo as CompanyInfo;
+                inscricaoMunicipal } = data.personalInfo as CompanyInfo
 
               personalInfo = {
                 isPJ: true,
@@ -531,21 +573,21 @@ const Profile: React.FC = () => {
                 cnpj: cnpjValidator.format(cnpj),
                 inscricaoEstadual,
                 inscricaoMunicipal
-              };
+              }
 
               await api.post('/account/personalInfo', personalInfo).then(response => {
-                const updatedUser = { ...user, personalInfo: { ...response.data } };
+                const updatedUser = { ...user, personalInfo: { ...response.data } }
 
-                updateUser(updatedUser);
-                setStepCompleted(true);
+                updateUser(updatedUser)
+                setStepCompleted(true)
               }).catch(err => {
-                console.log(err.response.data);
+                console.log(err.response.data)
 
-                setStepCompleted(false);
+                setStepCompleted(false)
 
                 err.response.data.errors.forEach((error: AppError) => {
-                  const apiError = findError(error.errorCode);
-                  const errorField = getErrorField(error.errorCode);
+                  const apiError = findError(error.errorCode)
+                  const errorField = getErrorField(error.errorCode)
 
                   if (!!errorField) {
                     formRef.current?.setFieldError(errorField.errorField, !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
@@ -554,12 +596,12 @@ const Profile: React.FC = () => {
                     handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
                   }
 
-                });
+                })
 
               })
             }
 
-            break;
+            break
           case ADDRESS_INDEX:
             const {
               cep,
@@ -568,17 +610,17 @@ const Profile: React.FC = () => {
               complement,
               district,
               number,
-            } = data.address;
+            } = data.address
 
-            // var cepFormatted = cep.replaceAll("-", "");
+            // var cepFormatted = cep.replaceAll("-", "")
             // cepFormatted = cepFormatted.slice(0, 5) + "-" + cepFormatted.slice(5, cep.length)
 
             if (!!complement) {
               if (complement.length < 4) {
-                setStepCompleted(false);
-                setLoading(false);
+                setStepCompleted(false)
+                setLoading(false)
                 formRef?.current?.setFieldError('address.complement', 'Mínimo de 4 caracteres')
-                return;
+                return
               }
             }
 
@@ -589,21 +631,21 @@ const Profile: React.FC = () => {
               complement,
               district,
               number
-            };
+            }
 
             await api.post('/account/address', addressInfo).then(response => {
-              updateUser({ ...user, address: { ...response.data } });
-              setStepCompleted(true);
+              updateUser({ ...user, address: { ...response.data } })
+              setStepCompleted(true)
             }).catch(err => {
-              console.log(err.response.data);
+              console.log(err.response.data)
 
-              setStepCompleted(false);
+              setStepCompleted(false)
 
               err.response.data.errors.forEach((error: AppError) => {
-                const apiError = findError(error.errorCode);
-                const errorField = getErrorField(error.errorCode);
+                const apiError = findError(error.errorCode)
+                const errorField = getErrorField(error.errorCode)
 
-                console.log(apiError);
+                console.log(apiError)
 
                 if (!!errorField) {
                   formRef.current?.setFieldError(errorField.errorField, !!errorField.errorBrief ? errorField.errorBrief : !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
@@ -612,16 +654,16 @@ const Profile: React.FC = () => {
                   handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
                 }
 
-              });
+              })
 
             })
 
-            break;
+            break
           case CONTACT_INDEX:
             const {
               phone,
               url,
-            } = data.contact;
+            } = data.contact
 
             const contact = {
               phone,
@@ -629,18 +671,18 @@ const Profile: React.FC = () => {
             }
 
             await api.post('/account/contact', contact).then(response => {
-              updateUser({ ...user, contact: { ...response.data } });
-              setStepCompleted(true);
+              updateUser({ ...user, contact: { ...response.data } })
+              setStepCompleted(true)
             }).catch(err => {
-              console.log(err.response.data);
+              console.log(err.response.data)
 
-              setStepCompleted(false);
+              setStepCompleted(false)
 
               err.response.data.errors.forEach((error: AppError) => {
-                const apiError = findError(error.errorCode);
-                const errorField = getErrorField(error.errorCode);
+                const apiError = findError(error.errorCode)
+                const errorField = getErrorField(error.errorCode)
 
-                console.log(apiError);
+                console.log(apiError)
 
                 if (!!errorField) {
                   formRef.current?.setFieldError(errorField.errorField, !!errorField.errorBrief ? errorField.errorBrief : !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
@@ -649,11 +691,11 @@ const Profile: React.FC = () => {
                   handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
                 }
 
-              });
+              })
 
             })
 
-            break;
+            break
           case SELLER_INDEX:
             const {
               bank,
@@ -661,7 +703,7 @@ const Profile: React.FC = () => {
               account,
               agency,
               pix,
-            } = data.bankInfo;
+            } = data.bankInfo
 
             const bankInfo = {
               bank,
@@ -669,21 +711,21 @@ const Profile: React.FC = () => {
               account,
               agency,
               pix
-            };
+            }
 
             await api.post('/account/bankInfo', bankInfo).then(response => {
-              updateUser({ ...user, bankInfo: { ...response.data } });
-              setStepCompleted(true);
+              updateUser({ ...user, bankInfo: { ...response.data } })
+              setStepCompleted(true)
             }).catch(err => {
-              console.log(err.response.data);
+              console.log(err.response.data)
 
-              setStepCompleted(false);
+              setStepCompleted(false)
 
               err.response.data.errors.forEach((error: AppError) => {
-                const apiError = findError(error.errorCode);
-                const errorField = getErrorField(error.errorCode);
+                const apiError = findError(error.errorCode)
+                const errorField = getErrorField(error.errorCode)
 
-                console.log(apiError);
+                console.log(apiError)
 
                 if (!!errorField) {
                   formRef.current?.setFieldError(errorField.errorField, !!errorField.errorBrief ? errorField.errorBrief : !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
@@ -692,29 +734,29 @@ const Profile: React.FC = () => {
                   handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
                 }
 
-              });
+              })
 
             })
 
-            break;
+            break
           case STORE_INDEX:
-            const storeName = data.shopInfo.name;
+            const storeName = data.shopInfo.name
 
-            const shopInfo = { name: storeName };
+            const shopInfo = { name: storeName }
 
             await api.post('/account/shopInfo', shopInfo).then(response => {
-              updateUser({ ...user, shopInfo: { ...response.data } });
-              setStepCompleted(true);
+              updateUser({ ...user, shopInfo: { ...response.data } })
+              setStepCompleted(true)
             }).catch(err => {
-              console.log(err.response.data);
+              console.log(err.response.data)
 
-              setStepCompleted(false);
+              setStepCompleted(false)
 
               err.response.data.errors.forEach((error: AppError) => {
-                const apiError = findError(error.errorCode);
-                const errorField = getErrorField(error.errorCode);
+                const apiError = findError(error.errorCode)
+                const errorField = getErrorField(error.errorCode)
 
-                console.log(apiError);
+                console.log(apiError)
 
                 if (!!errorField) {
                   formRef.current?.setFieldError(errorField.errorField, !!errorField.errorBrief ? errorField.errorBrief : !!apiError.example ? apiError.example.join('\n') : 'Erro indefinido')
@@ -723,105 +765,87 @@ const Profile: React.FC = () => {
                   handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
                 }
 
-              });
+              })
 
             })
 
-            // updateUser({ ...user, shopInfo: { ...shopInfo } });
+            // updateUser({ ...user, shopInfo: { ...shopInfo } })
 
-            break;
+            break
         }
 
-        setLoading(false);
-
-        // handleFlowStep();
-
-        // addToast({
-        //   type: 'success',
-        //   title: 'Perfil atualizado!',
-        //   description:
-        //     'Suas informações do perfil foram alteradas com sucesso!',
-        // });
+        setLoading(false)
       } catch (err) {
 
-        setStepCompleted(false);
-        setLoading(false);
+        setStepCompleted(false)
+        setLoading(false)
 
         if (err instanceof Yup.ValidationError) {
-          const errors = getValidationErrors(err);
+          const errors = getValidationErrors(err)
 
-          console.log(errors)
+          formRef.current?.setErrors(errors)
 
-          formRef.current?.setErrors(errors);
-
-          return;
+          return
         }
-
-        // addToast({
-        //   type: 'error',
-        //   title: 'Erro na atualização',
-        //   description:
-        //     'Ocorreu um erro ao atualizar seu perfil, tente novamente.',
-        // });
       }
     },
     [isChanged, flowIntent],
-  );
+  )
 
   const handleAvatarChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       if (e.target.files) {
-        const data = new FormData();
+        const data = new FormData()
 
-        data.append('avatar', e.target.files[0]);
+        data.append('avatar', e.target.files[0])
 
         // api.patch('/users/avatar', data).then(response => {
-        //   updateUser(response.data);
+        //   updateUser(response.data)
 
         //   // addToast({
         //   //   type: 'success',
         //   //   title: 'Avatar atualizado!',
-        //   // });
-        // });
+        //   // })
+        // })
       }
     },
     [updateUser],
-  );
+  )
 
   const handleSetBankCode = useCallback((bank: string) => {
     if (!!bank) {
       setChanged(true)
-      const index = banks.findIndex(b => bank === b.name);
-      formRef.current?.setFieldValue('bankInfo.bank', banks[index].code);
-      return;
+      const index = banks.findIndex(b => bank === b.name)
+      formRef.current?.setFieldValue('bankInfo.bank', banks[index].code)
+      return
     }
 
-    formRef.current?.setFieldValue('bankInfo.bank', '');
-  }, [banks]);
+    formRef.current?.setFieldValue('bankInfo.bank', '')
+  }, [banks])
 
   const handleSetBankName = useCallback((code: string) => {
     if (!!code) {
       setChanged(true)
-      const index = banks.findIndex(b => code === b.code);
-      formRef.current?.setFieldValue('bankInfo.name', banks[index].name);
-      return;
+      const index = banks.findIndex(b => code === b.code)
+      formRef.current?.setFieldValue('bankInfo.name', banks[index].name)
+      return
     }
 
-    formRef.current?.setFieldValue('bankInfo.name', '');
-  }, [banks]);
+    formRef.current?.setFieldValue('bankInfo.name', '')
+  }, [banks])
 
   const handleReturn = useCallback(() => {
-    setFlowIntent(false);
-    formRef.current?.submitForm();
+    setFlowIntent(false)
+    formRef.current?.submitForm()
   }, [])
 
   const handleAdvance = useCallback(() => {
-    setFlowIntent(true);
-    formRef.current?.submitForm();
+    setFlowIntent(true)
+    formRef.current?.submitForm()
   }, [])
 
   const handleModalVisibility = useCallback(() => {
-    handleModalMessage(false);
+    handleModalMessage(false)
   }, [])
 
   // useEffect(() => {
@@ -1008,30 +1032,36 @@ const Profile: React.FC = () => {
                         // value={!!user?.cpf ? user.cpf : ''}
                         />
 
-                        <Input
+                        <MaskedInput
                           name='inscricaoEstadual'
                           placeholder='Inscrição Estadual'
                           autoComplete='off'
-                          // isMasked
-                          // mask={'999.999.999-99'}
-                          onChange={() => {
+                          mask={ieMask}
+                          onChange={(e) => {
                             setChanged(true)
+
+                            if (letterRegex.test(e.currentTarget.value)) {
+                              setIeMask('******')
+                            } else {
+                              setIeMask('***.***.***-**')
+                            }
                           }}
-                          maxLength={9}
-                        // value={!!user?.cpf ? user.cpf : ''}
                         />
 
-                        <Input
+                        <MaskedInput
                           name='inscricaoMunicipal'
                           placeholder='Inscrição Municipal'
                           autoComplete='off'
-                          // isMasked
-                          // mask={'999.999.999-99'}
-                          onChange={() => {
+                          mask={imMask}
+                          onChange={(e) => {
                             setChanged(true)
+
+                            if (letterRegex.test(e.currentTarget.value)) {
+                              setImMask('******')
+                            } else {
+                              setImMask('***.***.***-**')
+                            }
                           }}
-                          maxLength={11}
-                        // value={!!user?.cpf ? user.cpf : ''}
                         />
                       </Scope>
                     </>
@@ -1275,11 +1305,11 @@ const Profile: React.FC = () => {
                 <Button
                   type="submit"
                   onClick={(e) => {
-                    e.preventDefault();
+                    e.preventDefault()
 
                     handleReturn()
 
-                    // handleFlowStep();
+                    // handleFlowStep()
                   }}
                   customStyle={{ className: styles.backButton }}
                   disabled={(flowStep === PERSONAL_INDEX || flowStep === -1)}
@@ -1290,11 +1320,11 @@ const Profile: React.FC = () => {
                   type="submit"
                   customStyle={{ className: styles.nextButton }}
                   onClick={(e) => {
-                    e.preventDefault();
+                    e.preventDefault()
 
                     handleAdvance()
 
-                    // handleFlowStep();
+                    // handleFlowStep()
                   }}
                 >
                   {(flowStep !== STORE_INDEX) ? 'Avançar' : 'Confirmar'}
@@ -1331,7 +1361,7 @@ const Profile: React.FC = () => {
         )
       }
     </div >
-  );
-};
+  )
+}
 
-export default Profile;
+export default Profile
