@@ -33,6 +33,9 @@ export function Products({ userFromApi }: ProductsProps) {
   const [items, setItems] = useState([] as Product[]);
   const [search, setSeacrh] = useState('');
 
+
+  const [disabledActions, setDisableActions] = useState(false);
+
   const { isLoading, setLoading } = useLoading();
   const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
 
@@ -189,6 +192,8 @@ export function Products({ userFromApi }: ProductsProps) {
                       token,
                       shop_id: !user ? '' : !!user.shopInfo._id ? user.shopInfo._id : '',
                     }}
+                    disabledActions={disabledActions}
+                    setDisabledActions={setDisableActions}
                   />
                 ))}
               </tbody>

@@ -37,7 +37,7 @@ const SignUp: React.FC = () => {
   const [isModalVisible, setModalVisibility] = useState(false);
   const [successfull, setSuccessfull] = useState(false);
   const [title, setTitle] = useState<string>();
-  const [message, setMessage] = useState<string>();
+  const [messages, setMessages] = useState<string[]>([]);
   const [userAvatar, setUserAvatar] = useState<string>();
   const [passwordCheck, setPasswordCheck] = useState('');
 
@@ -94,7 +94,7 @@ const SignUp: React.FC = () => {
         setSuccessfull(true);
         setLoading(false);
         setTitle('Cadastro realizado com sucesso!');
-        setMessage('Cheque seu e-mail para autenticar sua conta.');
+        setMessagess(['Cheque seu e-mail para autenticar sua conta.', 'Caso a conta não seja autenticada em algumas horas, o cadastro será cancelado.']);
       } catch (err) {
         setLoading(false);
 
@@ -111,14 +111,14 @@ const SignUp: React.FC = () => {
           setModalVisibility(true);
           setSuccessfull(false);
           setTitle('Usuário já existe');
-          setMessage('Tente realizar o login ou recuperar sua senha.');
+          setMessagess(['Tente realizar o login ou recuperar sua senha.']);
           return;
         }
 
         setModalVisibility(true);
         setSuccessfull(false);
         setTitle('Oops...');
-        setMessage('Ocorreu um erro durante o cadastro, tente novamente em alguns instantes.');
+        setMessagess(['Ocorreu um erro durante o cadastro, tente novamente em alguns instantes.']);
         // addToast({
         //   type: 'error',
         //   title: 'Erro na atualização',
@@ -138,19 +138,20 @@ const SignUp: React.FC = () => {
   }, [isModalVisible, successfull])
 
 
-  const handleAvatarChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files) {
-        const data = new FormData();
+  // TODO: Implementar avatar no cadastro e perfil do usuário no back-end
+  // const handleAvatarChange = useCallback(
+  //   (e: ChangeEvent<HTMLInputElement>) => {
+  //     if (e.target.files) {
+  //       const data = new FormData();
 
-        data.append('avatar', e.target.files[0]);
+  //       data.append('avatar', e.target.files[0]);
 
-        !!userAvatar && URL.revokeObjectURL(userAvatar);
-        setUserAvatar(URL.createObjectURL(e.target.files[0]));
-      }
-    },
-    [userAvatar, updateUser],
-  );
+  //       !!userAvatar && URL.revokeObjectURL(userAvatar);
+  //       setUserAvatar(URL.createObjectURL(e.target.files[0]));
+  //     }
+  //   },
+  //   [userAvatar, updateUser],
+  // );
 
   return (
     <div className={styles.signupContainer}>
@@ -176,6 +177,7 @@ const SignUp: React.FC = () => {
           }}
           onSubmit={handleSubmit}
         >
+          {/* TODO: Implementar avatar no cadastro e perfil do usuário no back-end */}
           {/* <div className={styles.avatarInput}>
             <AvatarInput avatarUrl={!!userAvatar ? userAvatar : ''} userName={'Avatar'} handleAvatarChange={handleAvatarChange} />
           </div> */}
@@ -183,12 +185,6 @@ const SignUp: React.FC = () => {
           <div className={styles.formsContainer}>
             <div className={styles.personal}>
               <h3>Sua conta Ozllo</h3>
-
-              {/* <Input
-                name='name'
-                placeholder='Nome'
-                autoComplete='off'
-              /> */}
 
               <Input
                 name='email'
@@ -289,7 +285,7 @@ const SignUp: React.FC = () => {
             <div className={styles.modalContent}>
               {successfull ? <FiCheck style={{ color: 'var(--green-100)' }} /> : <FiX style={{ color: 'var(--red-100)' }} />}
               <p>{title}</p>
-              <p>{message}</p>
+              {messages.map(message => <p> {message} </p>)}
             </div>
           </MessageModal>
         )

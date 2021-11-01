@@ -56,11 +56,6 @@ const MaskedInput: React.FC<MaskInputProps> = ({ name, label, ...rest }) => {
                 <ReactInputMask
                   onFocus={handleInputFocused}
                   onBlur={handleInputBlur}
-                  // inputRef={inputRef}
-                  // defaultValue={defaultValue}
-                  // getReference={(e) => {
-                  //   handleReference(e)
-                  // }}
                   ref={ref}
                   {...rest}
                   defaultValue={defaultValue}
@@ -70,11 +65,6 @@ const MaskedInput: React.FC<MaskInputProps> = ({ name, label, ...rest }) => {
               <ReactInputMask
                 onFocus={handleInputFocused}
                 onBlur={handleInputBlur}
-                // inputRef={inputRef}
-                // defaultValue={defaultValue}
-                // getReference={(e) => {
-                //   handleReference(e)
-                // }}
                 ref={ref}
                 {...rest}
                 defaultValue={defaultValue}

@@ -36,6 +36,8 @@ export function Products({ userFromApi }: ProductsProps) {
   const formRef = useRef<FormHandles>(null);
   const [error, setError] = useState('');
 
+  const [disabledActions, setDisableActions] = useState(false);
+
   const router = useRouter();
 
   const { token, user, updateUser } = useAuth();
@@ -108,18 +110,6 @@ export function Products({ userFromApi }: ProductsProps) {
     },
     [search],
   );
-
-  const handleAvailability = useCallback(async (id: string) => {
-    const index = products.findIndex(product => product._id === id);
-
-    await api.patch(`/product/${id}`, {
-      isActive: !products[index].is_active
-    }).then(response => {
-      // products[index].isActive === response.data.isActive;
-    }).catch(err => {
-      console.log(err)
-    })
-  }, [items, products]);
 
   return (
     <div className={styles.productsContainer}>

@@ -43,6 +43,9 @@ export function EditProductForm() {
 
   const [filledFields, setFilledFields] = useState(0);
   const [totalFields, setTotalFields] = useState(14);
+
+  const [oldStock, setOldStock] = useState<number[]>([]);
+  const [priceChanged, setPriceChange] = useState(false);
   const [isHintDisabled, setHintDisabled] = useState(false);
   const [brandInName, setBrandInName] = useState(false);
   const [colorInName, setColorInName] = useState(false);
@@ -118,6 +121,7 @@ export function EditProductForm() {
         setGenderRadio(response.data.gender)
 
         setVariations(response.data.variations)
+        setOldStock(response.data.variations.map((v: VariationDTO) => v.stock))
 
         setNationality(response.data.nationality)
         setCategory(response.data.category)
@@ -427,6 +431,20 @@ export function EditProductForm() {
         variations
       } = data;
 
+      if (priceChanged) {
+        api.patch(`/product/${id}/price`, {
+          price,
+          price_discounted
+        }, {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          }
+        }).then(response => {
+
+        })
+      }
+
       const product = {
         category,
         subcategory: subCategory,
@@ -441,17 +459,26 @@ export function EditProductForm() {
         width,
         length,
         weight,
-        price,
-        price_discounted,
         images: newImages,
-        //variations
       }
 
-      await variations.forEach(async (variation: VariationDTO) => {
+      await variations.forEach(async (variation: VariationDTO, i: number) => {
         if (!!variation._id && variation._id !== '') {
           const variationId = variation._id
 
+          if (oldStock[i] != variation.stock) {
+            api.patch(`/product/${id}/variation/${variationId}`,
+              { stock: variation.stock },
+              {
+                headers: {
+                  authorization: token,
+                  shop_id: user.shopInfo._id,
+                }
+              })
+          }
+
           delete variation._id
+          delete variation.stock
 
           await api.patch(`/product/${id}/variation/${variationId}`, variation, {
             headers: {
@@ -502,7 +529,7 @@ export function EditProductForm() {
         return;
       }
     }
-  }, [router, token, user, files, filesUrl, filledFields, totalFields, colorInName, brandInName])
+  }, [router, token, user, files, filesUrl, filledFields, totalFields, priceChanged, colorInName, brandInName])
 
   async function handleDeleteVariation(deletedIndex: number): Promise<void> {
     setVariations(formRef.current?.getData().variations)
@@ -650,6 +677,9 @@ export function EditProductForm() {
                 autoComplete='off'
                 type='number'
                 min={0}
+                onChange={() => {
+                  setPriceChange(true)
+                }}
               />
               <Input
                 name='price_discounted'
@@ -658,6 +688,9 @@ export function EditProductForm() {
                 autoComplete='off'
                 type='number'
                 min={0}
+                onChange={() => {
+                  setPriceChange(true)
+                }}
               />
             </div>
             <div className={styles.multipleInputContainer}>
