@@ -220,7 +220,7 @@ export function EditProductForm() {
         handleModalMessage(true, {
           type: 'error',
           title: 'Muitas fotos!',
-          message: ['Um produto pode ter no máximo 8 fotos']
+          message: ['Um produto pode ter no máximo 6 fotos']
         })
 
         return false;
