@@ -14,7 +14,6 @@ interface InputRefProps extends HTMLInputElement {
   acceptedFiles: File[];
 }
 
-// TODO: Realizar chamada na API para salvar as informações importadas
 const Importzone: React.FC<Props> = ({ name, onFileUploaded }) => {
   const [selectedFile, setselectedFile] = useState<string[]>([]);
   // const [err, setErr] = useState(false);
@@ -36,7 +35,6 @@ const Importzone: React.FC<Props> = ({ name, onFileUploaded }) => {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: '	application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel',
   })
 
   useEffect(() => {
@@ -63,7 +61,7 @@ const Importzone: React.FC<Props> = ({ name, onFileUploaded }) => {
       {...getRootProps()}
       onClick={() => dropZoneRef.current?.click()}
     >
-      <input {...getInputProps()} accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel' ref={dropZoneRef} />
+      <input {...getInputProps()} ref={dropZoneRef} />
       {
         !!error ?
           <>
