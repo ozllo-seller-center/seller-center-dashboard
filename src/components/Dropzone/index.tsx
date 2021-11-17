@@ -2,8 +2,6 @@ import { useField } from '@unform/core';
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { FiCamera, FiAlertCircle } from 'react-icons/fi'
-import { useModalMessage } from 'src/hooks/message';
-import { getFilename } from 'src/utils/util';
 
 // import './styles.module.css';
 
