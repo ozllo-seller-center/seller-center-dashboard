@@ -14,6 +14,9 @@ import styles from './styles.module.scss';
 import DatePickerPopup from '../../components/DatePickerPopup';
 import Collapsible from '../../components/Collapsible';
 import AttachButton from '../../components/AttachButton';
+import { useLoading } from 'src/hooks/loading';
+import { useAuth } from 'src/hooks/auth';
+import api from 'src/services/api';
 
 enum SellStatus {
   Entregue,
@@ -117,6 +120,40 @@ export function Sells({ sells }: SellsProps) {
   const [totalCanceled, setTotalCanceled] = useState('Carregando...');
   const [totalReturned, setTotalReturned] = useState('Carregando...');
   const [total, setTotal] = useState('Carregando...');
+
+  const { user, token, updateUser } = useAuth();
+  const { isLoading, setLoading } = useLoading();
+
+  useEffect(() => {
+    setLoading(true)
+
+    api.get('/account/detail').then(response => {
+      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
+
+      api.get('/order/all', {
+        headers: {
+          authorization: token,
+          shop_id: response.data.shopInfo._id,
+        }
+      }).then(response => {
+        console.log('Orders:')
+        console.log(response.data)
+
+        // response.data.orders.map((order: any) => {
+
+        // })
+
+        setLoading(false)
+      }).catch(err => {
+        console.log(err)
+        setLoading(false)
+      })
+    }).catch(err => {
+      console.log(err)
+      setLoading(false)
+    });
+  }, [])
+
 
   const inInterval = useCallback((order: Sell) => {
     switch (filter) {
