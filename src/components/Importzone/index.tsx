@@ -3,7 +3,7 @@ import { useField } from '@unform/core';
 import { useDropzone } from 'react-dropzone'
 
 import styles from './styles.module.scss';
-import { FiCheck } from 'react-icons/fi';
+import { FiCheck, FiX } from 'react-icons/fi';
 
 interface Props {
   name: string;
@@ -56,42 +56,52 @@ const Importzone: React.FC<Props> = ({ name, onFileUploaded }) => {
   }, [fieldName, registerField]);
 
   return (
-    <div
-      className={!!error ? styles.error : selectedFile.length >= 1 ? styles.uploaded : styles.importzone}
-      {...getRootProps()}
-      onClick={() => dropZoneRef.current?.click()}
-    >
-      <input {...getInputProps()} ref={dropZoneRef} />
-      {
-        !!error ?
-          <>
-            <p>
-              Erro com o(s) arquivo(s) selecionado(s)
-              <br />
-              Tente novamente
-            </p>
-          </>
-          :
-          selectedFile.length >= 1
-            ?
+    <div className={styles.parent}>
+      {selectedFile.length >= 1 &&
+        <FiX onClick={() => {
+          if (!!dropZoneRef.current)
+            dropZoneRef.current.acceptedFiles = []
+
+          setselectedFile([])
+        }} />
+      }
+      <div
+        className={!!error ? styles.error : selectedFile.length >= 1 ? styles.uploaded : styles.importzone}
+        {...getRootProps()}
+        onClick={() => dropZoneRef.current?.click()}
+      >
+        <input {...getInputProps()} ref={dropZoneRef} />
+        {
+          !!error ?
             <>
-              <FiCheck />
               <p>
-                {selectedFile.length > 1 ? 'Arquivos carregados' : 'Arquivo carregado'}
+                Erro com o(s) arquivo(s) selecionado(s)
+                <br />
+                Tente novamente
               </p>
             </>
             :
-            isDragActive ?
-              <p>
-                Solte o arquivo aqui ...
-              </p>
+            selectedFile.length >= 1
+              ?
+              <>
+                <FiCheck />
+                <p>
+                  {selectedFile.length > 1 ? 'Arquivos carregados' : 'Arquivo carregado'}
+                </p>
+              </>
               :
-              <p>
-                Clique ou arraste o(s)
-                <br />
-                arquivos aqui
-              </p>
-      }
+              isDragActive ?
+                <p>
+                  Solte o arquivo aqui ...
+                </p>
+                :
+                <p>
+                  Clique ou arraste o(s)
+                  <br />
+                  arquivos aqui
+                </p>
+        }
+      </div>
     </div>
   )
 }

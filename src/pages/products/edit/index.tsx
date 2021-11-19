@@ -143,7 +143,7 @@ export function EditProductForm() {
   useEffect(() => {
     setLoading(true)
 
-    if (!!category && category.length > 0) {
+    if (!!category) {
       api.get(`/category/${category}/attributes`).then(response => {
         setAttributes(response.data[0].attributes)
 
