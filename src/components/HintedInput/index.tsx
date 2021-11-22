@@ -14,13 +14,15 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
   label: string;
   containerStyle?: object;
+  hint?: React.ReactNode;
 }
 
-const Input: React.FC<InputProps> = ({
+const HintedInput: React.FC<InputProps> = ({
   name,
   label,
   containerStyle = {},
   disabled,
+  hint,
   ...rest
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -51,16 +53,19 @@ const Input: React.FC<InputProps> = ({
       <div
         className={disabled ? styles.containerDisabled : !!error ? styles.containerError : isFocused ? styles.containerFocused : isFilled ? styles.containerFilled : styles.container} >
         <label className={styles.inputLabel}>{label}</label>
-        <input
-          type="text"
-          name={name}
-          onFocus={handleInputFocused}
-          onBlur={handleInputBlur}
-          defaultValue={defaultValue}
-          ref={inputRef}
-          disabled={disabled}
-          {...rest}
-        />
+        <div className={styles.hintedContainer}>
+          <input
+            type="text"
+            name={name}
+            onFocus={handleInputFocused}
+            onBlur={handleInputBlur}
+            defaultValue={defaultValue}
+            ref={inputRef}
+            disabled={disabled}
+            {...rest}
+          />
+          {hint}
+        </div>
       </div>
       {error && (
         <p className={styles.error}>
@@ -71,4 +76,4 @@ const Input: React.FC<InputProps> = ({
   );
 };
 
-export default Input;
+export default HintedInput;

@@ -29,6 +29,7 @@ import Dropzone from 'src/components/Dropzone';
 import ImageController from 'src/components/ImageController';
 import RuledHintbox, { Rule } from 'src/components/RuledHintbox';
 import { matchingWords } from 'src/utils/util';
+import HintedInput from 'src/components/HintedInput';
 
 type VariationDTO = {
   _id?: string;
@@ -175,6 +176,8 @@ export function EditProductForm() {
   }, [variations, attributes])
 
   const setNameChecks = useCallback((name: string) => {
+    console.log('Name: ' + name)
+
     if (!name || name.length === 0 || !formRef.current?.getFieldValue('brand') || isHintDisabled) {
       setBrandInName(false)
       setColorInName(false)
@@ -598,10 +601,7 @@ export function EditProductForm() {
           <Form
             ref={formRef}
             onSubmit={handleSubmit}
-            onChange={(e) => {
-              calcFilledFields(formRef.current?.getData() as Product)
-              setNameChecks(formRef.current?.getFieldValue('name'))
-            }}
+            onChange={(e) => { calcFilledFields(formRef.current?.getData() as Product) }}
           >
             <p className={styles.imagesTitle}>Fotos do produto</p>
             <ImageController
@@ -611,7 +611,7 @@ export function EditProductForm() {
               handleDeleteFile={handleDeleteFile}
             />
             <div className={styles.doubleInputContainer}>
-              <Input
+              <HintedInput
                 name='name'
                 label='Nome do produto'
                 placeholder='Insira o nome do produto'
@@ -625,6 +625,9 @@ export function EditProductForm() {
                     icon={FiInfo}
                   />
                 )}
+                onChange={(e) => {
+                  setNameChecks(e.currentTarget.value)
+                }}
               />
               <Input
                 name='brand'

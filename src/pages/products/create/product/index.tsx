@@ -28,6 +28,7 @@ import { Attribute } from 'src/shared/types/category';
 import ImageController from 'src/components/ImageController';
 import RuledHintbox, { Rule } from 'src/components/RuledHintbox';
 import { matchingWords } from 'src/utils/util';
+import HintedInput from 'src/components/HintedInput';
 
 type VariationDTO = {
   size?: number | string,
@@ -328,6 +329,8 @@ export function ProductForm() {
         ...yupVariationSchema()
       });
 
+      console.log(data)
+
       await schema.validate(data, { abortEarly: false });
 
       const {
@@ -415,13 +418,13 @@ export function ProductForm() {
       setLoading(false)
     } catch (err) {
       setLoading(false)
-      console.log(err)
+
       if (err instanceof Yup.ValidationError) {
         const errors = getValidationErrors(err);
-        console.log(errors)
+
         formRef.current?.setErrors(errors);
 
-        if (err.name = 'images') {
+        if (err.name === 'images') {
           handleModalMessage(true, {
             type: 'error',
             title: 'Erro!',
@@ -431,6 +434,8 @@ export function ProductForm() {
 
         return;
       }
+
+      console.log(err)
     }
   }, [router, token, user, filledFields, totalFields, colorInName, brandInName])
 
@@ -497,7 +502,6 @@ export function ProductForm() {
             onSubmit={handleSubmit}
             onChange={(e) => {
               calcFilledFields(formRef.current?.getData() as Product)
-              setNameChecks(formRef.current?.getFieldValue('name'))
             }}
           >
             <p className={styles.imagesTitle}>Seleciones as fotos do produto</p>
@@ -510,7 +514,7 @@ export function ProductForm() {
             />
 
             <div className={styles.doubleInputContainer}>
-              <Input
+              <HintedInput
                 name='name'
                 label='Nome do produto'
                 placeholder='Insira o nome do produto'
@@ -524,6 +528,9 @@ export function ProductForm() {
                     icon={FiInfo}
                   />
                 )}
+                onChange={(e) => {
+                  setNameChecks(e.currentTarget.value)
+                }}
               />
 
               <Input
