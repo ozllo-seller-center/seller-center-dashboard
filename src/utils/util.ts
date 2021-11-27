@@ -179,8 +179,6 @@ export function matchingWords(source: string, comparTo: string) {
       match = sourceWord.toLowerCase() === comparingWord.toLowerCase()
     })
 
-    console.log(`Word ${comparingWord} matched? ${match}`)
-
     return match
   })
 
