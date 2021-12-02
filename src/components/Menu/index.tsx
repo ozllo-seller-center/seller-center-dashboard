@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { FiChevronLeft, FiHome, FiPackage, FiUser, FiShoppingCart } from 'react-icons/fi';
 import { FaRegMoneyBillAlt } from 'react-icons/fa';
+import { RiStore2Line } from 'react-icons/ri';
 import MenuItem from '../MenuItem';
 
 import styles from './styles.module.scss';
@@ -37,8 +38,9 @@ const Menu: React.FC<MenuProps> = ({ open, setOpen }) => {
         <MenuItem to="/dashboard" name="Home" setSelected={setSelected} iconLib={FiHome} />
         <MenuItem to={(!!width && width < 768) ? "/sells-mobile" : "/sells"} name="Minhas vendas" setSelected={setSelected} iconLib={FaRegMoneyBillAlt} />
         <MenuItem to={(!!width && width < 768) ? "/products-mobile" : "/products"} name="Produtos" setSelected={setSelected} iconLib={FiPackage} />
+        <MenuItem to="/marketplaces" name="Marketplaces" setSelected={setSelected} iconLib={RiStore2Line} />
       </div>
-      { (!!width && width < 768 && open) && <div className={styles.outside} onClick={() => setOpen(!open)} />}
+      {(!!width && width < 768 && open) && <div className={styles.outside} onClick={() => setOpen(!open)} />}
     </>
   )
 }
