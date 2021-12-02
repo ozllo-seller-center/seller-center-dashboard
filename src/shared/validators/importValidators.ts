@@ -4,6 +4,10 @@ export function valueDefined(v: string): boolean {
   return !!v;
 }
 
+export function descriptionValidate(v: any) {
+  return !!v && v.length <= 1800
+}
+
 export function catalogueValidate(v: any) {
   return !!v.category && !!v.subCategory && !!v.nationality
 }
@@ -39,7 +43,7 @@ export function InitProductImport(): ProductImport {
     },
     description: {
       value: undefined,
-      validate: (v: any) => valueDefined(v),
+      validate: (v: any) => descriptionValidate(v),
     },
     brand: {
       value: undefined,

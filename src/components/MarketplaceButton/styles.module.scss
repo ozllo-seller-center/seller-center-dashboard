@@ -1,0 +1,49 @@
+@import '../../../public/styles/__dimensions';
+
+.marketplaceButton {
+  width: 10rem;
+  height: 10rem;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+
+  align-items: center;
+
+  transform: scale(1, 1);
+  transform-origin: center;
+
+  transition: width 0.2s, height 0.2s, transform 0.2s;
+
+  @media screen and (min-width: $desktop-small-size) {
+    width: 8rem;
+    height: 8rem;
+  }
+
+  > img {
+    width: 100%;
+    object-fit: cover;
+
+    align-self: center;
+
+    transition: filter 0.5s, opacity 0.5s;
+
+    @media screen and (min-width: $desktop-small-size) {
+      opacity: 0.75;
+      filter: grayscale(100%);
+    }
+  }
+
+  &:hover {
+
+    > img {
+      filter: grayscale(0);
+      opacity: 1;
+    }
+  }
+}

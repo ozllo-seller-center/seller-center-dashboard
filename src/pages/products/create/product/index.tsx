@@ -315,7 +315,7 @@ export function ProductForm() {
         images: Yup.array().min(2, 'Escolha pelo menos duas imagens').max(8, 'Pode atribuir no máximo 8 imagens'),
         name: Yup.string().required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres'),
         description: Yup.string()
-          .required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres').max(2000, 'Deve conter no máximo 2000 caracteres'),
+          .required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres').max(1800, 'Deve conter no máximo 1800 caracteres'),
         brand: Yup.string().required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres'),
         ean: Yup.string(),
         sku: Yup.string().required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres'),
@@ -547,7 +547,7 @@ export function ProductForm() {
                 label='Descrição do produto'
                 placeholder='Insira a descrição do produto'
                 autoComplete='off'
-                maxLength={2000}
+                maxLength={1800}
               />
             </div>
 
