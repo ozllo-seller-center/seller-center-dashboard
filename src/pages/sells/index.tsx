@@ -19,6 +19,7 @@ import { useAuth } from 'src/hooks/auth';
 import api from 'src/services/api';
 
 enum SellStatus {
+  // 'pending' | 'approved' | 'invoiced' | 'shipped' | 'delivered' | 'canceled' | 'completed'
   Entregue,
   Processando,
   Retornado,
@@ -133,7 +134,9 @@ export function Sells({ sells }: SellsProps) {
       api.get('/order/all', {
         headers: {
           authorization: token,
-          shop_id: response.data.shopInfo._id,
+          shop: {
+            _id: response.data.shopInfo._id,
+          },
         }
       }).then(response => {
         console.log('Orders:')
