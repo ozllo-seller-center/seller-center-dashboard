@@ -134,7 +134,7 @@ export function Sells({ sells }: SellsProps) {
       api.get('/order/all', {
         headers: {
           authorization: token,
-          shop: response.data.shopInfo._id,
+          shop_id: response.data.shopInfo._id,
         }
       }).then(response => {
         console.log('Orders:')
