@@ -138,7 +138,7 @@ export function Sells({ sells }: SellsProps) {
         }
       }).then(response => {
         console.log('Orders:')
-        console.log(response.data)
+        console.log(JSON.stringify(response.data))
 
         // response.data.orders.map((order: any) => {
 
