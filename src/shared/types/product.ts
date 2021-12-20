@@ -1,9 +1,11 @@
 export type ProductImage = {
   file?: File,
   url?: string,
+  uploaded?: boolean,
 }
 
 export type Variation = {
+  _id?: string,
   size: number | string,
   stock?: number,
   color?: string,

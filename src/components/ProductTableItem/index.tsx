@@ -7,7 +7,7 @@ import router, { useRouter } from 'next/router';
 
 import { FiCameraOff, FiEdit } from 'react-icons/fi';
 import api from 'src/services/api';
-import { ProductSummary } from 'src/shared/types/product';
+import { Product, ProductSummary } from 'src/shared/types/product';
 
 import styles from './styles.module.scss'
 import switchStyles from './switch-styles.module.scss'
@@ -65,6 +65,43 @@ const ProductTableItem: React.FC<ProductItemProps> = ({ item, products, setProdu
         item.is_active = response.data.is_active;
 
         setIsAvailable(response.data.is_active)
+      }).catch(err => {
+        console.log(err)
+      })
+
+      await api.get(`/product/${id}`, {
+        headers: {
+          authorization: userInfo.token,
+          shop_id: userInfo.shop_id,
+        }
+      }).then(response => {
+        console.log(response.data as Product)
+
+        let product = response.data as Product
+
+        const variations = product.variations.map(v => {
+          v.stock = 0
+
+          return v
+        })
+
+        variations.forEach(v => {
+          if (v._id) {
+            api.patch(`/product/${id}/variation/${v._id}`,
+              { stock: v.stock },
+              {
+                headers: {
+                  authorization: userInfo.token,
+                  shop_id: userInfo.shop_id,
+                }
+              }).catch(err => {
+                console.log(err)
+              })
+
+            v.stock = 0
+            item.stock = 0
+          }
+        })
       }).catch(err => {
         console.log(err)
       })

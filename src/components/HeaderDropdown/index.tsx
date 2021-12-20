@@ -5,7 +5,7 @@ import styles from './styles.module.scss';
 
 type Item = {
   text: string;
-  value: number;
+  value: string;
 }
 
 interface HeaderDropdownProps extends LiHTMLAttributes<HTMLLIElement> {
