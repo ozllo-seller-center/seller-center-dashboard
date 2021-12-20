@@ -129,7 +129,7 @@ export function Sells() {
   const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage()
 
   const [isNfeAttachOpen, setNfeAttachOpen] = useState(false)
-  const [nfeItem, setNfeItem] = useState<Order>()
+  const [nfeItem, setNfeItem] = useState<OrderParent>()
 
   const inInterval = useCallback((order: Order) => {
 
@@ -530,7 +530,7 @@ export function Sells() {
                         isAttached={!!item.order.orderNotes} //!item.nfe_url
                         onClick={() => {
                           setNfeAttachOpen(true)
-                          setNfeItem(item.order)
+                          setNfeItem(item)
                         }}
                       />
                       :
@@ -590,7 +590,6 @@ export function Sells() {
           >
             <NfeModalContent item={nfeItem} closeModal={() => {
               setNfeAttachOpen(false)
-              console.log('Closing?')
             }} />
           </Modal>
         )

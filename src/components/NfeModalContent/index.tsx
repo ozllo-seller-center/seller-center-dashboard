@@ -2,16 +2,15 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
 
-import { Sell } from 'src/pages/sells';
-
 import styles from './styles.module.scss';
 import NfeDropzone from '../NfeDropzone';
 import api from 'src/services/api';
 import { useAuth } from 'src/hooks/auth';
 import { useModalMessage } from 'src/hooks/message';
+import { OrderParent } from 'src/shared/types/order';
 
 interface NfeModalContentProps {
-  item: Sell;
+  item: OrderParent;
   closeModal: Function;
 }
 
@@ -27,7 +26,7 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({ item, closeModal }) =
 
   useEffect(() => {
     if (formRef.current)
-      formRef.current.setData({ nfe: item.nfe_url })
+      formRef.current.setData({ nfe: item.order.orderNotes[0].message })
   }, []);
 
   const handleSubmit = useCallback(() => {
@@ -36,7 +35,7 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({ item, closeModal }) =
 
       dataContainer.append("images", nfeFile, nfeFile.name)
 
-      api.patch(`/order/${item.id}`, {
+      api.patch(`/order/${item._id}`, {
         header: {
           authorization: token,
           shop_id: user.shopInfo._id,
@@ -55,11 +54,11 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({ item, closeModal }) =
         onSubmit={() => { }}
         className={styles.nfeContent}
       >
-        <span>{!item.nfe_url ? 'Anexe uma NF-e a sua venda' : 'Esta venda já possuí uma NF-e anexada'}</span>
+        <span>{!item.order.orderNotes[0].message ? 'Anexe uma NF-e a sua venda' : 'Esta venda já possuí uma NF-e anexada'}</span>
         <NfeDropzone
           name='nfe'
           onFileUploaded={(files: File[]) => {
-            item.nfe_url = URL.createObjectURL(files[0])
+            item.order.orderNotes[0].message = URL.createObjectURL(files[0])
             setNfeFile(files[0])
 
             setCanConfirm(true)

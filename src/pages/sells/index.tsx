@@ -126,7 +126,7 @@ export function Sells() {
   const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage()
 
   const [isNfeAttachOpen, setNfeAttachOpen] = useState(false)
-  const [nfeItem, setNfeItem] = useState<Order>()
+  const [nfeItem, setNfeItem] = useState<OrderParent>()
 
   useEffect(() => {
     setLoading(true)
@@ -489,7 +489,7 @@ export function Sells() {
                         isAttached={!!item.order.orderNotes} //!item.nfe_url
                         onClick={() => {
                           setNfeAttachOpen(true)
-                          setNfeItem(item.order)
+                          setNfeItem(item)
                         }}
                       />
                       :
