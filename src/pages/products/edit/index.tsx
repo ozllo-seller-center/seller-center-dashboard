@@ -30,6 +30,7 @@ import ImageController from 'src/components/ImageController';
 import RuledHintbox, { Rule } from 'src/components/RuledHintbox';
 import { matchingWords } from 'src/utils/util';
 import HintedInput from 'src/components/HintedInput';
+import { RiTruckLine } from 'react-icons/ri';
 
 type VariationDTO = {
   _id?: string;
@@ -113,7 +114,8 @@ export function EditProductForm() {
         let files: ProductImage[]
         files = urls.map((url: string) => {
           return {
-            url
+            url,
+            uploaded: true,
           } as ProductImage
         })
 
@@ -218,6 +220,9 @@ export function EditProductForm() {
   const handleOnFileUpload = useCallback((acceptedFiles: File[], dropZoneRef: React.RefObject<any>) => {
     calcFilledFields(formRef.current?.getData() as Product);
 
+    console.log('Upload:')
+    console.log(acceptedFiles)
+
     acceptedFiles = acceptedFiles.filter((f, i) => {
       if (files.length + (i + 1) > 6) {
         handleModalMessage(true, {
@@ -242,21 +247,37 @@ export function EditProductForm() {
       return true;
     })
 
+    console.log(acceptedFiles)
+
     const newFiles = acceptedFiles.map(f => {
       return {
         file: f
       } as ProductImage
     })
 
-    let urls: string[] = [];
+    let urls: string[] = []
     newFiles.forEach(f => {
-      urls.push(URL.createObjectURL(f.file))
+      if (f.file) {
+        const url = URL.createObjectURL(f.file)
+
+        urls.push(url)
+
+        f.url = url
+        f.uploaded = false
+      }
     })
 
-    dropZoneRef.current.acceptedFiles = [...files, ...newFiles].map(f => f.url);
+    console.log('New Files:')
+    console.log(newFiles)
+
+    dropZoneRef.current.acceptedFiles = [...files, ...newFiles].map(f => f.url)
+
+    console.log('Images:')
+    console.log(dropZoneRef.current.acceptedFiles)
+
     setFiles([...files, ...newFiles]);
     setFilesUrl([...filesUrl, ...urls]);
-  }, [files]);
+  }, [files, filesUrl]);
 
   const handleDeleteFile = useCallback((url: string) => {
     URL.revokeObjectURL(url);
@@ -271,7 +292,7 @@ export function EditProductForm() {
     setFiles(filesUpdate);
 
     calcFilledFields(formRef.current?.getData() as Product);
-  }, [filesUrl])
+  }, [filesUrl, files])
 
   const handleFileOrder = useCallback((draggedFile: number, droppedAt: number) => {
 
@@ -399,10 +420,10 @@ export function EditProductForm() {
 
       var dataContainer = new FormData();
 
-      files.forEach((f, i) => (!!f.file && !f.url) && dataContainer.append("images", f.file, f.file.name));
+      files.forEach((f, i) => (!!f.file && !f.uploaded) && dataContainer.append("images", f.file, f.file.name));
 
       const oldImages = files.map(f => {
-        if (!!f.url && !f.file)
+        if (!!f.url && f.uploaded)
           return f.url
       })
 
@@ -417,6 +438,15 @@ export function EditProductForm() {
 
       if (!!oldImages)
         newImages = [...oldImages as string[], ...newImages];
+
+      await api.patch(`/product/${id}/images`, { images: newImages }, {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        }
+      }).then(response => {
+        console.log(response.data)
+      })
 
       const {
         name,

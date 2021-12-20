@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import * as Yup from 'yup';
 
 import XLSX from 'xlsx';
 
@@ -13,17 +12,16 @@ import { FiCheck, FiDownloadCloud, FiUploadCloud, FiX } from 'react-icons/fi';
 import { FaExclamation } from 'react-icons/fa';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import { importLines, ProductImport, VariationDTO } from 'src/shared/types/productImport';
+import { importLines, ProductImport } from 'src/shared/types/productImport';
 import api from 'src/services/api';
 import { Nationality } from 'src/shared/types/nationality';
-import { Attribute, Category, SubCategory } from 'src/shared/types/category';
+import { Category, SubCategory } from 'src/shared/types/category';
 import { Loader } from 'src/components/Loader';
 import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
 import { ErrorMessages } from 'src/shared/errors/ImportSheetError';
-import { valueDefined, catalogueValidate, discountValidate, imagesValidate, InitProductImport } from 'src/shared/validators/importValidators';
+import { InitProductImport } from 'src/shared/validators/importValidators';
 import { importToProduct } from 'src/shared/converters/importToProduct';
-import getValidationErrors from 'src/utils/getValidationErrors';
 import { Product } from 'src/shared/types/product';
 import { useAuth } from 'src/hooks/auth';
 import { isTokenValid } from 'src/utils/util';

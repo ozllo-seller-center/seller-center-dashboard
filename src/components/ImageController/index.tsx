@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { ProductImage } from 'src/shared/types/product';
 
@@ -78,7 +78,7 @@ const ImageController: React.FC<ImageControllerProps> = ({ files, handleFileOrde
               <>
                 {
                   dropPos === i && !dropIntent &&
-                  <hr id='divider' className={styles.dragLeftDivider} />
+                  <hr key={'previous'} id='divider' className={styles.dragLeftDivider} />
                 }
                 <ImageCard
                   key={i}
