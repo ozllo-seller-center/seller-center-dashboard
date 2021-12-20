@@ -25,7 +25,7 @@ import MessageModal from 'src/components/MessageModal';
 import { Order, OrderParent, OrderStatusType } from 'src/shared/types/order';
 
 enum SellStatus {
-  // 'pending' | 'approved' | 'invoiced' | 'shipped' | 'delivered' | 'canceled' | 'completed'
+  // 'Pending' | 'Approved' | 'Invoiced' | 'hipped' | 'Delivered' | 'Canceled' | 'Completed'
   Entregue = 'Entregue',
   Processando = 'Processando',
   Retornado = 'Retornado',
@@ -79,13 +79,13 @@ function InOrderStatus(order: Order, filter: OrderStatus): boolean {
 
   switch (filter) {
     case OrderStatus.Aprovado:
-      return order.status.status === 'approved' || order.status.status === 'delivered' || order.status.status === 'completed';
+      return order.status.status === 'Approved' || order.status.status === 'Delivered' || order.status.status === 'Completed';
     case OrderStatus.Cancelado:
-      return order.status.status === 'canceled';
+      return order.status.status === 'Canceled';
     case OrderStatus.Devolvido:
       return false; // return order.status.status === ''; FIXME: O objeto orders não apresenta um tipo de devolução no back-end
     case OrderStatus.Processando:
-      return order.status.status === 'pending' || order.status.status === 'invoiced' || order.status.status === 'shipped';
+      return order.status.status === 'Pending' || order.status.status === 'Invoiced' || order.status.status === 'Shipped';
   }
 
   return true;
@@ -186,19 +186,19 @@ export function Sells() {
       const order = orderParent.order;
       if (inInterval(order)) {
         switch (order.status.status) {
-          case 'completed':
-          case 'delivered':
-          case 'approved':
+          case 'Completed':
+          case 'Delivered':
+          case 'Approved':
             accumulator.totalApproved += order.payment.totalAmountPlusShipping
             accumulator.total += order.payment.totalAmountPlusShipping
             break
-          case 'pending':
-          case 'invoiced':
-          case 'shipped':
+          case 'Pending':
+          case 'Invoiced':
+          case 'Shipped':
             accumulator.totalProcessing += order.payment.totalAmountPlusShipping
             accumulator.total += order.payment.totalAmountPlusShipping
             break
-          case 'canceled':
+          case 'Canceled':
             accumulator.totalCanceled += order.payment.totalAmountPlusShipping
             accumulator.total -= order.payment.totalAmountPlusShipping
             break
@@ -249,15 +249,15 @@ export function Sells() {
 
       switch (status) {
         case SellStatus.Processando:
-          return inInterval(order) && (order.status.status === 'pending') && (search === '' || OrderContainsProduct(order, search))
+          return inInterval(order) && (order.status.status === 'Pending') && (search === '' || OrderContainsProduct(order, search))
         case SellStatus.Faturando:
-          return inInterval(order) && (order.status.status === 'invoiced') && (search === '' || OrderContainsProduct(order, search))
+          return inInterval(order) && (order.status.status === 'Invoiced') && (search === '' || OrderContainsProduct(order, search))
         case SellStatus.Despachando:
-          return inInterval(order) && (order.status.status === 'shipped') && (search === '' || OrderContainsProduct(order, search))
+          return inInterval(order) && (order.status.status === 'Shipped') && (search === '' || OrderContainsProduct(order, search))
         case SellStatus.Cancelado:
-          return inInterval(order) && (order.status.status === 'canceled') && (search === '' || OrderContainsProduct(order, search))
+          return inInterval(order) && (order.status.status === 'Canceled') && (search === '' || OrderContainsProduct(order, search))
         case SellStatus.Entregue:
-          return inInterval(order) && (order.status.status === 'delivered' || order.status.status === 'completed' || order.status.status === 'approved')
+          return inInterval(order) && (order.status.status === 'Delivered' || order.status.status === 'Completed' || order.status.status === 'Approved')
             && (search === '' || OrderContainsProduct(order, search))
         case SellStatus.Retornado:
           // FIXME: determinar status de devolução
@@ -297,17 +297,17 @@ export function Sells() {
 
   const getOrderStatus = useCallback((orderStatus: OrderStatusType) => {
     switch (orderStatus) {
-      case 'pending':
+      case 'Pending':
         return SellStatus.Processando
-      case 'invoiced':
+      case 'Invoiced':
         return SellStatus.Faturando
-      case 'shipped':
+      case 'Shipped':
         return SellStatus.Despachando
-      case 'canceled':
+      case 'Canceled':
         return SellStatus.Cancelado
-      case 'delivered':
-      case 'completed':
-      case 'approved':
+      case 'Delivered':
+      case 'Completed':
+      case 'Approved':
         return SellStatus.Entregue
 
       // FIXME: determinar status de devolução
@@ -593,7 +593,7 @@ const ordersFromApi: OrderParent[] = JSON.parse(`[
               }
           },
           "status": {
-              "status": "completed",
+              "status": "Completed",
               "updatedDate": "2021-10-06T07:20:17",
               "active": true,
               "message": ""
@@ -690,7 +690,7 @@ const ordersFromApi: OrderParent[] = JSON.parse(`[
               }
           },
           "status": {
-              "status": "shipped",
+              "status": "Shipped",
               "updatedDate": "2021-11-17T06:22:14",
               "active": true,
               "message": ""
@@ -769,7 +769,7 @@ const ordersFromApi: OrderParent[] = JSON.parse(`[
               }
           },
           "status": {
-              "status": "approved",
+              "status": "Approved",
               "updatedDate": "2021-09-21T05:40:55",
               "active": true,
               "message": ""
@@ -849,7 +849,7 @@ const ordersFromApi: OrderParent[] = JSON.parse(`[
               }
           },
           "status": {
-              "status": "approved",
+              "status": "Approved",
               "updatedDate": "2021-09-20T15:46:04",
               "active": true
           },
@@ -928,7 +928,7 @@ const ordersFromApi: OrderParent[] = JSON.parse(`[
               }
           },
           "status": {
-              "status": "delivered",
+              "status": "Delivered",
               "updatedDate": "2021-09-16T09:56:43",
               "active": true,
               "message": ""
@@ -1165,7 +1165,7 @@ const ordersFromApi: OrderParent[] = JSON.parse(`[
               }
           },
           "status": {
-              "status": "approved",
+              "status": "Approved",
               "updatedDate": "2021-12-07T08:33:02",
               "active": true,
               "message": ""

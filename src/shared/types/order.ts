@@ -40,7 +40,7 @@ export type OrderPayment = {
   address: OrderAddress,
 }
 
-export type OrderStatusType = 'pending' | 'approved' | 'invoiced' | 'shipped' | 'delivered' | 'canceled' | 'completed'
+export type OrderStatusType = 'Pending' | 'Approved' | 'Invoiced' | 'Shipped' | 'Delivered' | 'Canceled' | 'Completed'
 
 export type OrderStatus = {
   status: OrderStatusType,
