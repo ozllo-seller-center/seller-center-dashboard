@@ -1,28 +1,29 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FiCalendar, FiCheck, FiPaperclip, FiSearch, FiX } from 'react-icons/fi'
-import { FormHandles } from '@unform/core';
-import { GetStaticProps } from 'next';
-import { format, isSameWeek, isSameMonth, isToday } from 'date-fns';
-import { Form } from '@unform/web';
 
-import Button from '../../components/FilterButton';
-import BulletedButton from '../../components/BulletedButton';
-import FilterInput from '../../components/FilterInput';
-import StatusPanel from '../../components/OrderStatusPanel';
+import { FormHandles } from '@unform/core'
+import { format, isSameWeek, isSameMonth, isToday } from 'date-fns'
+import { Form } from '@unform/web'
 
-import styles from './styles.module.scss';
-import DatePickerPopup from '../../components/DatePickerPopup';
-import Collapsible from '../../components/Collapsible';
-import AttachController from '../../components/AttachController';
-import { useLoading } from 'src/hooks/loading';
-import { useAuth } from 'src/hooks/auth';
-import api from 'src/services/api';
-import AttachButton from 'src/components/AttachButton';
-import Modal from 'src/components/Modal';
-import NfeModalContent from 'src/components/NfeModalContent';
-import { useModalMessage } from 'src/hooks/message';
-import MessageModal from 'src/components/MessageModal';
-import { Order, OrderParent, OrderStatusType } from 'src/shared/types/order';
+import Button from '../../components/FilterButton'
+import BulletedButton from '../../components/BulletedButton'
+import FilterInput from '../../components/FilterInput'
+import StatusPanel from '../../components/OrderStatusPanel'
+
+import styles from './styles.module.scss'
+import DatePickerPopup from '../../components/DatePickerPopup'
+import Collapsible from '../../components/Collapsible'
+import AttachController from '../../components/AttachController'
+import { useLoading } from 'src/hooks/loading'
+import { useAuth } from 'src/hooks/auth'
+import api from 'src/services/api'
+import AttachButton from 'src/components/AttachButton'
+import Modal from 'src/components/Modal'
+import NfeModalContent from 'src/components/NfeModalContent'
+import { useModalMessage } from 'src/hooks/message'
+import MessageModal from 'src/components/MessageModal'
+import { Order, OrderParent, OrderStatusType } from 'src/shared/types/order'
+import OrderDetailsModal from 'src/components/OrderDetailsModal'
 
 enum SellStatus {
   // 'Pending' | 'Approved' | 'Invoiced' | 'hipped' | 'Delivered' | 'Canceled' | 'Completed'
@@ -36,7 +37,6 @@ enum SellStatus {
 }
 
 enum OrderStatus {
-
   Aprovado = 0,
   Processando = 1,
   Cancelado = 2,
@@ -60,44 +60,44 @@ type OrderProduct = {
 
 
 interface SearchFormData {
-  search: string;
+  search: string
 }
 
 interface SellsProps {
-  sells: OrderParent[];
+  sells: OrderParent[]
 }
 
 interface Totals {
-  totalApproved: number;
-  totalProcessing: number;
-  totalCanceled: number;
-  totalReturned: number;
-  total: number;
+  totalApproved: number
+  totalProcessing: number
+  totalCanceled: number
+  totalReturned: number
+  total: number
 }
 
 function InOrderStatus(order: Order, filter: OrderStatus): boolean {
 
   switch (filter) {
     case OrderStatus.Aprovado:
-      return order.status.status === 'Approved' || order.status.status === 'Delivered' || order.status.status === 'Completed';
+      return order.status.status === 'Approved' || order.status.status === 'Delivered' || order.status.status === 'Completed'
     case OrderStatus.Cancelado:
-      return order.status.status === 'Canceled';
+      return order.status.status === 'Canceled'
     case OrderStatus.Devolvido:
-      return false; // return order.status.status === ''; FIXME: O objeto orders não apresenta um tipo de devolução no back-end
+      return false // return order.status.status === '' FIXME: O objeto orders não apresenta um tipo de devolução no back-end
     case OrderStatus.Processando:
-      return order.status.status === 'Pending' || order.status.status === 'Invoiced' || order.status.status === 'Shipped';
+      return order.status.status === 'Pending' || order.status.status === 'Invoiced' || order.status.status === 'Shipped'
   }
 
-  return true;
+  return true
 }
 
 function OrderContainsProduct(order: Order, search: string): boolean {
   const contains = order.products.reduce((accumulator: number, product: OrderProduct) => {
-    accumulator += product.name.toLowerCase().includes(search.toLowerCase()) ? 1 : 0;
-    return accumulator;
+    accumulator += product.name.toLowerCase().includes(search.toLowerCase()) ? 1 : 0
+    return accumulator
   }, 0)
 
-  return !!contains;
+  return !!contains
 }
 
 export function Sells() {
@@ -128,62 +128,65 @@ export function Sells() {
   const [isNfeAttachOpen, setNfeAttachOpen] = useState(false)
   const [nfeItem, setNfeItem] = useState<OrderParent>()
 
+  const [modalOrder, setModalOrder] = useState<Order>()
+  const [isOrderModalOpen, setOrderModalOpen] = useState(false)
+
   useEffect(() => {
     setLoading(true)
 
-    // setOrders(ordersFromApi)
+    setOrders(ordersFromApi)
 
-    api.get('/account/detail').then(response => {
-      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
+    // api.get('/account/detail').then(response => {
+    //   updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
 
-      api.get('/order/all', {
-        headers: {
-          authorization: token,
-          shop_id: response.data.shopInfo._id,
-        }
-      }).then(response => {
-        console.log('Orders:')
-        console.log(JSON.stringify(response.data))
+    //   api.get('/order/all', {
+    //     headers: {
+    //       authorization: token,
+    //       shop_id: response.data.shopInfo._id,
+    //     }
+    //   }).then(response => {
+    //     console.log('Orders:')
+    //     console.log(JSON.stringify(response.data))
 
-        setOrders(response.data as OrderParent[])
-        // response.data.map((order: OrderParent) => {
+    //     setOrders(response.data as OrderParent[])
+    //     // response.data.map((order: OrderParent) => {
 
-        // })
+    //     // })
 
-        setLoading(false)
-      }).catch(err => {
-        console.log(err)
-        setLoading(false)
-      })
-    }).catch(err => {
-      console.log(err)
-      setLoading(false)
-    });
+    //     setLoading(false)
+    //   }).catch(err => {
+    //     console.log(err)
+    //     setLoading(false)
+    //   })
+    // }).catch(err => {
+    //   console.log(err)
+    //   setLoading(false)
+    // })
   }, [])
 
 
   const inInterval = useCallback((order: Order) => {
 
-    const date: Date = new Date(order.payment.purchaseDate);
+    const date: Date = new Date(order.payment.purchaseDate)
 
     switch (filter) {
       case Filter.Semana:
-        return isSameWeek(date, new Date());
+        return isSameWeek(date, new Date())
 
       case Filter.Mes:
-        return isSameMonth(date, new Date());
+        return isSameMonth(date, new Date())
 
       case Filter.Custom:
-        return format(date, 'yyyy/MM/dd') <= format(toDateFilter, 'yyyy/MM/dd') && format(date, 'yyyy/MM/dd') >= format(fromDateFilter, 'yyyy/MM/dd');
+        return format(date, 'yyyy/MM/dd') <= format(toDateFilter, 'yyyy/MM/dd') && format(date, 'yyyy/MM/dd') >= format(fromDateFilter, 'yyyy/MM/dd')
 
       default:
-        return isToday(date);
+        return isToday(date)
     }
   }, [status, fromDateFilter, toDateFilter, filter])
 
   useEffect(() => {
     const totals = orders.reduce((accumulator: Totals, orderParent: OrderParent) => {
-      const order = orderParent.order;
+      const order = orderParent.order
       if (inInterval(order)) {
         switch (order.status.status) {
           case 'Completed':
@@ -217,31 +220,31 @@ export function Sells() {
     setTotalApproved(new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
-    }).format(totals.totalApproved));
+    }).format(totals.totalApproved))
 
     setTotalProcessing(new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
-    }).format(totals.totalProcessing));
+    }).format(totals.totalProcessing))
 
     setTotalCanceled(new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
-    }).format(totals.totalCanceled));
+    }).format(totals.totalCanceled))
 
     setTotalReturned(new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
-    }).format(totals.totalReturned));
+    }).format(totals.totalReturned))
 
     setTotal(new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
-    }).format(totals.total));
-  }, [orders, orderStatus, fromDateFilter, toDateFilter, filter]);
+    }).format(totals.total))
+  }, [orders, orderStatus, fromDateFilter, toDateFilter, filter])
 
-  const formRef = useRef<FormHandles>(null);
-  const [error, setError] = useState('');
+  const formRef = useRef<FormHandles>(null)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     setItems(orders.filter((orderParent) => {
@@ -266,33 +269,37 @@ export function Sells() {
         default:
           return inInterval(order) && InOrderStatus(order, orderStatus) && (search === '' || OrderContainsProduct(order, search))
       }
-    }));
-  }, [orders, status, orderStatus, fromDateFilter, toDateFilter, search, filter]);
+    }))
+  }, [orders, status, orderStatus, fromDateFilter, toDateFilter, search, filter])
 
   const handleSubmit = useCallback(
     async (data: SearchFormData) => {
       try {
-        formRef.current?.setErrors({});
+        formRef.current?.setErrors({})
 
         if (data.search !== search) {
-          setSeacrh(data.search);
+          setSeacrh(data.search)
         }
 
       } catch (err) {
-        setError('Ocorreu um erro ao fazer login, cheque as credenciais.');
+        setError('Ocorreu um erro ao fazer login, cheque as credenciais.')
       }
     },
     [search],
-  );
+  )
 
   const handleAttachment = useCallback(async (data: any) => {
-  }, [items]);
+  }, [items])
 
-  const datePickerRef = useRef<FormHandles>(null);
-  const [datePickerVisibility, setDatePickerVisibility] = useState(false);
+  const datePickerRef = useRef<FormHandles>(null)
+  const [datePickerVisibility, setDatePickerVisibility] = useState(false)
 
   const handleModalVisibility = useCallback(() => {
-    handleModalMessage(false);
+    handleModalMessage(false)
+  }, [])
+
+  const handleOrderModalVisibility = useCallback(() => {
+    setOrderModalOpen(false)
   }, [])
 
   const getOrderStatus = useCallback((orderStatus: OrderStatusType) => {
@@ -374,8 +381,8 @@ export function Sells() {
                 icon={FiCalendar}
                 isActive={filter === Filter.Custom}
                 onClick={() => {
-                  setFilter(Filter.Custom);
-                  setDatePickerVisibility(!datePickerVisibility);
+                  setFilter(Filter.Custom)
+                  setDatePickerVisibility(!datePickerVisibility)
                 }}>Escolher período</Button>
 
               {filter === Filter.Custom && (
@@ -504,7 +511,13 @@ export function Sells() {
                           isAttached={!!item.order.orderNotes} //!item.nfe_url
                         />
                         :
-                        <span className={styles.action} style={{ cursor: 'help', opacity: 0.5 }} title="Desabilitado"> Ver detalhes </span>
+                        <span
+                          className={styles.action}
+                          onClick={() => {
+                            setOrderModalOpen(true)
+                            setModalOrder(item.order)
+                          }}
+                        > Ver detalhes </span>
                     }
                   </td>
                 </tr>
@@ -537,6 +550,11 @@ export function Sells() {
               {modalMessage.message.map((message, i) => <p key={i} className={styles.messages}>{message}</p>)}
             </div>
           </MessageModal>
+        )
+      }
+      {
+        (isOrderModalOpen && modalOrder) && (
+          <OrderDetailsModal handleVisibility={handleOrderModalVisibility} order={modalOrder} />
         )
       }
     </div >
@@ -1193,10 +1211,10 @@ const ordersFromApi: OrderParent[] = JSON.parse(`[
       },
       "shop_id": "60df95d99d34e9bd68fdcb8c"
   }
-]`);
+]`)
 
 // export const getStaticProps: GetStaticProps = async ({ }) => {
-//   const sells = ordersFromApi; //ordersFromApi.sort((a, b) => a.date < b.date ? -1 : 1);
+//   const sells = ordersFromApi //ordersFromApi.sort((a, b) => a.date < b.date ? -1 : 1)
 
 //   return ({
 //     props: { sells },
@@ -1204,4 +1222,4 @@ const ordersFromApi: OrderParent[] = JSON.parse(`[
 //   })
 // }
 
-export default Sells;
+export default Sells

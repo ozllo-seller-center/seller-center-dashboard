@@ -3,19 +3,20 @@ import { IconBaseProps } from 'react-icons';
 
 import styles from './styles.module.scss';
 
-interface MessageModalProps {
+interface ModalProps {
   handleVisibility: React.MouseEventHandler;
   title?: string;
   icon?: React.ComponentType<IconBaseProps>;
+  cleanStyle?: boolean;
   alterStyle?: boolean;
 }
 
-const MessageModal: React.FC<MessageModalProps> = ({ handleVisibility, alterStyle, title, icon: Icon, children }) => {
+const Modal: React.FC<ModalProps> = ({ handleVisibility, cleanStyle, alterStyle, title, icon: Icon, children }) => {
   return (
-    <div>
+    <div className={styles.parent}>
       <div onClick={handleVisibility} className={styles.modalBackground} />
       <div className={styles.modalContainer} style={{ backgroundColor: !alterStyle ? 'var(--white)' : 'var(--yellow-300)' }}>
-        <div className={styles.modalHeader}>
+        <div className={cleanStyle ? styles.modalClearHeader : styles.modalHeader}>
           {
             Icon && <Icon />
           }
@@ -30,4 +31,4 @@ const MessageModal: React.FC<MessageModalProps> = ({ handleVisibility, alterStyl
   )
 }
 
-export default MessageModal;
+export default Modal;
