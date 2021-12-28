@@ -26,6 +26,8 @@ import NfeModalContent from 'src/components/NfeModalContent';
 import MessageModal from 'src/components/MessageModal';
 import { Order, OrderParent, OrderStatusType } from 'src/shared/types/order';
 import api from 'src/services/api';
+import { BiPackage } from 'react-icons/bi';
+import OrderDetailsModal from 'src/components/OrderDetailsModal';
 
 enum SellStatus {
   // 'Pending' | 'Approved' | 'Invoiced' | 'Shipped' | 'Delivered' | 'Canceled' | 'Completed'
@@ -131,6 +133,9 @@ export function Sells() {
   const [isNfeAttachOpen, setNfeAttachOpen] = useState(false)
   const [nfeItem, setNfeItem] = useState<OrderParent>()
 
+  const [modalOrder, setModalOrder] = useState<Order>()
+  const [isOrderModalOpen, setOrderModalOpen] = useState(false)
+
   const inInterval = useCallback((order: Order) => {
 
     const date: Date = new Date(order.payment.purchaseDate);
@@ -158,25 +163,27 @@ export function Sells() {
     api.get('/account/detail').then(response => {
       updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
 
-      api.get('/order/all', {
-        headers: {
-          authorization: token,
-          shop_id: response.data.shopInfo._id,
-        }
-      }).then(response => {
-        console.log('Orders:')
-        console.log(JSON.stringify(response.data))
+      setOrders(ordersFromApi)
 
-        setOrders(response.data as OrderParent[])
-        // response.data.map((order: OrderParent) => {
+      // api.get('/order/all', {
+      //   headers: {
+      //     authorization: token,
+      //     shop_id: response.data.shopInfo._id,
+      //   }
+      // }).then(response => {
+      //   console.log('Orders:')
+      //   console.log(JSON.stringify(response.data))
 
-        // })
+      //   setOrders(response.data as OrderParent[])
+      //   // response.data.map((order: OrderParent) => {
 
-        setLoading(false)
-      }).catch(err => {
-        console.log(err)
-        setLoading(false)
-      })
+      //   // })
+
+      //   setLoading(false)
+      // }).catch(err => {
+      //   console.log(err)
+      //   setLoading(false)
+      // })
     }).catch(err => {
       console.log(err)
       setLoading(false)
@@ -291,6 +298,11 @@ export function Sells() {
     handleModalMessage(false);
   }, [])
 
+  const handleOrderModalVisibility = useCallback(() => {
+    setOrderModalOpen(false)
+  }, [])
+
+
   const handleAttachment = useCallback(async (data: any) => {
 
   }, [items]);
@@ -332,41 +344,6 @@ export function Sells() {
             { text: 'Cancelados', value: SellStatus.Cancelado }
           ]}
             setActiveItem={setStatus} />
-          {/* <BulletedButton
-            onClick={() => setStatus(SellStatus.Todos)}
-            isActive={status === SellStatus.Todos}>
-            Todas
-        </BulletedButton>
-          <BulletedButton
-            onClick={() => setStatus(SellStatus.Processando)}
-            isActive={status === SellStatus.Processando}>
-            Aguardando Pagamento
-        </BulletedButton>
-          <BulletedButton
-            onClick={() => setStatus(SellStatus.Faturando)}
-            isActive={status === SellStatus.Faturando}>
-            Aguardando Faturamento
-        </BulletedButton>
-          <BulletedButton
-            onClick={() => setStatus(SellStatus.Despachando)}
-            isActive={status === SellStatus.Despachando}>
-            Aguardando Despacho
-        </BulletedButton>
-          <BulletedButton
-            onClick={() => setStatus(SellStatus.Retornado)}
-            isActive={status === SellStatus.Retornado}>
-            Retornados
-        </BulletedButton>
-          <BulletedButton
-            onClick={() => setStatus(SellStatus.Cancelado)}
-            isActive={status === SellStatus.Cancelado}>
-            Cancelados
-        </BulletedButton>
-          <BulletedButton
-            onClick={() => setStatus(SellStatus.Entregue)}
-            isActive={status === SellStatus.Entregue}>
-            Entregues
-        </BulletedButton> */}
         </div>
         <div className={styles.divider} />
         <div className={styles.sellsContent}>
@@ -486,7 +463,7 @@ export function Sells() {
                     {
                       getOrderStatus(item.order.status.status) === SellStatus.Despachando && (
                         <div className={styles.processingItem}>
-                          <FiMoreHorizontal />
+                          <BiPackage />
                           Despachando
                         </div>
                       )
@@ -545,9 +522,13 @@ export function Sells() {
                           isAttached={!!item.order.orderNotes} //!item.nfe_url
                         />
                         :
-                        <Button customStyle={{ className: styles.detailsButton }}>
-                          Ver detalhes
-                        </Button>
+                        <Button
+                          className={styles.detailsButton}
+                          onClick={() => {
+                            setOrderModalOpen(true)
+                            setModalOrder(item.order)
+                          }}
+                        > Ver detalhes </Button>
                     }
                   </div>
                 </div>
@@ -603,6 +584,11 @@ export function Sells() {
               {modalMessage.message.map((message, i) => <p key={i} className={styles.messages}>{message}</p>)}
             </div>
           </MessageModal>
+        )
+      }
+      {
+        (isOrderModalOpen && modalOrder) && (
+          <OrderDetailsModal handleVisibility={handleOrderModalVisibility} order={modalOrder} />
         )
       }
     </>

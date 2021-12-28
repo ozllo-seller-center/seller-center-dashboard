@@ -1,3 +1,13 @@
+.parent {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+
+  overflow: hidden;
+}
+
 .modalBackground {
   position: absolute;
   top: 0;
@@ -9,6 +19,8 @@
   opacity: 0.5;
 
   z-index: 99;
+
+  overflow-y: hidden;
 }
 
 .modalContainer {
@@ -22,16 +34,14 @@
   border-radius: 6px;
 
   display: flex;
-  // padding: 3rem;
-
-  // align-content: center;
-  // text-align: center;
-
-  display: flex;
   flex-direction: column;
 
   min-width: 100px;
   min-height: 100px;
+
+  max-height: 90%;
+
+  overflow-y: hidden;
 
   .modalHeader {
     display: flex;
@@ -65,6 +75,56 @@
 
       border: none;
       background-color: var(--gray-300-50);
+      border-radius: 0 6px 0 0;
+
+      transition: filter 0.5s;
+
+      color: var(--grafite);
+      font-size: 1rem;
+      font-weight: lighter;
+
+      // svg {
+      //   color: var(--white);
+      //   width: 1.5rem;
+      //   height: 1.5rem;
+      // }
+
+      &:hover {
+        filter: brightness(0.8);
+      }
+    }
+  }
+
+  .modalClearHeader {
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+
+    > span {
+      // font-size: 1.25rem;
+      // font-weight: lighter;
+      text-align: center;
+
+      margin-left: 0.5rem;
+      margin-right: 1rem;
+    }
+
+    > svg {
+      width: 1rem;
+      height: 1rem;
+
+      color: var(--gray-500);
+      margin-left: 0.5rem;
+    }
+
+    > button {
+      margin-left: auto;
+
+      padding: 0.5rem 0.75rem;
+
+      border: none;
+      background-color: var(--white);
       border-radius: 0 6px 0 0;
 
       transition: filter 0.5s;
