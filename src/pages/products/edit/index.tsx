@@ -11,7 +11,7 @@ import RadioButtonGroup from '../../../components/RadioButtonGroup';
 import VariationsController from '../../../components/VariationsController';
 import getValidationErrors from '../../../utils/getValidationErrors';
 
-import { FiAlertTriangle, FiCheck, FiChevronLeft, FiInfo, FiX } from 'react-icons/fi';
+import { FiCheck, FiChevronLeft, FiInfo, FiX } from 'react-icons/fi';
 
 import styles from './styles.module.scss'
 
@@ -25,12 +25,10 @@ import { Loader } from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
 import Variation from 'src/components/VariationsController/Variation';
 import { Attribute } from 'src/shared/types/category';
-import Dropzone from 'src/components/Dropzone';
 import ImageController from 'src/components/ImageController';
 import RuledHintbox, { Rule } from 'src/components/RuledHintbox';
 import { matchingWords } from 'src/utils/util';
 import HintedInput from 'src/components/HintedInput';
-import { RiTruckLine } from 'react-icons/ri';
 
 type VariationDTO = {
   _id?: string;
@@ -106,8 +104,6 @@ export function EditProductForm() {
           shop_id: user.shopInfo._id,
         }
       }).then(response => {
-        console.log(response.data)
-
         const urls = response.data.images.filter((url: string) => (!!url && url !== null));
         setFilesUrl(urls)
 
@@ -178,8 +174,6 @@ export function EditProductForm() {
   }, [variations, attributes])
 
   const setNameChecks = useCallback((name: string) => {
-    console.log('Name: ' + name)
-
     if (!name || name.length === 0 || !formRef.current?.getFieldValue('brand') || isHintDisabled) {
       setBrandInName(false)
       setColorInName(false)
@@ -220,9 +214,6 @@ export function EditProductForm() {
   const handleOnFileUpload = useCallback((acceptedFiles: File[], dropZoneRef: React.RefObject<any>) => {
     calcFilledFields(formRef.current?.getData() as Product);
 
-    console.log('Upload:')
-    console.log(acceptedFiles)
-
     acceptedFiles = acceptedFiles.filter((f, i) => {
       if (files.length + (i + 1) > 6) {
         handleModalMessage(true, {
@@ -234,20 +225,8 @@ export function EditProductForm() {
         return false;
       }
 
-      if (f.size / 1024 / 1024 > 2) {
-        handleModalMessage(true, {
-          type: 'error',
-          title: 'Arquivo muito pesado!',
-          message: [`O arquivo ${f.name} excede o tamanho máximo de 2mb`]
-        })
-
-        return false;
-      }
-
       return true;
     })
-
-    console.log(acceptedFiles)
 
     const newFiles = acceptedFiles.map(f => {
       return {
@@ -258,22 +237,28 @@ export function EditProductForm() {
     let urls: string[] = []
     newFiles.forEach(f => {
       if (f.file) {
-        const url = URL.createObjectURL(f.file)
 
-        urls.push(url)
+        new Compressor(f.file, {
+          width: 1000,
+          height: 1000,
+          success(result) {
+            const url = URL.createObjectURL(result)
 
-        f.url = url
-        f.uploaded = false
+            urls.push(url)
+
+            f.file = result as File
+            f.url = url
+            f.uploaded = false
+          },
+          error(err) {
+            console.log(err.message);
+          },
+        })
+
       }
     })
 
-    console.log('New Files:')
-    console.log(newFiles)
-
     dropZoneRef.current.acceptedFiles = [...files, ...newFiles].map(f => f.url)
-
-    console.log('Images:')
-    console.log(dropZoneRef.current.acceptedFiles)
 
     setFiles([...files, ...newFiles]);
     setFilesUrl([...filesUrl, ...urls]);
@@ -445,7 +430,7 @@ export function EditProductForm() {
           shop_id: user.shopInfo._id,
         }
       }).then(response => {
-        console.log(response.data)
+
       })
 
       const {
