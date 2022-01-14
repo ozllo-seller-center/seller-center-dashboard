@@ -30,6 +30,8 @@ import RuledHintbox, { Rule } from 'src/components/RuledHintbox';
 import { matchingWords } from 'src/utils/util';
 import HintedInput from 'src/components/HintedInput';
 
+import Compressor from 'compressorjs';
+
 type VariationDTO = {
   _id?: string;
   size?: number | string,
@@ -234,9 +236,12 @@ export function EditProductForm() {
       } as ProductImage
     })
 
+    setLoading(true)
+
     let urls: string[] = []
     newFiles.forEach(f => {
       if (f.file) {
+        f.uploaded = false
 
         new Compressor(f.file, {
           width: 1000,
@@ -248,10 +253,13 @@ export function EditProductForm() {
 
             f.file = result as File
             f.url = url
-            f.uploaded = false
+
+            setLoading(false)
           },
           error(err) {
             console.log(err.message);
+
+            setLoading(false)
           },
         })
 
