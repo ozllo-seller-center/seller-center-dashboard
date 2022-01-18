@@ -105,7 +105,7 @@ const SignUp: React.FC = () => {
           return;
         }
 
-        console.log(err.response.data)
+        // console.log(err.response.data)
 
         if (err.response.data.errors.findIndex((er: AppError) => er.errorCode === 4) >= 0) {
           setModalVisibility(true);
