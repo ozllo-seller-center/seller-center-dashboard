@@ -19,15 +19,11 @@ export class CompanyInfo {
   cnpj: string
   name: string
   razaoSocial: string
-  inscricaoEstadual?: string
-  inscricaoMunicipal?: string
 
-  constructor(isPJ: boolean, cnpj: string, name: string, razaoSocial: string, inscricaoEstadual?: string, inscricaoMunicial?: string) {
+  constructor(isPJ: boolean, cnpj: string, name: string, razaoSocial: string) {
     this.isPJ = isPJ
     this.cnpj = cnpj
     this.name = name
     this.razaoSocial = razaoSocial
-    this.inscricaoEstadual = inscricaoEstadual
-    this.inscricaoMunicipal = inscricaoMunicial
   }
 }

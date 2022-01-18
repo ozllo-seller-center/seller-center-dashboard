@@ -188,7 +188,7 @@ export function matchingWords(source: string, comparTo: string) {
     return acc
   }, 0)
 
-  console.log(`Matching? ${matchCount} | ${compareToWords.length}`)
+  // console.log(`Matching? ${matchCount} | ${compareToWords.length}`)
 
   return matchCount === compareToWords.length;
 }

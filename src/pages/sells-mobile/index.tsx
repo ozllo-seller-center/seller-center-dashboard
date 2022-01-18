@@ -158,32 +158,30 @@ export function Sells() {
   useEffect(() => {
     setLoading(true)
 
-    // setOrders(ordersFromApi)
-
     api.get('/account/detail').then(response => {
       updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
 
-      setOrders(ordersFromApi)
+      // setOrders(ordersFromApi)
 
-      // api.get('/order/all', {
-      //   headers: {
-      //     authorization: token,
-      //     shop_id: response.data.shopInfo._id,
-      //   }
-      // }).then(response => {
-      //   console.log('Orders:')
-      //   console.log(JSON.stringify(response.data))
+      api.get('/order/all', {
+        headers: {
+          authorization: token,
+          shop_id: response.data.shopInfo._id,
+        }
+      }).then(response => {
+        // console.log('Orders:')
+        // console.log(JSON.stringify(response.data))
 
-      //   setOrders(response.data as OrderParent[])
-      //   // response.data.map((order: OrderParent) => {
+        setOrders(response.data as OrderParent[])
+        // response.data.map((order: OrderParent) => {
 
-      //   // })
+        // })
 
-      //   setLoading(false)
-      // }).catch(err => {
-      //   console.log(err)
-      //   setLoading(false)
-      // })
+        setLoading(false)
+      }).catch(err => {
+        console.log(err)
+        setLoading(false)
+      })
     }).catch(err => {
       console.log(err)
       setLoading(false)

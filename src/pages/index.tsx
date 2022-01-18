@@ -33,7 +33,7 @@ const SignIn: React.FC = () => {
   const route = useRouter();
 
   useEffect(() => {
-    console.log(process.env.NEXT_PUBLIC_API_URL);
+    // console.log(process.env.NEXT_PUBLIC_API_URL);
 
     if (!!user) {
       route.push('/dashboard');

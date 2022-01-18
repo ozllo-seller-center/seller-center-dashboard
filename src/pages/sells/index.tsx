@@ -145,8 +145,8 @@ export function Sells() {
           shop_id: response.data.shopInfo._id,
         }
       }).then(response => {
-        console.log('Orders:')
-        console.log(JSON.stringify(response.data))
+        // console.log('Orders:')
+        // console.log(JSON.stringify(response.data))
 
         setOrders(response.data as OrderParent[])
         // response.data.map((order: OrderParent) => {

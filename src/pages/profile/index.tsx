@@ -121,10 +121,6 @@ const Profile: React.FC = () => {
   const [sellerClassName, setSellerClassName] = useState(styles.flowUnset)
   const [shopClassName, setShopClassName] = useState(styles.flowUnset)
 
-  const [ieMask, setIeMask] = useState('***.***.***-**')
-  const [imMask, setImMask] = useState('***.***.***-**')
-
-
   const [banks, setBanks] = useState<Bank[]>([])
 
   const formRef = useRef<FormHandles>(null)
@@ -199,24 +195,14 @@ const Profile: React.FC = () => {
           }
         } as ProfileFormData)
 
+        console.log(`Loading false? ${isLoading}`)
+
         setLoading(false)
 
         return
       }
 
       formRef.current?.setData({ ...user, ...userInfo })
-
-      if (letterRegex.test(userInfo.personalInfo.inscricaoEstadual)) {
-        setIeMask('******')
-      } else {
-        setIeMask('***.***.***-**')
-      }
-
-      if (letterRegex.test(userInfo.personalInfo.inscricaoMunicipal)) {
-        setImMask('******')
-      } else {
-        setImMask('***.***.***-**')
-      }
 
       setLoading(false)
     }).catch(err => {
@@ -362,8 +348,6 @@ const Profile: React.FC = () => {
               name: Yup.string().required('Nome obrigatório'),
               razaoSocial: Yup.string().required('Razão Social obrigatório'),
               cnpj: Yup.string().required('CNPJ obrigatório').min(14, 'CNPJ deve ter 14 digitos'),
-              inscricaoMunicipal: Yup.string().required('Inscição Municipal obrigatória').min(2, 'Inscição Municipal deve ter no mínimo 2 caracteres'),
-              inscricaoEstadual: Yup.string().required('Inscição Estadual obrigatória').min(2, 'Inscição Estadual deve ter no mínimo 2 caracteres'),
             })
           }
 
@@ -562,17 +546,13 @@ const Profile: React.FC = () => {
               const {
                 name,
                 razaoSocial,
-                cnpj,
-                inscricaoEstadual,
-                inscricaoMunicipal } = data.personalInfo as CompanyInfo
+                cnpj, } = data.personalInfo as CompanyInfo
 
               personalInfo = {
                 isPJ: true,
                 name,
                 razaoSocial,
                 cnpj: cnpjValidator.format(cnpj),
-                inscricaoEstadual,
-                inscricaoMunicipal
               }
 
               await api.post('/account/personalInfo', personalInfo).then(response => {
@@ -1031,38 +1011,6 @@ const Profile: React.FC = () => {
                         // maxLength={14}
                         // value={!!user?.cpf ? user.cpf : ''}
                         />
-
-                        <MaskedInput
-                          name='inscricaoEstadual'
-                          placeholder='Inscrição Estadual'
-                          autoComplete='off'
-                          mask={ieMask}
-                          onChange={(e) => {
-                            setChanged(true)
-
-                            if (letterRegex.test(e.currentTarget.value)) {
-                              setIeMask('******')
-                            } else {
-                              setIeMask('***.***.***-**')
-                            }
-                          }}
-                        />
-
-                        <MaskedInput
-                          name='inscricaoMunicipal'
-                          placeholder='Inscrição Municipal'
-                          autoComplete='off'
-                          mask={imMask}
-                          onChange={(e) => {
-                            setChanged(true)
-
-                            if (letterRegex.test(e.currentTarget.value)) {
-                              setImMask('******')
-                            } else {
-                              setImMask('***.***.***-**')
-                            }
-                          }}
-                        />
                       </Scope>
                     </>
                   )
@@ -1198,7 +1146,7 @@ const Profile: React.FC = () => {
                     autoComplete='off'
                     // isMasked
                     mask={'9999-9'}
-                    maskChar='0'
+                    maskChar={'0'}
                     alwaysShowMask
                     onChange={(e) => {
                       setChanged(true)

@@ -172,7 +172,7 @@ export function ProductForm() {
     })
 
     newFiles.forEach(nf => {
-      console.log(nf.file?.size)
+      // console.log(nf.file?.size)
       if (nf.file) {
         new Compressor(nf.file, {
           width: 1000,
