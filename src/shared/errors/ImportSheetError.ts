@@ -15,8 +15,8 @@ export const ErrorMessages: SheetErrors = {
     message: 'É necessário informar o nome do produto de Id Agrupador %s, na linha %d',
   },
   description: {
-    title: 'Descrição de um produto não informada!',
-    message: 'É necessário informar a descrição do produto de Id Agrupador %s, na linha %d',
+    title: 'Descrição de um produto não informada ou acima do limite!',
+    message: 'É  a descrição do produto de Id Agrupador %s deve ser informada e conter no máximo 1800 caractéres, na linha %d',
   },
   brand: {
     title: 'Marca de um produto não informada!',
