@@ -60,8 +60,6 @@ function Import() {
   }, [process.browser]);
 
   const handleFileUpload = useCallback((uploads: File[]) => {
-    console.log(uploads)
-
     setFiles(uploads);
   }, []);
 
@@ -101,8 +99,6 @@ function Import() {
           const sheet: any[] = result.Planilha1
 
           sheet.forEach(async (line, i) => {
-            console.log(`Linha ${i}`)
-            console.log(line);
             // Ignorar o cabeçalho
             if (i > 1) {
               count++;
@@ -121,8 +117,6 @@ function Import() {
 
               for (let attrI = 0; attrI <= 24 && !stop; attrI++) {
                 const attribute = importLines[attrI]
-
-                console.log(`${attrI} Attribute: ${attribute} - Stop? ${stop}`)
 
                 const validate = productValidation[attribute].validate
 
@@ -146,7 +140,6 @@ function Import() {
                   case 22:
                   case 23:
                   case 24:
-                    console.log(`Image - ${attrI}: ${line[attrI]}`)
                     if (line[attrI])
                       productValidation[attribute].value.push(line[attrI])
                     break
@@ -191,11 +184,6 @@ function Import() {
             }
           })
 
-          console.log("-------------------------------------------------------------------")
-          console.log("Produtos importados: ")
-          console.log(importedProducts)
-          console.log("-------------------------------------------------------------------")
-
           if (count === 0) {
             handleModalMessage(true, {
               type: 'error',
@@ -207,7 +195,6 @@ function Import() {
             return
           }
 
-          console.log('Setting Imports!')
           // setImports(importedProducts)
           importProducts(importedProducts)
         }
@@ -219,30 +206,18 @@ function Import() {
 
   }, [files, isUploading, successfull, error]);
 
-  // useEffect(() => {
-  //   if (imports.length > 0) {
-  //     console.log('Calling imports:')
-  //     console.log(imports)
-  //     importProducts()
-  //   }
-  // }, [imports])
-
   const importProducts = useCallback(async (imports: ProductImport[]) => {
     let products: Product[] = []
 
     try {
       if (imports.length === 0) {
-        console.log('Imports not populated!')
         setLoading(false)
         return
       }
 
 
       products = importToProduct(imports)
-      console.log('Import ending? %s', products.length)
 
-      console.log('[Ini] Importing')
-      console.log(`${products.length} || ${imports.length}`)
       setLoading(true)
 
       products.map(async (product) => {
@@ -304,8 +279,6 @@ function Import() {
         const subCategories = await api.get(`/category/${category.code}/subcategories`).then(response => {
           return response.data as SubCategory[]
         }).catch(err => {
-          console.log('Sub-categorias não carregadas na importação')
-
           return []
         })
 

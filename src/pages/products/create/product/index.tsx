@@ -29,6 +29,7 @@ import ImageController from 'src/components/ImageController';
 import RuledHintbox, { Rule } from 'src/components/RuledHintbox';
 import { matchingWords } from 'src/utils/util';
 import HintedInput from 'src/components/HintedInput';
+import Compressor from 'compressorjs';
 
 type VariationDTO = {
   size?: number | string,
@@ -160,24 +161,31 @@ export function ProductForm() {
         return false;
       }
 
-      if (f.size / 1024 / 1024 > 2) {
-        handleModalMessage(true, {
-          type: 'error',
-          title: 'Arquivo muito pesado!',
-          message: [`O arquivo ${f.name} excede o tamanho máximo de 2mb`]
-        })
-
-        return false;
-      }
-
       return true;
     })
 
-    const newFiles = acceptedFiles.map(f => {
+    let newFiles = acceptedFiles.map(f => {
       return {
         file: f,
         url: URL.createObjectURL(f)
       } as ProductImage
+    })
+
+    newFiles.forEach(nf => {
+      // console.log(nf.file?.size)
+      if (nf.file) {
+        new Compressor(nf.file, {
+          width: 1000,
+          height: 1000,
+          success(result) {
+            nf.file = result as File
+            nf.url = URL.createObjectURL(result)
+          },
+          error(err) {
+            console.log(err.message);
+          },
+        })
+      }
     })
 
     dropZoneRef.current.acceptedFiles = [...files, ...newFiles].map(f => f.url);

@@ -161,7 +161,7 @@ const AuthProvider: React.FC = ({ children }) => {
 
     api.defaults.headers.authorization = token;
 
-    console.log(`Api URL: ${process.env.NEXT_PUBLIC_API_URL}`)
+    // console.log(`Api URL: ${process.env.NEXT_PUBLIC_API_URL}`)
 
     await api.get('/account/detail').then(response => {
       const isActive = user.isActive
