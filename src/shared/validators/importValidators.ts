@@ -5,6 +5,11 @@ export function valueDefined(v: string): boolean {
 }
 
 export function descriptionValidate(v: any) {
+
+  if (!(!!v && v.length <= 1800)) {
+    console.log(`Description Length: ${v.length}`)
+  }
+
   return !!v && v.length <= 1800
 }
 

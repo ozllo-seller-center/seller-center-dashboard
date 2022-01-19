@@ -79,13 +79,13 @@ function InOrderStatus(order: Order, filter: OrderStatus): boolean {
 
   switch (filter) {
     case OrderStatus.Aprovado:
-      return order.status.status === 'Approved' || order.status.status === 'Delivered' || order.status.status === 'Completed'
+      return order.status.status === 'Delivered' || order.status.status === 'Completed'
     case OrderStatus.Cancelado:
       return order.status.status === 'Canceled'
     case OrderStatus.Devolvido:
       return false // return order.status.status === '' FIXME: O objeto orders não apresenta um tipo de devolução no back-end
     case OrderStatus.Processando:
-      return order.status.status === 'Pending' || order.status.status === 'Invoiced' || order.status.status === 'Shipped'
+      return order.status.status === 'Approved' || order.status.status === 'Pending' || order.status.status === 'Invoiced' || order.status.status === 'Shipped'
   }
 
   return true
@@ -191,10 +191,10 @@ export function Sells() {
         switch (order.status.status) {
           case 'Completed':
           case 'Delivered':
-          case 'Approved':
             accumulator.totalApproved += order.payment.totalAmountPlusShipping
             accumulator.total += order.payment.totalAmountPlusShipping
             break
+          case 'Approved':
           case 'Pending':
           case 'Invoiced':
           case 'Shipped':
@@ -254,13 +254,13 @@ export function Sells() {
         case SellStatus.Processando:
           return inInterval(order) && (order.status.status === 'Pending') && (search === '' || OrderContainsProduct(order, search))
         case SellStatus.Faturando:
-          return inInterval(order) && (order.status.status === 'Invoiced') && (search === '' || OrderContainsProduct(order, search))
+          return inInterval(order) && (order.status.status === 'Invoiced' || order.status.status === 'Approved') && (search === '' || OrderContainsProduct(order, search))
         case SellStatus.Despachando:
           return inInterval(order) && (order.status.status === 'Shipped') && (search === '' || OrderContainsProduct(order, search))
         case SellStatus.Cancelado:
           return inInterval(order) && (order.status.status === 'Canceled') && (search === '' || OrderContainsProduct(order, search))
         case SellStatus.Entregue:
-          return inInterval(order) && (order.status.status === 'Delivered' || order.status.status === 'Completed' || order.status.status === 'Approved')
+          return inInterval(order) && (order.status.status === 'Delivered' || order.status.status === 'Completed')
             && (search === '' || OrderContainsProduct(order, search))
         case SellStatus.Retornado:
           // FIXME: determinar status de devolução
@@ -306,6 +306,7 @@ export function Sells() {
     switch (orderStatus) {
       case 'Pending':
         return SellStatus.Processando
+      case 'Approved':
       case 'Invoiced':
         return SellStatus.Faturando
       case 'Shipped':
@@ -314,7 +315,6 @@ export function Sells() {
         return SellStatus.Cancelado
       case 'Delivered':
       case 'Completed':
-      case 'Approved':
         return SellStatus.Entregue
 
       // FIXME: determinar status de devolução

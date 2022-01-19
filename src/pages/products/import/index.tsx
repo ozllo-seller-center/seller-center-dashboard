@@ -66,7 +66,8 @@ function Import() {
   const handleImport = useCallback(async () => {
     let importedProducts: ProductImport[] = []
 
-    setLoading(true);
+    setLoading(true)
+    setError(false)
 
     files.map(async (file) => {
       let reader = new FileReader()
@@ -98,9 +99,11 @@ function Import() {
         if (!!result.Planilha1) {
           const sheet: any[] = result.Planilha1
 
+          console.log(sheet)
+
           sheet.forEach(async (line, i) => {
             // Ignorar o cabeçalho
-            if (i > 1) {
+            if (i > 1 && line.length > 0) {
               count++;
 
               let productValidation: ProductImport = InitProductImport()
@@ -112,7 +115,9 @@ function Import() {
                   message: [`Não foi encontrado um id arupador na linha ${i + 1}`]
                 })
 
-                stop = true;
+                stop = true
+
+                setError(true)
               }
 
               for (let attrI = 0; attrI <= 24 && !stop; attrI++) {
@@ -161,7 +166,9 @@ function Import() {
                     })
                   }
 
-                  break;
+                  setError(true)
+
+                  return;
                 }
               }
 
@@ -173,6 +180,10 @@ function Import() {
                   title: error.title,
                   message: [error.message.replace('%s', line[3]).replace('%d', (i + 1).toString())]
                 })
+
+                console.log(error.message.replace('%s', line[3]).replace('%d', (i + 1).toString()))
+
+                setError(true)
 
                 return;
               }
@@ -219,6 +230,11 @@ function Import() {
       products = importToProduct(imports)
 
       setLoading(true)
+
+      if (error) {
+        setLoading(false)
+        return
+      }
 
       products.map(async (product) => {
 
@@ -353,7 +369,7 @@ function Import() {
       console.log(err)
       setLoading(false)
     }
-  }, [user, token, categories])
+  }, [user, token, categories, error])
 
   const handleModalVisibility = useCallback(() => {
     handleModalMessage(false);
