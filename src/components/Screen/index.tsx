@@ -27,8 +27,8 @@ const Layout: React.FC = ({ children }) => {
   }, [process.browser]);
 
   const [open, setOpen] = useState(true);
-
-  const { user, isRegisterCompleted, signOut, token } = useAuth();
+  const [visible, setVisible] = useState(true);
+  const { user, isRegisterCompleted, signOut, token, isAdmin } = useAuth();
   const { isLoading } = useLoading();
   const { showModalMessage, modalMessage, handleModalMessage } = useModalMessage();
 
@@ -43,6 +43,16 @@ const Layout: React.FC = ({ children }) => {
   useEffect(() => {
     setOpen(!!width && width >= 1152)
   }, [width])
+
+  useEffect(() => {
+    async function isUserAdmin(){
+      const result = await isAdmin();
+      
+      setVisible(!result)
+    }
+
+    isUserAdmin()
+  }, [])
 
   useEffect(() => {
     setShowMessage(showModalMessage)
@@ -81,8 +91,8 @@ const Layout: React.FC = ({ children }) => {
 
   return (
     <>
-      <Menu open={open} setOpen={setOpen} />
-      <div className={open ? styles.openMenu : styles.closedMenu}>
+      <Menu open={open} setOpen={setOpen} visible={visible}/>
+      <div className={ !visible ? styles.closedMenu : open ? styles.openMenu : styles.closedMenu}>
         <Header open={open} setOpen={setOpen} />
         <main className={styles.container}>
           {children}

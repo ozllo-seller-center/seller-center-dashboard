@@ -28,7 +28,7 @@ const SignIn: React.FC = () => {
   const [error, setError] = useState('');
   const [isLoading, setLoading] = useState(false);
 
-  const { user, signIn, updateUser } = useAuth();
+  const { user, signIn, isAdmin, updateUser } = useAuth();
 
   const route = useRouter();
 
@@ -59,17 +59,10 @@ const SignIn: React.FC = () => {
           password: data.password,
         });
 
-        // await api.get('/account/detail').then(response => {
-        //   updateUser({ ...user, ...response.data, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' })
-        // }).catch(err => {
-        //   console.log(err)
-
-        //   setError('Ocorreu um erro ao fazer login, cheque as credenciais.');
-        // });
-
         setLoading(false);
+        const userIsAdmin = await isAdmin();
 
-        route.push('/dashboard');
+        userIsAdmin ? route.push('/admin') : route.push('/dashboard');
       } catch (err) {
         setLoading(false);
 
