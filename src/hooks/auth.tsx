@@ -113,10 +113,8 @@ const AuthProvider: React.FC = ({ children }) => {
       headers: {
         authorization: authToken
       }
-    }).catch(err => {
-      console.log(err)
-    })
-
+    });
+    
     const { token } = response.data;
 
     const decodedToken = jwt_decode(token) as Token;
