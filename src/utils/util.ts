@@ -137,6 +137,8 @@ export const isTokenValid = async (token: string | undefined): Promise<Boolean> 
   await api.get('/account/decode').then(response => {
     decoded = { ...response.data };
   }).catch(err => {
+    console.log(err)
+
     decoded = undefined
   })
 
@@ -219,4 +221,12 @@ export function groupBy(list: Array<any>, keyGetter: any) {
     }
   });
   return map;
+}
+
+const nowIsoDate = () => {
+  return new Date(Date.now()).toISOString()
+}
+
+export const isoDateHub2b = (date: string) => {
+  return date.substring(0, 19)
 }

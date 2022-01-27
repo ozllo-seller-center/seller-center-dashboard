@@ -40,7 +40,7 @@ const ForgotPassword: React.FC = () => {
 
   const formRef = useRef<FormHandles>(null);
 
-  const { user, updateUser } = useAuth();
+  const { user } = useAuth();
 
   const router = useRouter();
 

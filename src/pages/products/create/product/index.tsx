@@ -89,7 +89,7 @@ export function ProductForm() {
     setLoading(true)
 
     api.get('/account/detail').then(response => {
-      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
+      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id, userId: response.data.shopInfo.userId } })
     }).catch(err => {
       console.log(err)
     });

@@ -132,26 +132,26 @@ const Profile: React.FC = () => {
       setFlowStep(!!user && !!user.personalInfo ? 0 : -1)
     }
 
-    isTokenValid(token).then(valid => {
-      if (valid) {
-        api.get(`auth/token/${token}`).then(response => {
-          const { isValid } = response.data
+    // isTokenValid(token).then(valid => {
+    // if (valid) {
+    api.get(`auth/token/${token}`).then(response => {
+      const { isValid } = response.data
 
-          if (!isValid) {
-            signOut()
-            router.push('/')
-            return
-          }
-
-        }).catch((error) => {
-          signOut()
-          router.push('/')
-          return
-        })
-
+      if (!isValid) {
+        signOut()
+        router.push('/')
         return
       }
+
+    }).catch((error) => {
+      signOut()
+      router.push('/')
+      return
     })
+
+    // return
+    // }
+    // })
   }, [user, token])
 
   const userData = useMemo(() => {

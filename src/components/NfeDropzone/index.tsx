@@ -7,7 +7,7 @@ import { FiCheck, FiX } from 'react-icons/fi';
 
 interface Props {
   name: string;
-  onFileUploaded: Function;
+  onFileUploaded: (f: File) => Promise<boolean>;
 }
 
 interface InputRefProps extends HTMLInputElement {
@@ -16,20 +16,31 @@ interface InputRefProps extends HTMLInputElement {
 
 const NfeDropzone: React.FC<Props> = ({ name, onFileUploaded }) => {
   const [selectedFile, setselectedFile] = useState<string[]>([]);
-  // const [err, setErr] = useState(false);
+  const [err, setErr] = useState(false);
 
   const dropZoneRef = useRef<InputRefProps>(null);
 
   const { fieldName, registerField, defaultValue = [], error } = useField(name);
 
-  const onDrop = useCallback(acceptedFiles => {
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    setErr(false)
+
     try {
       if (dropZoneRef.current) {
-        onFileUploaded(acceptedFiles);
-        setselectedFile(acceptedFiles.map((f: File) => URL.createObjectURL(f)));
+        const valid = await onFileUploaded(acceptedFiles[0])
+
+        console.log(valid)
+
+        if (valid) {
+          setselectedFile([URL.createObjectURL(acceptedFiles[0])]);
+          return
+        }
+
+        setErr(true)
       }
     } catch (err) {
-
+      console.log(err)
+      setErr(true)
     }
   }, [selectedFile, onFileUploaded])
 
@@ -50,7 +61,9 @@ const NfeDropzone: React.FC<Props> = ({ name, onFileUploaded }) => {
       },
       setValue: (ref: InputRefProps, value) => {
         ref.acceptedFiles = value;
-        setselectedFile(value.map((f: File) => URL.createObjectURL(f)));
+
+        if (value)
+          setselectedFile([URL.createObjectURL(value[0])]);
       },
     });
   }, [fieldName, registerField]);
@@ -70,14 +83,14 @@ const NfeDropzone: React.FC<Props> = ({ name, onFileUploaded }) => {
         {...getRootProps()}
         onClick={() => dropZoneRef.current?.click()}
       >
-        <input {...getInputProps()} ref={dropZoneRef} />
+        <input {...getInputProps()} accept='text/xml' ref={dropZoneRef} />
         {
-          !!error ?
+          !!error || err ?
             <>
               <p>
-                Erro com o(s) arquivo(s) selecionado(s)
+                Erro com o arquivon selecionado
                 <br />
-                Tente novamente
+                Certifique-se que o arquivo é um XML válido
               </p>
             </>
             :
@@ -86,7 +99,7 @@ const NfeDropzone: React.FC<Props> = ({ name, onFileUploaded }) => {
               <>
                 <FiCheck />
                 <p>
-                  {selectedFile.length > 1 ? 'Arquivos carregados' : 'Arquivo carregado'}
+                  NFe carregada
                 </p>
               </>
               :
@@ -96,9 +109,9 @@ const NfeDropzone: React.FC<Props> = ({ name, onFileUploaded }) => {
                 </p>
                 :
                 <p>
-                  Clique ou arraste o(s)
+                  Clique ou arraste a
                   <br />
-                  arquivos aqui
+                  NFe aqui
                 </p>
         }
       </div>

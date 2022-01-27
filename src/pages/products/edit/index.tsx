@@ -1,72 +1,72 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useRouter } from 'next/router'
 
-import { FormHandles, Scope } from '@unform/core';
-import { Form } from '@unform/web';
-import * as Yup from 'yup';
+import { FormHandles, Scope } from '@unform/core'
+import { Form } from '@unform/web'
+import * as Yup from 'yup'
 
-import Button from '../../../components/PrimaryButton';
-import Input from '../../../components/Input';
-import RadioButtonGroup from '../../../components/RadioButtonGroup';
-import VariationsController from '../../../components/VariationsController';
-import getValidationErrors from '../../../utils/getValidationErrors';
+import Button from '../../../components/PrimaryButton'
+import Input from '../../../components/Input'
+import RadioButtonGroup from '../../../components/RadioButtonGroup'
+import VariationsController from '../../../components/VariationsController'
+import getValidationErrors from '../../../utils/getValidationErrors'
 
-import { FiCheck, FiChevronLeft, FiInfo, FiX } from 'react-icons/fi';
+import { FiCheck, FiChevronLeft, FiInfo, FiX } from 'react-icons/fi'
 
 import styles from './styles.module.scss'
 
-import api from 'src/services/api';
-import { useAuth } from 'src/hooks/auth';
-import { Product, ProductImage } from 'src/shared/types/product';
-import TextArea from 'src/components/Textarea';
-import { useLoading } from 'src/hooks/loading';
-import { useModalMessage } from 'src/hooks/message';
-import { Loader } from 'src/components/Loader';
-import MessageModal from 'src/components/MessageModal';
-import Variation from 'src/components/VariationsController/Variation';
-import { Attribute } from 'src/shared/types/category';
-import ImageController from 'src/components/ImageController';
-import RuledHintbox, { Rule } from 'src/components/RuledHintbox';
-import { matchingWords } from 'src/utils/util';
-import HintedInput from 'src/components/HintedInput';
+import api from 'src/services/api'
+import { useAuth } from 'src/hooks/auth'
+import { Product, ProductImage } from 'src/shared/types/product'
+import TextArea from 'src/components/Textarea'
+import { useLoading } from 'src/hooks/loading'
+import { useModalMessage } from 'src/hooks/message'
+import { Loader } from 'src/components/Loader'
+import MessageModal from 'src/components/MessageModal'
+import Variation from 'src/components/VariationsController/Variation'
+import { Attribute } from 'src/shared/types/category'
+import ImageController from 'src/components/ImageController'
+import RuledHintbox, { Rule } from 'src/components/RuledHintbox'
+import { matchingWords } from 'src/utils/util'
+import HintedInput from 'src/components/HintedInput'
 
-import Compressor from 'compressorjs';
+import Compressor from 'compressorjs'
 
 type VariationDTO = {
-  _id?: string;
+  _id?: string
   size?: number | string,
   stock?: number,
   color?: string,
 }
 
 export function EditProductForm() {
-  const [files, setFiles] = useState<ProductImage[]>([]);
-  const [filesUrl, setFilesUrl] = useState<string[]>([]);
+  const [files, setFiles] = useState<ProductImage[]>([])
+  const [filesUrl, setFilesUrl] = useState<string[]>([])
 
-  const [filledFields, setFilledFields] = useState(0);
-  const [totalFields, setTotalFields] = useState(14);
+  const [filledFields, setFilledFields] = useState(0)
+  const [totalFields, setTotalFields] = useState(14)
 
-  const [oldStock, setOldStock] = useState<number[]>([]);
-  const [priceChanged, setPriceChange] = useState(false);
-  const [isHintDisabled, setHintDisabled] = useState(false);
-  const [brandInName, setBrandInName] = useState(false);
-  const [colorInName, setColorInName] = useState(false);
+  const [oldStock, setOldStock] = useState<number[]>([])
+  const [priceChanged, setPriceChange] = useState(false)
+  const [isHintDisabled, setHintDisabled] = useState(false)
+  const [brandInName, setBrandInName] = useState(false)
+  const [colorInName, setColorInName] = useState(false)
 
-  const [variations, setVariations] = useState<VariationDTO[]>([{}]);
-  const [nationality, setNationality] = useState('');
-  const [category, setCategory] = useState('');
-  const [subCategory, setSubCategory] = useState('');
-  const [genderRadio, setGenderRadio] = useState('M');
+  const [variations, setVariations] = useState<VariationDTO[]>([{}])
+  const [nationality, setNationality] = useState('')
+  const [category, setCategory] = useState('')
+  const [subCategory, setSubCategory] = useState('')
+  const [genderRadio, setGenderRadio] = useState('M')
 
-  const formRef = useRef<FormHandles>(null);
+  const formRef = useRef<FormHandles>(null)
 
-  const router = useRouter();
+  const router = useRouter()
 
-  const { user, token, updateUser } = useAuth();
-  const { isLoading, setLoading } = useLoading();
-  const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
+  const { user, token, updateUser, signOut } = useAuth()
+  const { isLoading, setLoading } = useLoading()
+  const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage()
 
-  const [attributes, setAttributes] = useState<Attribute[]>([]);
+  const [attributes, setAttributes] = useState<Attribute[]>([])
 
   const hintRules = useMemo(() => {
     if (isHintDisabled)
@@ -86,19 +86,35 @@ export function EditProductForm() {
 
   useEffect(() => {
     // setLoading(true)
-    api.get('/account/detail').then(response => {
-      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
-    }).catch(err => {
-      console.log(err)
-    });
+
+    api.get(`auth/token/${token}`).then(response => {
+      const { isValid } = response.data
+
+      if (!isValid) {
+        signOut()
+        router.push('/')
+        return
+      }
+
+      api.get('/account/detail').then(response => {
+        updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id, userId: response.data.shopInfo.userId } })
+      }).catch(err => {
+        console.log(err)
+      })
+
+    }).catch((error) => {
+      signOut()
+      router.push('/')
+      return
+    })
   }, [])
 
 
   useEffect(() => {
-    setLoading(true);
+    setLoading(true)
 
     if (!!formRef.current && !!user) {
-      const { id } = router.query;
+      const { id } = router.query
 
       api.get(`/product/${id}`, {
         headers: {
@@ -106,7 +122,7 @@ export function EditProductForm() {
           shop_id: user.shopInfo._id,
         }
       }).then(response => {
-        const urls = response.data.images.filter((url: string) => (!!url && url !== null));
+        const urls = response.data.images.filter((url: string) => (!!url && url !== null))
         setFilesUrl(urls)
 
         let files: ProductImage[]
@@ -117,7 +133,7 @@ export function EditProductForm() {
           } as ProductImage
         })
 
-        setFiles(files);
+        setFiles(files)
 
         setGenderRadio(response.data.gender)
 
@@ -129,7 +145,7 @@ export function EditProductForm() {
         setSubCategory(response.data.subcategory)
 
         formRef.current?.setData(response.data)
-        // setFormData(response.data);
+        // setFormData(response.data)
 
         setLoading(false)
       }).catch(err => {
@@ -152,7 +168,7 @@ export function EditProductForm() {
 
         response.data[0].attributes.map((attr: Attribute) => {
           if (attr.name === 'flavor') {
-            setHintDisabled(true);
+            setHintDisabled(true)
           }
         })
 
@@ -168,7 +184,7 @@ export function EditProductForm() {
   useEffect(() => {
     if (variations.length > 0) {
       setTotalFields(10 + variations.length * (attributes.length + 1))
-      return;
+      return
     }
 
     setTotalFields(10 + (attributes.length + 1))
@@ -179,14 +195,14 @@ export function EditProductForm() {
     if (!name || name.length === 0 || !formRef.current?.getFieldValue('brand') || isHintDisabled) {
       setBrandInName(false)
       setColorInName(false)
-      return;
+      return
     }
 
     let brandCheck = matchingWords(name, formRef.current?.getFieldValue('brand'))
 
-    setBrandInName(brandCheck);
+    setBrandInName(brandCheck)
 
-    let colorCheck = false;
+    let colorCheck = false
 
     attributes.map(async attr => {
       if (attr.name === 'color') {
@@ -199,22 +215,22 @@ export function EditProductForm() {
       }
     })
 
-    setColorInName(colorCheck);
+    setColorInName(colorCheck)
 
     if (brandCheck || colorCheck) {
       formRef.current?.setFieldError('name', brandCheck ? 'Não insira a marca no nome do produto' : 'Não informe a cor no nome do produto')
       return
     }
 
-    formRef.current?.setFieldError('name', '');
+    formRef.current?.setFieldError('name', '')
   }, [attributes, isHintDisabled])
 
   const handleModalVisibility = useCallback(() => {
-    handleModalMessage(false);
+    handleModalMessage(false)
   }, [])
 
   const handleOnFileUpload = useCallback((acceptedFiles: File[], dropZoneRef: React.RefObject<any>) => {
-    calcFilledFields(formRef.current?.getData() as Product);
+    calcFilledFields(formRef.current?.getData() as Product)
 
     acceptedFiles = acceptedFiles.filter((f, i) => {
       if (files.length + (i + 1) > 6) {
@@ -224,10 +240,10 @@ export function EditProductForm() {
           message: ['Um produto pode ter no máximo 6 fotos']
         })
 
-        return false;
+        return false
       }
 
-      return true;
+      return true
     })
 
     const newFiles = acceptedFiles.map(f => {
@@ -257,7 +273,7 @@ export function EditProductForm() {
             setLoading(false)
           },
           error(err) {
-            console.log(err.message);
+            console.log(err.message)
 
             setLoading(false)
           },
@@ -268,23 +284,23 @@ export function EditProductForm() {
 
     dropZoneRef.current.acceptedFiles = [...files, ...newFiles].map(f => f.url)
 
-    setFiles([...files, ...newFiles]);
-    setFilesUrl([...filesUrl, ...urls]);
-  }, [files, filesUrl]);
+    setFiles([...files, ...newFiles])
+    setFilesUrl([...filesUrl, ...urls])
+  }, [files, filesUrl])
 
   const handleDeleteFile = useCallback((url: string) => {
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(url)
 
-    const deletedIndex = files.findIndex(f => f.url === url);
+    const deletedIndex = files.findIndex(f => f.url === url)
 
-    const urlsUpdate = filesUrl.filter((f, i) => i !== deletedIndex);
-    const filesUpdate = files.filter((f, i) => i !== deletedIndex);
+    const urlsUpdate = filesUrl.filter((f, i) => i !== deletedIndex)
+    const filesUpdate = files.filter((f, i) => i !== deletedIndex)
 
-    formRef.current?.setFieldValue('images', filesUpdate);
-    setFilesUrl(urlsUpdate);
-    setFiles(filesUpdate);
+    formRef.current?.setFieldValue('images', filesUpdate)
+    setFilesUrl(urlsUpdate)
+    setFiles(filesUpdate)
 
-    calcFilledFields(formRef.current?.getData() as Product);
+    calcFilledFields(formRef.current?.getData() as Product)
   }, [filesUrl, files])
 
   const handleFileOrder = useCallback((draggedFile: number, droppedAt: number) => {
@@ -298,55 +314,55 @@ export function EditProductForm() {
 
     newFiles = newFiles.filter((item, i) => i != draggedFile)
 
-    newFiles.splice(droppedAt, 0, auxFile);
+    newFiles.splice(droppedAt, 0, auxFile)
 
     setFiles([...newFiles])
   }, [files])
 
   const calcFilledFields = useCallback((data: Product) => {
 
-    let filled = 0;
+    let filled = 0
 
     if (data.name)
-      filled++;
+      filled++
     if (data.brand)
-      filled++;
+      filled++
     if (data.description)
-      filled++;
+      filled++
     if (data.sku)
-      filled++;
+      filled++
     if (data.height)
-      filled++;
+      filled++
     if (data.width)
-      filled++;
+      filled++
     if (data.length)
-      filled++;
+      filled++
     if (data.weight)
-      filled++;
+      filled++
     if (data.price)
-      filled++;
+      filled++
     if (filesUrl.length > 0)
-      filled++;
+      filled++
 
     data.variations.forEach(variation => {
-      !!variation.size && filled++;
-      !!variation.stock && filled++;
-      !!variation.color && filled++;
-      !!variation.flavor && filled++;
+      !!variation.size && filled++
+      !!variation.stock && filled++
+      !!variation.color && filled++
+      !!variation.flavor && filled++
 
       attributes.map(attribute => {
         switch (attribute.name) {
           case 'gluten_free':
-            filled++;
-            break;
+            filled++
+            break
           case 'lactose_free':
-            filled++;
-            break;
+            filled++
+            break
         }
       })
     })
 
-    setFilledFields(filled);
+    setFilledFields(filled)
   }, [filesUrl, filledFields, totalFields, attributes])
 
   const yupVariationSchema = useCallback((): object => {
@@ -371,21 +387,21 @@ export function EditProductForm() {
   const handleSubmit = useCallback(async (data) => {
     if (filledFields < totalFields) {
       handleModalMessage(true, { type: 'error', title: 'Formulário incompleto', message: ['Preencha todas as informações obrigatórias antes de continuar.'] })
-      return;
+      return
     }
 
     if (colorInName || brandInName) {
       handleModalMessage(true, { type: 'error', title: 'Nome de produto inválido', message: [brandInName ? 'Remova a marca do nome do produto.' : 'Remova a cor do nome do produto.', 'Quando necessário o sistema adicionará essas informações ao nome do produto.'] })
-      return;
+      return
     }
 
     if (data.price_discounted === "") {
-      data.price_discounted = data.price;
+      data.price_discounted = data.price
     }
 
     try {
       setLoading(true)
-      formRef.current?.setErrors({});
+      formRef.current?.setErrors({})
 
       const schema = Yup.object().shape({
         images: Yup.array().min(1, 'Escolha pelo menos \numa imagem'),
@@ -403,17 +419,17 @@ export function EditProductForm() {
         price: Yup.number().required('Campo obrigatório'),
         price_discounted: Yup.number().nullable().min(0, 'Valor mínimo de R$ 0').max(data.price, `Valor máximo de R$ ${data.price}`),
         ...yupVariationSchema(),
-      });
+      })
 
-      await schema.validate(data, { abortEarly: false });
+      await schema.validate(data, { abortEarly: false })
 
       const {
         id
-      } = router.query;
+      } = router.query
 
-      var dataContainer = new FormData();
+      var dataContainer = new FormData()
 
-      files.forEach((f, i) => (!!f.file && !f.uploaded) && dataContainer.append("images", f.file, f.file.name));
+      files.forEach((f, i) => (!!f.file && !f.uploaded) && dataContainer.append("images", f.file, f.file.name))
 
       const oldImages = files.map(f => {
         if (!!f.url && f.uploaded)
@@ -427,10 +443,10 @@ export function EditProductForm() {
         }
       }).then(response => {
         return response.data.urls as string[]
-      });
+      })
 
       if (!!oldImages)
-        newImages = [...oldImages as string[], ...newImages];
+        newImages = [...oldImages as string[], ...newImages]
 
       await api.patch(`/product/${id}/images`, { images: newImages }, {
         headers: {
@@ -455,7 +471,7 @@ export function EditProductForm() {
         price,
         price_discounted,
         variations
-      } = data;
+      } = data
 
       if (priceChanged) {
         api.patch(`/product/${id}/price`, {
@@ -515,7 +531,7 @@ export function EditProductForm() {
 
           })
 
-          return;
+          return
         }
 
         delete variation._id
@@ -539,20 +555,20 @@ export function EditProductForm() {
         setLoading(false)
 
         if (window.innerWidth >= 768) {
-          router.push('/products');
-          return;
+          router.push('/products')
+          return
         }
 
-        router.push('/products-mobile');
+        router.push('/products-mobile')
       })
     } catch (err) {
       setLoading(false)
       console.log(err)
       if (err instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(err);
-        formRef.current?.setErrors(errors);
+        const errors = getValidationErrors(err)
+        formRef.current?.setErrors(errors)
 
-        return;
+        return
       }
     }
   }, [router, token, user, files, filesUrl, filledFields, totalFields, priceChanged, colorInName, brandInName])
@@ -560,15 +576,15 @@ export function EditProductForm() {
   async function handleDeleteVariation(deletedIndex: number): Promise<void> {
     setVariations(formRef.current?.getData().variations)
 
-    const tempVars = variations.filter((vars, i) => i !== deletedIndex);
-    const deletedVariation = variations[deletedIndex];
+    const tempVars = variations.filter((vars, i) => i !== deletedIndex)
+    const deletedVariation = variations[deletedIndex]
 
     setVariations(tempVars)
 
-    formRef.current?.setFieldValue('variations', tempVars);
+    formRef.current?.setFieldValue('variations', tempVars)
     formRef.current?.setData({ ...formRef.current?.getData(), variations: tempVars })
 
-    const { id } = router.query;
+    const { id } = router.query
     await api.delete(`/product/${id}/variation/${deletedVariation._id}`, {
       headers: {
         authorization: token,
@@ -579,7 +595,7 @@ export function EditProductForm() {
 
   const handleAddVariation = useCallback(() => {
     setVariations([...variations, {}])
-  }, [variations]);
+  }, [variations])
 
   return (
     <>
@@ -802,7 +818,7 @@ export function EditProductForm() {
         )
       }
     </>
-  );
+  )
 }
 
-export default EditProductForm;
+export default EditProductForm

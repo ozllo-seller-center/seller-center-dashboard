@@ -134,30 +134,30 @@ export function Sells() {
   useEffect(() => {
     setLoading(true)
 
-    // setOrders(ordersFromApi)
+    setOrders(ordersFromApi)
 
     api.get('/account/detail').then(response => {
-      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
+      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id, userId: response.data.shopInfo.userId } })
 
-      api.get('/order/all', {
-        headers: {
-          authorization: token,
-          shop_id: response.data.shopInfo._id,
-        }
-      }).then(response => {
-        // console.log('Orders:')
-        // console.log(JSON.stringify(response.data))
+      // api.get('/order/all', {
+      //   headers: {
+      //     authorization: token,
+      //     shop_id: response.data.shopInfo._id,
+      //   }
+      // }).then(response => {
+      //   // console.log('Orders:')
+      //   // console.log(JSON.stringify(response.data))
 
-        setOrders(response.data as OrderParent[])
-        // response.data.map((order: OrderParent) => {
+      //   setOrders(response.data as OrderParent[])
+      //   // response.data.map((order: OrderParent) => {
 
-        // })
+      //   // })
 
-        setLoading(false)
-      }).catch(err => {
-        console.log(err)
-        setLoading(false)
-      })
+      //   setLoading(false)
+      // }).catch(err => {
+      //   console.log(err)
+      //   setLoading(false)
+      // })
     }).catch(err => {
       console.log(err)
       setLoading(false)
@@ -247,7 +247,7 @@ export function Sells() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    setItems(orders.filter((orderParent) => {
+    const newItems = orders.filter((orderParent) => {
       const order = orderParent.order
 
       switch (status) {
@@ -269,7 +269,14 @@ export function Sells() {
         default:
           return inInterval(order) && InOrderStatus(order, orderStatus) && (search === '' || OrderContainsProduct(order, search))
       }
-    }))
+    })
+
+    if (status === SellStatus.Faturando) {
+      console.log('Faturando:')
+      console.log(newItems)
+    }
+
+    setItems(newItems)
   }, [orders, status, orderStatus, fromDateFilter, toDateFilter, search, filter])
 
   const handleSubmit = useCallback(
@@ -493,7 +500,7 @@ export function Sells() {
                         attachedText='NF-e Anexada'
                         unattachedText='Anexar NF-e'
                         placeholder='Informe a URL da NF-e'
-                        isAttached={!!item.order.orderNotes} //!item.nfe_url
+                        isAttached={!!item.order.orderNotes && item.order.orderNotes.length > 0} //!item.nfe_url
                         onClick={() => {
                           setNfeAttachOpen(true)
                           setNfeItem(item)
@@ -737,7 +744,7 @@ const ordersFromApi: OrderParent[] = JSON.parse(`[
       "shop_id": "60df95d99d34e9bd68fdcb8c"
   },
   {
-      "_id": "61ba3416cf833d0016816f41",
+      "_id": "61bfaf6cd604990016433fd7",
       "order": {
           "reference": {
               "idTenant": 3865,

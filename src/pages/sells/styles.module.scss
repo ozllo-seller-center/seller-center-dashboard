@@ -54,10 +54,6 @@
           width: 80%;
         }
 
-        button + button {
-          // margin-left: 1rem;
-        }
-
         .searchContainer {
           grid-area: search;
 
@@ -224,4 +220,42 @@
   margin: 0 0.75rem;
   background-color: var(--gray-300);
   opacity: 0.5;
+}
+
+.modalContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  .loader {
+    align-self: center;
+    border: 1rem solid var(--gray-100);
+    border-top: 1rem solid var(--grafite);
+    border-radius: 50%;
+    width: 6.5rem;
+    height: 6.5rem;
+    animation: spin 2s linear infinite;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--grafite);
+
+    margin-bottom: 0.5rem;
+  }
+
+  .messages {
+    font-size: 1.25rem;
+    color: var(--grafite);
+  }
+
+  > svg {
+    width: 5rem;
+    height: 5rem;
+
+    margin-bottom: 1rem;
+  }
 }
