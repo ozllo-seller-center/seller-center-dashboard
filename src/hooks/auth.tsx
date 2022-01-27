@@ -67,6 +67,12 @@ interface SignInCredentials {
   password: string;
 }
 
+interface AdminSignInCredentials {
+  adminEmail: string;
+  userId: string;
+  authToken: string;
+}
+
 interface AuthContextData {
   user: User;
   token: string;
@@ -75,6 +81,8 @@ interface AuthContextData {
   updateUser(user: User): void;
   verifyUser(apiToken: ApiToken): boolean;
   isRegisterCompleted: boolean;
+  isAdmin(): Promise<boolean>;
+  adminSignIn(credentials: AdminSignInCredentials): Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -97,6 +105,47 @@ const AuthProvider: React.FC = ({ children }) => {
 
     return {} as AuthState;
   });
+
+  const adminSignIn = useCallback(async ({ adminEmail, userId, authToken }) => {
+
+    const response = await api.post('admin/login',
+    { admin: adminEmail, userId: userId },
+    {
+      headers: {
+        authorization: authToken
+      }
+    });
+    
+    const { token } = response.data;
+
+    const decodedToken = jwt_decode(token) as Token;
+
+    let user: User = decodedToken.data as User;
+
+    api.defaults.headers.authorization = token;
+
+    console.log(`Api URL: ${process.env.NEXT_PUBLIC_API_URL}`)
+
+    await api.get('/account/detail').then(response => {
+      const isActive = user.isActive
+
+      // console.log('Auth data')
+      // console.log(response.data);
+
+      user = { ...user, ...response.data, isActive, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' };
+
+      if (!user.isActive) {
+        throw new InactiveUserError("Usuário inativado, login não pode ser realizado.");
+      }
+    }).catch(err => {
+      console.log(err)
+    });
+
+    localStorage.setItem('@SellerCenter:token', token);
+    localStorage.setItem('@SellerCenter:user', JSON.stringify(user));
+
+    setData({ token, user });
+  }, []);
 
   const signIn = useCallback(async ({ email, password }) => {
 
@@ -184,9 +233,15 @@ const AuthProvider: React.FC = ({ children }) => {
     return false
   }, [data]);
 
+
+  const isAdmin  = async () => await api.get('/account/decode').then(response => {
+    return response.data.role === 'admin';
+  });
+
+
   return (
     <AuthContext.Provider
-      value={{ user: data.user, token: data.token, signIn, signOut, updateUser, verifyUser, isRegisterCompleted }}
+      value={{ user: data.user, token: data.token, signIn, signOut, updateUser, verifyUser, isRegisterCompleted, isAdmin, adminSignIn }}
     >
       {children}
     </AuthContext.Provider>

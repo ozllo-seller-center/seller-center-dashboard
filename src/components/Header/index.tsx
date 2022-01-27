@@ -65,6 +65,12 @@ export const Header: React.FC<HeaderProps> = ({ open, setOpen }) => {
       return
     }
 
+    if (router.pathname.includes('admin')) {
+      setTitle('Administrador')
+      setDescription(<span></span>)
+      return
+    }
+
     setTitle('Produtos')
     setDescription(<span>Adicione produtos manualmente ou através de um planilha</span>)
   }, [router])

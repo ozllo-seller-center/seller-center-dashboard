@@ -10,9 +10,10 @@ import styles from './styles.module.scss';
 interface MenuProps {
   open: boolean;
   setOpen: Function;
+  visible: boolean;
 }
 
-const Menu: React.FC<MenuProps> = ({ open, setOpen }) => {
+const Menu: React.FC<MenuProps> = ({ open, setOpen, visible }) => {
   const { width } = useMemo(() => {
     if (typeof window !== 'undefined') {
       return { width: window.innerWidth }
@@ -30,7 +31,7 @@ const Menu: React.FC<MenuProps> = ({ open, setOpen }) => {
 
   return (
     <>
-      <div className={open ? styles.menuOpen : styles.menuClosed}>
+      <div className={!visible ? styles.invisibleMenu :  open ? styles.menuOpen : styles.menuClosed}>
         <div className={styles.menuHeader}>
           <img src='/assets/logo_white.png' alt="Ozllo" />
           <FiChevronLeft color="#FFFFFF" onClick={() => setOpen(!open)} />

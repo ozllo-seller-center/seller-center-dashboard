@@ -9,6 +9,12 @@
   }
 }
 
+.invisibleMenu {
+  height: 0;
+  width: 0;
+  visibility: hidden;
+}
+
 .menuOpen {
   z-index: 3;
 
