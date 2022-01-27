@@ -376,26 +376,50 @@ function Import() {
   }, [])
 
   useEffect(() => {
-    isTokenValid(token).then(valid => {
-      if (valid) {
-        api.get(`auth/token/${token}`).then(response => {
-          const { isValid } = response.data
+    setLoading(true)
+    // isTokenValid(token).then(valid => {
+    //   if (valid) {
+    api.get(`auth/token/${token}`).then(response => {
+      const { isValid } = response.data
 
-          if (!isValid) {
-            signOut()
-            router.push('/')
-            return
-          }
+      if (!isValid) {
+        setLoading(false)
 
-        }).catch((error) => {
-          signOut()
-          router.push('/')
-          return
-        })
-
+        signOut()
+        router.push('/')
         return
       }
+
+      api.get('/account/detail').then(response => {
+        updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id, userId: response.data.shopInfo.userId } })
+      }).catch(err => {
+        console.log(err)
+      });
+
+      api.get('/category/all').then(response => {
+        setCategories(response.data)
+
+        setLoading(false)
+      }).catch(err => {
+        console.log(err)
+
+        setLoading(false)
+
+        return []
+      })
+
+    }).catch((error) => {
+      signOut()
+      router.push('/')
+
+      setLoading(false)
+
+      return
     })
+
+    // return
+    //   }
+    // })
 
     setNationalities([{
       id: '1',
@@ -404,24 +428,6 @@ function Import() {
       id: '2',
       name: 'Internacional',
     }]);
-
-    api.get('/account/detail').then(response => {
-      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
-    }).catch(err => {
-      console.log(err)
-    });
-
-    api.get('/category/all').then(response => {
-      setCategories(response.data)
-
-      // setLoading(false)
-    }).catch(err => {
-      console.log(err)
-
-      // setLoading(false)
-
-      return []
-    })
   }, [])
 
   return (

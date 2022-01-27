@@ -45,6 +45,7 @@
     "react-tooltip": "^4.2.21",
     "sass": "^1.32.8",
     "xlsx": "^0.17.3",
+    "xml2js": "^0.4.23",
     "yup": "^0.32.9"
   },
   "devDependencies": {
@@ -62,6 +63,7 @@
     "@types/react-router-dom": "^5.1.7",
     "@types/react-select": "^4.0.15",
     "@types/styled-components": "^5.1.9",
+    "@types/xml2js": "^0.4.9",
     "@types/yup": "^0.29.11",
     "@typescript-eslint/eslint-plugin": "^4.20.0",
     "@typescript-eslint/parser": "^4.20.0",

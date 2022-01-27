@@ -94,3 +94,12 @@ export type OrderParent = {
   shop_id: string,
   order: Order,
 }
+
+export type OrderNFe = {
+  key: string,
+  issueDate: string,
+  number: string,
+  cfop: string,
+  series: string,
+  order: Order
+}
