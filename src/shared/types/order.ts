@@ -103,3 +103,11 @@ export type OrderNFe = {
   series: string,
   order: Order
 }
+
+export type OrderInvoice = {
+  code: string,
+  shippingProvider: string,
+  shippingService: string,
+  shippingDate: string,
+  link?: string,
+}

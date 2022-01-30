@@ -24,6 +24,8 @@ import { useModalMessage } from 'src/hooks/message'
 import MessageModal from 'src/components/MessageModal'
 import { Order, OrderParent, OrderStatusType } from 'src/shared/types/order'
 import OrderDetailsModal from 'src/components/OrderDetailsModal'
+import TrackingModalContent from 'src/components/TrackingModalContent'
+import router from 'next/router'
 
 enum SellStatus {
   // 'Pending' | 'Approved' | 'Invoiced' | 'hipped' | 'Delivered' | 'Canceled' | 'Completed'
@@ -125,8 +127,11 @@ export function Sells() {
   const { isLoading, setLoading } = useLoading()
   const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage()
 
-  const [isNfeAttachOpen, setNfeAttachOpen] = useState(false)
+  const [isNfeModalOpen, setNfeModalOpen] = useState(false)
   const [nfeItem, setNfeItem] = useState<OrderParent>()
+
+  const [isTrackingModalOpen, setTrackingModalOpen] = useState(false)
+  const [trackingItem, setTrackingItem] = useState<OrderParent>()
 
   const [modalOrder, setModalOrder] = useState<Order>()
   const [isOrderModalOpen, setOrderModalOpen] = useState(false)
@@ -149,6 +154,7 @@ export function Sells() {
         // console.log(JSON.stringify(response.data))
 
         setOrders(response.data as OrderParent[])
+
         // response.data.map((order: OrderParent) => {
 
         // })
@@ -159,8 +165,10 @@ export function Sells() {
         setLoading(false)
       })
     }).catch(err => {
-      console.log(err)
       setLoading(false)
+
+      console.log(err)
+      router.push('/')
     })
   }, [])
 
@@ -294,9 +302,6 @@ export function Sells() {
     },
     [search],
   )
-
-  const handleAttachment = useCallback(async (data: any) => {
-  }, [items])
 
   const datePickerRef = useRef<FormHandles>(null)
   const [datePickerVisibility, setDatePickerVisibility] = useState(false)
@@ -500,22 +505,28 @@ export function Sells() {
                         attachedText='NF-e Anexada'
                         unattachedText='Anexar NF-e'
                         placeholder='Informe a URL da NF-e'
-                        isAttached={!!item.order.orderNotes && item.order.orderNotes.length > 0} //!item.nfe_url
+                        // isAttached={!!item.order.orderNotes && item.order.orderNotes.length > 0} //!item.nfe_url
+                        isAttached={false}
                         onClick={() => {
-                          setNfeAttachOpen(true)
+                          setNfeModalOpen(true)
                           setNfeItem(item)
                         }}
                       />
                       :
                       status === SellStatus.Despachando ?
-                        <AttachController
+                        <AttachButton
                           name={item._id}
                           title='Código de envio'
                           attachedText='Código de Envio'
                           unattachedText='Informar código'
                           placeholder='Informe o código de envio'
-                          handleAttachment={handleAttachment}
-                          isAttached={!!item.order.orderNotes} //!item.nfe_url
+                          // handleAttachment={handleAttachment}
+                          // isAttached={!!item.order.orderNotes} //!item.nfe_url
+                          isAttached={false}
+                          onClick={() => {
+                            setTrackingModalOpen(true)
+                            setTrackingItem(item)
+                          }}
                         />
                         :
                         <span
@@ -538,13 +549,24 @@ export function Sells() {
         )}
       </div>
       {
-        (isNfeAttachOpen && nfeItem) && (
+        (isNfeModalOpen && nfeItem) && (
           <Modal
-            handleVisibility={() => { setNfeAttachOpen(false) }}
+            handleVisibility={() => { setNfeModalOpen(false) }}
             title='Anexar NF-e'
             icon={FiPaperclip}
           >
-            <NfeModalContent item={nfeItem} closeModal={() => setNfeAttachOpen(false)} />
+            <NfeModalContent item={nfeItem} closeModal={() => setNfeModalOpen(false)} />
+          </Modal>
+        )
+      }
+      {
+        (isTrackingModalOpen && trackingItem) && (
+          <Modal
+            handleVisibility={() => { setTrackingModalOpen(false) }}
+            title='Anexar Rastreio'
+            icon={FiPaperclip}
+          >
+            <TrackingModalContent item={trackingItem} closeModal={() => setTrackingModalOpen(false)} />
           </Modal>
         )
       }
