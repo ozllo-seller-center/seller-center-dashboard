@@ -16,6 +16,8 @@ import Input from '../Input'
 import { useLoading } from 'src/hooks/loading'
 import { Loader } from '../Loader'
 import { FiCheck } from 'react-icons/fi'
+import getValidationErrors from 'src/utils/getValidationErrors'
+import { useRouter } from 'next/router'
 
 interface NfeModalContentProps {
   item: OrderParent
@@ -30,10 +32,20 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({ item, closeModal }) =
 
   const [isSuccess, setSuccess] = useState(false)
 
-  const { user, token } = useAuth()
+  const { user, token, updateUser } = useAuth()
+  const router = useRouter()
 
   const { handleModalMessage } = useModalMessage()
   const { isLoading, setLoading } = useLoading()
+
+  useEffect(() => {
+    api.get('/account/detail').then(response => {
+      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id, userId: response.data.shopInfo.userId } })
+    }).catch(err => {
+      router.push('/')
+    })
+  }, [])
+
 
   const handleSubmit = useCallback(async (data) => {
     // var dataContainer = new FormData()
@@ -49,30 +61,44 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({ item, closeModal }) =
       number: Yup.string().required('Campo obrigatório')
     })
 
-    await schema.validate(data, { abortEarly: false })
+    try {
+      await schema.validate(data, { abortEarly: false })
 
-    const nfe = {
-      ...data,
-      order: item,
-      issuedDate: (!nfeData) ? isoDateHub2b(new Date().toISOString()) : nfeData.issueDate,
-    }
-
-    api.post(`/order/${item._id}/invoice`, nfe, {
-      headers: {
-        authorization: token,
-        shop_id: user.shopInfo._id,
+      const nfe = {
+        ...data,
+        order: item,
+        issuedDate: (!nfeData) ? isoDateHub2b(new Date().toISOString()) : nfeData.issueDate,
       }
-    }).then(reponse => {
+
+      api.post(`/order/${item._id}/invoice`, nfe, {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        }
+      }).then(reponse => {
+        setLoading(false)
+
+        setSuccess(true)
+
+      }).catch(err => {
+        setLoading(false)
+        setSuccess(false)
+
+        handleModalMessage(true, { title: 'Erro', message: ['Erro ao enviar NF-e'], type: 'error' })
+      })
+    } catch (err) {
       setLoading(false)
 
-      setSuccess(true)
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err);
 
-    }).catch(err => {
-      setLoading(false)
-      setSuccess(false)
+        formRef.current?.setErrors(errors);
 
-      handleModalMessage(true, { title: 'Erro', message: ['Erro ao enviar NF-e'], type: 'error' })
-    })
+        return;
+      }
+
+      console.log(err)
+    }
   }, [nfeData])
 
   return (
