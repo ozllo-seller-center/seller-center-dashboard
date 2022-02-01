@@ -68,11 +68,10 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({ item, closeModal }) =
 
       const nfe = {
         ...data,
-        order: item.order,
         issuedDate: (!nfeData) ? isoDateHub2b(new Date().toISOString()) : nfeData.issueDate,
       }
 
-      api.post(`/order/${item._id}/invoice`, nfe, {
+      api.post(`/order/${item.order.reference.id}/invoice`, nfe, {
         headers: {
           authorization: token,
           shop_id: user.shopInfo._id,
