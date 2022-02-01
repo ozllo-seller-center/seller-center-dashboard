@@ -99,19 +99,19 @@ const NfeDropzone: React.FC<Props> = ({ name, onFileUploaded }) => {
               <>
                 <FiCheck />
                 <p>
-                  NFe carregada
+                  XML da NFe carregado
                 </p>
               </>
               :
               isDragActive ?
                 <p>
-                  Solte o arquivo aqui ...
+                  Solte o arquivo XML aqui ...
                 </p>
                 :
                 <p>
-                  Clique ou arraste a
+                  Clique ou arraste o
                   <br />
-                  NFe aqui
+                  XML da NFe aqui
                 </p>
         }
       </div>
