@@ -64,9 +64,11 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({ item, closeModal }) =
     try {
       await schema.validate(data, { abortEarly: false })
 
+      delete data.nfe
+
       const nfe = {
         ...data,
-        order: item,
+        order: item.order,
         issuedDate: (!nfeData) ? isoDateHub2b(new Date().toISOString()) : nfeData.issueDate,
       }
 
