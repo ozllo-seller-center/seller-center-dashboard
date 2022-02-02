@@ -26,24 +26,18 @@ import { Order, OrderParent, OrderStatusType } from 'src/shared/types/order'
 import OrderDetailsModal from 'src/components/OrderDetailsModal'
 import TrackingModalContent from 'src/components/TrackingModalContent'
 import router from 'next/router'
+import { OrderStatus } from 'src/shared/enums/order'
+import { InOrderStatus, OrderContainsProduct } from 'src/shared/functions/sells'
 
 enum SellStatus {
-  // 'Pending' | 'Approved' | 'Invoiced' | 'hipped' | 'Delivered' | 'Canceled' | 'Completed'
+  // 'Pending' | 'Approved' | 'Invoiced' | 'Shipped' | 'Delivered' | 'Canceled' | 'Completed'
   Entregue = 'Entregue',
   Processando = 'Processando',
-  Retornado = 'Retornado',
   Cancelado = 'Cancelado',
-  Faturando = 'Faturado',
+  Faturando = 'Aprovado',
+  Despachado = 'Despachado',
   Despachando = 'Despachando',
   Todos = '?'
-}
-
-enum OrderStatus {
-  Aprovado = 0,
-  Processando = 1,
-  Cancelado = 2,
-  Devolvido = 3,
-  Todos = 4
 }
 
 enum Filter {
@@ -73,33 +67,7 @@ interface Totals {
   totalApproved: number
   totalProcessing: number
   totalCanceled: number
-  totalReturned: number
   total: number
-}
-
-function InOrderStatus(order: Order, filter: OrderStatus): boolean {
-
-  switch (filter) {
-    case OrderStatus.Aprovado:
-      return order.status.status === 'Delivered' || order.status.status === 'Completed'
-    case OrderStatus.Cancelado:
-      return order.status.status === 'Canceled'
-    case OrderStatus.Devolvido:
-      return false // return order.status.status === '' FIXME: O objeto orders não apresenta um tipo de devolução no back-end
-    case OrderStatus.Processando:
-      return order.status.status === 'Approved' || order.status.status === 'Pending' || order.status.status === 'Invoiced' || order.status.status === 'Shipped'
-  }
-
-  return true
-}
-
-function OrderContainsProduct(order: Order, search: string): boolean {
-  const contains = order.products.reduce((accumulator: number, product: OrderProduct) => {
-    accumulator += product.name.toLowerCase().includes(search.toLowerCase()) ? 1 : 0
-    return accumulator
-  }, 0)
-
-  return !!contains
 }
 
 export function Sells() {
@@ -120,7 +88,6 @@ export function Sells() {
   const [totalApproved, setTotalApproved] = useState('Carregando...')
   const [totalProcessing, setTotalProcessing] = useState('Carregando...')
   const [totalCanceled, setTotalCanceled] = useState('Carregando...')
-  const [totalReturned, setTotalReturned] = useState('Carregando...')
   const [total, setTotal] = useState('Carregando...')
 
   const { user, token, updateUser } = useAuth()
@@ -199,13 +166,13 @@ export function Sells() {
         switch (order.status.status) {
           case 'Completed':
           case 'Delivered':
+          case 'Invoiced':
+          case 'Shipped':
             accumulator.totalApproved += order.payment.totalAmountPlusShipping
             accumulator.total += order.payment.totalAmountPlusShipping
             break
           case 'Approved':
           case 'Pending':
-          case 'Invoiced':
-          case 'Shipped':
             accumulator.totalProcessing += order.payment.totalAmountPlusShipping
             accumulator.total += order.payment.totalAmountPlusShipping
             break
@@ -213,17 +180,11 @@ export function Sells() {
             accumulator.totalCanceled += order.payment.totalAmountPlusShipping
             accumulator.total -= order.payment.totalAmountPlusShipping
             break
-
-          // FIXME: determinar status de devolução
-          // case SellStatus.Retornado:
-          //   accumulator.totalReturned += order.payment.totalAmountPlusShipping
-          //   accumulator.total -= order.payment.totalAmountPlusShipping
-          //   break
         }
       }
 
       return accumulator
-    }, { totalApproved: 0, totalCanceled: 0, totalProcessing: 0, totalReturned: 0, total: 0 })
+    }, { totalApproved: 0, totalCanceled: 0, totalProcessing: 0, total: 0 })
 
     setTotalApproved(new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -239,11 +200,6 @@ export function Sells() {
       style: 'currency',
       currency: 'BRL',
     }).format(totals.totalCanceled))
-
-    setTotalReturned(new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(totals.totalReturned))
 
     setTotal(new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -262,27 +218,21 @@ export function Sells() {
         case SellStatus.Processando:
           return inInterval(order) && (order.status.status === 'Pending') && (search === '' || OrderContainsProduct(order, search))
         case SellStatus.Faturando:
-          return inInterval(order) && (order.status.status === 'Invoiced' || order.status.status === 'Approved') && (search === '' || OrderContainsProduct(order, search))
+          return inInterval(order) && (order.status.status === 'Approved') && (search === '' || OrderContainsProduct(order, search))
         case SellStatus.Despachando:
+          return inInterval(order) && (order.status.status === 'Invoiced') && (search === '' || OrderContainsProduct(order, search))
+        case SellStatus.Despachado:
           return inInterval(order) && (order.status.status === 'Shipped') && (search === '' || OrderContainsProduct(order, search))
         case SellStatus.Cancelado:
           return inInterval(order) && (order.status.status === 'Canceled') && (search === '' || OrderContainsProduct(order, search))
         case SellStatus.Entregue:
           return inInterval(order) && (order.status.status === 'Delivered' || order.status.status === 'Completed')
             && (search === '' || OrderContainsProduct(order, search))
-        case SellStatus.Retornado:
-          // FIXME: determinar status de devolução
-          return false
 
         default:
           return inInterval(order) && InOrderStatus(order, orderStatus) && (search === '' || OrderContainsProduct(order, search))
       }
     })
-
-    if (status === SellStatus.Faturando) {
-      console.log('Faturando:')
-      console.log(newItems)
-    }
 
     setItems(newItems)
   }, [orders, status, orderStatus, fromDateFilter, toDateFilter, search, filter])
@@ -319,19 +269,16 @@ export function Sells() {
       case 'Pending':
         return SellStatus.Processando
       case 'Approved':
-      case 'Invoiced':
         return SellStatus.Faturando
-      case 'Shipped':
+      case 'Invoiced':
         return SellStatus.Despachando
+      case 'Shipped':
+        return SellStatus.Despachado
       case 'Canceled':
         return SellStatus.Cancelado
       case 'Delivered':
       case 'Completed':
         return SellStatus.Entregue
-
-      // FIXME: determinar status de devolução
-      // case :
-      //   return SellStatus.Retornado
     }
   }, [])
 
@@ -359,19 +306,19 @@ export function Sells() {
           Aguardando Despacho
         </BulletedButton>
         <BulletedButton
-          onClick={() => setStatus(SellStatus.Retornado)}
-          isActive={status === SellStatus.Retornado}>
-          Retornados
+          onClick={() => setStatus(SellStatus.Despachado)}
+          isActive={status === SellStatus.Despachado}>
+          Despachados
+        </BulletedButton>
+        <BulletedButton
+          onClick={() => setStatus(SellStatus.Entregue)}
+          isActive={status === SellStatus.Entregue}>
+          Entregues & Concluídos
         </BulletedButton>
         <BulletedButton
           onClick={() => setStatus(SellStatus.Cancelado)}
           isActive={status === SellStatus.Cancelado}>
           Cancelados
-        </BulletedButton>
-        <BulletedButton
-          onClick={() => setStatus(SellStatus.Entregue)}
-          isActive={status === SellStatus.Entregue}>
-          Entregues
         </BulletedButton>
       </div>
       <div className={styles.divider} />
@@ -433,9 +380,6 @@ export function Sells() {
             </StatusPanel>
             <StatusPanel title='Cancelados' onClick={() => setOrderStatus(OrderStatus.Cancelado)} isActive={orderStatus === OrderStatus.Cancelado}>
               <span className={styles.redText}> {totalCanceled} </span>
-            </StatusPanel>
-            <StatusPanel title='Devolvidos' onClick={() => setOrderStatus(OrderStatus.Devolvido)} isActive={orderStatus === OrderStatus.Devolvido}>
-              <span className={styles.orangeText}> {totalReturned} </span>
             </StatusPanel>
           </div>
         )}
@@ -506,10 +450,14 @@ export function Sells() {
                         unattachedText='Anexar NF-e'
                         placeholder='Informe a URL da NF-e'
                         // isAttached={!!item.order.orderNotes && item.order.orderNotes.length > 0} //!item.nfe_url
-                        isAttached={false}
+                        isAttached={item.order.status.status === 'Invoiced'}
                         onClick={() => {
-                          setNfeModalOpen(true)
-                          setNfeItem(item)
+                          if (item.order.status.status === 'Approved') {
+                            setNfeModalOpen(true)
+                            setNfeItem(item)
+
+                            return
+                          }
                         }}
                       />
                       :
@@ -522,10 +470,12 @@ export function Sells() {
                           placeholder='Informe o código de envio'
                           // handleAttachment={handleAttachment}
                           // isAttached={!!item.order.orderNotes} //!item.nfe_url
-                          isAttached={false}
+                          isAttached={item.order.status.status === 'Shipped'}
                           onClick={() => {
-                            setTrackingModalOpen(true)
-                            setTrackingItem(item)
+                            if (item.order.status.status === 'Invoiced') {
+                              setTrackingModalOpen(true)
+                              setTrackingItem(item)
+                            }
                           }}
                         />
                         :
