@@ -67,7 +67,7 @@ const TrackingModalContent: React.FC<TrackingModalContentProps> = ({ item, close
         shippingDate: isoDateHub2b(data.shippingDate.toISOString()),
       }
 
-      api.post(`/order/${item._id}/tracking`, invoice, {
+      api.post(`/order/${item.order.reference.id}/tracking`, invoice, {
         headers: {
           authorization: token,
           shop_id: user.shopInfo._id,
