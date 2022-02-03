@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FiCalendar, FiCheck, FiPaperclip, FiSearch, FiX } from 'react-icons/fi'
 
 import { FormHandles } from '@unform/core'
-import { format, isSameWeek, isSameMonth, isToday } from 'date-fns'
+import { format, isSameWeek, isToday, subDays } from 'date-fns'
 import { Form } from '@unform/web'
 
 import Button from '../../components/FilterButton'
@@ -142,14 +142,19 @@ export function Sells() {
 
   const inInterval = useCallback((order: Order) => {
 
-    const date: Date = new Date(order.payment.purchaseDate)
+    console.log(order.payment.purchaseDate)
+    const date: Date = new Date(order.payment.purchaseDate)//parse(order.payment.purchaseDate, 'yyyy-MM-ddThh:mm:ss', new Date())
+
+    console.log(date)
 
     switch (filter) {
       case Filter.Semana:
         return isSameWeek(date, new Date())
 
       case Filter.Mes:
-        return isSameMonth(date, new Date())
+        const today = new Date()
+
+        return date >= subDays(today, 30) && date <= today
 
       case Filter.Custom:
         return format(date, 'yyyy/MM/dd') <= format(toDateFilter, 'yyyy/MM/dd') && format(date, 'yyyy/MM/dd') >= format(fromDateFilter, 'yyyy/MM/dd')

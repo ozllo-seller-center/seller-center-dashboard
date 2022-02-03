@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { FiBox, FiCalendar, FiCheck, FiClipboard, FiMoreHorizontal, FiPaperclip, FiSearch, FiX, FiXCircle } from 'react-icons/fi'
-import { RiArrowGoBackFill } from 'react-icons/ri'
+import { FiCalendar, FiCheck, FiClipboard, FiMoreHorizontal, FiPaperclip, FiSearch, FiX } from 'react-icons/fi'
 import { FormHandles } from '@unform/core';
-import { GetStaticProps } from 'next';
-import { format, isSameWeek, isSameMonth, isToday, parse } from 'date-fns';
+import { format, isSameWeek, isToday, subDays } from 'date-fns';
 import { Form } from '@unform/web';
 
 import Button from '../../components/PrimaryButton';
@@ -16,7 +14,6 @@ import styles from './styles.module.scss';
 import DatePickerPopup from '../../components/DatePickerPopup';
 import Collapsible from '../../components/Collapsible';
 import HeaderDropdown from 'src/components/HeaderDropdown';
-import AttachController from 'src/components/AttachController';
 import AttachButton from 'src/components/AttachButton';
 import { useAuth } from 'src/hooks/auth';
 import { useLoading } from 'src/hooks/loading';
@@ -114,7 +111,9 @@ export function Sells() {
         return isSameWeek(date, new Date());
 
       case Filter.Mes:
-        return isSameMonth(date, new Date());
+        const today = new Date()
+
+        return date >= subDays(today, 30) && date <= today
 
       case Filter.Custom:
         return format(date, 'yyyy/MM/dd') <= format(toDateFilter, 'yyyy/MM/dd') && format(date, 'yyyy/MM/dd') >= format(fromDateFilter, 'yyyy/MM/dd');

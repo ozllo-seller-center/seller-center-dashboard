@@ -178,7 +178,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
                 <strong>Responsável</strong>
                 <span>{order.shipping.responsible}</span>
                 <strong>Previsão de entrega</strong>
-                <span>{format(new Date(order.shipping.estimatedDeliveryDate), 'dd/MM/yyyy - hh:mm:ss')}</span>
+                <span>{order.shipping.estimatedDeliveryDate ? format(new Date(order.shipping.estimatedDeliveryDate), 'dd/MM/yyyy - hh:mm:ss') : 'Sem previsão'}</span>
               </div>
             </div>
           </div>
@@ -190,7 +190,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
               {
                 order.products.map(product => {
                   return (
-                    <div className={styles.product}>
+                    <div key={product.idProduct} className={styles.product}>
                       <strong className={styles.title}>Item</strong>
                       <span>{product.name}</span>
                       <div className={styles.details}>
