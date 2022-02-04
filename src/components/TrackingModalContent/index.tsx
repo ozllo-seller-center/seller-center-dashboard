@@ -21,9 +21,10 @@ import { useRouter } from 'next/router'
 interface TrackingModalContentProps {
   item: OrderParent
   closeModal: Function
+  onTrackSent?: Function
 }
 
-const TrackingModalContent: React.FC<TrackingModalContentProps> = ({ item, closeModal }) => {
+const TrackingModalContent: React.FC<TrackingModalContentProps> = ({ item, onTrackSent, closeModal }) => {
   const formRef = useRef<FormHandles>(null)
 
   const [isSuccess, setSuccess] = useState(false)
@@ -77,6 +78,8 @@ const TrackingModalContent: React.FC<TrackingModalContentProps> = ({ item, close
 
         setSuccess(true)
 
+        if (onTrackSent)
+          onTrackSent()
       }).catch(err => {
         setLoading(false)
 
