@@ -1,33 +1,34 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FiCalendar, FiCheck, FiClipboard, FiMoreHorizontal, FiPaperclip, FiSearch, FiX } from 'react-icons/fi'
-import { FormHandles } from '@unform/core';
-import { format, isSameWeek, isToday, subDays } from 'date-fns';
-import { Form } from '@unform/web';
+import { FormHandles } from '@unform/core'
+import { format, isSameWeek, isToday, subDays } from 'date-fns'
+import { Form } from '@unform/web'
 
-import Button from '../../components/PrimaryButton';
-import FilterButton from '../../components/FilterButton';
+import Button from '../../components/PrimaryButton'
+import FilterButton from '../../components/FilterButton'
 
-import FilterInput from '../../components/FilterInput';
-import StatusPanel from '../../components/OrderStatusPanel';
+import FilterInput from '../../components/FilterInput'
+import StatusPanel from '../../components/OrderStatusPanel'
 
-import styles from './styles.module.scss';
-import DatePickerPopup from '../../components/DatePickerPopup';
-import Collapsible from '../../components/Collapsible';
-import HeaderDropdown from 'src/components/HeaderDropdown';
-import AttachButton from 'src/components/AttachButton';
-import { useAuth } from 'src/hooks/auth';
-import { useLoading } from 'src/hooks/loading';
-import { useModalMessage } from 'src/hooks/message';
-import Modal from 'src/components/Modal';
-import NfeModalContent from 'src/components/NfeModalContent';
-import MessageModal from 'src/components/MessageModal';
-import { Order, OrderParent, OrderStatusType } from 'src/shared/types/order';
-import api from 'src/services/api';
-import { BiPackage } from 'react-icons/bi';
-import OrderDetailsModal from 'src/components/OrderDetailsModal';
-import TrackingModalContent from 'src/components/TrackingModalContent';
-import { InOrderStatus, OrderContainsProduct } from 'src/shared/functions/sells';
-import { OrderStatus } from 'src/shared/enums/order';
+import styles from './styles.module.scss'
+import DatePickerPopup from '../../components/DatePickerPopup'
+import Collapsible from '../../components/Collapsible'
+import HeaderDropdown from 'src/components/HeaderDropdown'
+import AttachButton from 'src/components/AttachButton'
+import { useAuth } from 'src/hooks/auth'
+import { useLoading } from 'src/hooks/loading'
+import { useModalMessage } from 'src/hooks/message'
+import Modal from 'src/components/Modal'
+import NfeModalContent from 'src/components/NfeModalContent'
+import MessageModal from 'src/components/MessageModal'
+import { Order, OrderParent, OrderStatusType } from 'src/shared/types/order'
+import api from 'src/services/api'
+import { BiPackage } from 'react-icons/bi'
+import OrderDetailsModal from 'src/components/OrderDetailsModal'
+import TrackingModalContent from 'src/components/TrackingModalContent'
+import { InOrderStatus, OrderContainsProduct } from 'src/shared/functions/sells'
+import { OrderStatus } from 'src/shared/enums/order'
+import { useRouter } from 'next/router'
 
 enum SellStatus {
   // 'Pending' | 'Approved' | 'Invoiced' | 'Shipped' | 'Delivered' | 'Canceled' | 'Completed'
@@ -102,13 +103,15 @@ export function Sells() {
   const [modalOrder, setModalOrder] = useState<Order>()
   const [isOrderModalOpen, setOrderModalOpen] = useState(false)
 
+  const router = useRouter()
+
   const inInterval = useCallback((order: Order) => {
 
-    const date: Date = new Date(order.payment.purchaseDate);
+    const date: Date = new Date(order.payment.purchaseDate)
 
     switch (filter) {
       case Filter.Semana:
-        return isSameWeek(date, new Date());
+        return isSameWeek(date, new Date())
 
       case Filter.Mes:
         const today = new Date()
@@ -116,20 +119,18 @@ export function Sells() {
         return date >= subDays(today, 30) && date <= today
 
       case Filter.Custom:
-        return format(date, 'yyyy/MM/dd') <= format(toDateFilter, 'yyyy/MM/dd') && format(date, 'yyyy/MM/dd') >= format(fromDateFilter, 'yyyy/MM/dd');
+        return format(date, 'yyyy/MM/dd') <= format(toDateFilter, 'yyyy/MM/dd') && format(date, 'yyyy/MM/dd') >= format(fromDateFilter, 'yyyy/MM/dd')
 
       default:
-        return isToday(date);
+        return isToday(date)
     }
   }, [status, fromDateFilter, toDateFilter, filter])
 
-  useEffect(() => {
+  const loadOrders = useCallback(() => {
     setLoading(true)
 
     api.get('/account/detail').then(response => {
       updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id, userId: response.data.shopInfo.userId } })
-
-      // setOrders(ordersFromApi)
 
       api.get('/order/all', {
         headers: {
@@ -141,6 +142,7 @@ export function Sells() {
         // console.log(JSON.stringify(response.data))
 
         setOrders(response.data as OrderParent[])
+
         // response.data.map((order: OrderParent) => {
 
         // })
@@ -151,10 +153,18 @@ export function Sells() {
         setLoading(false)
       })
     }).catch(err => {
-      console.log(err)
       setLoading(false)
-    });
+
+      console.log(err)
+      router.push('/')
+    })
+  }, [user])
+
+  useEffect(() => {
+    // setOrders(ordersFromApi)
+    loadOrders()
   }, [])
+
 
   useEffect(() => {
     const totals = orders.reduce((accumulator: Totals, orderParent: OrderParent) => {
@@ -204,8 +214,8 @@ export function Sells() {
     }).format(totals.total))
   }, [orders, orderStatus, fromDateFilter, toDateFilter, filter])
 
-  const formRef = useRef<FormHandles>(null);
-  const [error, setError] = useState('');
+  const formRef = useRef<FormHandles>(null)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     const newItems = orders.filter((orderParent) => {
@@ -237,21 +247,21 @@ export function Sells() {
   const handleSubmit = useCallback(
     async (data: SearchFormData) => {
       try {
-        formRef.current?.setErrors({});
+        formRef.current?.setErrors({})
 
         if (data.search !== search) {
-          setSeacrh(data.search);
+          setSeacrh(data.search)
         }
 
       } catch (err) {
-        setError('Ocorreu um erro ao fazer login, cheque as credenciais.');
+        setError('Ocorreu um erro ao fazer login, cheque as credenciais.')
       }
     },
     [search],
-  );
+  )
 
   const handleModalVisibility = useCallback(() => {
-    handleModalMessage(false);
+    handleModalMessage(false)
   }, [])
 
   const handleOrderModalVisibility = useCallback(() => {
@@ -261,10 +271,10 @@ export function Sells() {
 
   const handleAttachment = useCallback(async (data: any) => {
 
-  }, [items]);
+  }, [items])
 
-  const datePickerRef = useRef<FormHandles>(null);
-  const [datePickerVisibility, setDatePickerVisibility] = useState(false);
+  const datePickerRef = useRef<FormHandles>(null)
+  const [datePickerVisibility, setDatePickerVisibility] = useState(false)
 
   const getOrderStatus = useCallback((orderStatus: OrderStatusType) => {
     switch (orderStatus) {
@@ -316,8 +326,8 @@ export function Sells() {
                   icon={FiCalendar}
                   isActive={filter === Filter.Custom}
                   onClick={() => {
-                    setFilter(Filter.Custom);
-                    setDatePickerVisibility(!datePickerVisibility);
+                    setFilter(Filter.Custom)
+                    setDatePickerVisibility(!datePickerVisibility)
                   }}>
                   Escolher período
                 </FilterButton>
@@ -525,9 +535,7 @@ export function Sells() {
             title='Anexar NF-e'
             icon={FiPaperclip}
           >
-            <NfeModalContent item={nfeItem} closeModal={() => {
-              setNfeModalOpen(false)
-            }} />
+            <NfeModalContent item={nfeItem} closeModal={() => { setNfeModalOpen(false) }} onNfeSent={loadOrders} />
           </Modal>
         )
       }
@@ -538,7 +546,7 @@ export function Sells() {
             title='Anexar Rastreio'
             icon={FiPaperclip}
           >
-            <TrackingModalContent item={trackingItem} closeModal={() => setTrackingModalOpen(false)} />
+            <TrackingModalContent item={trackingItem} closeModal={() => setTrackingModalOpen(false)} onTrackSent={loadOrders} />
           </Modal>
         )
       }
@@ -1212,10 +1220,10 @@ const ordersFromApi: OrderParent[] = JSON.parse(`[
       },
       "shop_id": "60df95d99d34e9bd68fdcb8c"
   }
-]`);
+]`)
 
 // export const getStaticProps: GetStaticProps = async ({ }) => {
-//   const sells = ordersFromApi.sort((a, b) => a.date < b.date ? -1 : 1);
+//   const sells = ordersFromApi.sort((a, b) => a.date < b.date ? -1 : 1)
 
 //   return ({
 //     props: { sells },
@@ -1223,4 +1231,4 @@ const ordersFromApi: OrderParent[] = JSON.parse(`[
 //   })
 // }
 
-export default Sells;
+export default Sells

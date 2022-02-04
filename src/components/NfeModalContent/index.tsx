@@ -18,13 +18,15 @@ import { Loader } from '../Loader'
 import { FiCheck } from 'react-icons/fi'
 import getValidationErrors from 'src/utils/getValidationErrors'
 import { useRouter } from 'next/router'
+import { MdOutlineFitnessCenter } from 'react-icons/md'
 
 interface NfeModalContentProps {
   item: OrderParent
   closeModal: Function
+  onNfeSent?: Function
 }
 
-const NfeModalContent: React.FC<NfeModalContentProps> = ({ item, closeModal }) => {
+const NfeModalContent: React.FC<NfeModalContentProps> = ({ item, onNfeSent, closeModal }) => {
   const formRef = useRef<FormHandles>(null)
 
   const [nfeFile, setNfeFile] = useState<File>()
@@ -81,6 +83,8 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({ item, closeModal }) =
 
         setSuccess(true)
 
+        if (onNfeSent)
+          onNfeSent()
       }).catch(err => {
         setLoading(false)
         setSuccess(false)

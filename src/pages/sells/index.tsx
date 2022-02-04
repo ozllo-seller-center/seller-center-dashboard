@@ -103,10 +103,8 @@ export function Sells() {
   const [modalOrder, setModalOrder] = useState<Order>()
   const [isOrderModalOpen, setOrderModalOpen] = useState(false)
 
-  useEffect(() => {
+  const loadOrders = useCallback(() => {
     setLoading(true)
-
-    // setOrders(ordersFromApi)
 
     api.get('/account/detail').then(response => {
       updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id, userId: response.data.shopInfo.userId } })
@@ -137,6 +135,12 @@ export function Sells() {
       console.log(err)
       router.push('/')
     })
+  }, [user])
+
+  useEffect(() => {
+    // setOrders(ordersFromApi)
+    loadOrders()
+
   }, [])
 
 
@@ -510,7 +514,7 @@ export function Sells() {
             title='Anexar NF-e'
             icon={FiPaperclip}
           >
-            <NfeModalContent item={nfeItem} closeModal={() => setNfeModalOpen(false)} />
+            <NfeModalContent item={nfeItem} closeModal={() => setNfeModalOpen(false)} onNfeSent={loadOrders} />
           </Modal>
         )
       }
@@ -521,7 +525,7 @@ export function Sells() {
             title='Anexar Rastreio'
             icon={FiPaperclip}
           >
-            <TrackingModalContent item={trackingItem} closeModal={() => setTrackingModalOpen(false)} />
+            <TrackingModalContent item={trackingItem} closeModal={() => setTrackingModalOpen(false)} onTrackSent={loadOrders} />
           </Modal>
         )
       }
