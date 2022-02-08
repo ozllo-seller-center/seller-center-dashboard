@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { FiCalendar, FiCheck, FiPaperclip, FiSearch, FiX } from 'react-icons/fi'
+import { FiAlertTriangle, FiCalendar, FiCheck, FiPaperclip, FiSearch, FiX } from 'react-icons/fi'
 
 import { FormHandles } from '@unform/core'
-import { format, isSameWeek, isToday, subDays } from 'date-fns'
+import { addDays, differenceInBusinessDays, format, isSameWeek, isToday, subDays } from 'date-fns'
 import { Form } from '@unform/web'
 
 import Button from '../../components/FilterButton'
@@ -28,6 +28,7 @@ import TrackingModalContent from 'src/components/TrackingModalContent'
 import router from 'next/router'
 import { OrderStatus } from 'src/shared/enums/order'
 import { InOrderStatus, OrderContainsProduct } from 'src/shared/functions/sells'
+import Tooltip, { HoverTooltip } from 'src/components/Tooltip'
 
 enum SellStatus {
   // 'Pending' | 'Approved' | 'Invoiced' | 'Shipped' | 'Delivered' | 'Canceled' | 'Completed'
@@ -103,6 +104,10 @@ export function Sells() {
   const [modalOrder, setModalOrder] = useState<Order>()
   const [isOrderModalOpen, setOrderModalOpen] = useState(false)
 
+  const [openTooltip, setOpenTooltip] = useState(false)
+  const [toolTipYOffset, setToolTipYOffset] = useState(0)
+  const [toolTipXOffset, setToolTipXOffset] = useState(0)
+
   const loadOrders = useCallback(() => {
     setLoading(true)
 
@@ -117,6 +122,8 @@ export function Sells() {
       }).then(response => {
         // console.log('Orders:')
         // console.log(JSON.stringify(response.data))
+
+        console.log(response.data as OrderParent[])
 
         setOrders(response.data as OrderParent[])
 
@@ -216,51 +223,31 @@ export function Sells() {
     }).format(totals.total))
   }, [orders, orderStatus, fromDateFilter, toDateFilter, filter])
 
-  const formRef = useRef<FormHandles>(null)
-  const [error, setError] = useState('')
-
   useEffect(() => {
     const newItems = orders.filter((orderParent) => {
       const order = orderParent.order
 
       switch (status) {
         case SellStatus.Processando:
-          return inInterval(order) && (order.status.status === 'Pending') && (search === '' || OrderContainsProduct(order, search))
+          return inInterval(order) && (order.status.status === 'Pending')
         case SellStatus.Faturando:
-          return inInterval(order) && (order.status.status === 'Approved') && (search === '' || OrderContainsProduct(order, search))
+          return inInterval(order) && (order.status.status === 'Approved')
         case SellStatus.Despachando:
-          return inInterval(order) && (order.status.status === 'Invoiced') && (search === '' || OrderContainsProduct(order, search))
+          return inInterval(order) && (order.status.status === 'Invoiced')
         case SellStatus.Despachado:
-          return inInterval(order) && (order.status.status === 'Shipped') && (search === '' || OrderContainsProduct(order, search))
+          return inInterval(order) && (order.status.status === 'Shipped')
         case SellStatus.Cancelado:
-          return inInterval(order) && (order.status.status === 'Canceled') && (search === '' || OrderContainsProduct(order, search))
+          return inInterval(order) && (order.status.status === 'Canceled')
         case SellStatus.Entregue:
           return inInterval(order) && (order.status.status === 'Delivered' || order.status.status === 'Completed')
-            && (search === '' || OrderContainsProduct(order, search))
 
         default:
-          return inInterval(order) && InOrderStatus(order, orderStatus) && (search === '' || OrderContainsProduct(order, search))
+          return inInterval(order) && InOrderStatus(order, orderStatus)
       }
     })
 
     setItems(newItems)
   }, [orders, status, orderStatus, fromDateFilter, toDateFilter, search, filter])
-
-  const handleSubmit = useCallback(
-    async (data: SearchFormData) => {
-      try {
-        formRef.current?.setErrors({})
-
-        if (data.search !== search) {
-          setSeacrh(data.search)
-        }
-
-      } catch (err) {
-        setError('Ocorreu um erro ao fazer login, cheque as credenciais.')
-      }
-    },
-    [search],
-  )
 
   const datePickerRef = useRef<FormHandles>(null)
   const [datePickerVisibility, setDatePickerVisibility] = useState(false)
@@ -289,6 +276,18 @@ export function Sells() {
       case 'Completed':
         return SellStatus.Entregue
     }
+  }, [])
+
+  const getDaysToShip = useCallback((orderUpdateDate: string) => {
+    let orderDate = new Date(orderUpdateDate)
+    const today = new Date()
+    orderDate = addDays(orderDate, 2)
+
+    console.log(`Ship date: ${orderDate.toISOString()}`)
+    console.log(`Today date: ${today.toISOString()}`)
+    console.log(differenceInBusinessDays(today, orderDate))
+
+    return differenceInBusinessDays(orderDate, today)
   }, [])
 
   return (
@@ -367,13 +366,6 @@ export function Sells() {
                 />
               )}
             </div>
-            <Form ref={formRef} onSubmit={handleSubmit} className={styles.searchContainer}>
-              <FilterInput
-                name="search"
-                icon={FiSearch}
-                placeholder="Pesquise um produto..."
-                autoComplete="off" />
-            </Form>
           </div>
         </div>
         {status === SellStatus.Todos && (
@@ -447,8 +439,51 @@ export function Sells() {
                       ).format(item.order.payment.totalAmountPlusShipping)
                     }
                   </td>
-                  <td width='12.5%'>
-                    {getOrderStatus(item.order.status.status)}
+                  <td width='12.5%' className={styles.statusCell}>
+                    {(item.order.status.status === 'Invoiced' && getDaysToShip(item.order.status.updatedDate) <= 2) ? (
+                      <div className={styles.shippmentWarning}>
+                        {/* {
+                          getDaysToShip(item.order.status.updatedDate) >= 2 &&
+                          <span>{getDaysToShip(item.order.status.updatedDate)} dias p/ despachar</span>
+                        }
+                        {
+                          getDaysToShip(item.order.status.updatedDate) === 1 &&
+                          <span>Último dia p/ despachar</span>
+                        }
+                        {
+                          getDaysToShip(item.order.status.updatedDate) <= 0 &&
+                          <span>Data de despacho vencida</span>
+                        } */}
+                        <FiAlertTriangle
+                          style={getDaysToShip(item.order.status.updatedDate) >= 0 ? { color: 'var(--yellow-300)' } : { color: 'var(--red-300)' }}
+                          onMouseOver={(e) => {
+                            setOpenTooltip(true)
+                            setToolTipYOffset(e.pageY)
+                            setToolTipXOffset(e.pageX)
+                          }}
+                          onMouseOut={(e) => { setOpenTooltip(false) }}
+                        />
+                        <span style={getDaysToShip(item.order.status.updatedDate) >= 0 ? { color: 'var(--yellow-300)' } : { color: 'var(--red-300)' }}>{getOrderStatus(item.order.status.status)}</span>
+                      </div>
+                    ) : (getOrderStatus(item.order.status.status))}
+                    {openTooltip && (
+                      <HoverTooltip closeTooltip={() => setOpenTooltip(false)} offsetY={toolTipYOffset} offsetX={toolTipXOffset}>
+                        <div className={getDaysToShip(item.order.status.updatedDate) >= 0 ? styles.yellowText : styles.redText}>
+                          {
+                            getDaysToShip(item.order.status.updatedDate) >= 1 &&
+                            <span>{getDaysToShip(item.order.status.updatedDate)} dias p/ despachar</span>
+                          }
+                          {
+                            getDaysToShip(item.order.status.updatedDate) === 0 &&
+                            <span>Último dia p/ despachar</span>
+                          }
+                          {
+                            getDaysToShip(item.order.status.updatedDate) < 0 &&
+                            <span>Despache atrasado!</span>
+                          }
+                        </div>
+                      </HoverTooltip>
+                    )}
                   </td>
                   <td id={status === SellStatus.Faturando || status === SellStatus.Despachando ? styles.attachmentCell : styles.actionCell}>
                     {status === SellStatus.Faturando ?
@@ -514,7 +549,11 @@ export function Sells() {
             title='Anexar NF-e'
             icon={FiPaperclip}
           >
-            <NfeModalContent item={nfeItem} closeModal={() => setNfeModalOpen(false)} onNfeSent={loadOrders} />
+            <NfeModalContent
+              item={nfeItem}
+              closeModal={() => setNfeModalOpen(false)}
+              onNfeSent={loadOrders}
+            />
           </Modal>
         )
       }
@@ -525,7 +564,11 @@ export function Sells() {
             title='Anexar Rastreio'
             icon={FiPaperclip}
           >
-            <TrackingModalContent item={trackingItem} closeModal={() => setTrackingModalOpen(false)} onTrackSent={loadOrders} />
+            <TrackingModalContent
+              item={trackingItem}
+              closeModal={() => setTrackingModalOpen(false)}
+              onTrackSent={loadOrders}
+            />
           </Modal>
         )
       }

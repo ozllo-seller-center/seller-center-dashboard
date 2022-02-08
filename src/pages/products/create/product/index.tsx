@@ -522,7 +522,7 @@ export function ProductForm() {
             />
 
             <div className={styles.doubleInputContainer}>
-              <HintedInput
+              {/* <HintedInput
                 name='name'
                 label='Nome do produto'
                 placeholder='Insira o nome do produto'
@@ -539,6 +539,13 @@ export function ProductForm() {
                 onChange={(e) => {
                   setNameChecks(e.currentTarget.value)
                 }}
+              /> */}
+              <Input
+                name='name'
+                label='Nome do produto'
+                placeholder='Insira o nome do produto'
+                autoComplete='off'
+                maxLength={100}
               />
 
               <Input
