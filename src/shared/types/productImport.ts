@@ -28,6 +28,7 @@ export const importLines: SheetLines = {
   22: 'image',
   23: 'image',
   24: 'image',
+  25: '_id',
 }
 
 type SheetAttr = {

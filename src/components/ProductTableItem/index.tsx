@@ -41,6 +41,7 @@ const ProductTableItem: React.FC<ProductItemProps> = ({ item, products, setProdu
   const itemRef = useRef<HTMLInputElement>(null);
 
   const router = useRouter();
+  const [count, setCount] = useState(0); 
 
   useEffect(() => {
     const index = products.findIndex(product => product._id === item._id);
@@ -48,6 +49,11 @@ const ProductTableItem: React.FC<ProductItemProps> = ({ item, products, setProdu
     const updateProducts = products;
 
     updateProducts[index].is_active = item.is_active;
+    
+    if(count === 0 && updateProducts[index].checked == undefined){
+      setCount(1);
+      updateProducts[index].checked = false; 
+    }
 
     setProducts(updateProducts);
   }, [item])
@@ -108,8 +114,25 @@ const ProductTableItem: React.FC<ProductItemProps> = ({ item, products, setProdu
     }
   }, [isAvailable, disabledActions]);
 
+  const selectOrDeselectProduct = () =>{
+    const index = products.findIndex(product => product._id === item._id);
+    const updateProducts = products;
+    updateProducts[index].checked = !updateProducts[index].checked;
+    setProducts(updateProducts);
+  }
+
   return (
     <tr className={styles.tableItem} key={item._id}>
+      <td>
+        <input
+                    type='checkbox'
+                    name={item._id}
+                    value={item._id}
+                    onClick={() => {
+                      selectOrDeselectProduct()
+                    }}
+                    />
+      </td>
       <td id={styles.imgCell} >
         {!!item.images ? <img src={item.images[0]} alt={item.name} /> : <FiCameraOff />}
       </td>
