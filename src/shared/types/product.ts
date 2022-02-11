@@ -39,6 +39,8 @@ export type Product = {
   nationality: string,
   category: string,
   subcategory: string,
+  _id: string,
+  grouperId: string
 }
 
 export type ProductSummary = {
@@ -51,4 +53,5 @@ export type ProductSummary = {
   stock: number;
   images?: string[];
   variations: Variation[];
+  checked: boolean;
 }

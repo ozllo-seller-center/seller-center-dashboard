@@ -39,7 +39,7 @@
 .sellsHeader {
   display: flex;
 
-  button + button {
+  button+button {
     margin-left: 1rem;
 
     @media screen and (min-width: $desktop-size) {
@@ -78,7 +78,7 @@
         width: 80%;
       }
 
-      > button {
+      >button {
         text-align: center;
       }
 
@@ -110,7 +110,7 @@
     background-color: var(--white);
     border-radius: 6px;
 
-    box-shadow: 0 3px 6px rgba(0,0,0,0.08), 0 3px 6px rgba(0,0,0,0.11);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.11);
 
     .cardHeader {
       display: grid;
@@ -124,7 +124,7 @@
       .start {
         text-align: start;
 
-        > svg {
+        >svg {
           width: 1rem;
           height: 1rem;
 
@@ -135,7 +135,7 @@
       .end {
         text-align: end;
 
-        > svg {
+        >svg {
           width: 1rem;
           height: 1rem;
 
@@ -155,15 +155,18 @@
     .cardBody {
       display: flex;
 
-      padding: 1rem;
+      padding: 1rem 1.25rem;
 
       .products {
-        > span {
+        >span {
           font-size: 1.1rem;
         }
       }
 
-      .approvedItem, .processingItem, .canceledItem, .returnedItem {
+      .approvedItem,
+      .processingItem,
+      .canceledItem,
+      .returnedItem {
         display: flex;
         flex-direction: column;
 
@@ -175,7 +178,7 @@
       .approvedItem {
         color: var(--green-100);
 
-        > svg {
+        >svg {
           color: var(--green-100);
           width: 2rem;
           height: 2rem;
@@ -187,7 +190,7 @@
       .processingItem {
         color: var(--blue-100);
 
-        > svg {
+        >svg {
           color: var(--blue-100);
           width: 2rem;
           height: 2rem;
@@ -199,7 +202,7 @@
       .canceledItem {
         color: var(--red-100);
 
-        > svg {
+        >svg {
           color: var(--red-100);
           width: 2rem;
           height: 2rem;
@@ -211,7 +214,7 @@
       .returnedItem {
         color: var(--orange-100);
 
-        > svg {
+        >svg {
           color: var(--orange-100);
           width: 2rem;
           height: 2rem;
@@ -232,11 +235,12 @@
 
       padding: 1rem;
 
-      > span {
+      >span {
         font-weight: bold;
       }
 
-      > button, > div {
+      >button,
+      >div {
         margin-left: auto;
       }
 
@@ -260,7 +264,7 @@
     }
   }
 
-  .itemCard + .itemCard {
+  .itemCard+.itemCard {
     margin-top: 1rem;
   }
 
@@ -329,8 +333,10 @@
 
   animation: appear 1s;
 
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 
   &::-webkit-scrollbar {
     display: none;
@@ -346,8 +352,24 @@
 
     padding: 1rem;
 
-    > div + div {
+    >div+div {
       margin-left: 1rem;
     }
   }
+}
+
+.shippmentWarning {
+  display: flex;
+
+  column-gap: 0.5rem;
+
+  align-items: center;
+
+  font-size: 1.25rem;
+
+  >svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
 }

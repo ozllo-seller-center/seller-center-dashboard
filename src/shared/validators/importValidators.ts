@@ -104,7 +104,10 @@ export function InitProductImport(): ProductImport {
     },
     image: {
       value: [],
-    }
+    },
+    _id: {
+      value: undefined
+    },
   }
 
   return productValidation;

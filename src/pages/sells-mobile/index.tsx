@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { FiCalendar, FiCheck, FiClipboard, FiMoreHorizontal, FiPaperclip, FiSearch, FiX } from 'react-icons/fi'
+import { FiAlertTriangle, FiCalendar, FiCheck, FiClipboard, FiMoreHorizontal, FiPaperclip, FiSearch, FiX } from 'react-icons/fi'
 import { FormHandles } from '@unform/core'
-import { format, isSameWeek, isToday, subDays } from 'date-fns'
+import { addDays, differenceInBusinessDays, format, isSameWeek, isToday, subDays } from 'date-fns'
 import { Form } from '@unform/web'
 
 import Button from '../../components/PrimaryButton'
@@ -29,6 +29,7 @@ import TrackingModalContent from 'src/components/TrackingModalContent'
 import { InOrderStatus, OrderContainsProduct } from 'src/shared/functions/sells'
 import { OrderStatus } from 'src/shared/enums/order'
 import { useRouter } from 'next/router'
+import { MdOutlineLocalShipping } from 'react-icons/md'
 
 enum SellStatus {
   // 'Pending' | 'Approved' | 'Invoiced' | 'Shipped' | 'Delivered' | 'Canceled' | 'Completed'
@@ -78,7 +79,7 @@ export function Sells() {
 
   const [fromDateFilter, setFromDateFilter] = useState(new Date())
   const [toDateFilter, setToDateFilter] = useState(new Date())
-  const [filter, setFilter] = useState(Filter.Hoje)
+  const [filter, setFilter] = useState(Filter.Mes)
   const [search, setSeacrh] = useState('')
 
   const itemsRef = useMemo(() => Array(items.length).fill(0).map(i => React.createRef<HTMLTableRowElement>()), [items])
@@ -294,6 +295,14 @@ export function Sells() {
     }
   }, [])
 
+  const getDaysToShip = useCallback((orderUpdateDate: string) => {
+    let orderDate = new Date(orderUpdateDate)
+    const today = new Date()
+    orderDate = addDays(orderDate, 2)
+
+    return differenceInBusinessDays(orderDate, today)
+  }, [])
+
   return (
     <>
       <div className={status !== SellStatus.Todos ? styles.sellsContainer : styles.sellsContainerShorter}>
@@ -319,7 +328,7 @@ export function Sells() {
                 Esta semana
               </FilterButton>
               <FilterButton isActive={filter === Filter.Mes} onClick={() => setFilter(Filter.Mes)}>
-                Este mês
+                Últimos 30 dias
               </FilterButton>
               <div>
                 <FilterButton
@@ -432,6 +441,14 @@ export function Sells() {
                       )
                     }
                     {
+                      getOrderStatus(item.order.status.status) === SellStatus.Despachado && (
+                        <div className={styles.approvedItem}>
+                          <MdOutlineLocalShipping />
+                          Despachado
+                        </div>
+                      )
+                    }
+                    {
                       getOrderStatus(item.order.status.status) === SellStatus.Cancelado && (
                         <div className={styles.canceledItem}>
                           <FiX />
@@ -460,6 +477,28 @@ export function Sells() {
                     }
                     </span>
 
+                    {
+                      (item.order.status.status !== 'Shipped' && item.order.status.status !== 'Delivered' &&
+                        item.order.status.status !== 'Completed' && item.order.status.status !== 'Canceled' &&
+                        getDaysToShip(item.order.payment.paymentDate) <= 2) && (
+                        <div className={styles.shippmentWarning} style={getDaysToShip(item.order.payment.paymentDate) >= 0 ? { color: 'var(--yellow-300)' } : { color: 'var(--red-300)' }}>
+                          <FiAlertTriangle />
+                          {
+                            getDaysToShip(item.order.payment.paymentDate) >= 1 &&
+                            <span>{getDaysToShip(item.order.payment.paymentDate)} dias p/ despachar</span>
+                          }
+                          {
+                            getDaysToShip(item.order.payment.paymentDate) === 0 &&
+                            <span>Último dia p/ despachar</span>
+                          }
+                          {
+                            getDaysToShip(item.order.payment.paymentDate) < 0 &&
+                            <span>Despache atrasado!</span>
+                          }
+                        </div>
+                      )
+                    }
+
                     {status === SellStatus.Faturando ?
                       <AttachButton
                         name={item._id}
@@ -468,10 +507,14 @@ export function Sells() {
                         unattachedText='Anexar NF-e'
                         placeholder='Informe a URL da NF-e'
                         // isAttached={!!item.order.orderNotes && item.order.orderNotes.length > 0} //!item.nfe_url
-                        isAttached={false}
+                        isAttached={item.order.status.status === 'Invoiced'}
                         onClick={() => {
-                          setNfeModalOpen(true)
-                          setNfeItem(item)
+                          if (item.order.status.status === 'Approved') {
+                            setNfeModalOpen(true)
+                            setNfeItem(item)
+
+                            return
+                          }
                         }}
                       />
                       :
@@ -484,10 +527,12 @@ export function Sells() {
                           placeholder='Informe o código de envio'
                           // handleAttachment={handleAttachment}
                           // isAttached={!!item.order.orderNotes} //!item.nfe_url
-                          isAttached={false}
+                          isAttached={item.order.status.status === 'Shipped'}
                           onClick={() => {
-                            setTrackingModalOpen(true)
-                            setTrackingItem(item)
+                            if (item.order.status.status === 'Invoiced') {
+                              setTrackingModalOpen(true)
+                              setTrackingItem(item)
+                            }
                           }}
                         />
                         :
@@ -501,9 +546,7 @@ export function Sells() {
                     }
                   </div>
                 </div>
-              )
-              )
-              }
+              ))}
             </div>
           ) : (
             <span className={styles.emptyList}> Nenhum item foi encontrado </span>
@@ -535,7 +578,11 @@ export function Sells() {
             title='Anexar NF-e'
             icon={FiPaperclip}
           >
-            <NfeModalContent item={nfeItem} closeModal={() => { setNfeModalOpen(false) }} onNfeSent={loadOrders} />
+            <NfeModalContent
+              item={nfeItem}
+              closeModal={() => setNfeModalOpen(false)}
+              onNfeSent={loadOrders}
+            />
           </Modal>
         )
       }
@@ -546,7 +593,11 @@ export function Sells() {
             title='Anexar Rastreio'
             icon={FiPaperclip}
           >
-            <TrackingModalContent item={trackingItem} closeModal={() => setTrackingModalOpen(false)} onTrackSent={loadOrders} />
+            <TrackingModalContent
+              item={trackingItem}
+              closeModal={() => setTrackingModalOpen(false)}
+              onTrackSent={loadOrders}
+            />
           </Modal>
         )
       }
