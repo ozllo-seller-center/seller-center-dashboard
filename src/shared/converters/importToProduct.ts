@@ -21,6 +21,7 @@ export function importToProduct(importProducts: ProductImport[]): Product[] {
     product.category = group[0].catalogue.value.category
     product.subcategory = group[0].catalogue.value.subCategory
 
+    product._id = group[0]._id.value
     product.name = group[0].name.value
     product.brand = group[0].brand.value
     product.description = group[0].description.value
@@ -33,6 +34,7 @@ export function importToProduct(importProducts: ProductImport[]): Product[] {
     product.width = group[0].width.value
     product.length = group[0].length.value
     product.weight = group[0].weight.value
+    product.grouperId = group[0].grouperId.value
 
     product.images = []
 

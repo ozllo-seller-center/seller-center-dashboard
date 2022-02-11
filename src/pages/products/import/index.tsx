@@ -12,6 +12,7 @@ import { FiCheck, FiDownloadCloud, FiUploadCloud, FiX } from 'react-icons/fi';
 import { FaExclamation } from 'react-icons/fa';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
+import * as Yup from 'yup'
 import { importLines, ProductImport } from 'src/shared/types/productImport';
 import api from 'src/services/api';
 import { Nationality } from 'src/shared/types/nationality';
@@ -25,8 +26,17 @@ import { importToProduct } from 'src/shared/converters/importToProduct';
 import { Product } from 'src/shared/types/product';
 import { useAuth } from 'src/hooks/auth';
 import { isTokenValid } from 'src/utils/util';
+import getValidationErrors from 'src/utils/getValidationErrors';
+
+type VariationDTO = {
+  _id?: string
+  size?: number | string,
+  stock?: number,
+  color?: string,
+}
 
 function Import() {
+
   const [files, setFiles] = useState<File[]>([]);
 
   const [isModalVisible, setModalVisibility] = useState(false);
@@ -96,8 +106,8 @@ function Import() {
         let count = 0;
         let stop = false;
 
-        if (!!result.Planilha1) {
-          const sheet: any[] = result.Planilha1
+        if (!!result.Planilha1 || !!result.data) {
+          const sheet: any[] = result.Planilha1 ? result.Planilha1 : result.data
 
           console.log(sheet)
 
@@ -119,8 +129,8 @@ function Import() {
 
                 setError(true)
               }
-
-              for (let attrI = 0; attrI <= 24 && !stop; attrI++) {
+              let size = line.length - 1;
+              for (let attrI = 0; attrI <= size && !stop; attrI++) {
                 const attribute = importLines[attrI]
 
                 const validate = productValidation[attribute].validate
@@ -148,6 +158,7 @@ function Import() {
                     if (line[attrI])
                       productValidation[attribute].value.push(line[attrI])
                     break
+                  case 25:
 
                   default:
                     if (line[attrI])
@@ -340,18 +351,23 @@ function Import() {
           variations
         }
 
-        await api.post('/product', p, {
-          headers: {
-            authorization: token,
-            shop_id: user.shopInfo._id,
-          }
-        }).then(response => {
-          handleModalMessage(true, { title: 'Produtos cadastrados!', message: [`Foram cadastrados ${products.length} produtos e suas variações`], type: 'success' })
-        }).catch(err => {
-          console.log(err.response);
+        if (product._id) {
+          const newImages: string[] = product.images.map(img => { return img.url });
+          handleSubmit(product, newImages, products);
+        } else {
+          await api.post('/product', p, {
+            headers: {
+              authorization: token,
+              shop_id: user.shopInfo._id,
+            }
+          }).then(response => {
+            handleModalMessage(true, { title: 'Produtos cadastrados!', message: [`Foram cadastrados ${products.length} produtos e suas variações`], type: 'success' })
+          }).catch(err => {
+            console.log(err.response);
 
-          handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
-        });
+            handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
+          });
+        }
       })
 
       setLoading(false)
@@ -370,6 +386,82 @@ function Import() {
       setLoading(false)
     }
   }, [user, token, categories, error])
+
+  const handleSubmit = useCallback(async (product, newImages, products) => {
+
+    try {
+      await api.patch(`/product/${product._id}/images`, { images: newImages }, {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        }
+      }).then(response => {
+
+      })
+
+      const {
+        variations
+      } = product
+      let price = product.price.toString();
+      let price_discounted = product.price_discounted.toString();
+      api.patch(`/product/${product._id}/price`, {
+        price,
+        price_discounted
+      }, {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        }
+      }).then(response => {
+
+      })
+
+
+      await variations.forEach(async (variation: VariationDTO, i: number) => {
+        if (!!product.grouperId && product.grouperId !== '') {
+          const variationId = product.grouperId
+
+          await api.patch(`/product/${product._id}/variation/${variationId}`, variation, {
+            headers: {
+              authorization: token,
+              shop_id: user.shopInfo._id,
+            }
+          }).then(response => {
+
+          })
+
+          return
+        }
+        delete variation._id
+      })
+
+      await api.patch(`/product/${product._id}`, product, {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        }
+      }).then(response => {
+        setLoading(false)
+        handleModalMessage(true, { title: 'Produtos alterados!', message: [`Foram alterados ${products.length} produtos e suas variações`], type: 'success' })
+        if (window.innerWidth >= 768) {
+          router.push('/products')
+          return
+        }
+
+        router.push('/products-mobile')
+      })
+    } catch (err) {
+      setLoading(false)
+      handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
+      console.log(err)
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err)
+        formRef.current?.setErrors(errors)
+
+        return
+      }
+    }
+  }, [router, token, user, files])
 
   const handleModalVisibility = useCallback(() => {
     handleModalMessage(false);
@@ -464,6 +556,18 @@ function Import() {
           <div className={styles.importPanel}>
             <FiUploadCloud />
             <h3>Importar</h3>
+            <p>Solte ou clique na caixa abaixo para realizar o upload</p>
+            <p className={styles.smallText}>São aceitas planilhas no formato *.xlsx, *.xls e *.csv com tamanho de até 10MB</p>
+            <Form ref={formRef} onSubmit={async () => {
+              await handleImport()
+            }}>
+              <Importzone name='import' onFileUploaded={handleFileUpload} />
+              <button type='submit'>Importar Planilha</button>
+            </Form>
+          </div>
+          <div className={styles.importPanel}>
+            <FiUploadCloud />
+            <h3>Alterar Produto(s)</h3>
             <p>Solte ou clique na caixa abaixo para realizar o upload</p>
             <p className={styles.smallText}>São aceitas planilhas no formato *.xlsx, *.xls e *.csv com tamanho de até 10MB</p>
             <Form ref={formRef} onSubmit={async () => {
