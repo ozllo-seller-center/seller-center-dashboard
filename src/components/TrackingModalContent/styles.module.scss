@@ -1,11 +1,18 @@
+@import '../../../public/styles/__dimensions.scss';
+
 .trackingContent {
   display: flex;
   flex-direction: column;
 
   padding: 0.5rem;
 
-  min-width: 725px;
-  min-height: 432px;
+  min-width: 300px;
+  min-height: 332px;
+
+  @media screen and (min-width: $tablet_vertical) {
+    min-width: 725px;
+    min-height: 432px;
+  }
 
   // align-content: space-between;
   // align-items: center;

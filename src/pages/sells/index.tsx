@@ -80,7 +80,7 @@ export function Sells() {
   const [fromDateFilter, setFromDateFilter] = useState(new Date())
   const [toDateFilter, setToDateFilter] = useState(new Date())
 
-  const [filter, setFilter] = useState(Filter.Hoje)
+  const [filter, setFilter] = useState(Filter.Mes)
   const [search, setSeacrh] = useState('')
 
   const itemsRef = useMemo(() => Array(items.length).fill(0).map(i => React.createRef<HTMLTableRowElement>()), [items])
@@ -283,10 +283,6 @@ export function Sells() {
     const today = new Date()
     orderDate = addDays(orderDate, 2)
 
-    console.log(`Ship date: ${orderDate.toISOString()}`)
-    console.log(`Today date: ${today.toISOString()}`)
-    console.log(differenceInBusinessDays(today, orderDate))
-
     return differenceInBusinessDays(orderDate, today)
   }, [])
 
@@ -340,7 +336,7 @@ export function Sells() {
               Esta semana
             </Button>
             <Button isActive={filter === Filter.Mes} onClick={() => setFilter(Filter.Mes)}>
-              Este mês
+              Últimos 30 dias
             </Button>
             <div className={styles.verticalDivider} />
             <div>
@@ -440,7 +436,9 @@ export function Sells() {
                     }
                   </td>
                   <td width='12.5%' className={styles.statusCell}>
-                    {(item.order.status.status === 'Invoiced' && getDaysToShip(item.order.status.updatedDate) <= 2) ? (
+                    {(item.order.status.status !== 'Shipped' && item.order.status.status !== 'Delivered' &&
+                      item.order.status.status !== 'Completed' && item.order.status.status !== 'Canceled' &&
+                      getDaysToShip(item.order.payment.paymentDate) <= 2) ? (
                       <div className={styles.shippmentWarning}>
                         {/* {
                           getDaysToShip(item.order.status.updatedDate) >= 2 &&
@@ -455,7 +453,7 @@ export function Sells() {
                           <span>Data de despacho vencida</span>
                         } */}
                         <FiAlertTriangle
-                          style={getDaysToShip(item.order.status.updatedDate) >= 0 ? { color: 'var(--yellow-300)' } : { color: 'var(--red-300)' }}
+                          style={getDaysToShip(item.order.payment.paymentDate) >= 0 ? { color: 'var(--yellow-300)' } : { color: 'var(--red-300)' }}
                           onMouseOver={(e) => {
                             setOpenTooltip(true)
                             setToolTipYOffset(e.pageY)
@@ -463,22 +461,22 @@ export function Sells() {
                           }}
                           onMouseOut={(e) => { setOpenTooltip(false) }}
                         />
-                        <span style={getDaysToShip(item.order.status.updatedDate) >= 0 ? { color: 'var(--yellow-300)' } : { color: 'var(--red-300)' }}>{getOrderStatus(item.order.status.status)}</span>
+                        <span style={getDaysToShip(item.order.payment.paymentDate) >= 0 ? { color: 'var(--yellow-300)' } : { color: 'var(--red-300)' }}>{getOrderStatus(item.order.status.status)}</span>
                       </div>
                     ) : (getOrderStatus(item.order.status.status))}
                     {openTooltip && (
                       <HoverTooltip closeTooltip={() => setOpenTooltip(false)} offsetY={toolTipYOffset} offsetX={toolTipXOffset}>
-                        <div className={getDaysToShip(item.order.status.updatedDate) >= 0 ? styles.yellowText : styles.redText}>
+                        <div className={getDaysToShip(item.order.payment.paymentDate) >= 0 ? styles.yellowText : styles.redText}>
                           {
-                            getDaysToShip(item.order.status.updatedDate) >= 1 &&
-                            <span>{getDaysToShip(item.order.status.updatedDate)} dias p/ despachar</span>
+                            getDaysToShip(item.order.payment.paymentDate) >= 1 &&
+                            <span>{getDaysToShip(item.order.payment.paymentDate)} dias p/ despachar</span>
                           }
                           {
-                            getDaysToShip(item.order.status.updatedDate) === 0 &&
+                            getDaysToShip(item.order.payment.paymentDate) === 0 &&
                             <span>Último dia p/ despachar</span>
                           }
                           {
-                            getDaysToShip(item.order.status.updatedDate) < 0 &&
+                            getDaysToShip(item.order.payment.paymentDate) < 0 &&
                             <span>Despache atrasado!</span>
                           }
                         </div>
