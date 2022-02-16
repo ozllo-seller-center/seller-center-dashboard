@@ -1,16 +1,9 @@
 import { createTheme, MuiThemeProvider, Switch } from '@material-ui/core';
-import React, { useCallback, useState } from 'react';
-import { useEffect } from 'react';
-import { useRef } from 'react';
-
-import router, { useRouter } from 'next/router';
-
-import { FiCameraOff, FiEdit } from 'react-icons/fi';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import api from 'src/services/api';
 import { Product, ProductSummary } from 'src/shared/types/product';
-
-import styles from './styles.module.scss'
-import switchStyles from './switch-styles.module.scss'
+import styles from './styles.module.scss';
+import switchStyles from './switch-styles.module.scss';
 
 const theme = createTheme({
   palette: {
@@ -40,8 +33,7 @@ const ProductTableItem: React.FC<ProductItemProps> = ({ item, products, setProdu
 
   const itemRef = useRef<HTMLInputElement>(null);
 
-  const router = useRouter();
-  const [count, setCount] = useState(0); 
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     const index = products.findIndex(product => product._id === item._id);
@@ -49,10 +41,10 @@ const ProductTableItem: React.FC<ProductItemProps> = ({ item, products, setProdu
     const updateProducts = products;
 
     updateProducts[index].is_active = item.is_active;
-    
-    if(count === 0 && updateProducts[index].checked == undefined){
+
+    if (count === 0 && updateProducts[index].checked == undefined) {
       setCount(1);
-      updateProducts[index].checked = false; 
+      updateProducts[index].checked = false;
     }
 
     setProducts(updateProducts);
@@ -114,99 +106,43 @@ const ProductTableItem: React.FC<ProductItemProps> = ({ item, products, setProdu
     }
   }, [isAvailable, disabledActions]);
 
-  const selectOrDeselectProduct = () =>{
-    const index = products.findIndex(product => product._id === item._id);
-    const updateProducts = products;
-    updateProducts[index].checked = !updateProducts[index].checked;
-    setProducts(updateProducts);
-  }
-
   return (
-    <tr className={styles.tableItem} key={item._id}>
-      <td>
-        <input
-                    type='checkbox'
-                    name={item._id}
-                    value={item._id}
-                    onClick={() => {
-                      selectOrDeselectProduct()
-                    }}
-                    />
-      </td>
-      <td id={styles.imgCell} >
-        {!!item.images ? <img src={item.images[0]} alt={item.name} /> : <FiCameraOff />}
-      </td>
-      <td id={styles.nameCell}>
-        {item.name}
-      </td>
-      <td>
-        {item.brand}
-      </td>
-      <td>
-        {item.sku}
-      </td>
-      <td id={styles.valueCell}>
-        {
-          new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-          }
-          ).format(item.price)
-        }
-      </td>
-      <td className={item.stock <= 0 ? styles.redText : ''}>
-        {new Intl.NumberFormat('pt-BR').format(item.stock)}
-      </td>
-      <td id={styles.switchCell}>
-        <MuiThemeProvider theme={theme}>
-          <Switch
-            inputRef={itemRef}
-            checked={item.is_active}
-            onClick={() => {
-              handleAvailability(item._id)
+    <div id={styles.switchCell}>
+      <MuiThemeProvider theme={theme}>
+        <Switch
+          inputRef={itemRef}
+          checked={item.is_active}
+          onClick={() => {
+            handleAvailability(item._id)
 
-              if (!disabledActions && !!setDisabledActions) {
-                setDisabledActions(true)
+            if (!disabledActions && !!setDisabledActions) {
+              setDisabledActions(true)
 
-                setTimeout(() => {
-                  setDisabledActions(false)
-                }, 1500)
+              setTimeout(() => {
+                setDisabledActions(false)
+              }, 1500)
+            }
+          }}
+          classes={
+            disabledActions ?
+              {
+                root: switchStyles.root,
+                thumb: switchStyles.thumbDisabled,
+                track: switchStyles.trackDisabled,
+                checked: switchStyles.checked,
               }
-            }}
-            classes={
-              disabledActions ?
-                {
-                  root: switchStyles.root,
-                  thumb: switchStyles.thumbDisabled,
-                  track: switchStyles.trackDisabled,
-                  checked: switchStyles.checked,
-                }
-                :
-                {
-                  root: switchStyles.root,
-                  thumb: isAvailable ? switchStyles.thumb : switchStyles.thumbUnchecked,
-                  track: isAvailable ? switchStyles.track : switchStyles.trackUnchecked,
-                  checked: switchStyles.checked,
-                }
-            }
-          />
-        </MuiThemeProvider>
-        <span className={styles.switchSubtitle}>{isAvailable ? 'Ativado' : 'Desativado'}</span>
-      </td>
-      <td id={styles.editCell}>
-        <div onClick={() => {
-          router.push({
-            pathname: 'products/edit',
-            query: {
-              id: item._id,
-            }
-          })
-        }}>
-          <FiEdit />
-          <span> Editar </span>
-        </div>
-      </td>
-    </tr>
+              :
+              {
+                root: switchStyles.root,
+                thumb: isAvailable ? switchStyles.thumb : switchStyles.thumbUnchecked,
+                track: isAvailable ? switchStyles.track : switchStyles.trackUnchecked,
+                checked: switchStyles.checked,
+              }
+          }
+        />
+      </MuiThemeProvider>
+      <span className={styles.switchSubtitle}>{isAvailable ? 'Ativado' : 'Desativado'}</span>
+    </div>
   )
 }
 

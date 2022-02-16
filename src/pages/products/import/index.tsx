@@ -158,7 +158,6 @@ function Import() {
                     if (line[attrI])
                       productValidation[attribute].value.push(line[attrI])
                     break
-                  case 25:
 
                   default:
                     if (line[attrI])
@@ -218,6 +217,132 @@ function Import() {
           }
 
           // setImports(importedProducts)
+          importProducts(importedProducts)
+        }
+      }
+
+      reader.readAsArrayBuffer(file)
+    })
+
+
+  }, [files, isUploading, successfull, error]);
+
+  const handleAlteracao = useCallback(async () => {
+    let importedProducts: ProductImport[] = []
+
+    setLoading(true)
+    setError(false)
+
+    files.map(async (file) => {
+      let reader = new FileReader()
+
+      reader.onload = async (e) => {
+        if (!e.target || e.target.result === null)
+          return
+
+        let data = e.target.result
+
+        if (!(data instanceof ArrayBuffer)) {
+          return
+        }
+
+        data = new Uint8Array(data)
+
+        let workbook = XLSX.read(data, { type: 'array' })
+        let result: any = {}
+
+        workbook.SheetNames.forEach((sheet) => {
+          let roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheet], { header: 1 })
+          if (roa.length)
+            result[sheet] = roa
+        })
+
+        let count = 0;
+        let stop = false;
+
+        if (!!result.Planilha1 || !!result.data) {
+          const sheet: any[] = result.Planilha1 ? result.Planilha1 : result.data
+
+          console.log(sheet)
+
+          sheet.forEach(async (line, i) => {
+            // Ignorar o cabeçalho
+            if (i > 1 && line.length > 0) {
+              count++;
+
+              let productValidation: ProductImport = InitProductImport()
+
+              if (!line[3]) {
+                handleModalMessage(true, {
+                  type: 'error',
+                  title: 'Id Agrupador não encontrado!',
+                  message: [`Não foi encontrado um id arupador na linha ${i + 1}`]
+                })
+
+                stop = true
+
+                setError(true)
+              }
+              let size = line.length - 1;
+              for (let attrI = 0; attrI <= size && !stop; attrI++) {
+                const attribute = importLines[attrI]
+
+                const validate = productValidation[attribute].validate
+
+                switch (attrI) {
+                  case 0:
+                    let value = line[attrI]?.split(">")
+                    if (value && value != "") {
+                      productValidation[attribute].value.nationality = value[0].trim()
+                      productValidation[attribute].value.category = value[1].trim()
+                      productValidation[attribute].value.subCategory = value[2].trim()
+                    }
+                    break
+                  case 16:
+                    let gender = line[attrI]?.charAt(0).toUpperCase()
+                    if (gender && gender != "") {
+                      productValidation[attribute].value = gender
+                    }
+
+                    break;
+
+                  case 19:
+                  case 20:
+                  case 21:
+                  case 22:
+                  case 23:
+                  case 24:
+                    if (line[attrI])
+                      productValidation[attribute].value.push(line[attrI])
+                    break
+                  case 25:
+
+                  default:
+                    if (line[attrI])
+                      productValidation[attribute].value = line[attrI]
+                    break
+                }
+
+              }
+
+              if (stop)
+                return
+
+              importedProducts.push(productValidation)
+            }
+          })
+
+          if (count === 0) {
+            handleModalMessage(true, {
+              type: 'error',
+              title: 'Nenhum produto encontrado',
+              message: ['A planilha selecionada não possui nenhum registro válido']
+            })
+
+            setImports([])
+            return
+          }
+
           importProducts(importedProducts)
         }
       }
@@ -294,6 +419,7 @@ function Import() {
         // }).catch(err => {
         //   console.log(err)
         // });
+        let isVariation = false;
 
         const imagesUrls = product.images.map(img => img.url)
 
@@ -345,8 +471,8 @@ function Import() {
           width,
           length,
           weight,
-          price: price.toString(),
-          price_discounted: !price_discounted ? price.toString() : price_discounted.toString(),
+          price: price?.toString(),
+          price_discounted: !price_discounted ? price?.toString() : price_discounted?.toString(),
           images: imagesUrls,
           variations
         }
@@ -388,33 +514,41 @@ function Import() {
   }, [user, token, categories, error])
 
   const handleSubmit = useCallback(async (product, newImages, products) => {
+    let isVariation = false;
+    if (!product.gender && product.variation.length > 0) {
+      isVariation = true;
+    }
 
     try {
-      await api.patch(`/product/${product._id}/images`, { images: newImages }, {
-        headers: {
-          authorization: token,
-          shop_id: user.shopInfo._id,
-        }
-      }).then(response => {
+      if (!isVariation) {
+        await api.patch(`/product/${product._id}/images`, { images: newImages }, {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          }
+        }).then(response => {
 
-      })
+        })
+      }
 
       const {
         variations
       } = product
-      let price = product.price.toString();
-      let price_discounted = product.price_discounted.toString();
-      api.patch(`/product/${product._id}/price`, {
-        price,
-        price_discounted
-      }, {
-        headers: {
-          authorization: token,
-          shop_id: user.shopInfo._id,
-        }
-      }).then(response => {
+      if (!isVariation) {
+        let price = product.price.toString();
+        let price_discounted = product.price_discounted.toString();
+        api.patch(`/product/${product._id}/price`, {
+          price,
+          price_discounted
+        }, {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          }
+        }).then(response => {
 
-      })
+        })
+      }
 
 
       await variations.forEach(async (variation: VariationDTO, i: number) => {
@@ -434,22 +568,23 @@ function Import() {
         }
         delete variation._id
       })
+      if (!isVariation) {
+        await api.patch(`/product/${product._id}`, product, {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          }
+        }).then(response => {
+          setLoading(false)
+          handleModalMessage(true, { title: 'Produtos alterados!', message: [`Foram alterados ${products.length} produtos e suas variações`], type: 'success' })
+          if (window.innerWidth >= 768) {
+            router.push('/products')
+            return
+          }
 
-      await api.patch(`/product/${product._id}`, product, {
-        headers: {
-          authorization: token,
-          shop_id: user.shopInfo._id,
-        }
-      }).then(response => {
-        setLoading(false)
-        handleModalMessage(true, { title: 'Produtos alterados!', message: [`Foram alterados ${products.length} produtos e suas variações`], type: 'success' })
-        if (window.innerWidth >= 768) {
-          router.push('/products')
-          return
-        }
-
-        router.push('/products-mobile')
-      })
+          router.push('/products-mobile')
+        })
+      }
     } catch (err) {
       setLoading(false)
       handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
@@ -571,7 +706,7 @@ function Import() {
             <p>Solte ou clique na caixa abaixo para realizar o upload</p>
             <p className={styles.smallText}>São aceitas planilhas no formato *.xlsx, *.xls e *.csv com tamanho de até 10MB</p>
             <Form ref={formRef} onSubmit={async () => {
-              await handleImport()
+              await handleAlteracao()
             }}>
               <Importzone name='import' onFileUploaded={handleFileUpload} />
               <button type='submit'>Importar Planilha</button>

@@ -1,30 +1,24 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/router';
-import { MuiThemeProvider, createTheme, Switch } from '@material-ui/core';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import { FiSearch, FiCameraOff, FiCheck, FiX } from 'react-icons/fi';
-
-import api from 'src/services/api';
-import { useAuth, User } from 'src/hooks/auth';
-import BulletedButton from '../../components/BulletedButton';
-import FilterInput from '../../components/FilterInput';
-
-import { ProductSummary as Product, Variation } from 'src/shared/types/product';
-
-import styles from './styles.module.scss';
-
-import { useLoading } from 'src/hooks/loading';
-import { useModalMessage } from 'src/hooks/message';
+import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { FiCameraOff, FiCheck, FiEdit, FiSearch, FiX } from 'react-icons/fi';
 import { Loader } from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
 import ProductTableItem from 'src/components/ProductTableItem';
-
-import XLSX from 'xlsx';
-import { Nationalities } from 'src/shared/enums/Nationalities';
+import { useAuth, User } from 'src/hooks/auth';
+import { useLoading } from 'src/hooks/loading';
+import { useModalMessage } from 'src/hooks/message';
+import api from 'src/services/api';
 import { Categories } from 'src/shared/enums/Categories';
-import { Subcategories } from 'src/shared/enums/Subcategories';
 import { Genres } from 'src/shared/enums/Genres';
+import { Nationalities } from 'src/shared/enums/Nationalities';
+import { Subcategories } from 'src/shared/enums/Subcategories';
+import { ProductSummary as Product, Variation } from 'src/shared/types/product';
+import XLSX from 'xlsx';
+import BulletedButton from '../../components/BulletedButton';
+import FilterInput from '../../components/FilterInput';
+import styles from './styles.module.scss';
 
 interface SearchFormData {
   search: string;
@@ -46,6 +40,10 @@ export function Products({ userFromApi }: ProductsProps) {
   const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
 
   const { token, user, updateUser } = useAuth();
+  const [checked, setChecked] = React.useState(false);
+  const [checkedState, setCheckedState] = useState(
+    new Array(50).fill(false)
+  );
 
   useEffect(() => {
     // !!userFromApi && updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: userFromApi.shopInfo._id } })
@@ -103,6 +101,7 @@ export function Products({ userFromApi }: ProductsProps) {
           }
 
           product.stock = stockCount;
+          product.checked = false;
 
           return product;
         })
@@ -142,6 +141,48 @@ export function Products({ userFromApi }: ProductsProps) {
     handleModalMessage(false);
   }, [])
 
+  const selectOrDeselectAllProducts = useCallback(async () => {
+    const updatedCheckedState = checkedState.map(() => {
+      return !checked;
+    }
+    );
+    setCheckedState(updatedCheckedState);
+    const updateProducts = products;
+    updateProducts.forEach(produto => {
+      produto.checked = !checked;
+    })
+    setProducts(updateProducts);
+
+    const produtos = items;
+    produtos.forEach(item => {
+      item.checked = !checked;
+    })
+    setItems(produtos);
+    setChecked(!checked);
+  }, [checked, products, items])
+
+  const handleChange = useCallback(async (id: any, position: number) => {
+    const updatedCheckedState = checkedState.map((item, index) => {
+      if (index === position) {
+        return !item
+      }
+      return item
+    }
+    );
+    
+    const index = products.findIndex(product => product._id === id);
+    const updateProducts = products;
+    updateProducts[index].checked = !checkedState[position];
+
+    const indexItem = items.findIndex(item => item._id === id);
+    const updateItems = items;
+    updateItems[indexItem].checked = !checkedState[position];
+
+    setCheckedState(updatedCheckedState);
+    setProducts(updateProducts);
+    setItems(updateItems);
+  }, [checkedState, products, items])
+
   const getVariations = (produto: any) => {
     const { variations } = produto
     return variations.map((variacao: Variation, index: number) => {
@@ -174,29 +215,29 @@ export function Products({ userFromApi }: ProductsProps) {
 
   const getHeader = () => {
 
-      return {
-        Categoria: "Obrigatório",
-        Nome_do_Produto: "Obrigatório",
-        Marca: "Obrigatório",
-        Id_agupador: "Obrigatório",
-        Tamanho: "Obrigatório",
-        Cor_ou_Sabor: "Obrigatório",
-        Quantidade: "Obrigatório",
-        Descricao_do_Produto: "Obrigatório",
-        EAN: "Opcional",
-        SKU: "Obrigatório",
-        Valor_cheio: "Obrigatório",
-        Valor_promocional: "Obrigatório",
-        Altura_embalagem: "Obrigatório",
-        Largura_embalagem: "Obrigatório",
-        Comprimento_embalagem: "Obrigatório",
-        Peso_embalagem: "Obrigatório",
-        Genero: "Obrigatório",
-        Lactose: "Obrigatório para Alimentos",
-        Gluten: "Obrigatório para alimentos",
-        ...getImagesHeader(),
-        Id_Produto: "Obrigatório",
-      }
+    return {
+      Categoria: "Obrigatório",
+      Nome_do_Produto: "Obrigatório",
+      Marca: "Obrigatório",
+      Id_agupador: "Obrigatório",
+      Tamanho: "Obrigatório",
+      Cor_ou_Sabor: "Obrigatório",
+      Quantidade: "Obrigatório",
+      Descricao_do_Produto: "Obrigatório",
+      EAN: "Opcional",
+      SKU: "Obrigatório",
+      Valor_cheio: "Obrigatório",
+      Valor_promocional: "Obrigatório",
+      Altura_embalagem: "Obrigatório",
+      Largura_embalagem: "Obrigatório",
+      Comprimento_embalagem: "Obrigatório",
+      Peso_embalagem: "Obrigatório",
+      Genero: "Obrigatório",
+      Lactose: "Obrigatório para Alimentos",
+      Gluten: "Obrigatório para alimentos",
+      ...getImagesHeader(),
+      Id_Produto: "Obrigatório",
+    }
   }
 
   const getProducts = () => {
@@ -261,7 +302,6 @@ export function Products({ userFromApi }: ProductsProps) {
     a.click();
   }
 
-
   return (
     <div className={styles.productsContainer}>
       <div className={styles.productsHeader}>
@@ -269,10 +309,6 @@ export function Products({ userFromApi }: ProductsProps) {
           onClick={() => { }}
           isActive>
           Meus produtos
-        </BulletedButton>
-        <BulletedButton
-          onClick={exportToCSV}>
-          Exportar produtos
         </BulletedButton>
         <BulletedButton
           onClick={() => { router.push('/products/create') }}>
@@ -296,12 +332,30 @@ export function Products({ userFromApi }: ProductsProps) {
             </Form>
           </div>
         </div>
+        <div className={styles.productsOptions}>
+          <div className={styles.contentFilters}>
+            <section className={styles.header}>
+              <div className={styles.panelFooter}>
+                <button type='button' onClick={exportToCSV}>Exportar produto(s)</button>
+              </div>
+            </section>
+          </div>
+        </div>
         <div className={styles.tableContainer}>
           {items.length > 0 ? (
             <table className={styles.table}>
               <thead className={styles.tableHeader}>
                 <tr>
-                  <th>Selecione</th>
+                  <th>
+                    <input className={styles.checkbox}
+                      type='checkbox'
+                      name='todos'
+                      value='todos'
+                      onChange={selectOrDeselectAllProducts}
+                      checked={checked}
+                      key={Math.random()}
+                    />
+                  </th>
                   <th>Foto</th>
                   <th>Nome do produto</th>
                   <th>Marca</th>
@@ -314,18 +368,67 @@ export function Products({ userFromApi }: ProductsProps) {
               </thead>
               <tbody className={styles.tableBody}>
                 {items.map((item, i) => (
-                  <ProductTableItem
-                    key={i}
-                    item={item}
-                    products={products}
-                    setProducts={setProducts}
-                    userInfo={{
-                      token,
-                      shop_id: !user ? '' : !!user.shopInfo._id ? user.shopInfo._id : '',
-                    }}
-                    disabledActions={disabledActions}
-                    setDisabledActions={setDisableActions}
-                  />
+                  <tr key={i}>
+                    <td>
+                      <input className={styles.checkboxDados}
+                        type="checkbox"
+                        onChange={() => handleChange(item._id, i)}
+                        checked={checkedState[i]}
+                        key={item._id}
+                      />
+                    </td>
+                    <td id={styles.imgCell} >
+                      {!!item.images ? <img src={item.images[0]} alt={item.name} /> : <FiCameraOff />}
+                    </td>
+                    <td id={styles.nameCell}>
+                      {item.name}
+                    </td>
+                    <td id={styles.nameCell}>
+                      {item.brand}
+                    </td>
+                    <td id={styles.nameCell}>
+                      {item.sku}
+                    </td>
+                    <td id={styles.valueCell}>
+                      {
+                        new Intl.NumberFormat('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL',
+                        }
+                        ).format(item.price)
+                      }
+                    </td>
+                    <td className={item.stock <= 0 ? styles.redText : styles.nameCell}>
+                      {new Intl.NumberFormat('pt-BR').format(item.stock)}
+                    </td>
+                    <td>
+                      <ProductTableItem
+                        key={i}
+                        item={item}
+                        products={products}
+                        setProducts={setProducts}
+                        userInfo={{
+                          token,
+                          shop_id: !user ? '' : !!user.shopInfo._id ? user.shopInfo._id : '',
+                        }}
+                        disabledActions={disabledActions}
+                        setDisabledActions={setDisableActions}
+                      />
+                    </td>
+                    <td id={styles.editCell}>
+                      <div onClick={() => {
+                        router.push({
+                          pathname: 'products/edit',
+                          query: {
+                            id: item._id,
+                          }
+                        })
+                      }}>
+                        <FiEdit />
+                        <span> Editar </span>
+                      </div>
+                    </td>
+                  </tr>
                 ))}
               </tbody>
             </table>
