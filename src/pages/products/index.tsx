@@ -44,6 +44,7 @@ export function Products({ userFromApi }: ProductsProps) {
   const [checkedState, setCheckedState] = useState(
     new Array(50).fill(false)
   );
+  const [isDisabledAcoes, setIsDisabledAcoes] = React.useState(true);
 
   useEffect(() => {
     // !!userFromApi && updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: userFromApi.shopInfo._id } })
@@ -159,6 +160,7 @@ export function Products({ userFromApi }: ProductsProps) {
     })
     setItems(produtos);
     setChecked(!checked);
+    setIsDisabledAcoes(checked);
   }, [checked, products, items])
 
   const handleChange = useCallback(async (id: any, position: number) => {
@@ -169,7 +171,7 @@ export function Products({ userFromApi }: ProductsProps) {
       return item
     }
     );
-    
+
     const index = products.findIndex(product => product._id === id);
     const updateProducts = products;
     updateProducts[index].checked = !checkedState[position];
@@ -181,7 +183,16 @@ export function Products({ userFromApi }: ProductsProps) {
     setCheckedState(updatedCheckedState);
     setProducts(updateProducts);
     setItems(updateItems);
-  }, [checkedState, products, items])
+    let isChecked = true;
+    updatedCheckedState.map((item) => {
+      if (item) {
+        isChecked = false;
+      }
+    }
+    );
+    setIsDisabledAcoes(isChecked);
+
+  }, [checkedState, products, items, isDisabledAcoes])
 
   const getVariations = (produto: any) => {
     const { variations } = produto
@@ -332,15 +343,15 @@ export function Products({ userFromApi }: ProductsProps) {
             </Form>
           </div>
         </div>
-        <div className={styles.productsOptions}>
-          <div className={styles.contentFilters}>
-            <section className={styles.header}>
-              <div className={styles.panelFooter}>
-                <button type='button' onClick={exportToCSV}>Exportar produto(s)</button>
-              </div>
-            </section>
+        <section className={styles.header}>
+          <div className={styles.panelFooter}>
+            <select className={styles.selectOption}>
+              <option selected value="">Ação em massa</option>
+              <option value="1">Exportar Produtos</option>
+            </select>
+            <button type='button' onClick={exportToCSV} disabled={isDisabledAcoes}>Aplicar</button>
           </div>
-        </div>
+        </section>
         <div className={styles.tableContainer}>
           {items.length > 0 ? (
             <table className={styles.table}>
