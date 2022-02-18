@@ -10,10 +10,7 @@ import { useAuth, User } from 'src/hooks/auth';
 import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
 import api from 'src/services/api';
-import { Categories } from 'src/shared/enums/Categories';
-import { Genres } from 'src/shared/enums/Genres';
-import { Nationalities } from 'src/shared/enums/Nationalities';
-import { Subcategories } from 'src/shared/enums/Subcategories';
+import { getHeader, getVariations } from 'src/shared/functions/products';
 import { ProductSummary as Product, Variation } from 'src/shared/types/product';
 import XLSX from 'xlsx';
 import BulletedButton from '../../components/BulletedButton';
@@ -33,17 +30,14 @@ export function Products({ userFromApi }: ProductsProps) {
   const [items, setItems] = useState([] as Product[]);
   const [search, setSeacrh] = useState('');
 
-
   const [disabledActions, setDisableActions] = useState(false);
 
   const { isLoading, setLoading } = useLoading();
   const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
 
   const { token, user, updateUser } = useAuth();
-  const [checked, setChecked] = React.useState(false);
-  const [checkedState, setCheckedState] = useState(
-    new Array(50).fill(false)
-  );
+  const [checked, setChecked] = useState(false);
+  const [checkedState, setCheckedState] = useState(false);
 
   useEffect(() => {
     // !!userFromApi && updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: userFromApi.shopInfo._id } })
@@ -142,103 +136,30 @@ export function Products({ userFromApi }: ProductsProps) {
   }, [])
 
   const selectOrDeselectAllProducts = useCallback(async () => {
-    const updatedCheckedState = checkedState.map(() => {
-      return !checked;
-    }
-    );
-    setCheckedState(updatedCheckedState);
-    const updateProducts = products;
-    updateProducts.forEach(produto => {
-      produto.checked = !checked;
-    })
-    setProducts(updateProducts);
-
     const produtos = items;
     produtos.forEach(item => {
       item.checked = !checked;
     })
+
     setItems(produtos);
     setChecked(!checked);
-  }, [checked, products, items])
+  }, [checked, items])
 
-  const handleChange = useCallback(async (id: any, position: number) => {
-    const updatedCheckedState = checkedState.map((item, index) => {
-      if (index === position) {
-        return !item
-      }
-      return item
-    }
-    );
-    
-    const index = products.findIndex(product => product._id === id);
-    const updateProducts = products;
-    updateProducts[index].checked = !checkedState[position];
+  const handleCheckboxChange = useCallback(async (id: any, position: number) => {
+
+    // const index = products.findIndex(product => product._id === id);
+    // const updateProducts = [...products];
+    // updateProducts[index].checked = !updateProducts[position].checked;
 
     const indexItem = items.findIndex(item => item._id === id);
-    const updateItems = items;
-    updateItems[indexItem].checked = !checkedState[position];
+    const updateItems = [...items];
+    updateItems[indexItem].checked = !updateItems[position].checked;
 
-    setCheckedState(updatedCheckedState);
-    setProducts(updateProducts);
+    setChecked(updateItems.reduce((accumulator, item) => accumulator && item.checked, false));
+
+    // setProducts(updateProducts);
     setItems(updateItems);
-  }, [checkedState, products, items])
-
-  const getVariations = (produto: any) => {
-    const { variations } = produto
-    return variations.map((variacao: Variation, index: number) => {
-
-      return {
-        Categoria: index == 0 ? getCategory(produto) : "",
-        Nome_do_Produto: index == 0 ? produto.name : "",
-        Marca: index == 0 ? produto.brand : "",
-        Id_agupador: variacao._id ? variacao._id : "",
-        Tamanho: variacao.size ? variacao.size : "",
-        Cor_ou_Sabor: variacao.color ? variacao.color : "",
-        Quantidade: variacao.stock ? variacao.stock : "",
-        Descricao_do_Produto: index == 0 ? produto.description : "",
-        EAN: index == 0 ? produto.ean : "",
-        SKU: index == 0 ? produto.sku : "",
-        Valor_cheio: index == 0 ? produto.price : "",
-        Valor_promocional: index == 0 ? produto.price_discounted : "",
-        Altura_embalagem: index == 0 ? produto.height : "",
-        Largura_embalagem: index == 0 ? produto.width : "",
-        Comprimento_embalagem: index == 0 ? produto.length : "",
-        Peso_embalagem: index == 0 ? produto.weight : "",
-        Genero: index == 0 ? getGender(produto) : "",
-        Lactose: index == 0 ? produto.lactose_free : "",
-        Gluten: index == 0 ? produto.gluten_free : "",
-        ...getImages(produto.images),
-        Id_Produto: index == 0 ? produto._id : "",
-      }
-    })
-  }
-
-  const getHeader = () => {
-
-    return {
-      Categoria: "Obrigatório",
-      Nome_do_Produto: "Obrigatório",
-      Marca: "Obrigatório",
-      Id_agupador: "Obrigatório",
-      Tamanho: "Obrigatório",
-      Cor_ou_Sabor: "Obrigatório",
-      Quantidade: "Obrigatório",
-      Descricao_do_Produto: "Obrigatório",
-      EAN: "Opcional",
-      SKU: "Obrigatório",
-      Valor_cheio: "Obrigatório",
-      Valor_promocional: "Obrigatório",
-      Altura_embalagem: "Obrigatório",
-      Largura_embalagem: "Obrigatório",
-      Comprimento_embalagem: "Obrigatório",
-      Peso_embalagem: "Obrigatório",
-      Genero: "Obrigatório",
-      Lactose: "Obrigatório para Alimentos",
-      Gluten: "Obrigatório para alimentos",
-      ...getImagesHeader(),
-      Id_Produto: "Obrigatório",
-    }
-  }
+  }, [items])
 
   const getProducts = () => {
     const produtosFiltrados = items.filter(p => p.checked)
@@ -248,40 +169,6 @@ export function Products({ userFromApi }: ProductsProps) {
       produtosCSV = [...produtosCSV, ...getVariations(produto)]
     });
     return produtosCSV
-  }
-
-  const getGender = (produto: any) => {
-    if (Genres.Masculino === produto.gender.trim()) {
-      return Genres.M;
-    } else if (Genres.Feminino === produto.gender.trim()) {
-      return Genres.F;
-    } else if (Genres.Unissex === produto.gender.trim()) {
-      return Genres.U;
-    }
-    return "";
-  }
-
-  const getCategory = (produto: any) => {
-    let nacionalidade = Nationalities[produto.nationality]; // nacionalidade
-    let categoria = Categories[produto.category]; //categoria
-    let subCategoria = Subcategories[produto.subcategory]; //subcategoria
-    return nacionalidade + " > " + categoria + " > " + subCategoria;
-  }
-
-
-  const getImages = (images: any) => {
-    let objetoImagem = {}
-    for (let i = 0; i <= 5; i++) {
-      objetoImagem = { ...objetoImagem, [`image_${i + 1}`]: images[i] ? images[i] : "" }
-    }
-    return objetoImagem
-  }
-  const getImagesHeader = () => {
-    let objetoImagem = {}
-    for (let i = 0; i <= 5; i++) {
-      objetoImagem = { ...objetoImagem, [`image_${i + 1}`]: i <= 1 ? "Obrigatório" : "Opcional" }
-    }
-    return objetoImagem
   }
 
   const exportToCSV = () => {
@@ -372,8 +259,8 @@ export function Products({ userFromApi }: ProductsProps) {
                     <td>
                       <input className={styles.checkboxDados}
                         type="checkbox"
-                        onChange={() => handleChange(item._id, i)}
-                        checked={checkedState[i]}
+                        onChange={() => handleCheckboxChange(item._id, i)}
+                        checked={item.checked}
                         key={item._id}
                       />
                     </td>
