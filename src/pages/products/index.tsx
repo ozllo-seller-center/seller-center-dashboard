@@ -45,6 +45,7 @@ export function Products({ userFromApi }: ProductsProps) {
     new Array(50).fill(false)
   );
   const [isDisabledAcoes, setIsDisabledAcoes] = React.useState(true);
+  const [valorAcoes, setValorAcoes] = useState("");
 
   useEffect(() => {
     // !!userFromApi && updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: userFromApi.shopInfo._id } })
@@ -295,6 +296,12 @@ export function Products({ userFromApi }: ProductsProps) {
     return objetoImagem
   }
 
+  const executarAcao= () => {
+    if(valorAcoes === "1"){
+      exportToCSV();
+    }
+  }
+
   const exportToCSV = () => {
     const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
     const csvData = getProducts();
@@ -312,6 +319,11 @@ export function Products({ userFromApi }: ProductsProps) {
     });
     a.click();
   }
+
+
+  const setValorAcao = useCallback((value) => {
+    setValorAcoes(value.target.value);
+  }, [valorAcoes])
 
   return (
     <div className={styles.productsContainer}>
@@ -345,11 +357,11 @@ export function Products({ userFromApi }: ProductsProps) {
         </div>
         <section className={styles.header}>
           <div className={styles.panelFooter}>
-            <select className={styles.selectOption}>
-              <option selected value="">Ação em massa</option>
+            <select value={valorAcoes || ""} onChange={setValorAcao} className={styles.selectOption}>
+              <option selected value="0">Ação em massa</option>
               <option value="1">Exportar Produtos</option>
             </select>
-            <button type='button' onClick={exportToCSV} disabled={isDisabledAcoes}>Aplicar</button>
+            <button type='button' onClick={executarAcao} disabled={isDisabledAcoes}>Aplicar</button>
           </div>
         </section>
         <div className={styles.tableContainer}>
