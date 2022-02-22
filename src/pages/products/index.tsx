@@ -11,6 +11,10 @@ import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
 import api from 'src/services/api';
 import { getHeader, getVariations } from 'src/shared/functions/products';
+import { Categories } from 'src/shared/enums/Categories';
+import { Genres } from 'src/shared/enums/Genres';
+import { Nationalities } from 'src/shared/enums/Nationalities';
+import { Subcategories } from 'src/shared/enums/Subcategories';
 import { ProductSummary as Product, Variation } from 'src/shared/types/product';
 import XLSX from 'xlsx';
 import BulletedButton from '../../components/BulletedButton';
@@ -30,6 +34,7 @@ export function Products({ userFromApi }: ProductsProps) {
   const [items, setItems] = useState([] as Product[]);
   const [search, setSeacrh] = useState('');
 
+
   const [disabledActions, setDisableActions] = useState(false);
 
   const { isLoading, setLoading } = useLoading();
@@ -38,6 +43,9 @@ export function Products({ userFromApi }: ProductsProps) {
   const { token, user, updateUser } = useAuth();
   const [checked, setChecked] = useState(false);
   const [checkedState, setCheckedState] = useState(false);
+
+  const [isDisabledAcoes, setIsDisabledAcoes] = React.useState(true);
+  const [valorAcoes, setValorAcoes] = useState("");
 
   useEffect(() => {
     // !!userFromApi && updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: userFromApi.shopInfo._id } })
@@ -143,7 +151,8 @@ export function Products({ userFromApi }: ProductsProps) {
 
     setItems(produtos);
     setChecked(!checked);
-  }, [checked, items])
+    setIsDisabledAcoes(checked);
+  }, [checked, products, items])
 
   const handleCheckboxChange = useCallback(async (id: any, position: number) => {
 
@@ -157,9 +166,16 @@ export function Products({ userFromApi }: ProductsProps) {
 
     setChecked(updateItems.reduce((accumulator, item) => accumulator && item.checked, false));
 
+    let isChecked = true;
+    updateItems.map((item) => {
+      if (item.checked)
+        isChecked = false
+    });
+    setIsDisabledAcoes(isChecked);
+
     // setProducts(updateProducts);
     setItems(updateItems);
-  }, [items])
+  }, [products, items, isDisabledAcoes])
 
   const getProducts = () => {
     const produtosFiltrados = items.filter(p => p.checked)
@@ -187,6 +203,17 @@ export function Products({ userFromApi }: ProductsProps) {
       setTimeout(() => URL.revokeObjectURL(a.href), 30 * 1000);
     });
     a.click();
+  }
+
+
+  const setValorAcao = useCallback((value) => {
+    setValorAcoes(value.target.value);
+  }, [valorAcoes])
+
+  const executarAcao = () => {
+    if (valorAcoes === "1") {
+      exportToCSV();
+    }
   }
 
   return (
@@ -219,15 +246,15 @@ export function Products({ userFromApi }: ProductsProps) {
             </Form>
           </div>
         </div>
-        <div className={styles.productsOptions}>
-          <div className={styles.contentFilters}>
-            <section className={styles.header}>
-              <div className={styles.panelFooter}>
-                <button type='button' onClick={exportToCSV}>Exportar produto(s)</button>
-              </div>
-            </section>
+        <section className={styles.header}>
+          <div className={styles.panelFooter}>
+            <select value={valorAcoes || ""} onChange={setValorAcao} className={styles.selectOption}>
+              <option selected value="0">Ação em massa</option>
+              <option value="1">Exportar Produtos</option>
+            </select>
+            <button type='button' onClick={executarAcao} disabled={isDisabledAcoes}>Aplicar</button>
           </div>
-        </div>
+        </section>
         <div className={styles.tableContainer}>
           {items.length > 0 ? (
             <table className={styles.table}>
