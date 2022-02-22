@@ -167,8 +167,8 @@ export function Products({ userFromApi }: ProductsProps) {
     setChecked(updateItems.reduce((accumulator, item) => accumulator && item.checked, false));
 
     let isChecked = true;
-    updatedCheckedState.map((item) => {
-      if (item)
+    updateItems.map((item) => {
+      if (item.checked)
         isChecked = false
     });
     setIsDisabledAcoes(isChecked);
@@ -209,6 +209,12 @@ export function Products({ userFromApi }: ProductsProps) {
   const setValorAcao = useCallback((value) => {
     setValorAcoes(value.target.value);
   }, [valorAcoes])
+
+  const executarAcao = () => {
+    if (valorAcoes === "1") {
+      exportToCSV();
+    }
+  }
 
   return (
     <div className={styles.productsContainer}>
