@@ -323,6 +323,38 @@ function Import() {
                     break
                 }
 
+                if (validate && !validate(productValidation[attribute].value)) {
+                  const error = ErrorMessages[attribute]
+
+                  if (error) {
+                    handleModalMessage(true, {
+                      type: 'error',
+                      title: error.title,
+                      message: [error.message.replace('%s', line[3]).replace('%d', (i + 1).toString())]
+                    })
+                  }
+
+                  setError(true)
+
+                  return;
+                }
+
+              }
+
+              if (productValidation['image'].value.length < 2) {
+                const error = ErrorMessages['image']
+
+                handleModalMessage(true, {
+                  type: 'error',
+                  title: error.title,
+                  message: [error.message.replace('%s', line[3]).replace('%d', (i + 1).toString())]
+                })
+
+                console.log(error.message.replace('%s', line[3]).replace('%d', (i + 1).toString()))
+
+                setError(true)
+
+                return;
               }
 
               if (stop)
@@ -514,13 +546,9 @@ function Import() {
   }, [user, token, categories, error])
 
   const handleSubmit = useCallback(async (product, newImages, products) => {
-    let isVariation = false;
-    if (!product.gender && product.variation.length > 0) {
-      isVariation = true;
-    }
-
     try {
-      if (!isVariation) {
+     /* if (!isVariation) {
+        //imagens - verificar se e necessario
         await api.patch(`/product/${product._id}/images`, { images: newImages }, {
           headers: {
             authorization: token,
@@ -528,13 +556,12 @@ function Import() {
           }
         }).then(response => {
 
-        })
-      }
+        })/
+      }*/
 
       const {
         variations
       } = product
-      if (!isVariation) {
         let price = product.price.toString();
         let price_discounted = product.price_discounted.toString();
         api.patch(`/product/${product._id}/price`, {
@@ -548,13 +575,11 @@ function Import() {
         }).then(response => {
 
         })
-      }
 
 
       await variations.forEach(async (variation: VariationDTO, i: number) => {
         if (!!product.grouperId && product.grouperId !== '') {
           const variationId = product.grouperId
-
           await api.patch(`/product/${product._id}/variation/${variationId}`, variation, {
             headers: {
               authorization: token,
@@ -568,7 +593,6 @@ function Import() {
         }
         delete variation._id
       })
-      if (!isVariation) {
         await api.patch(`/product/${product._id}`, product, {
           headers: {
             authorization: token,
@@ -584,7 +608,6 @@ function Import() {
 
           router.push('/products-mobile')
         })
-      }
     } catch (err) {
       setLoading(false)
       handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
