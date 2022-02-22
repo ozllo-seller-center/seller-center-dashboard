@@ -140,3 +140,9 @@ build
 # Todo File
 todo.mkd
 hours.mkd
+
+
+/shelf/
+/workspace.xml
+
+.idea
