@@ -26,4 +26,22 @@ const Tooltip: React.FC<TooltipProps> = ({ title, offsetY, closeTooltip, classNa
   );
 };
 
+interface HoverTooltipProps {
+  offsetX?: number;
+  offsetY?: number;
+  className?: string;
+  closeTooltip: React.MouseEventHandler<HTMLDivElement | SVGElement>;
+}
+
+export const HoverTooltip: React.FC<HoverTooltipProps> = ({ offsetY, offsetX, closeTooltip, className, children }) => {
+
+  return (
+    <>
+      <div className={styles.hoverContainer} style={{ top: offsetY, left: offsetX ? offsetX : undefined }}>
+        {children}
+      </div>
+    </>
+  );
+};
+
 export default Tooltip;

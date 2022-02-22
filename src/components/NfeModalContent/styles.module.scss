@@ -1,10 +1,16 @@
+@import '../../../public/styles/__dimensions.scss';
+
 .nfeContent {
   display: flex;
   flex-direction: column;
 
   padding: 0.5rem;
 
-  min-width: 725px;
+  min-width: 300px;
+
+  @media screen and (min-width: $tablet_vertical) {
+    min-width: 725px;
+  }
 
   // align-content: space-between;
   // align-items: center;
@@ -68,11 +74,11 @@
 
   align-self: stretch;
 
-  & + & {
+  &+& {
     margin-top: 0.5rem;
   }
 
-  > div {
+  >div {
     flex: 1;
   }
 }
@@ -100,7 +106,7 @@
 
   align-items: center;
 
-  > svg {
+  >svg {
     width: 4rem;
     height: 4rem;
 

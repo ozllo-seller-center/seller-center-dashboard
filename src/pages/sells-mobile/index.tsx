@@ -1,33 +1,35 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { FiCalendar, FiCheck, FiClipboard, FiMoreHorizontal, FiPaperclip, FiSearch, FiX } from 'react-icons/fi'
-import { FormHandles } from '@unform/core';
-import { format, isSameWeek, isToday, subDays } from 'date-fns';
-import { Form } from '@unform/web';
+import { FiAlertTriangle, FiCalendar, FiCheck, FiClipboard, FiMoreHorizontal, FiPaperclip, FiSearch, FiX } from 'react-icons/fi'
+import { FormHandles } from '@unform/core'
+import { addDays, differenceInBusinessDays, format, isSameWeek, isToday, subDays } from 'date-fns'
+import { Form } from '@unform/web'
 
-import Button from '../../components/PrimaryButton';
-import FilterButton from '../../components/FilterButton';
+import Button from '../../components/PrimaryButton'
+import FilterButton from '../../components/FilterButton'
 
-import FilterInput from '../../components/FilterInput';
-import StatusPanel from '../../components/OrderStatusPanel';
+import FilterInput from '../../components/FilterInput'
+import StatusPanel from '../../components/OrderStatusPanel'
 
-import styles from './styles.module.scss';
-import DatePickerPopup from '../../components/DatePickerPopup';
-import Collapsible from '../../components/Collapsible';
-import HeaderDropdown from 'src/components/HeaderDropdown';
-import AttachButton from 'src/components/AttachButton';
-import { useAuth } from 'src/hooks/auth';
-import { useLoading } from 'src/hooks/loading';
-import { useModalMessage } from 'src/hooks/message';
-import Modal from 'src/components/Modal';
-import NfeModalContent from 'src/components/NfeModalContent';
-import MessageModal from 'src/components/MessageModal';
-import { Order, OrderParent, OrderStatusType } from 'src/shared/types/order';
-import api from 'src/services/api';
-import { BiPackage } from 'react-icons/bi';
-import OrderDetailsModal from 'src/components/OrderDetailsModal';
-import TrackingModalContent from 'src/components/TrackingModalContent';
-import { InOrderStatus, OrderContainsProduct } from 'src/shared/functions/sells';
-import { OrderStatus } from 'src/shared/enums/order';
+import styles from './styles.module.scss'
+import DatePickerPopup from '../../components/DatePickerPopup'
+import Collapsible from '../../components/Collapsible'
+import HeaderDropdown from 'src/components/HeaderDropdown'
+import AttachButton from 'src/components/AttachButton'
+import { useAuth } from 'src/hooks/auth'
+import { useLoading } from 'src/hooks/loading'
+import { useModalMessage } from 'src/hooks/message'
+import Modal from 'src/components/Modal'
+import NfeModalContent from 'src/components/NfeModalContent'
+import MessageModal from 'src/components/MessageModal'
+import { Order, OrderParent, OrderStatusType } from 'src/shared/types/order'
+import api from 'src/services/api'
+import { BiPackage } from 'react-icons/bi'
+import OrderDetailsModal from 'src/components/OrderDetailsModal'
+import TrackingModalContent from 'src/components/TrackingModalContent'
+import { InOrderStatus, OrderContainsProduct } from 'src/shared/functions/sells'
+import { OrderStatus } from 'src/shared/enums/order'
+import { useRouter } from 'next/router'
+import { MdOutlineLocalShipping } from 'react-icons/md'
 
 enum SellStatus {
   // 'Pending' | 'Approved' | 'Invoiced' | 'Shipped' | 'Delivered' | 'Canceled' | 'Completed'
@@ -77,7 +79,7 @@ export function Sells() {
 
   const [fromDateFilter, setFromDateFilter] = useState(new Date())
   const [toDateFilter, setToDateFilter] = useState(new Date())
-  const [filter, setFilter] = useState(Filter.Hoje)
+  const [filter, setFilter] = useState(Filter.Mes)
   const [search, setSeacrh] = useState('')
 
   const itemsRef = useMemo(() => Array(items.length).fill(0).map(i => React.createRef<HTMLTableRowElement>()), [items])
@@ -102,13 +104,15 @@ export function Sells() {
   const [modalOrder, setModalOrder] = useState<Order>()
   const [isOrderModalOpen, setOrderModalOpen] = useState(false)
 
+  const router = useRouter()
+
   const inInterval = useCallback((order: Order) => {
 
-    const date: Date = new Date(order.payment.purchaseDate);
+    const date: Date = new Date(order.payment.purchaseDate)
 
     switch (filter) {
       case Filter.Semana:
-        return isSameWeek(date, new Date());
+        return isSameWeek(date, new Date())
 
       case Filter.Mes:
         const today = new Date()
@@ -116,20 +120,18 @@ export function Sells() {
         return date >= subDays(today, 30) && date <= today
 
       case Filter.Custom:
-        return format(date, 'yyyy/MM/dd') <= format(toDateFilter, 'yyyy/MM/dd') && format(date, 'yyyy/MM/dd') >= format(fromDateFilter, 'yyyy/MM/dd');
+        return format(date, 'yyyy/MM/dd') <= format(toDateFilter, 'yyyy/MM/dd') && format(date, 'yyyy/MM/dd') >= format(fromDateFilter, 'yyyy/MM/dd')
 
       default:
-        return isToday(date);
+        return isToday(date)
     }
   }, [status, fromDateFilter, toDateFilter, filter])
 
-  useEffect(() => {
+  const loadOrders = useCallback(() => {
     setLoading(true)
 
     api.get('/account/detail').then(response => {
       updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id, userId: response.data.shopInfo.userId } })
-
-      // setOrders(ordersFromApi)
 
       api.get('/order/all', {
         headers: {
@@ -141,6 +143,7 @@ export function Sells() {
         // console.log(JSON.stringify(response.data))
 
         setOrders(response.data as OrderParent[])
+
         // response.data.map((order: OrderParent) => {
 
         // })
@@ -151,10 +154,18 @@ export function Sells() {
         setLoading(false)
       })
     }).catch(err => {
-      console.log(err)
       setLoading(false)
-    });
+
+      console.log(err)
+      router.push('/')
+    })
+  }, [user])
+
+  useEffect(() => {
+    // setOrders(ordersFromApi)
+    loadOrders()
   }, [])
+
 
   useEffect(() => {
     const totals = orders.reduce((accumulator: Totals, orderParent: OrderParent) => {
@@ -204,8 +215,8 @@ export function Sells() {
     }).format(totals.total))
   }, [orders, orderStatus, fromDateFilter, toDateFilter, filter])
 
-  const formRef = useRef<FormHandles>(null);
-  const [error, setError] = useState('');
+  const formRef = useRef<FormHandles>(null)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     const newItems = orders.filter((orderParent) => {
@@ -237,21 +248,21 @@ export function Sells() {
   const handleSubmit = useCallback(
     async (data: SearchFormData) => {
       try {
-        formRef.current?.setErrors({});
+        formRef.current?.setErrors({})
 
         if (data.search !== search) {
-          setSeacrh(data.search);
+          setSeacrh(data.search)
         }
 
       } catch (err) {
-        setError('Ocorreu um erro ao fazer login, cheque as credenciais.');
+        setError('Ocorreu um erro ao fazer login, cheque as credenciais.')
       }
     },
     [search],
-  );
+  )
 
   const handleModalVisibility = useCallback(() => {
-    handleModalMessage(false);
+    handleModalMessage(false)
   }, [])
 
   const handleOrderModalVisibility = useCallback(() => {
@@ -261,10 +272,10 @@ export function Sells() {
 
   const handleAttachment = useCallback(async (data: any) => {
 
-  }, [items]);
+  }, [items])
 
-  const datePickerRef = useRef<FormHandles>(null);
-  const [datePickerVisibility, setDatePickerVisibility] = useState(false);
+  const datePickerRef = useRef<FormHandles>(null)
+  const [datePickerVisibility, setDatePickerVisibility] = useState(false)
 
   const getOrderStatus = useCallback((orderStatus: OrderStatusType) => {
     switch (orderStatus) {
@@ -282,6 +293,14 @@ export function Sells() {
       case 'Completed':
         return SellStatus.Entregue
     }
+  }, [])
+
+  const getDaysToShip = useCallback((orderUpdateDate: string) => {
+    let orderDate = new Date(orderUpdateDate)
+    const today = new Date()
+    orderDate = addDays(orderDate, 2)
+
+    return differenceInBusinessDays(orderDate, today)
   }, [])
 
   return (
@@ -309,15 +328,15 @@ export function Sells() {
                 Esta semana
               </FilterButton>
               <FilterButton isActive={filter === Filter.Mes} onClick={() => setFilter(Filter.Mes)}>
-                Este mês
+                Últimos 30 dias
               </FilterButton>
               <div>
                 <FilterButton
                   icon={FiCalendar}
                   isActive={filter === Filter.Custom}
                   onClick={() => {
-                    setFilter(Filter.Custom);
-                    setDatePickerVisibility(!datePickerVisibility);
+                    setFilter(Filter.Custom)
+                    setDatePickerVisibility(!datePickerVisibility)
                   }}>
                   Escolher período
                 </FilterButton>
@@ -422,6 +441,14 @@ export function Sells() {
                       )
                     }
                     {
+                      getOrderStatus(item.order.status.status) === SellStatus.Despachado && (
+                        <div className={styles.approvedItem}>
+                          <MdOutlineLocalShipping />
+                          Despachado
+                        </div>
+                      )
+                    }
+                    {
                       getOrderStatus(item.order.status.status) === SellStatus.Cancelado && (
                         <div className={styles.canceledItem}>
                           <FiX />
@@ -450,6 +477,28 @@ export function Sells() {
                     }
                     </span>
 
+                    {
+                      (item.order.status.status !== 'Shipped' && item.order.status.status !== 'Delivered' &&
+                        item.order.status.status !== 'Completed' && item.order.status.status !== 'Canceled' &&
+                        getDaysToShip(item.order.payment.paymentDate) <= 2) && (
+                        <div className={styles.shippmentWarning} style={getDaysToShip(item.order.payment.paymentDate) >= 0 ? { color: 'var(--yellow-300)' } : { color: 'var(--red-300)' }}>
+                          <FiAlertTriangle />
+                          {
+                            getDaysToShip(item.order.payment.paymentDate) >= 1 &&
+                            <span>{getDaysToShip(item.order.payment.paymentDate)} dias p/ despachar</span>
+                          }
+                          {
+                            getDaysToShip(item.order.payment.paymentDate) === 0 &&
+                            <span>Último dia p/ despachar</span>
+                          }
+                          {
+                            getDaysToShip(item.order.payment.paymentDate) < 0 &&
+                            <span>Despache atrasado!</span>
+                          }
+                        </div>
+                      )
+                    }
+
                     {status === SellStatus.Faturando ?
                       <AttachButton
                         name={item._id}
@@ -458,10 +507,14 @@ export function Sells() {
                         unattachedText='Anexar NF-e'
                         placeholder='Informe a URL da NF-e'
                         // isAttached={!!item.order.orderNotes && item.order.orderNotes.length > 0} //!item.nfe_url
-                        isAttached={false}
+                        isAttached={item.order.status.status === 'Invoiced'}
                         onClick={() => {
-                          setNfeModalOpen(true)
-                          setNfeItem(item)
+                          if (item.order.status.status === 'Approved') {
+                            setNfeModalOpen(true)
+                            setNfeItem(item)
+
+                            return
+                          }
                         }}
                       />
                       :
@@ -474,10 +527,12 @@ export function Sells() {
                           placeholder='Informe o código de envio'
                           // handleAttachment={handleAttachment}
                           // isAttached={!!item.order.orderNotes} //!item.nfe_url
-                          isAttached={false}
+                          isAttached={item.order.status.status === 'Shipped'}
                           onClick={() => {
-                            setTrackingModalOpen(true)
-                            setTrackingItem(item)
+                            if (item.order.status.status === 'Invoiced') {
+                              setTrackingModalOpen(true)
+                              setTrackingItem(item)
+                            }
                           }}
                         />
                         :
@@ -491,9 +546,7 @@ export function Sells() {
                     }
                   </div>
                 </div>
-              )
-              )
-              }
+              ))}
             </div>
           ) : (
             <span className={styles.emptyList}> Nenhum item foi encontrado </span>
@@ -525,9 +578,11 @@ export function Sells() {
             title='Anexar NF-e'
             icon={FiPaperclip}
           >
-            <NfeModalContent item={nfeItem} closeModal={() => {
-              setNfeModalOpen(false)
-            }} />
+            <NfeModalContent
+              item={nfeItem}
+              closeModal={() => setNfeModalOpen(false)}
+              onNfeSent={loadOrders}
+            />
           </Modal>
         )
       }
@@ -538,7 +593,11 @@ export function Sells() {
             title='Anexar Rastreio'
             icon={FiPaperclip}
           >
-            <TrackingModalContent item={trackingItem} closeModal={() => setTrackingModalOpen(false)} />
+            <TrackingModalContent
+              item={trackingItem}
+              closeModal={() => setTrackingModalOpen(false)}
+              onTrackSent={loadOrders}
+            />
           </Modal>
         )
       }
@@ -1212,10 +1271,10 @@ const ordersFromApi: OrderParent[] = JSON.parse(`[
       },
       "shop_id": "60df95d99d34e9bd68fdcb8c"
   }
-]`);
+]`)
 
 // export const getStaticProps: GetStaticProps = async ({ }) => {
-//   const sells = ordersFromApi.sort((a, b) => a.date < b.date ? -1 : 1);
+//   const sells = ordersFromApi.sort((a, b) => a.date < b.date ? -1 : 1)
 
 //   return ({
 //     props: { sells },
@@ -1223,4 +1282,4 @@ const ordersFromApi: OrderParent[] = JSON.parse(`[
 //   })
 // }
 
-export default Sells;
+export default Sells

@@ -71,6 +71,11 @@ export const Header: React.FC<HeaderProps> = ({ open, setOpen }) => {
       return
     }
 
+    if (router.pathname.includes('integrations')) {
+      setTitle('Integrações')
+      setDescription(<span>Integre suas informações a partir do seu ERP ou E-commerce</span>)
+    }
+
     setTitle('Produtos')
     setDescription(<span>Adicione produtos manualmente ou através de um planilha</span>)
   }, [router])
