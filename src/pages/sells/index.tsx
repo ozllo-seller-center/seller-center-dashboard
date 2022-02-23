@@ -29,6 +29,7 @@ import router from 'next/router'
 import { OrderStatus } from 'src/shared/enums/order'
 import { InOrderStatus, OrderContainsProduct } from 'src/shared/functions/sells'
 import Tooltip, { HoverTooltip } from 'src/components/Tooltip'
+import { Loader } from 'src/components/Loader'
 
 enum SellStatus {
   // 'Pending' | 'Approved' | 'Invoiced' | 'Shipped' | 'Delivered' | 'Canceled' | 'Completed'
@@ -111,42 +112,44 @@ export function Sells() {
   const loadOrders = useCallback(() => {
     setLoading(true)
 
+    api.get('/order/all', {
+      headers: {
+        authorization: token,
+        shop_id: user.shopInfo._id,
+      }
+    }).then(response => {
+      // console.log('Orders:')
+      // console.log(JSON.stringify(response.data))
+
+      console.log(response.data as OrderParent[])
+
+      setOrders(response.data as OrderParent[])
+
+      // response.data.map((order: OrderParent) => {
+
+      // })
+
+      setLoading(false)
+    }).catch(err => {
+      console.log(err)
+      setLoading(false)
+    })
+  }, [user])
+
+  useEffect(() => {
+    // setOrders(ordersFromApi)
+    setLoading(true)
+
     api.get('/account/detail').then(response => {
       updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id, userId: response.data.shopInfo.userId } })
 
-      api.get('/order/all', {
-        headers: {
-          authorization: token,
-          shop_id: response.data.shopInfo._id,
-        }
-      }).then(response => {
-        // console.log('Orders:')
-        // console.log(JSON.stringify(response.data))
-
-        console.log(response.data as OrderParent[])
-
-        setOrders(response.data as OrderParent[])
-
-        // response.data.map((order: OrderParent) => {
-
-        // })
-
-        setLoading(false)
-      }).catch(err => {
-        console.log(err)
-        setLoading(false)
-      })
+      loadOrders()
     }).catch(err => {
       setLoading(false)
 
       console.log(err)
       router.push('/')
     })
-  }, [user])
-
-  useEffect(() => {
-    // setOrders(ordersFromApi)
-    loadOrders()
 
   }, [])
 
@@ -165,7 +168,7 @@ export function Sells() {
       case Filter.Mes:
         const today = new Date()
 
-        return date >= subDays(today, 30) && date <= today
+        return date.getDate() >= subDays(today, 31).getDate() && date.getDate() <= today.getDate()
 
       case Filter.Custom:
         return format(date, 'yyyy/MM/dd') <= format(toDateFilter, 'yyyy/MM/dd') && format(date, 'yyyy/MM/dd') >= format(fromDateFilter, 'yyyy/MM/dd')
@@ -584,6 +587,13 @@ export function Sells() {
       {
         (isOrderModalOpen && modalOrder) && (
           <OrderDetailsModal handleVisibility={handleOrderModalVisibility} order={modalOrder} />
+        )
+      }
+      {
+        isLoading && (
+          <div className={styles.loadingContainer}>
+            <Loader />
+          </div>
         )
       }
     </div >
