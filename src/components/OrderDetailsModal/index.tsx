@@ -168,6 +168,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
                 <span>{order.shipping.address.address}, nº{order.shipping.address.number}</span>
                 <span>{order.shipping.address.neighborhood}</span>
                 <span>{order.shipping.address.city} - {order.shipping.address.state}</span>
+                {order.shipping.address.additionalInfo && <span>Complemento: {order.shipping.address.additionalInfo}</span>}
               </div>
               <div className={styles.column}>
                 <strong className={styles.subTitle}>Dados do envio</strong>
