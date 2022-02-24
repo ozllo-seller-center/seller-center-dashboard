@@ -41,7 +41,7 @@ const Menu: React.FC<MenuProps> = ({ open, setOpen, visible }) => {
         <MenuItem to={(!!width && width < 768) ? "/sells-mobile" : "/sells"} name="Minhas vendas" setSelected={setSelected} iconLib={FaRegMoneyBillAlt} />
         <MenuItem to={(!!width && width < 768) ? "/products-mobile" : "/products"} name="Produtos" setSelected={setSelected} iconLib={FiPackage} />
         <MenuItem to="/marketplaces" name="Marketplaces" setSelected={setSelected} iconLib={RiStore2Line} />
-        <MenuItem to="/integrations" name="Integrações" setSelected={setSelected} iconLib={MdOutlineIntegrationInstructions} />
+        {/* <MenuItem to="/integrations" name="Integrações" setSelected={setSelected} iconLib={MdOutlineIntegrationInstructions} /> */}
       </div>
       {(!!width && width < 768 && open) && <div className={styles.outside} onClick={() => setOpen(!open)} />}
     </>

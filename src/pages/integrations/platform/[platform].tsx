@@ -25,6 +25,8 @@ import img15 from '../../../../public/assets/magento2.png'
 import img16 from '../../../../public/assets/softvar.png'
 import img17 from '../../../../public/assets/Bseller.png'
 import img18 from '../../../../public/assets/idealeWare.png'
+import Textfield from 'src/components/Textfield'
+import Button from 'src/components/PrimaryButton'
 
 interface PlatformInfo {
   title: string,
@@ -356,9 +358,180 @@ const Platform: React.FC = () => {
         ref={formRef}
         onSubmit={handleSubmit}>
         <div className={styles.card}>
-          <img src={platformInfo.img} />
+          {/* <img src={platformInfo.img} /> */}
           <h1>Integração {platformInfo.title}</h1>
-          <Input name='T' label='Teste' />
+
+          {platformInfo.apiUrl &&
+            <Textfield
+              name='apiUrl'
+              label='URL da API'
+              placeholder={`Insira o URL da API ${platformInfo.title}`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.apiKey &&
+            <Textfield
+              name='apiKey'
+              label='API Key'
+              placeholder={`Insira a API Key do ${platformInfo.title}`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.secret &&
+            <Textfield
+              name='secretKey'
+              label='Secret Key'
+              placeholder={`Insira a Secret Key de acesso ao ${platformInfo.title}`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.email &&
+            <Textfield
+              name='email'
+              label='Email'
+              placeholder={`Insira o email`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.password &&
+            <Textfield
+              name='password'
+              label=''
+              placeholder={`Insira a senha`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.shopName &&
+            <Textfield
+              name='shopName'
+              label={`Nome da loja ${platformInfo.title}`}
+              placeholder={`Insira a API Key do ${platformInfo.title}`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.apiKey &&
+            <Textfield
+              name='apiKey'
+              label=''
+              placeholder={`Insira a API Key do ${platformInfo.title}`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.apiKey &&
+            <Textfield
+              name='apiKey'
+              label=''
+              placeholder={`Insira a API Key do ${platformInfo.title}`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.apiKey &&
+            <Textfield
+              name='apiKey'
+              label=''
+              placeholder={`Insira a API Key do ${platformInfo.title}`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.apiKey &&
+            <Textfield
+              name='apiKey'
+              label=''
+              placeholder={`Insira a API Key do ${platformInfo.title}`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.apiKey &&
+            <Textfield
+              name='apiKey'
+              label=''
+              placeholder={`Insira a API Key do ${platformInfo.title}`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.apiKey &&
+            <Textfield
+              name='apiKey'
+              label=''
+              placeholder={`Insira a API Key do ${platformInfo.title}`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.eMillenium &&
+            <Textfield
+              name='eMillenium'
+              label='Vitrine da Loja E-millenium'
+              placeholder={`Insira a API Key do ${platformInfo.title}`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.url &&
+            <Textfield
+              name='shopUrl'
+              label='URL da loja'
+              placeholder={`Insira o URL da loja ${platformInfo.title}`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.ecommerceUrl &&
+            <Textfield
+              name='apiKey'
+              label='URL do Ecommerce'
+              placeholder={`Insira o URL do seu ecommerce`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.jwt &&
+            <Textfield
+              name='jwt'
+              label='Token JWT da API'
+              placeholder={`Insira o token JWT para a API ${platformInfo.title}`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.ecommerceId &&
+            <Textfield
+              name='ecommerceId'
+              label='Id Ecommerce'
+              placeholder={`Insira o Id Ecommerce para criação de pedidos (opcional)`}
+              fullWidth
+            />}
+
+          {platformInfo.channelId &&
+            <Textfield
+              name='channelId'
+              label='ChannelId'
+              placeholder={`Insira o channelId do ${platformInfo.title}`}
+              fullWidth
+              required
+            />}
+
+          {platformInfo.clientId &&
+            <Textfield
+              name='clientId'
+              label='ClientId'
+              placeholder={`Insira a clientId do ${platformInfo.title}`}
+              fullWidth
+              required
+            />}
+
+          <Button type='submit' onClick={() => { formRef.current?.submitForm() }}>Cadastrar integração</Button>
         </div>
         <Snackbar open={open} autoHideDuration={10000} anchorOrigin={{ vertical: 'top', horizontal: 'center', }} onClose={handleClose}>
           <Alert severity={type} sx={{ width: '100%' }}>
