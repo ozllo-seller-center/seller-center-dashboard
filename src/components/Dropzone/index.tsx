@@ -27,12 +27,12 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, disabled }) => {
     setErr(undefined);
     clearError();
 
-    if (disabled && dropZoneRef.current) {
-      const popped = acceptedFiles.pop()
+    // if (disabled && dropZoneRef.current) {
+    //   const popped = acceptedFiles.pop()
 
-      dropZoneRef.current.acceptedFiles = popped
-      return
-    }
+    //   dropZoneRef.current.acceptedFiles = popped
+    //   return
+    // }
 
     try {
       if (dropZoneRef.current) {
@@ -80,40 +80,32 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, disabled }) => {
         //   ?
         //   <img src={selectedFileUrl} alt='Point thumbnail' />
         //   :
-        !!disabled ?
-          <p>
-            <FiCamera />
-            Clique ou arraste
-            <br />
-            As fotos aqui
+        !!error ?
+          <p className='error'>
+            <FiAlertCircle />
+            {error}
           </p>
           :
-          !!error ?
+          !!err ?
             <p className='error'>
               <FiAlertCircle />
-              {error}
+              Erro com o arquivo selecionado
+              <br />
+              Tente novamente
             </p>
             :
-            !!err ?
-              <p className='error'>
-                <FiAlertCircle />
-                Erro com o arquivo selecionado
-                <br />
-                Tente novamente
+            isDragActive ?
+              <p>
+                <FiCamera />
+                Solte o arquivo aqui ...
               </p>
               :
-              isDragActive ?
-                <p>
-                  <FiCamera />
-                  Solte o arquivo aqui ...
-                </p>
-                :
-                <p>
-                  <FiCamera />
-                  Clique ou arraste
-                  <br />
-                  As fotos aqui
-                </p>
+              <p>
+                <FiCamera />
+                Clique ou arraste
+                <br />
+                As fotos aqui
+              </p>
       }
     </div>
   )
