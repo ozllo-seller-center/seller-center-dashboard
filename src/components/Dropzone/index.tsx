@@ -8,6 +8,7 @@ import { FiCamera, FiAlertCircle } from 'react-icons/fi'
 interface Props {
   name: string;
   onFileUploaded: (acceptedFiles: File[], dropZoneRef: React.RefObject<any>) => void;
+  disabled?: boolean;
 }
 
 interface InputRefProps extends HTMLInputElement {
@@ -15,7 +16,7 @@ interface InputRefProps extends HTMLInputElement {
 }
 
 // TODO: Passar a lista de imagens para dentro deste componente (externalizar como outro componente se preicsar)
-const Dropzone: React.FC<Props> = ({ name, onFileUploaded }) => {
+const Dropzone: React.FC<Props> = ({ name, onFileUploaded, disabled }) => {
   // const [selectedFileUrl, setselectedFileUrl] = useState<string[]>([]);
   const [err, setErr] = useState<string>();
 
@@ -25,6 +26,13 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded }) => {
   const onDrop = useCallback(acceptedFiles => {
     setErr(undefined);
     clearError();
+
+    if (disabled && dropZoneRef.current) {
+      const popped = acceptedFiles.pop()
+
+      dropZoneRef.current.acceptedFiles = popped
+      return
+    }
 
     try {
       if (dropZoneRef.current) {
@@ -72,32 +80,40 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded }) => {
         //   ?
         //   <img src={selectedFileUrl} alt='Point thumbnail' />
         //   :
-        !!error ?
-          <p className='error'>
-            <FiAlertCircle />
-            {error}
+        !!disabled ?
+          <p>
+            <FiCamera />
+            Clique ou arraste
+            <br />
+            As fotos aqui
           </p>
           :
-          !!err ?
+          !!error ?
             <p className='error'>
               <FiAlertCircle />
-              Erro com o arquivo selecionado
-              <br />
-              Tente novamente
+              {error}
             </p>
             :
-            isDragActive ?
-              <p>
-                <FiCamera />
-                Solte o arquivo aqui ...
+            !!err ?
+              <p className='error'>
+                <FiAlertCircle />
+                Erro com o arquivo selecionado
+                <br />
+                Tente novamente
               </p>
               :
-              <p>
-                <FiCamera />
-                Clique ou arraste
-                <br />
-                As fotos aqui
-              </p>
+              isDragActive ?
+                <p>
+                  <FiCamera />
+                  Solte o arquivo aqui ...
+                </p>
+                :
+                <p>
+                  <FiCamera />
+                  Clique ou arraste
+                  <br />
+                  As fotos aqui
+                </p>
       }
     </div>
   )

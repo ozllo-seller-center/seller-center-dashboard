@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { ProductImage } from 'src/shared/types/product';
 
@@ -20,6 +20,11 @@ const ImageController: React.FC<ImageControllerProps> = ({ files, handleFileOrde
 
   const [dropPos, setDropPos] = useState(-1);
   const [dropIntent, setDropIntent] = useState<boolean>(false);
+
+  useEffect(() => {
+    console.log('ImageController - files changed:')
+    console.log(files)
+  }, [files])
 
 
   const dragParentHandler = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -69,13 +74,14 @@ const ImageController: React.FC<ImageControllerProps> = ({ files, handleFileOrde
       <Dropzone
         name='images'
         onFileUploaded={handleOnFileUpload}
+        disabled={!!dragging}
       />
 
       {
         files.map((f, i) => {
           if (!!f.url)
             return (
-              <>
+              <div key={i} style={{ display: 'flex' }}>
                 {
                   dropPos === i && !dropIntent &&
                   <hr key={'previous'} id='divider' className={styles.dragLeftDivider} />
@@ -92,7 +98,7 @@ const ImageController: React.FC<ImageControllerProps> = ({ files, handleFileOrde
                   (dropPos === i) && dropIntent &&
                   <hr id='divider' className={styles.dragRightDivider} />
                 }
-              </>
+              </div>
             )
         })
       }
