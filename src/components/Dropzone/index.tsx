@@ -80,13 +80,15 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, disabled }) => {
         //   ?
         //   <img src={selectedFileUrl} alt='Point thumbnail' />
         //   :
-        !!error ?
-          <p className='error'>
-            <FiAlertCircle />
-            {error}
-          </p>
-          :
-          !!err ?
+       // !!disabled ?
+        //   <p>
+        //     <FiCamera />
+        //     Clique ou arraste
+        //     <br />
+        //     As fotos aqui
+        //   </p>
+        //   :
+          !!error ?
             <p className='error'>
               <FiAlertCircle />
               Erro com o arquivo selecionado
