@@ -27,12 +27,12 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, disabled }) => {
     setErr(undefined);
     clearError();
 
-    if (disabled && dropZoneRef.current) {
-      const popped = acceptedFiles.pop()
+    // if (disabled && dropZoneRef.current) {
+    //   const popped = acceptedFiles.pop()
 
-      dropZoneRef.current.acceptedFiles = popped
-      return
-    }
+    //   dropZoneRef.current.acceptedFiles = popped
+    //   return
+    // }
 
     try {
       if (dropZoneRef.current) {
@@ -80,14 +80,14 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, disabled }) => {
         //   ?
         //   <img src={selectedFileUrl} alt='Point thumbnail' />
         //   :
-        !!disabled ?
-          <p>
-            <FiCamera />
-            Clique ou arraste
-            <br />
-            As fotos aqui
-          </p>
-          :
+        // !!disabled ?
+        //   <p>
+        //     <FiCamera />
+        //     Clique ou arraste
+        //     <br />
+        //     As fotos aqui
+        //   </p>
+        //   :
           !!error ?
             <p className='error'>
               <FiAlertCircle />
