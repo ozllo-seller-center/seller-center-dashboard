@@ -43,7 +43,6 @@ export function EditProductForm() {
   const [files, setFiles] = useState<ProductImage[]>([])
   const [filesUrl, setFilesUrl] = useState<string[]>([])
 
-  const [filledFields, setFilledFields] = useState(0)
   const [totalFields, setTotalFields] = useState(14)
 
   const [oldStock, setOldStock] = useState<number[]>([])
@@ -164,8 +163,6 @@ export function EditProductForm() {
       api.get(`/category/${category}/attributes`).then(response => {
         setAttributes(response.data[0].attributes)
 
-        setFilledFields(10 + variations.length * (response.data[0].attributes.length + 1))
-
         response.data[0].attributes.map((attr: Attribute) => {
           if (attr.name === 'flavor') {
             setHintDisabled(true)
@@ -188,7 +185,6 @@ export function EditProductForm() {
     }
 
     setTotalFields(10 + (attributes.length + 1))
-    setFilledFields(10 + (attributes.length + 1))
   }, [variations, attributes])
 
   const setNameChecks = useCallback((name: string) => {
@@ -229,10 +225,8 @@ export function EditProductForm() {
     handleModalMessage(false)
   }, [])
 
-
   const handleOnFileUpload = useCallback((acceptedFiles: File[], dropZoneRef: React.RefObject<any>) => {
     calcFilledFields(formRef.current?.getData() as Product)
-
     acceptedFiles = acceptedFiles.filter((f, i) => {
       if (files.length + (i + 1) > 6) {
         handleModalMessage(true, {
@@ -300,8 +294,6 @@ export function EditProductForm() {
     formRef.current?.setFieldValue('images', filesUpdate)
     setFilesUrl(urlsUpdate)
     setFiles(filesUpdate)
-
-    calcFilledFields(formRef.current?.getData() as Product)
   }, [filesUrl, files])
 
   const handleFileOrder = useCallback((draggedFile: number, droppedAt: number) => {
@@ -320,30 +312,48 @@ export function EditProductForm() {
     setFiles([...newFiles])
   }, [files])
 
-  const calcFilledFields = useCallback((data: Product) => {
+  const filledFields = useMemo(() => {
+
+    if (!formRef.current)
+      return 0
+
+    const data = formRef.current?.getData() as Product;
+
+    if (!data)
+      return 0
 
     let filled = 0
 
     if (data.name)
       filled++
+
     if (data.brand)
       filled++
+
     if (data.description)
       filled++
+
     if (data.sku)
       filled++
+
     if (data.height)
       filled++
+
     if (data.width)
       filled++
+
     if (data.length)
       filled++
+
     if (data.weight)
       filled++
+
     if (data.price)
       filled++
-    if (filesUrl.length > 0)
+
+    if (files.length >= 2)
       filled++
+
 
     data.variations.forEach(variation => {
       !!variation.size && filled++
@@ -363,8 +373,8 @@ export function EditProductForm() {
       })
     })
 
-    setFilledFields(filled)
-  }, [filesUrl, filledFields, totalFields, attributes])
+    return filled
+  }, [files, totalFields, attributes, formRef.current?.getData()])
 
   const yupVariationSchema = useCallback((): object => {
     return attributes.findIndex(attribute => attribute.name === 'flavor') >= 0 ?
@@ -405,7 +415,7 @@ export function EditProductForm() {
       formRef.current?.setErrors({})
 
       const schema = Yup.object().shape({
-        images: Yup.array().min(1, 'Escolha pelo menos \numa imagem'),
+        images: Yup.array().min(2, 'Escolha pelo menos duas imagens').max(8, 'Pode atribuir no máximo 8 imagens'),
         name: Yup.string().required('Campo obrigatório').min(2, "Deve conter pelo menos 2 caracteres"),
         description: Yup.string()
           .required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres').max(1800, 'Deve conter no máximo 1800 caracteres'),
@@ -641,7 +651,7 @@ export function EditProductForm() {
           <Form
             ref={formRef}
             onSubmit={handleSubmit}
-            onChange={(e) => { calcFilledFields(formRef.current?.getData() as Product) }}
+            // onChange={(e) => { calcFilledFields(formRef.current?.getData() as Product) }}
           >
             <p className={styles.imagesTitle}>Fotos do produto</p>
             <ImageController

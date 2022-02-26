@@ -63,10 +63,8 @@ const SignIn: React.FC = () => {
         const userIsAdmin = await isAdmin();
 
         userIsAdmin ? route.push('/admin') : route.push('/dashboard');
-      } catch (err) {
+      } catch (err: any) {
         setLoading(false);
-
-        console.log(err)
 
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
