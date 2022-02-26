@@ -226,7 +226,6 @@ export function EditProductForm() {
   }, [])
 
   const handleOnFileUpload = useCallback((acceptedFiles: File[], dropZoneRef: React.RefObject<any>) => {
-    calcFilledFields(formRef.current?.getData() as Product)
     acceptedFiles = acceptedFiles.filter((f, i) => {
       if (files.length + (i + 1) > 6) {
         handleModalMessage(true, {
