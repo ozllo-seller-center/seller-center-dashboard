@@ -95,7 +95,7 @@ const SignUp: React.FC = () => {
         setLoading(false);
         setTitle('Cadastro realizado com sucesso!');
         setMessages(['Cheque seu e-mail para autenticar sua conta.', 'Caso a conta não seja autenticada em algumas horas, o cadastro será cancelado.']);
-      } catch (err) {
+      } catch (err: any) {
         setLoading(false);
 
         if (err instanceof Yup.ValidationError) {
