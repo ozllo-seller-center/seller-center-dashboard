@@ -1,12 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 import { useRouter } from 'next/router';
 import * as Yup from 'yup';
 import { FiCheck, FiX } from 'react-icons/fi';
 
-import { useAuth, User } from '../../hooks/auth';
-import api from '../../services/api';
-
-import styles from './styles.module.scss'
 import { useLoading } from 'src/hooks/loading';
 import { FormHandles } from '@unform/core/typings/types';
 import { Form } from '@unform/web';
@@ -16,15 +14,17 @@ import getValidationErrors from 'src/utils/getValidationErrors';
 import { isEmailValid, isPasswordSecure } from 'src/utils/util';
 import Button from 'src/components/PrimaryButton';
 import Input from 'src/components/InputLabeless';
-import { Loader } from 'src/components/Loader';
+import Loader from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
 import { MdUpdate } from 'react-icons/md';
+import styles from './styles.module.scss';
+import api from '../../services/api';
+import { useAuth, User } from '../../hooks/auth';
 
 type ConfirmationFormData = {
   password: string,
   password_confirmation: string,
 }
-
 
 const ResetPassword: React.FC = () => {
   const [isVerifying, setVerifying] = useState(true);
@@ -53,8 +53,7 @@ const ResetPassword: React.FC = () => {
     }
 
     api.get(`/auth/resetPassword/${token}`).then((response) => {
-
-      if (!!response.data) {
+      if (response.data) {
         setVerifying(false);
         setVerified(true);
 
@@ -68,9 +67,8 @@ const ResetPassword: React.FC = () => {
     }).catch((err) => {
       setVerifying(false);
       setVerified(false);
-    })
-
-  }, [])
+    });
+  }, []);
 
   const handleSubmit = useCallback(
     async (data: ConfirmationFormData) => {
@@ -82,25 +80,29 @@ const ResetPassword: React.FC = () => {
           password: Yup.string()
             .required('Senha obrigatória')
             .min(8, 'No mínimo 8 digitos')
-            .test('password-validation',
+            .test(
+              'password-validation',
               'A senha não cumpre os critérios de segurança indicados abaixo',
               (value) => (
                 !!value && isPasswordSecure(value)
-              )),
+              ),
+            ),
           password_confirmation: Yup.string()
             .required('Confirme sua senha')
-            .test('password-validation',
+            .test(
+              'password-validation',
               ' ',
               (value) => (
                 !!value && isPasswordSecure(value)
-              ))
+              ),
+            )
             .oneOf([Yup.ref('password')], 'A confirmação deve ser igual a senha'),
         });
 
         await schema.validate(data, { abortEarly: false });
 
         const {
-          password
+          password,
         } = data;
 
         await api.post('/auth/resetPassword', { user_id: userId, new_password: password });
@@ -132,22 +134,21 @@ const ResetPassword: React.FC = () => {
         // });
       }
     },
-    [userId],
+    [setLoading, userId],
   );
 
   const handleModalVisibility = useCallback(() => {
     setModalVisibility(false);
 
-    if (successfull)
-      router.push('/');
-  }, [isModalVisible, successfull])
+    if (successfull) { router.push('/'); }
+  }, [router, successfull]);
 
   return (
     <div className={styles.container}>
       {
         isVerifying && (
           <div className={styles.verifying}>
-            <div className={styles.dotFlashing}></div>
+            <div className={styles.dotFlashing} />
             <p>Estamos verificando sua requisição</p>
           </div>
         )
@@ -184,7 +185,7 @@ const ResetPassword: React.FC = () => {
                     type="password"
                     placeholder="Senha"
                     onChange={(e) => {
-                      setPasswordCheck(e.target.value)
+                      setPasswordCheck(e.target.value);
                     }}
                   />
 
@@ -200,52 +201,47 @@ const ResetPassword: React.FC = () => {
                     </span>
                     <div>
                       {
-                        passwordCheck === '' ?
-                          <VscCircleFilled className={styles.empty} />
-                          :
-                          passwordCheck.length >= 8 ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                        passwordCheck === ''
+                          ? <VscCircleFilled className={styles.empty} />
+                          : passwordCheck.length >= 8 ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
                       }
                       <span className={passwordCheck === '' ? styles.empty : passwordCheck.length >= 8 ? styles.check : styles.error}>
                         A senha deve conter pelo menos 8 caractéres
                       </span>
 
                       {
-                        passwordCheck === '' ?
-                          <VscCircleFilled className={styles.empty} />
-                          :
-                          (/[a-z]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                        passwordCheck === ''
+                          ? <VscCircleFilled className={styles.empty} />
+                          : (/[a-z]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
                       }
                       <span className={passwordCheck === '' ? styles.empty : (/[a-z]/.test(passwordCheck)) ? styles.check : styles.error}>
                         Deve conter pelo menos uma letra minúscula
                       </span>
 
                       {
-                        passwordCheck === '' ?
-                          <VscCircleFilled className={styles.empty} />
-                          :
-                          (/[A-Z]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                        passwordCheck === ''
+                          ? <VscCircleFilled className={styles.empty} />
+                          : (/[A-Z]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
                       }
                       <span className={passwordCheck === '' ? styles.empty : (/[A-Z]/.test(passwordCheck)) ? styles.check : styles.error}>
                         Deve conter pelo menos uma letra maiúscula
                       </span>
 
                       {
-                        passwordCheck === '' ?
-                          <VscCircleFilled className={styles.empty} />
-                          :
-                          (/[0-9]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                        passwordCheck === ''
+                          ? <VscCircleFilled className={styles.empty} />
+                          : (/[0-9]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
                       }
                       <span className={passwordCheck === '' ? styles.empty : (/[0-9]/.test(passwordCheck)) ? styles.check : styles.error}>
                         Deve conter pelo menos um digito numérico
                       </span>
 
                       {
-                        passwordCheck === '' ?
-                          <VscCircleFilled className={styles.empty} />
-                          :
-                          (/[!@#\$%\^&\*]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                        passwordCheck === ''
+                          ? <VscCircleFilled className={styles.empty} />
+                          : (/[!@#$%^&*]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
                       }
-                      <span className={passwordCheck === '' ? styles.empty : (/[!@#\$%\^&\*]/.test(passwordCheck)) ? styles.check : styles.error}>
+                      <span className={passwordCheck === '' ? styles.empty : (/[!@#$%^&*]/.test(passwordCheck)) ? styles.check : styles.error}>
                         Deve conter pelo menos um caractére especial
                       </span>
 
@@ -281,7 +277,7 @@ const ResetPassword: React.FC = () => {
         )
       }
     </div>
-  )
-}
+  );
+};
 
 export default ResetPassword;

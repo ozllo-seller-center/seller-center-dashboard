@@ -1,7 +1,7 @@
 import React from 'react';
 
-export const Shortcuts: React.FC = () => {
-  return (
-    <></>
-  );
-}
+const Shortcuts: React.FC = () => (
+  <div />
+);
+
+export default Shortcuts;

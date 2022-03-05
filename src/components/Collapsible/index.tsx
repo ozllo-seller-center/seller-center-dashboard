@@ -1,6 +1,6 @@
 import React, { RefObject, useCallback, useState } from 'react';
 
-import styles from './styles.module.scss'
+import styles from './styles.module.scss';
 
 interface CollapsibleProps {
   totalItems?: number;
@@ -26,11 +26,21 @@ const Collapsible: React.FC<CollapsibleProps> = ({ totalItems, toggleRef, childr
         {children}
       </div>
       <div className={styles.lblToggleContainer}>
-        {isChecked ? <span className={styles.lblToggle} onClick={() => checkHandle(false)}>Recolher...</span> : <span className={styles.lblToggle} onClick={() => checkHandle(true)}>Ver todos</span>}
-        {!!totalItems && !isChecked && <span className={styles.overflowItems}>(mais {totalItems - 2} itens)</span>}
+        {isChecked
+          ? <span className={styles.lblToggle} onClick={() => checkHandle(false)}>Recolher...</span>
+          : <span className={styles.lblToggle} onClick={() => checkHandle(true)}>Ver todos</span>}
+        {!!totalItems && !isChecked && (
+        <span className={styles.overflowItems}>
+          (mais
+          {' '}
+          {totalItems - 2}
+          {' '}
+          itens)
+        </span>
+        )}
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default Collapsible;

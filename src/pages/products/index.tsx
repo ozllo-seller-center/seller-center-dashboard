@@ -1,9 +1,13 @@
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FiCameraOff, FiCheck, FiEdit, FiSearch, FiX } from 'react-icons/fi';
-import { Loader } from 'src/components/Loader';
+import React, {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
+import {
+  FiCameraOff, FiCheck, FiEdit, FiSearch, FiX,
+} from 'react-icons/fi';
+import Loader from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
 import ProductTableItem from 'src/components/ProductTableItem';
 import { useAuth, User } from 'src/hooks/auth';
@@ -11,11 +15,7 @@ import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
 import api from 'src/services/api';
 import { getHeader, getVariations } from 'src/shared/functions/products';
-import { Categories } from 'src/shared/enums/Categories';
-import { Genres } from 'src/shared/enums/Genres';
-import { Nationalities } from 'src/shared/enums/Nationalities';
-import { Subcategories } from 'src/shared/enums/Subcategories';
-import { ProductSummary as Product, Variation } from 'src/shared/types/product';
+import { ProductSummary as Product } from 'src/shared/types/product';
 import XLSX from 'xlsx';
 import BulletedButton from '../../components/BulletedButton';
 import FilterInput from '../../components/FilterInput';
@@ -34,7 +34,6 @@ export function Products({ userFromApi }: ProductsProps) {
   const [items, setItems] = useState([] as Product[]);
   const [search, setSeacrh] = useState('');
 
-
   const [disabledActions, setDisableActions] = useState(false);
 
   const { isLoading, setLoading } = useLoading();
@@ -45,11 +44,11 @@ export function Products({ userFromApi }: ProductsProps) {
   const [checkedState, setCheckedState] = useState(false);
 
   const [isDisabledAcoes, setIsDisabledAcoes] = React.useState(true);
-  const [valorAcoes, setValorAcoes] = useState("");
+  const [valorAcoes, setValorAcoes] = useState('');
 
   useEffect(() => {
     // !!userFromApi && updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: userFromApi.shopInfo._id } })
-  }, [userFromApi])
+  }, [userFromApi]);
 
   // const itemsRef = useMemo(() => Array(items.length).fill(0).map(i => React.createRef<HTMLInputElement>()), [items]);
 
@@ -60,68 +59,66 @@ export function Products({ userFromApi }: ProductsProps) {
 
   useEffect(() => {
     setLoading(true);
-    api.get('/account/detail').then(response => {
-      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
+
+    api.get('/account/detail').then((response) => {
+      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } });
       setLoading(false);
       // return response.data as User;
-    }).catch(err => {
-      console.log(err)
+    }).catch((err) => {
+      console.log(err);
       setLoading(false);
     });
-  }, [])
+  }, []);
 
   useEffect(() => {
     setLoading(true);
 
-    setItems(products.filter(product => {
-      return (!!product.name && (search === '' || product.name.toLowerCase().includes(search.toLowerCase())));
-    }));
+    setItems(products.filter((product) => (!!product.name && (search === '' || product.name.toLowerCase().includes(search.toLowerCase())))));
 
     setLoading(false);
-  }, [search, products]);
+  }, [search, products, setLoading]);
 
   useEffect(() => {
-    if (!!user) {
+    if (user) {
       setLoading(true);
 
       api.get('/product', {
         headers: {
           authorization: token,
           shop_id: user.shopInfo._id,
-        }
-      }).then(response => {
-
+        },
+      }).then((response) => {
         let productsDto = response.data as Product[];
 
-        productsDto = productsDto.map(product => {
-          let stockCount: number = 0;
+        productsDto = productsDto.map((product) => {
+          let stockCount = 0;
 
-          if (!!product.variations) {
-            product.variations.forEach(variation => {
-              stockCount = stockCount + Number(variation.stock);
-            })
+          if (product.variations) {
+            product.variations.forEach((variation) => {
+              stockCount += Number(variation.stock);
+            });
           }
 
           product.stock = stockCount;
           product.checked = false;
 
           return product;
-        })
+        });
 
-
-        setProducts(productsDto)
-        setItems(productsDto)
+        setProducts(productsDto);
+        setItems(productsDto);
 
         setLoading(false);
-      }).catch((error) => {
-        console.log(error)
+      }).catch((err) => {
+        console.log(err);
+
         setProducts([]);
-        setItems([])
+        setItems([]);
 
         setLoading(false);
-      })
+      });
     }
-  }, [user]);
+  }, [setLoading, token, user]);
 
   const handleSubmit = useCallback(
     async (data: SearchFormData) => {
@@ -131,7 +128,6 @@ export function Products({ userFromApi }: ProductsProps) {
         if (data.search !== search) {
           setSeacrh(data.search);
         }
-
       } catch (err) {
         setError('Ocorreu um erro ao fazer login, cheque as credenciais.');
       }
@@ -141,26 +137,25 @@ export function Products({ userFromApi }: ProductsProps) {
 
   const handleModalVisibility = useCallback(() => {
     handleModalMessage(false);
-  }, [])
+  }, []);
 
   const selectOrDeselectAllProducts = useCallback(async () => {
     const produtos = items;
-    produtos.forEach(item => {
+    produtos.forEach((item) => {
       item.checked = !checked;
-    })
+    });
 
     setItems(produtos);
     setChecked(!checked);
     setIsDisabledAcoes(checked);
-  }, [checked, products, items])
+  }, [checked, products, items]);
 
   const handleCheckboxChange = useCallback(async (id: any, position: number) => {
-
     // const index = products.findIndex(product => product._id === id);
     // const updateProducts = [...products];
     // updateProducts[index].checked = !updateProducts[position].checked;
 
-    const indexItem = items.findIndex(item => item._id === id);
+    const indexItem = items.findIndex((item) => item._id === id);
     const updateItems = [...items];
     updateItems[indexItem].checked = !updateItems[position].checked;
 
@@ -168,68 +163,68 @@ export function Products({ userFromApi }: ProductsProps) {
 
     let isChecked = true;
     updateItems.map((item) => {
-      if (item.checked)
-        isChecked = false
+      if (item.checked) { isChecked = false; }
     });
     setIsDisabledAcoes(isChecked);
 
     // setProducts(updateProducts);
     setItems(updateItems);
-  }, [products, items, isDisabledAcoes])
+  }, [products, items, isDisabledAcoes]);
 
   const getProducts = () => {
-    const produtosFiltrados = items.filter(p => p.checked)
-    let produtosCSV: any = []
-    produtosCSV.push(getHeader())
-    produtosFiltrados.forEach(produto => {
-      produtosCSV = [...produtosCSV, ...getVariations(produto)]
+    const produtosFiltrados = items.filter((p) => p.checked);
+    let produtosCSV: any = [];
+    produtosCSV.push(getHeader());
+    produtosFiltrados.forEach((produto) => {
+      produtosCSV = [...produtosCSV, ...getVariations(produto)];
     });
-    return produtosCSV
-  }
+    return produtosCSV;
+  };
 
   const exportToCSV = () => {
     const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
     const csvData = getProducts();
 
     const ws = XLSX.utils.json_to_sheet(csvData);
-    const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
+    const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
     const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const data = new Blob([excelBuffer], { type: fileType });
 
     const a = document.createElement('a');
-    a.download = "Produtos.xlsx";
+    a.download = 'Produtos.xlsx';
     a.href = URL.createObjectURL(data);
-    a.addEventListener('click', (e) => {
+    a.addEventListener('click', () => {
       setTimeout(() => URL.revokeObjectURL(a.href), 30 * 1000);
     });
     a.click();
-  }
-
+  };
 
   const setValorAcao = useCallback((value) => {
     setValorAcoes(value.target.value);
-  }, [valorAcoes])
+  }, [valorAcoes]);
 
   const executarAcao = () => {
-    if (valorAcoes === "1") {
+    if (valorAcoes === '1') {
       exportToCSV();
     }
-  }
+  };
 
   return (
     <div className={styles.productsContainer}>
       <div className={styles.productsHeader}>
         <BulletedButton
-          onClick={() => { }}
-          isActive>
+          isActive
+        >
           Meus produtos
         </BulletedButton>
         <BulletedButton
-          onClick={() => { router.push('/products/create') }}>
+          onClick={() => { router.push('/products/create'); }}
+        >
           Criar novo produto
         </BulletedButton>
         <BulletedButton
-          onClick={() => { router.push('/products/import') }}>
+          onClick={() => { router.push('/products/import'); }}
+        >
           Importar ou exportar
         </BulletedButton>
       </div>
@@ -242,17 +237,18 @@ export function Products({ userFromApi }: ProductsProps) {
                 name="search"
                 icon={FiSearch}
                 placeholder="Pesquise um produto..."
-                autoComplete="off" />
+                autoComplete="off"
+              />
             </Form>
           </div>
         </div>
         <section className={styles.header}>
           <div className={styles.panelFooter}>
-            <select value={valorAcoes || ""} onChange={setValorAcao} className={styles.selectOption}>
+            <select value={valorAcoes || ''} onChange={setValorAcao} className={styles.selectOption}>
               <option selected value="0">Ação em massa</option>
               <option value="1">Exportar Produtos</option>
             </select>
-            <button type='button' onClick={executarAcao} disabled={isDisabledAcoes}>Aplicar</button>
+            <button type="button" onClick={executarAcao} disabled={isDisabledAcoes}>Aplicar</button>
           </div>
         </section>
         <div className={styles.tableContainer}>
@@ -261,10 +257,11 @@ export function Products({ userFromApi }: ProductsProps) {
               <thead className={styles.tableHeader}>
                 <tr>
                   <th>
-                    <input className={styles.checkbox}
-                      type='checkbox'
-                      name='todos'
-                      value='todos'
+                    <input
+                      className={styles.checkbox}
+                      type="checkbox"
+                      name="todos"
+                      value="todos"
                       onChange={selectOrDeselectAllProducts}
                       checked={checked}
                       key={Math.random()}
@@ -282,17 +279,18 @@ export function Products({ userFromApi }: ProductsProps) {
               </thead>
               <tbody className={styles.tableBody}>
                 {items.map((item, i) => (
-                  <tr key={i}>
+                  <tr key={item._id}>
                     <td>
-                      <input className={styles.checkboxDados}
+                      <input
+                        className={styles.checkboxDados}
                         type="checkbox"
                         onChange={() => handleCheckboxChange(item._id, i)}
                         checked={item.checked}
                         key={item._id}
                       />
                     </td>
-                    <td id={styles.imgCell} >
-                      {!!item.images ? <img src={item.images[0]} alt={item.name} /> : <FiCameraOff />}
+                    <td id={styles.imgCell}>
+                      {item.images ? <img src={item.images[0]} alt={item.name} /> : <FiCameraOff />}
                     </td>
                     <td id={styles.nameCell}>
                       {item.name}
@@ -308,8 +306,7 @@ export function Products({ userFromApi }: ProductsProps) {
                         new Intl.NumberFormat('pt-BR', {
                           style: 'currency',
                           currency: 'BRL',
-                        }
-                        ).format(item.price)
+                        }).format(item.price)
                       }
                     </td>
                     <td className={item.stock <= 0 ? styles.redText : styles.nameCell}>
@@ -317,13 +314,13 @@ export function Products({ userFromApi }: ProductsProps) {
                     </td>
                     <td>
                       <ProductTableItem
-                        key={i}
+                        key={item._id}
                         item={item}
                         products={products}
                         setProducts={setProducts}
                         userInfo={{
                           token,
-                          shop_id: !user ? '' : !!user.shopInfo._id ? user.shopInfo._id : '',
+                          shop_id: (!user || !user.shopInfo._id) ? '' : user.shopInfo._id,
                         }}
                         disabledActions={disabledActions}
                         setDisabledActions={setDisableActions}
@@ -335,9 +332,10 @@ export function Products({ userFromApi }: ProductsProps) {
                           pathname: 'products/edit',
                           query: {
                             id: item._id,
-                          }
-                        })
-                      }}>
+                          },
+                        });
+                      }}
+                      >
                         <FiEdit />
                         <span> Editar </span>
                       </div>
@@ -370,15 +368,13 @@ export function Products({ userFromApi }: ProductsProps) {
         )
       }
     </div>
-  )
+  );
 }
 
-export const getInitialProps = async () => {
-  return ({
-    props: {
-    },
-    revalidate: 10
-  });
-}
+export const getInitialProps = async () => ({
+  props: {
+  },
+  revalidate: 10,
+});
 
 export default Products;

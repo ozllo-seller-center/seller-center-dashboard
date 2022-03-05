@@ -4,34 +4,36 @@ import React, {
   useRef,
   useState,
   useCallback,
+  useMemo,
 } from 'react';
 
 import { useField } from '@unform/core';
-import DatePicker from 'react-datepicker';
 import pt from 'date-fns/locale/pt-BR';
 
 import { FiCalendar } from 'react-icons/fi';
 
-import styles from './styles.module.scss';
+import DatePicker from 'react-datepicker';
+
 import ReactDatePicker from 'react-datepicker';
+import styles from './styles.module.scss';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
   label: string;
-  containerStyle?: object;
 }
 
 const DatePickerInput: React.FC<InputProps> = ({
   name,
   label,
-  containerStyle = {},
   disabled,
   ...rest
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
-  const { fieldName, defaultValue, error, registerField } = useField(name);
+  const {
+    fieldName, defaultValue, error, registerField,
+  } = useField(name);
 
   const [inputDate, setInputDate] = useState(new Date() as any);
   const dateRef = useRef<ReactDatePicker>(null);
@@ -57,11 +59,24 @@ const DatePickerInput: React.FC<InputProps> = ({
     });
   }, [fieldName, registerField]);
 
+  const containerStyle = useMemo(() => {
+    if (disabled) { return styles.containerDisabled; }
+
+    if (error) { return styles.containerError; }
+
+    if (isFocused) { return styles.containerFocused; }
+
+    if (isFilled) { return styles.containerFilled; }
+
+    return styles.container;
+  }, [disabled, error, isFilled, isFocused]);
+
   return (
     <div className={styles.parent}>
       <div
-        className={disabled ? styles.containerDisabled : !!error ? styles.containerError : isFocused ? styles.containerFocused : isFilled ? styles.containerFilled : styles.container} >
-        <label className={styles.inputLabel}>{label}</label>
+        className={containerStyle}
+      >
+        <span className={styles.inputLabel}>{label}</span>
         <div>
           <DatePicker
             name={name}
@@ -72,13 +87,13 @@ const DatePickerInput: React.FC<InputProps> = ({
             ref={dateRef}
             locale={pt}
             dateFormatCalendar="MMMM yyyy"
-            formatWeekDay={(formattedDate: string) => { return formattedDate[0].toUpperCase() + formattedDate.substr(1, 2).toLowerCase() }}
-            dateFormat='dd/MM/yyyy'
-            todayButton='Hoje'
+            formatWeekDay={(formattedDate: string) => formattedDate[0].toUpperCase() + formattedDate.substr(1, 2).toLowerCase()}
+            dateFormat="dd/MM/yyyy"
+            todayButton="Hoje"
             className={styles.datePicker}
             showPopperArrow={false}
-            closeOnScroll={true}
-            disabledKeyboardNavigation={true}
+            closeOnScroll
+            disabledKeyboardNavigation
           />
           <FiCalendar />
         </div>

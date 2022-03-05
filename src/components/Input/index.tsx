@@ -4,6 +4,7 @@ import React, {
   useRef,
   useState,
   useCallback,
+  useMemo,
 } from 'react';
 
 import { useField } from '@unform/core';
@@ -13,20 +14,20 @@ import styles from './styles.module.scss';
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
   label: string;
-  containerStyle?: object;
 }
 
 const Input: React.FC<InputProps> = ({
   name,
   label,
-  containerStyle = {},
   disabled,
   ...rest
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
-  const { fieldName, defaultValue, error, registerField } = useField(name);
+  const {
+    fieldName, defaultValue, error, registerField,
+  } = useField(name);
 
   const handleInputFocused = useCallback(() => {
     setIsFocused(true);
@@ -36,7 +37,7 @@ const Input: React.FC<InputProps> = ({
     setIsFocused(false);
 
     setIsFilled(!!inputRef.current?.value || !!defaultValue);
-  }, []);
+  }, [defaultValue]);
 
   useEffect(() => {
     registerField({
@@ -46,11 +47,21 @@ const Input: React.FC<InputProps> = ({
     });
   }, [fieldName, registerField]);
 
+  const containerStyle = useMemo(() => {
+    if (disabled) { return styles.containerDisabled; }
+    if (error) { return styles.containerError; }
+    if (isFocused) { return styles.containerFocused; }
+    if (isFilled) { return styles.containerFilled; }
+
+    return styles.container;
+  }, [disabled, error, isFilled, isFocused]);
+
   return (
     <div className={styles.parent}>
       <div
-        className={disabled ? styles.containerDisabled : !!error ? styles.containerError : isFocused ? styles.containerFocused : isFilled ? styles.containerFilled : styles.container} >
-        <label className={styles.inputLabel}>{label}</label>
+        className={containerStyle}
+      >
+        <label htmlFor={inputRef.current?.id} className={styles.inputLabel}>{label}</label>
         <input
           type="text"
           name={name}

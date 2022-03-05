@@ -1,29 +1,46 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, {
+  useEffect,
+} from 'react';
 
-import styles from './styles.module.scss'
+import api from 'src/services/api';
+import Card from 'src/components/Card';
+import { useAuth } from 'src/hooks/auth';
+import styles from './styles.module.scss';
 
-import Card from 'src/components/Card'
-
-import img1 from '../../../public/assets/bling.png'
-import img2 from '../../../public/assets/ecoys.jpg'
-import img3 from '../../../public/assets/ihub.png'
-import img4 from '../../../public/assets/infra.jpg'
-import img5 from '../../../public/assets/linxC.png'
-import img6 from '../../../public/assets/linxE.png'
-import img7 from '../../../public/assets/linxO.png'
-import img8 from '../../../public/assets/lojaI.png'
-import img9 from '../../../public/assets/magento.png'
-import img10 from '../../../public/assets/opencart.png'
-import img11 from '../../../public/assets/tiny.png'
-import img12 from '../../../public/assets/tray.png'
-import img13 from '../../../public/assets/vtex.png'
-import img14 from '../../../public/assets/woo.png'
-import img15 from '../../../public/assets/magento2.png'
-import img16 from '../../../public/assets/softvar.png'
-import img17 from '../../../public/assets/Bseller.png'
-import img18 from '../../../public/assets/idealeWare.png'
+import img1 from '../../../public/assets/bling.png';
+import img2 from '../../../public/assets/ecoys.jpg';
+import img3 from '../../../public/assets/ihub.png';
+import img4 from '../../../public/assets/infra.jpg';
+import img5 from '../../../public/assets/linxC.png';
+import img6 from '../../../public/assets/linxE.png';
+import img7 from '../../../public/assets/linxO.png';
+import img8 from '../../../public/assets/lojaI.png';
+import img9 from '../../../public/assets/magento.png';
+import img10 from '../../../public/assets/opencart.png';
+import img11 from '../../../public/assets/tiny.png';
+import img12 from '../../../public/assets/tray.png';
+import img13 from '../../../public/assets/vtex.png';
+import img14 from '../../../public/assets/woo.png';
+import img15 from '../../../public/assets/magento2.png';
+import img16 from '../../../public/assets/softvar.png';
+import img17 from '../../../public/assets/Bseller.png';
+import img18 from '../../../public/assets/idealeWare.png';
 
 const Integrations: React.FC = () => {
+  const {
+    user, token,
+  } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      api.get('integration/system', {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        },
+      });
+    }
+  }, [token, user]);
 
   return (
     <div className={styles.container}>
@@ -59,7 +76,7 @@ const Integrations: React.FC = () => {
         <Card imgSrc={img11.src} reference="tiny" title="Tiny" />
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default Integrations;

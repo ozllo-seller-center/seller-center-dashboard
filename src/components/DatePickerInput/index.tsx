@@ -32,7 +32,9 @@ const Input: React.FC<DatePickerInputProps> = ({
   const [inputDate, setInputDate] = useState(new Date() as any);
   const dateRef = useRef<ReactDatePicker>(null);
 
-  const { fieldName, defaultValue, error, registerField } = useField(name);
+  const {
+    fieldName, defaultValue, error, registerField,
+  } = useField(name);
 
   useEffect(() => {
     registerField({
@@ -46,37 +48,35 @@ const Input: React.FC<DatePickerInputProps> = ({
   }, [fieldName, registerField]);
 
   return (
-    <>
-      <div
-        className={styles.container}
-      >
-        {isStart && (
-          <span>de</span>
-        )}
-        {isEnd && (
-          <span>até</span>
-        )}
-        <DatePicker
-          name={name}
-          selected={inputDate}
-          onChange={setInputDate}
-          ref={dateRef}
-          locale={pt}
-          dateFormatCalendar="MMMM yyyy"
-          formatWeekDay={formattedDate => { return formattedDate[0].toUpperCase() + formattedDate.substr(1, 2).toLowerCase() }}
-          dateFormat='dd/MM/yyyy'
-          todayButton='Hoje'
-          selectsRange={isRanged}
-          selectsStart={isStart}
-          selectsEnd={isEnd}
-          className={styles.datePicker}
-          showPopperArrow={false}
-          closeOnScroll={true}
-          disabledKeyboardNavigation={true}
-        />
-        <FiCalendar />
-      </div>
-    </>
+    <div
+      className={styles.container}
+    >
+      {isStart && (
+      <span>de</span>
+      )}
+      {isEnd && (
+      <span>até</span>
+      )}
+      <DatePicker
+        name={name}
+        selected={inputDate}
+        onChange={setInputDate}
+        ref={dateRef}
+        locale={pt}
+        dateFormatCalendar="MMMM yyyy"
+        formatWeekDay={(formattedDate) => formattedDate[0].toUpperCase() + formattedDate.substr(1, 2).toLowerCase()}
+        dateFormat="dd/MM/yyyy"
+        todayButton="Hoje"
+        selectsRange={isRanged}
+        selectsStart={isStart}
+        selectsEnd={isEnd}
+        className={styles.datePicker}
+        showPopperArrow={false}
+        closeOnScroll
+        disabledKeyboardNavigation
+      />
+      <FiCalendar />
+    </div>
   );
 };
 

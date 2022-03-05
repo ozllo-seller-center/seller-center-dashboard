@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
-import { useRouter } from 'next/router';
-import { FiCheck, FiX } from 'react-icons/fi';
-
-import styles from './styles.module.scss';
-
-import MessageModal from '../../components/MessageModal';
-import { Loader } from 'src/components/Loader';
+import Loader from 'src/components/Loader';
 import { useLoading } from 'src/hooks/loading';
 import MarketplaceButton from 'src/components/MarketplaceButton';
+import styles from './styles.module.scss';
 
 type MarketplaceData = {
   name: string,
@@ -17,10 +12,9 @@ type MarketplaceData = {
 }
 
 const SignUp: React.FC = () => {
+  const { isLoading, setLoading } = useLoading();
 
-  const { isLoading, setLoading } = useLoading()
-
-  const [marketplaces, setMarketplaces] = useState<MarketplaceData[]>([])
+  const [marketplaces, setMarketplaces] = useState<MarketplaceData[]>([]);
 
   useEffect(() => {
     setMarketplaces([
@@ -104,18 +98,17 @@ const SignUp: React.FC = () => {
         url: 'https://www.zatini.com.br/lojista/loja-ozllo',
         image: '/assets/zatini-transparent.png',
       },
-    ])
-  }, [])
-
+    ]);
+  }, []);
 
   return (
     <div className={styles.marketplacesContainer}>
       {
-        marketplaces.map(marketplaces => (
+        marketplaces.map((marketplace) => (
           <MarketplaceButton
-            name={marketplaces.name}
-            image={marketplaces.image}
-            url={marketplaces.url}
+            name={marketplace.name}
+            image={marketplace.image}
+            url={marketplace.url}
           />
         ))
       }
@@ -126,7 +119,7 @@ const SignUp: React.FC = () => {
           </div>
         )
       }
-    </div >
+    </div>
   );
 };
 

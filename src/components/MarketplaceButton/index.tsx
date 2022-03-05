@@ -8,22 +8,21 @@ interface MarketplaceButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
   image: string,
 }
 
-const MarketplaceButton: React.FC<MarketplaceButtonProps> = ({ name, url, image, ...rest }) => {
-  return (
-    <button
-      type='button'
-      className={styles.marketplaceButton}
-      onClick={() => {
-        const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
+const MarketplaceButton: React.FC<MarketplaceButtonProps> = ({
+  name, url, image, ...rest
+}) => (
+  <button
+    type="button"
+    className={styles.marketplaceButton}
+    onClick={() => {
+      const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
 
-        if (newWindow)
-          newWindow.opener = null
-      }}
-      {...rest}
-    >
-      <img src={image} alt={name} />
-    </button>
-  )
-}
+      if (newWindow) { newWindow.opener = null; }
+    }}
+    {...rest}
+  >
+    <img src={image} alt={name} />
+  </button>
+);
 
 export default MarketplaceButton;

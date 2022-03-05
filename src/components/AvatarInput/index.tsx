@@ -9,18 +9,15 @@ interface AvatarInputProps {
   handleAvatarChange: React.ChangeEventHandler<HTMLInputElement>;
 }
 
-const AvatarInput: React.FC<AvatarInputProps> = ({ avatarUrl, userName, handleAvatarChange }) => {
+const AvatarInput: React.FC<AvatarInputProps> = ({ avatarUrl, userName, handleAvatarChange }) => (
+  <div className={avatarUrl ? styles.avatarInput : styles.emptyAvatarInput}>
+    {!!avatarUrl && <img src={avatarUrl} alt={userName} />}
+    <label htmlFor="avatar">
+      <FiCamera />
 
-  return (
-    <div className={!!avatarUrl ? styles.avatarInput : styles.emptyAvatarInput} >
-      {!!avatarUrl && <img src={avatarUrl} alt={userName} />}
-      <label htmlFor="avatar">
-        <FiCamera />
-
-        <input type="file" accept="image/x-png,image/gif,image/jpeg" id="avatar" onChange={handleAvatarChange} />
-      </label>
-    </div>
-  )
-}
+      <input type="file" accept="image/x-png,image/gif,image/jpeg" id="avatar" onChange={handleAvatarChange} />
+    </label>
+  </div>
+);
 
 export default AvatarInput;
