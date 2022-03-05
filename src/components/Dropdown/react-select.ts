@@ -1,4 +1,4 @@
-import { GroupTypeBase, Styles } from "react-select";
+import { GroupTypeBase, Styles } from 'react-select';
 
 const customStyles: Partial<Styles<{
   value: string;
@@ -28,18 +28,20 @@ const customStyles: Partial<Styles<{
     const opacity = state.isDisabled ? 0.5 : 1;
     const transition = 'opacity 300ms';
 
-    return { ...provided, opacity, transition, display: 'inline-flex' };
+    return {
+      ...provided, opacity, transition, display: 'inline-flex',
+    };
   },
   indicatorSeparator: () => ({
-    display: 'none'
+    display: 'none',
   }),
   menu: (provided, state) => ({
-    ...provided
+    ...provided,
   }),
   option: (provided, state) => ({
     ...provided,
     background: state.isSelected ? 'var(--red-100)' : 'var(--white)',
   }),
-}
+};
 
 export default customStyles;

@@ -1,10 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useRef, useState,
+} from 'react';
 import { HTMLAttributes } from 'react';
 
 import { useField } from '@unform/core';
 
-import styles from './styles.module.scss'
 import ReactInputMask, { Props as InputProps } from 'react-input-mask';
+import styles from './styles.module.scss';
 
 interface MaskInputProps extends Omit<InputProps, 'ref'> {
   name: string;
@@ -19,7 +21,9 @@ interface InputMaskRef extends ReactInputMask {
 const MaskedInput: React.FC<MaskInputProps> = ({ name, label, ...rest }) => {
   const ref = useRef<InputMaskRef>(null);
 
-  const { fieldName, defaultValue, error, registerField } = useField(name);
+  const {
+    fieldName, defaultValue, error, registerField,
+  } = useField(name);
 
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(!!defaultValue);
@@ -33,8 +37,7 @@ const MaskedInput: React.FC<MaskInputProps> = ({ name, label, ...rest }) => {
   const handleInputBlur = useCallback(() => {
     setIsFocused(false);
 
-    if (!!ref.current)
-      setIsFilled(!!ref.current?.value);
+    if (ref.current) { setIsFilled(!!ref.current?.value); }
   }, [ref]);
 
   useEffect(() => {
@@ -45,14 +48,22 @@ const MaskedInput: React.FC<MaskInputProps> = ({ name, label, ...rest }) => {
     });
   }, [fieldName, registerField]);
 
+  const containerStyle = useMemo(() => {
+    if (error) { return styles.containerError; }
+    if (isFocused) { return styles.containerFocused; }
+    if (isFilled) { return styles.containerFilled; }
+
+    return styles.container;
+  }, [error, isFilled, isFocused]);
+
   return (
     <>
-      <div className={!!error ? styles.containerError : isFocused ? styles.containerFocused : isFilled ? styles.containerFilled : styles.container}>
+      <div className={containerStyle}>
         <div>
           {
-            !!label ? (
+            label ? (
               <>
-                <label>{label}</label>
+                <span>{label}</span>
                 <ReactInputMask
                   onFocus={handleInputFocused}
                   onBlur={handleInputBlur}
@@ -79,7 +90,7 @@ const MaskedInput: React.FC<MaskInputProps> = ({ name, label, ...rest }) => {
         </p>
       )}
     </>
-  )
-}
+  );
+};
 
 export default MaskedInput;

@@ -1,5 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { GetStaticProps } from "next";
+import React, {
+  useCallback, useEffect, useMemo, useRef, useState,
+} from 'react';
+import { GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 import { MuiThemeProvider, createTheme, Switch } from '@material-ui/core';
 import { FormHandles } from '@unform/core';
@@ -9,18 +11,15 @@ import { FiSearch, FiCameraOff, FiEdit } from 'react-icons/fi';
 
 import api from 'src/services/api';
 import { useAuth, User } from 'src/hooks/auth';
+import { ProductSummary as Product } from 'src/shared/types/product';
+import ProductItemCard from 'src/components/ProductItemCard';
 import BulletedButton from '../../components/BulletedButton';
 import FilterInput from '../../components/FilterInput';
 
-import { ProductSummary as Product } from 'src/shared/types/product';
-
 import styles from './styles.module.scss';
-import ProductItemCard from 'src/components/ProductItemCard';
+
 interface SearchFormData {
   search: string;
-}
-interface ProductsProps {
-  products: Product[];
 }
 
 interface ProductsProps {
@@ -43,57 +42,53 @@ export function Products({ userFromApi }: ProductsProps) {
   const { token, user, updateUser } = useAuth();
 
   useEffect(() => {
-    if (!!user) {
+    if (user) {
       api.get('/product', {
         headers: {
           authorization: token,
           shop_id: user.shopInfo._id,
-        }
-      }).then(response => {
+        },
+      }).then((response) => {
         // console.log(response.data)
 
         let productsDto = response.data as Product[];
 
-        productsDto = productsDto.map(product => {
+        productsDto = productsDto.map((product) => {
           let stockCount = 0;
 
           if (!!product.variations && Array.isArray(product.variations)) {
-            product.variations.forEach(variation => {
+            product.variations.forEach((variation) => {
               stockCount += Number(variation.stock);
-            })
+            });
           }
 
           product.stock = stockCount;
 
           return product;
-        })
+        });
 
+        setProducts(productsDto);
+        setItems(productsDto);
+      }).catch((err) => {
+        console.log(err);
 
-        setProducts(productsDto)
-        setItems(productsDto)
-      }).catch((error) => {
-        console.log(error)
         setProducts([]);
-        setItems([])
-      })
+        setItems([]);
+      });
     }
   }, [user]);
 
   useEffect(() => {
-    !!userFromApi && updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: userFromApi.shopInfo._id } })
-  }, [userFromApi])
+    if (userFromApi) { updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: userFromApi.shopInfo._id } }); }
+  }, [userFromApi]);
 
   useEffect(() => {
     setLoading(true);
 
-
-    setItems(products.filter(product => {
-      return (search === '' || product.name.toLowerCase().includes(search.toLowerCase()));
-    }));
+    setItems(products.filter((product) => (search === '' || product.name.toLowerCase().includes(search.toLowerCase()))));
 
     setLoading(false);
   }, [search, products]);
-
 
   const handleSubmit = useCallback(
     async (data: SearchFormData) => {
@@ -103,7 +98,6 @@ export function Products({ userFromApi }: ProductsProps) {
         if (data.search !== search) {
           setSeacrh(data.search);
         }
-
       } catch (err) {
         setError('Ocorreu um erro ao fazer login, cheque as credenciais.');
       }
@@ -115,16 +109,19 @@ export function Products({ userFromApi }: ProductsProps) {
     <div className={styles.productsContainer}>
       <div className={styles.productsHeader}>
         <BulletedButton
-          onClick={() => { router.push('/products-mobile') }}
-          isActive>
+          onClick={() => { router.push('/products-mobile'); }}
+          isActive
+        >
           Meus produtos
         </BulletedButton>
         <BulletedButton
-          onClick={() => { router.push('/products/create') }}>
+          onClick={() => { router.push('/products/create'); }}
+        >
           Criar novo produto
         </BulletedButton>
         <BulletedButton
-          onClick={() => { router.push('/products/import') }}>
+          onClick={() => { router.push('/products/import'); }}
+        >
           Importar ou exportar
         </BulletedButton>
       </div>
@@ -137,7 +134,8 @@ export function Products({ userFromApi }: ProductsProps) {
                 name="search"
                 icon={FiSearch}
                 placeholder="Pesquise um produto..."
-                autoComplete="off" />
+                autoComplete="off"
+              />
             </Form>
           </div>
         </div>
@@ -147,7 +145,7 @@ export function Products({ userFromApi }: ProductsProps) {
               products={products}
               setProducts={setProducts}
               item={item}
-              userInfo={{ token, shop_id: !!user ? !!user.shopInfo._id ? user.shopInfo._id : '' : '' }}
+              userInfo={{ token, shop_id: (!user || !user.shopInfo._id) ? '' : user.shopInfo._id }}
             />
           ))
         ) : (
@@ -155,22 +153,20 @@ export function Products({ userFromApi }: ProductsProps) {
         )}
       </div>
     </div>
-  )
+  );
 }
 
 export const getInitialProps = async () => {
-  const user = api.get('/account/detail').then(response => {
-    return response.data as User;
-  }).catch(err => {
-    console.log(err)
+  const user = api.get('/account/detail').then((response) => response.data as User).catch((err) => {
+    console.log(err);
   });
 
   return ({
     props: {
-      userFromApi: user
+      userFromApi: user,
     },
-    revalidate: 10
+    revalidate: 10,
   });
-}
+};
 
 export default Products;

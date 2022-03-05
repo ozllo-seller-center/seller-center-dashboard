@@ -4,6 +4,7 @@ import React, {
   useRef,
   useState,
   useCallback,
+  useMemo,
 } from 'react';
 import { IconBaseProps } from 'react-icons';
 import { useField } from '@unform/core';
@@ -13,19 +14,19 @@ import styles from './styles.module.scss';
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
   icon: React.ComponentType<IconBaseProps>;
-  containerStyle?: object;
 }
 
 const FilterInput: React.FC<InputProps> = ({
   name,
-  containerStyle = {},
   icon: Icon,
   ...rest
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
-  const { fieldName, defaultValue, error, registerField } = useField(name);
+  const {
+    fieldName, defaultValue, error, registerField,
+  } = useField(name);
 
   const handleInputFocused = useCallback(() => {
     setIsFocused(true);
@@ -45,10 +46,18 @@ const FilterInput: React.FC<InputProps> = ({
     });
   }, [fieldName, registerField]);
 
+  const containerStyle = useMemo(() => {
+    if (error) { return styles.containerError; }
+    if (isFocused) { return styles.containerFocused; }
+    if (isFilled) { return styles.containerFilled; }
+
+    return styles.container;
+  }, [error, isFilled, isFocused]);
+
   return (
     <>
       <div
-        className={!!error ? styles.containerError : isFocused ? styles.containerFocused : isFilled ? styles.containerFilled : styles.container}
+        className={containerStyle}
       >
         <input
           name={name}
@@ -59,8 +68,8 @@ const FilterInput: React.FC<InputProps> = ({
           {...rest}
         />
 
-        <button type='submit'>
-          {Icon && <Icon size={26} type='submit' />}
+        <button type="submit">
+          {Icon && <Icon size={26} type="submit" />}
         </button>
       </div>
       {error && (

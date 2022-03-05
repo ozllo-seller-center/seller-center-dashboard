@@ -7,20 +7,19 @@ type PanelProps = HTMLAttributes<HTMLDivElement> & {
   isActive?: boolean;
 }
 
-const OrderStatusPanel: React.FC<PanelProps> = ({ children, isActive, title, onClick }) => {
-  // console.log(`${title} - ${isActive}`)
-  return (
-    <div onClick={onClick} className={isActive ? styles.containerActive : styles.container} >
-      <label>{title}</label>
-      <div className={styles.content}>
-        {children}
-      </div>
-      {/* <div className={styles.link} onClick={onClick}>
+const OrderStatusPanel: React.FC<PanelProps> = ({
+  children, isActive, title, onClick,
+}) => (
+  <div onClick={onClick} className={isActive ? styles.containerActive : styles.container}>
+    <span>{title}</span>
+    <div className={styles.content}>
+      {children}
+    </div>
+    {/* <div className={styles.link} onClick={onClick}>
         <a>Ver mais</a>
         <FiChevronRight />
       </div> */}
-    </div>
-  );
-}
+  </div>
+);
 
 export default OrderStatusPanel;

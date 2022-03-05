@@ -18,16 +18,15 @@ const LoadingProvider: React.FC = ({ children }) => {
     >
       {children}
     </LoadingContext.Provider>
-  )
-}
+  );
+};
 
 function useLoading(): LoadingContextData {
   const context = useContext(LoadingContext);
 
-  if (!context)
-    throw new Error('useLoading must be used within an LoagindProvider');
+  if (!context) { throw new Error('useLoading must be used within an LoagindProvider'); }
 
   return context;
 }
 
-export { LoadingProvider, useLoading }
+export { LoadingProvider, useLoading };

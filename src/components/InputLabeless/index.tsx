@@ -1,17 +1,14 @@
 import { useField } from '@unform/core';
-import React, { InputHTMLAttributes, useCallback, useEffect, useRef, useState } from 'react';
-import InputMask, { ReactInputMask } from 'react-input-mask';
+import React, {
+  InputHTMLAttributes, useCallback, useEffect, useMemo, useRef, useState,
+} from 'react';
 
-import DatePicker from 'react-datepicker';
-import pt from 'date-fns/locale/pt-BR';
-
-import '../DatePickerInput/datepickerstyles.module.css';
-import styles from './styles.module.scss';
+// import '../DatePickerInput/datepickerstyles.module.css';
 import ReactDatePicker from 'react-datepicker';
+import styles from './styles.module.scss';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
-  containerStyle?: object;
 }
 
 interface InputRefProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -22,16 +19,18 @@ interface InputRefProps extends InputHTMLAttributes<HTMLInputElement> {
   setIsFilled: Function;
 }
 
-const InputDefault: React.FC<InputRefProps> = ({ inputRef, name, placeholder, disabled, defaultValue, setIsFocused, setIsFilled, ...rest }) => {
+const InputDefault: React.FC<InputRefProps> = ({
+  inputRef, name, placeholder, disabled, defaultValue, setIsFocused, setIsFilled, ...rest
+}) => {
   const handleInputFocused = useCallback(() => {
     setIsFocused(true);
-  }, []);
+  }, [setIsFocused]);
 
   const handleInputBlur = useCallback(() => {
     setIsFocused(false);
 
     setIsFilled(inputRef?.current.value);
-  }, []);
+  }, [inputRef, setIsFilled, setIsFocused]);
 
   return (
     <input
@@ -45,20 +44,20 @@ const InputDefault: React.FC<InputRefProps> = ({ inputRef, name, placeholder, di
       disabled={disabled}
       {...rest}
     />
-  )
-}
+  );
+};
 
 const Input: React.FC<InputProps> = ({
   name,
   disabled,
   placeholder,
-  containerStyle = {},
   ...rest
 }) => {
-  const dateRef = useRef<ReactDatePicker>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { fieldName, defaultValue, error, registerField } = useField(name);
+  const {
+    fieldName, defaultValue, error, registerField,
+  } = useField(name);
 
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(!!defaultValue);
@@ -71,10 +70,20 @@ const Input: React.FC<InputProps> = ({
     });
   }, [fieldName, registerField]);
 
+  const containerStyle = useMemo(() => {
+    if (disabled) { return styles.containerDisabled; }
+    if (error) { return styles.containerError; }
+    if (isFocused) { return styles.containerFocused; }
+    if (isFilled) { return styles.containerFilled; }
+
+    return styles.container;
+  }, [disabled, error, isFilled, isFocused]);
+
   return (
-    <div style={containerStyle}>
+    <div>
       <div
-        className={disabled ? styles.containerDisabled : !!error ? styles.containerError : isFocused ? styles.containerFocused : isFilled ? styles.containerFilled : styles.container} >
+        className={containerStyle}
+      >
         <InputDefault
           inputRef={inputRef}
           name={name}
@@ -83,7 +92,8 @@ const Input: React.FC<InputProps> = ({
           setIsFilled={setIsFilled}
           setIsFocused={setIsFocused}
           disabled={disabled}
-          {...rest} />
+          {...rest}
+        />
       </div>
       {error && (
         <p className={styles.error}>
@@ -92,6 +102,6 @@ const Input: React.FC<InputProps> = ({
       )}
     </div>
   );
-}
+};
 
 export default Input;

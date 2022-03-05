@@ -53,7 +53,22 @@
       "@typescript-eslint/ban-types": "off",
       "camelcase": "off",
       "consistent-return": "off",
-      "array-callback-return": "off"
+      "array-callback-return": "off",
+      "react/require-default-props": "off",
+      "react/jsx-props-no-spreading": "off",
+      "jsx-a11y/no-noninteractive-element-interactions": "off",
+      "jsx-a11y/anchor-is-valid": "off",
+      "jsx-a11y/click-events-have-key-events": "off",
+      "jsx-a11y/no-static-element-interactions": "off",
+      "import/no-duplicates": "off",
+      "react/button-has-type": "off",
+      "jsx-a11y/no-noninteractive-element-to-interactive-role": "off",
+      "prefer-destructuring": "off",
+      "jsx-a11y/control-has-associated-label": "off",
+      "jsx-a11y/label-has-associated-control": "off",
+      "react/jsx-no-constructed-context-values": "off",
+      "no-case-declarations": "off",
+      "no-nested-ternary": "off"
     },
     "settings": {
       "import/resolver": {

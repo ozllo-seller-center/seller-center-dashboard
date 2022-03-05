@@ -13,13 +13,13 @@ import {
 
 import api from 'src/services/api';
 import { useAuth } from 'src/hooks/auth';
-import { Product, ProductImage } from 'src/shared/types/product';
+import { Product, ProductImage, Variation } from 'src/shared/types/product';
 import TextArea from 'src/components/Textarea';
 import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
-import { Loader } from 'src/components/Loader';
+import Loader from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
-import Variation from 'src/components/VariationsController/Variation';
+import VariationField from 'src/components/VariationsController/Variation';
 import { Attribute } from 'src/shared/types/category';
 import ImageController from 'src/components/ImageController';
 import RuledHintbox, { Rule } from 'src/components/RuledHintbox';
@@ -39,6 +39,9 @@ type VariationDTO = {
   size?: number | string,
   stock?: number,
   color?: string,
+  flavor?: string,
+  gluten_free?: boolean,
+  lactose_free?: boolean,
 }
 
 export function EditProductForm() {
@@ -338,9 +341,11 @@ export function EditProductForm() {
 
     if (data.price) { filled += 1; }
 
-    if (files.length >= 2) { filled += 1; }
+    if (files.length >= 2) {
+      filled += 1;
+    }
 
-    data.variations.forEach((variation) => {
+    data.variations.forEach((variation: Variation) => {
       if (variation.size) { filled += 1; }
       if (variation.stock) { filled += 1; }
       if (variation.color) { filled += 1; }
@@ -363,7 +368,8 @@ export function EditProductForm() {
     setChanging(false);
 
     return filled;
-  }, [files, attributes, isChanging]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [files, attributes, isChanging, formRef.current]);
 
   const yupVariationSchema = useCallback((): object => (attributes.findIndex((attribute) => attribute.name === 'flavor') >= 0
     ? {
@@ -536,7 +542,7 @@ export function EditProductForm() {
           authorization: token,
           shop_id: user.shopInfo._id,
         },
-      }).then((response) => {
+      }).then(() => {
         setLoading(false);
 
         if (window.innerWidth >= 768) {
@@ -557,14 +563,12 @@ export function EditProductForm() {
   }, [filledFields, totalFields, colorInName, brandInName, handleModalMessage, setLoading, yupVariationSchema, router, files, token, user.shopInfo._id, priceChanged, category, subCategory, nationality, oldStock]);
 
   const handleDeleteVariation = useCallback(async (deletedIndex: number): Promise<void> => {
-    setVariations(formRef.current?.getData().variations);
+    const vars = formRef.current?.getData().variations;
 
-    const tempVars = variations.filter((vars, i) => i !== deletedIndex);
+    const tempVars = vars.filter((v: any, i: number) => i !== deletedIndex);
     const deletedVariation = variations[deletedIndex];
 
-    setVariations(tempVars);
-
-    formRef.current?.setFieldValue('variations', tempVars);
+    formRef.current?.setFieldValue('variations', [...tempVars]);
     formRef.current?.setData({ ...formRef.current?.getData(), variations: tempVars });
 
     const { id } = router.query;
@@ -574,6 +578,9 @@ export function EditProductForm() {
         shop_id: user.shopInfo._id,
       },
     });
+
+    setVariations([...tempVars]);
+    setChanging(true);
   }, [variations, token, user, router]);
 
   const handleAddVariation = useCallback(() => {
@@ -766,7 +773,7 @@ export function EditProductForm() {
                 {
                   variations.map((variation, i) => (
                     <Scope key={variation._id ? variation._id : i} path={`variations[${i}]`}>
-                      <Variation
+                      <VariationField
                         variation={variation}
                         index={i}
                         handleDeleteVariation={handleDeleteVariation}

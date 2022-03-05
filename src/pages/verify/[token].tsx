@@ -5,7 +5,7 @@ import { FiCheck, FiX } from 'react-icons/fi';
 import { useAuth, User } from '../../hooks/auth';
 import api from '../../services/api';
 
-import styles from './styles.module.scss'
+import styles from './styles.module.scss';
 
 const Verify: React.FC = () => {
   const [isVerifying, setVerifying] = useState(true);
@@ -22,7 +22,6 @@ const Verify: React.FC = () => {
     }
 
     api.get(`/auth/activate/${token}`).then((response) => {
-
       if (verifyUser(response.data)) {
         setVerifying(false);
         setVerified(true);
@@ -36,19 +35,18 @@ const Verify: React.FC = () => {
 
       setVerifying(false);
       setVerified(false);
-    }).catch((err) => {
+    }).catch(() => {
       setVerifying(false);
       setVerified(false);
-    })
-
-  }, [])
+    });
+  }, []);
 
   return (
     <div className={styles.container}>
       {
         isVerifying && (
           <div className={styles.verifying}>
-            <div className={styles.dotFlashing}></div>
+            <div className={styles.dotFlashing} />
             <p>Estamos confirmando seu e-mail e autenticando o acesso</p>
           </div>
         )
@@ -72,7 +70,7 @@ const Verify: React.FC = () => {
         )
       }
     </div>
-  )
-}
+  );
+};
 
 export default Verify;
