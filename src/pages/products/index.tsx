@@ -11,11 +11,7 @@ import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
 import api from 'src/services/api';
 import { getHeader, getVariations } from 'src/shared/functions/products';
-import { Categories } from 'src/shared/enums/Categories';
-import { Genres } from 'src/shared/enums/Genres';
-import { Nationalities } from 'src/shared/enums/Nationalities';
-import { Subcategories } from 'src/shared/enums/Subcategories';
-import { ProductSummary as Product, Variation } from 'src/shared/types/product';
+import { ProductSummary as Product } from 'src/shared/types/product';
 import XLSX from 'xlsx';
 import BulletedButton from '../../components/BulletedButton';
 import FilterInput from '../../components/FilterInput';
@@ -233,28 +229,34 @@ export function Products({ userFromApi }: ProductsProps) {
           Importar ou exportar
         </BulletedButton>
       </div>
-      <div className={styles.divider} />
       <div className={styles.productsContent}>
-        <div className={styles.productsOptions}>
-          <div className={styles.contentFilters}>
-            <Form ref={formRef} onSubmit={handleSubmit}>
-              <FilterInput
-                name="search"
-                icon={FiSearch}
-                placeholder="Pesquise um produto..."
-                autoComplete="off" />
-            </Form>
+        
+        <div className={styles.divider} />
+        <div className={styles.productsContent}>
+          <div className={styles.productsOptions}>
+            <div className={styles.contentFilters}>
+            <div className={styles.panelFooter}>
+                <select value={valorAcoes || ""} onChange={setValorAcao} className={styles.selectOption}>
+                  <option selected value="0">Ação em massa</option>
+                  <option value="1">Exportar Produto(s)</option>
+                  <option value="2">Excluir Produto(s)</option>
+                </select>
+                <button type='button' onClick={executarAcao} disabled={isDisabledAcoes}>Aplicar</button>
+              </div>
+            <div style={{ display: 'flex', flex: 1 }}>
+                <Form ref={formRef} onSubmit={handleSubmit}>
+                  <FilterInput
+                    name="search"
+                    icon={FiSearch}
+                    placeholder="Pesquise um produto..."
+                    autoComplete="off" />
+                </Form>
+              </div>
+              
+              
+            </div>
           </div>
         </div>
-        <section className={styles.header}>
-          <div className={styles.panelFooter}>
-            <select value={valorAcoes || ""} onChange={setValorAcao} className={styles.selectOption}>
-              <option selected value="0">Ação em massa</option>
-              <option value="1">Exportar Produtos</option>
-            </select>
-            <button type='button' onClick={executarAcao} disabled={isDisabledAcoes}>Aplicar</button>
-          </div>
-        </section>
         <div className={styles.tableContainer}>
           {items.length > 0 ? (
             <table className={styles.table}>
