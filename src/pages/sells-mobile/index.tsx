@@ -139,7 +139,7 @@ export const SellsMobile: React.FC = () => {
   useEffect(() => {
     // setOrders(ordersFromApi)
     loadOrders();
-  }, [loadOrders]);
+  }, []);
 
   useEffect(() => {
     const totals = orders.reduce((accumulator: Totals, orderParent: OrderParent) => {
