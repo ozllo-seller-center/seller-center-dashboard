@@ -5,7 +5,7 @@ type SheetErrors = {
   }
 }
 
-export const ErrorMessages: SheetErrors = {
+const ErrorMessages: SheetErrors = {
   catalogue: {
     title: 'Categorização de um produto não selecionada!',
     message: 'É necessário selecionar a categorização do produto de Id Agrupador %s, na linha %d',
@@ -53,5 +53,7 @@ export const ErrorMessages: SheetErrors = {
   image: {
     title: 'Imagens não informadas!',
     message: 'É necessário informar pelo menos duas imagens do produto de Id Agrupador %s, na linha %d',
-  }
-}
+  },
+};
+
+export default ErrorMessages;

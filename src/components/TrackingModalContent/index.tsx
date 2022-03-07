@@ -1,22 +1,24 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Form } from '@unform/web'
-import { FormHandles } from '@unform/core'
-import * as Yup from 'yup'
+import React, {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
+import { Form } from '@unform/web';
+import { FormHandles } from '@unform/core';
+import * as Yup from 'yup';
 
-import styles from './styles.module.scss'
-import api from 'src/services/api'
-import { useAuth } from 'src/hooks/auth'
-import { useModalMessage } from 'src/hooks/message'
-import { OrderInvoice, OrderParent } from 'src/shared/types/order'
+import api from 'src/services/api';
+import { useAuth } from 'src/hooks/auth';
+import { useModalMessage } from 'src/hooks/message';
+import { OrderInvoice, OrderParent } from 'src/shared/types/order';
 
-import { isoDateHub2b } from 'src/utils/util'
-import Input from '../Input'
-import { useLoading } from 'src/hooks/loading'
-import { Loader } from '../Loader'
-import { FiCheck } from 'react-icons/fi'
-import DatePickerInput from '../DatePicker'
-import getValidationErrors from 'src/utils/getValidationErrors'
-import { useRouter } from 'next/router'
+import { isoDateHub2b } from 'src/utils/util';
+import { useLoading } from 'src/hooks/loading';
+import { FiCheck } from 'react-icons/fi';
+import getValidationErrors from 'src/utils/getValidationErrors';
+import { useRouter } from 'next/router';
+import DatePickerInput from '../DatePicker';
+import Loader from '../Loader';
+import Input from '../Input';
+import styles from './styles.module.scss';
 
 interface TrackingModalContentProps {
   item: OrderParent
@@ -25,68 +27,67 @@ interface TrackingModalContentProps {
 }
 
 const TrackingModalContent: React.FC<TrackingModalContentProps> = ({ item, onTrackSent, closeModal }) => {
-  const formRef = useRef<FormHandles>(null)
+  const formRef = useRef<FormHandles>(null);
 
-  const [isSuccess, setSuccess] = useState(false)
+  const [isSuccess, setSuccess] = useState(false);
 
-  const { user, token, updateUser } = useAuth()
-  const router = useRouter()
+  const { user, token, updateUser } = useAuth();
+  const router = useRouter();
 
-  const { handleModalMessage } = useModalMessage()
-  const { isLoading, setLoading } = useLoading()
+  const { handleModalMessage } = useModalMessage();
+  const { isLoading, setLoading } = useLoading();
 
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
 
-    api.get('/account/detail').then(response => {
-      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id, userId: response.data.shopInfo.userId } })
-      setLoading(false)
-    }).catch(err => {
-      setLoading(false)
-      router.push('/')
-    })
-  }, [])
+    api.get('/account/detail').then((response) => {
+      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id, userId: response.data.shopInfo.userId } });
+      setLoading(false);
+    }).catch((err) => {
+      setLoading(false);
+      router.push('/');
+    });
+  }, []);
 
   const handleSubmit = useCallback(async (data) => {
-    setSuccess(false)
+    setSuccess(false);
 
-    setLoading(true)
+    setLoading(true);
 
     const schema = Yup.object().shape({
-      code: Yup.string().required('Campo obrigatório').min(8, "Deve conter pelo menos 8 caracteres"),
+      code: Yup.string().required('Campo obrigatório').min(8, 'Deve conter pelo menos 8 caracteres'),
       url: Yup.string().url('Deve ser uma URL (Ex.: http://site.com.br/)').required('Campo obrigatório'),
       shippingProvider: Yup.string().required('Campo obrigatório'),
       shippingService: Yup.string().required('Campo obrigatório'),
       shippingDate: Yup.date().required('Campo obrigatório'),
-    })
+    });
 
     try {
-      await schema.validate(data, { abortEarly: false })
+      await schema.validate(data, { abortEarly: false });
 
       const invoice: OrderInvoice = {
         ...data,
         shippingDate: isoDateHub2b(data.shippingDate.toISOString()),
-      }
+      };
 
       api.post(`/order/${item.order.reference.id}/tracking`, invoice, {
         headers: {
           authorization: token,
           shop_id: user.shopInfo._id,
-        }
-      }).then(reponse => {
-        setLoading(false)
+        },
+      }).then((reponse) => {
+        setLoading(false);
 
-        setSuccess(true)
+        setSuccess(true);
 
-        if (onTrackSent)
-          onTrackSent()
-      }).catch(err => {
-        setLoading(false)
+        if (onTrackSent) { onTrackSent(); }
+      }).catch((err) => {
+        setLoading(false);
 
-        handleModalMessage(true, { title: 'Erro', message: ['Erro ao enviar rastreio'], type: 'error' })
-      })
+        handleModalMessage(true, { title: 'Erro', message: ['Erro ao enviar rastreio'], type: 'error' });
+      });
     } catch (err) {
-      setLoading(false)
+      setLoading(false);
 
       if (err instanceof Yup.ValidationError) {
         const errors = getValidationErrors(err);
@@ -96,9 +97,9 @@ const TrackingModalContent: React.FC<TrackingModalContentProps> = ({ item, onTra
         return;
       }
 
-      console.log(err)
+      console.log(err);
     }
-  }, [])
+  }, []);
 
   return (
     <div>
@@ -119,40 +120,40 @@ const TrackingModalContent: React.FC<TrackingModalContentProps> = ({ item, onTra
               maskChar={'#'}
             /> */}
             <DatePickerInput
-              name='shippingDate'
-              label='Data de postagem'
+              name="shippingDate"
+              label="Data de postagem"
             />
           </div>
           <div className={styles.doubleInputContainer}>
             <Input
-              name='code'
-              label='Código'
-              placeholder='Código de rastreio'
-              autoComplete='off'
+              name="code"
+              label="Código"
+              placeholder="Código de rastreio"
+              autoComplete="off"
             />
             <Input
-              name='url'
-              label='Link'
-              placeholder='Link do rastreio'
-              autoComplete='off'
+              name="url"
+              label="Link"
+              placeholder="Link do rastreio"
+              autoComplete="off"
             />
           </div>
           <div className={styles.doubleInputContainer}>
             <Input
-              name='shippingProvider'
-              label='Trasnportadora'
-              placeholder='Transportadora'
-              autoComplete='off'
+              name="shippingProvider"
+              label="Trasnportadora"
+              placeholder="Transportadora"
+              autoComplete="off"
             />
             <Input
-              name='shippingService'
-              label='Serviço'
-              placeholder='Serviço'
-              autoComplete='off'
+              name="shippingService"
+              label="Serviço"
+              placeholder="Serviço"
+              autoComplete="off"
             />
           </div>
 
-          <button type='submit' className={styles.button}>Confirmar</button>
+          <button type="submit" className={styles.button}>Confirmar</button>
         </Form>
       ) : (
         <div className={styles.sucessParent}>
@@ -167,8 +168,8 @@ const TrackingModalContent: React.FC<TrackingModalContentProps> = ({ item, onTra
           </div>
         )
       }
-    </div >
-  )
-}
+    </div>
+  );
+};
 
-export default TrackingModalContent
+export default TrackingModalContent;

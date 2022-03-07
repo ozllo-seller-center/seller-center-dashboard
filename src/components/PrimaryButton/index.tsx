@@ -13,18 +13,20 @@ interface Button extends ButtonHTMLAttributes<HTMLButtonElement> {
   };
 }
 
-const Button: React.FC<Button> = ({ isActive, customStyle, icon: Icon, children, onClick, ...rest }) => {
-  return (!!customStyle ?
-    <button className={isActive && !!customStyle.activeClassName ? customStyle.activeClassName : customStyle.className} onClick={onClick} {...rest}>
-      {!!Icon && <Icon />}
-      {children}
-    </button>
-    :
+const Button: React.FC<Button> = ({
+  isActive, customStyle, icon: Icon, children, onClick, ...rest
+}) => (customStyle ? (
+  <button className={isActive && !!customStyle.activeClassName ? customStyle.activeClassName : customStyle.className} onClick={onClick} {...rest}>
+    {!!Icon && <Icon />}
+    {children}
+  </button>
+)
+  : (
     <button className={isActive ? styles.buttonActive : styles.button} {...rest} onClick={onClick} {...rest}>
       {!!Icon && <Icon />}
       {children}
     </button>
-  );
-}
+  )
+);
 
 export default Button;

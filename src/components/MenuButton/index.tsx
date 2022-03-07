@@ -7,12 +7,10 @@ interface BurgerProps {
   setOpen: Function;
 }
 
-const MenuButton: React.FC<BurgerProps> = ({ open, setOpen }: BurgerProps) => {
-  return (
-    <button className={styles.menuButton} onClick={() => setOpen(!open)}>
-      <FiMenu />
-    </button>
-  )
-}
+const MenuButton: React.FC<BurgerProps> = ({ open, setOpen }: BurgerProps) => (
+  <button className={styles.menuButton} onClick={() => setOpen(!open)}>
+    <FiMenu />
+  </button>
+);
 
 export default MenuButton;

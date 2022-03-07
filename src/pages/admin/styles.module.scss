@@ -45,6 +45,8 @@
 
     // height: 20%;
 
+    max-width: 800px;
+
     .tableContainer {
       flex: 1;
       display: flex;
@@ -93,7 +95,7 @@
 
     .tableContainer {
       flex: 1;
-      
+
 
       .table {
         flex: 1;
@@ -107,7 +109,7 @@
 
         .tableHeader {
           flex: 1;
-          
+
           th {
             text-align: left;
             padding: 1rem 1rem;

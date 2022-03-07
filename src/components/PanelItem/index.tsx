@@ -1,6 +1,6 @@
 import React from 'react';
 import { FiPlusCircle } from 'react-icons/fi';
-import { useRouter } from "next/router";
+import { useRouter } from 'next/router';
 
 import styles from './styles.module.scss';
 
@@ -17,9 +17,9 @@ const MenuButton: React.FC<PanelItemProps> = ({ title, value, valueColor }: Pane
     <div className={styles.panelItemContainer}>
       <p className={styles.title}>{title}</p>
       <span className={styles[`${valueColor}`]}>{value}</span>
-      <button type='button'><FiPlusCircle /></button>
+      <button type="button"><FiPlusCircle /></button>
     </div>
-  )
-}
+  );
+};
 
 export default MenuButton;

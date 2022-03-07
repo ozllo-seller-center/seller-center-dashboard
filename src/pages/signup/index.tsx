@@ -1,4 +1,6 @@
-import React, { useCallback, useRef, ChangeEvent, useState } from 'react';
+import React, {
+  useCallback, useRef, ChangeEvent, useState,
+} from 'react';
 
 import { FormHandles, Scope } from '@unform/core';
 import { Form } from '@unform/web';
@@ -8,6 +10,9 @@ import Link from 'next/link';
 import { FiCheck, FiChevronLeft, FiX } from 'react-icons/fi';
 import { VscCircleFilled } from 'react-icons/vsc';
 
+import Loader from 'src/components/Loader';
+import { useLoading } from 'src/hooks/loading';
+import { AppError } from 'src/shared/errors/api/errors';
 import { useAuth } from '../../hooks/auth';
 
 import api from '../../services/api';
@@ -20,9 +25,6 @@ import { isEmailValid, isPasswordSecure } from '../../utils/util';
 import Input from '../../components/InputLabeless';
 import Button from '../../components/PrimaryButton';
 import MessageModal from '../../components/MessageModal';
-import { Loader } from 'src/components/Loader';
-import { useLoading } from 'src/hooks/loading';
-import { AppError } from 'src/shared/errors/api/errors';
 
 type SignUpFormData = {
   name: string,
@@ -63,29 +65,34 @@ const SignUp: React.FC = () => {
               'Informe um e-mail válido',
               (value) => (
                 !!value && isEmailValid(value)
-              )),
+              ),
+            ),
           password: Yup.string()
             .required('Senha obrigatória')
             .min(8, 'No mínimo 8 digitos')
-            .test('password-validation',
+            .test(
+              'password-validation',
               'A senha não cumpre os critérios de segurança indicados abaixo',
               (value) => (
                 !!value && isPasswordSecure(value)
-              )),
+              ),
+            ),
           password_confirmation: Yup.string()
             .required('Confirme sua senha')
-            .test('password-validation',
+            .test(
+              'password-validation',
               ' ',
               (value) => (
                 !!value && isPasswordSecure(value)
-              ))
+              ),
+            )
             .oneOf([Yup.ref('password')], 'A confirmação deve ser igual a senha'),
         });
         await schema.validate(data, { abortEarly: false });
 
         const {
           email,
-          password
+          password,
         } = data;
 
         await api.post('/auth/create', { email, password });
@@ -133,10 +140,8 @@ const SignUp: React.FC = () => {
   const handleModalVisibility = useCallback(() => {
     setModalVisibility(false);
 
-    if (successfull)
-      router.push('/');
-  }, [isModalVisible, successfull])
-
+    if (successfull) { router.push('/'); }
+  }, [isModalVisible, successfull]);
 
   // TODO: Implementar avatar no cadastro e perfil do usuário no back-end
   // const handleAvatarChange = useCallback(
@@ -159,7 +164,7 @@ const SignUp: React.FC = () => {
         <div>
           <Link href="/">
             <Button
-              type='button'
+              type="button"
               customStyle={{ className: styles.backButton }}
               icon={FiChevronLeft}
             >
@@ -187,9 +192,9 @@ const SignUp: React.FC = () => {
               <h3>Sua conta Ozllo</h3>
 
               <Input
-                name='email'
-                placeholder='E-mail'
-                autoComplete='off'
+                name="email"
+                placeholder="E-mail"
+                autoComplete="off"
               />
 
               <Input
@@ -197,7 +202,7 @@ const SignUp: React.FC = () => {
                 type="password"
                 placeholder="Senha"
                 onChange={(e) => {
-                  setPasswordCheck(e.target.value)
+                  setPasswordCheck(e.target.value);
                 }}
               />
 
@@ -213,52 +218,47 @@ const SignUp: React.FC = () => {
                 </span>
                 <div>
                   {
-                    passwordCheck === '' ?
-                      <VscCircleFilled className={styles.empty} />
-                      :
-                      passwordCheck.length >= 8 ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                    passwordCheck === ''
+                      ? <VscCircleFilled className={styles.empty} />
+                      : passwordCheck.length >= 8 ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
                   }
                   <span className={passwordCheck === '' ? styles.empty : passwordCheck.length >= 8 ? styles.check : styles.error}>
                     A senha deve conter pelo menos 8 caractéres
                   </span>
 
                   {
-                    passwordCheck === '' ?
-                      <VscCircleFilled className={styles.empty} />
-                      :
-                      (/[a-z]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                    passwordCheck === ''
+                      ? <VscCircleFilled className={styles.empty} />
+                      : (/[a-z]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
                   }
                   <span className={passwordCheck === '' ? styles.empty : (/[a-z]/.test(passwordCheck)) ? styles.check : styles.error}>
                     Deve conter pelo menos uma letra minúscula
                   </span>
 
                   {
-                    passwordCheck === '' ?
-                      <VscCircleFilled className={styles.empty} />
-                      :
-                      (/[A-Z]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                    passwordCheck === ''
+                      ? <VscCircleFilled className={styles.empty} />
+                      : (/[A-Z]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
                   }
                   <span className={passwordCheck === '' ? styles.empty : (/[A-Z]/.test(passwordCheck)) ? styles.check : styles.error}>
                     Deve conter pelo menos uma letra maiúscula
                   </span>
 
                   {
-                    passwordCheck === '' ?
-                      <VscCircleFilled className={styles.empty} />
-                      :
-                      (/[0-9]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                    passwordCheck === ''
+                      ? <VscCircleFilled className={styles.empty} />
+                      : (/[0-9]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
                   }
                   <span className={passwordCheck === '' ? styles.empty : (/[0-9]/.test(passwordCheck)) ? styles.check : styles.error}>
                     Deve conter pelo menos um digito numérico
                   </span>
 
                   {
-                    passwordCheck === '' ?
-                      <VscCircleFilled className={styles.empty} />
-                      :
-                      (/[!@#\$%\^&\*]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                    passwordCheck === ''
+                      ? <VscCircleFilled className={styles.empty} />
+                      : (/[!@#$%^&*]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
                   }
-                  <span className={passwordCheck === '' ? styles.empty : (/[!@#\$%\^&\*]/.test(passwordCheck)) ? styles.check : styles.error}>
+                  <span className={passwordCheck === '' ? styles.empty : (/[!@#$%^&*]/.test(passwordCheck)) ? styles.check : styles.error}>
                     Deve conter pelo menos um caractére especial
                   </span>
 
@@ -285,7 +285,13 @@ const SignUp: React.FC = () => {
             <div className={styles.modalContent}>
               {successfull ? <FiCheck style={{ color: 'var(--green-100)' }} /> : <FiX style={{ color: 'var(--red-100)' }} />}
               <p>{title}</p>
-              {messages.map(message => <p> {message} </p>)}
+              {messages.map((message) => (
+                <p>
+                  {' '}
+                  {message}
+                  {' '}
+                </p>
+              ))}
             </div>
           </MessageModal>
         )
