@@ -1,439 +1,611 @@
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/router';
+
+import XLSX from 'xlsx';
+
+import BulletedButton from '../../../components/BulletedButton';
+import Importzone from '../../../components/Importzone';
+import MessageModal from '../../../components/MessageModal';
+
+import styles from './styles.module.scss';
+import { FiCheck, FiDownloadCloud, FiUploadCloud, FiX } from 'react-icons/fi';
+import { FaExclamation } from 'react-icons/fa';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FiCameraOff, FiCheck, FiEdit, FiSearch, FiX } from 'react-icons/fi';
+import * as Yup from 'yup'
+import { importLines, ProductImport } from 'src/shared/types/productImport';
+import api from 'src/services/api';
+import { Nationality } from 'src/shared/types/nationality';
+import { Category, SubCategory } from 'src/shared/types/category';
 import { Loader } from 'src/components/Loader';
-import MessageModal from 'src/components/MessageModal';
-import ActionModal from 'src/components/ModalAction';
-import ProductTableItem from 'src/components/ProductTableItem';
-import { useAuth, User } from 'src/hooks/auth';
 import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
-import api from 'src/services/api';
-import { getHeader, getVariations } from 'src/shared/functions/products';
-import { ProductSummary as Product } from 'src/shared/types/product';
-import XLSX from 'xlsx';
-import BulletedButton from '../../components/BulletedButton';
-import FilterInput from '../../components/FilterInput';
-import styles from './styles.module.scss';
+import { ErrorMessages } from 'src/shared/errors/ImportSheetError';
+import { InitProductImport } from 'src/shared/validators/importValidators';
+import { importToProduct } from 'src/shared/converters/importToProduct';
+import { Product } from 'src/shared/types/product';
+import { useAuth } from 'src/hooks/auth';
+import { isTokenValid } from 'src/utils/util';
+import getValidationErrors from 'src/utils/getValidationErrors';
 
-interface SearchFormData {
-  search: string;
+type VariationDTO = {
+  _id?: string
+  size?: number | string,
+  stock?: number,
+  color?: string,
 }
 
-interface ProductsProps {
-  userFromApi: User;
-}
+function Import() {
 
-export function Products({ userFromApi }: ProductsProps) {
-  const [products, setProducts] = useState([] as Product[]);
-  const [items, setItems] = useState([] as Product[]);
-  const [search, setSeacrh] = useState('');
+  const [files, setFiles] = useState<File[]>([]);
 
+  const [isModalVisible, setModalVisibility] = useState(false);
 
-  const [disabledActions, setDisableActions] = useState(false);
+  const [isUploading, setUploading] = useState(false);
+  const [successfull, setSuccessfull] = useState(false);
+  const [error, setError] = useState(false);
 
-  const { isLoading, setLoading } = useLoading();
+  const [imports, setImports] = useState<ProductImport[]>([]);
+  const [nationalities, setNationalities] = useState([] as Nationality[]);
+  const [categories, setCategories] = useState([] as Category[]);
+  const [subCategories, setSubCategories] = useState([] as SubCategory[]);
+
   const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
+  const { setLoading, isLoading } = useLoading();
 
-  const { token, user, updateUser } = useAuth();
-  const [checked, setChecked] = useState(false);
-  const [checkedState, setCheckedState] = useState(false);
-
-  const [isDisabledAcoes, setIsDisabledAcoes] = React.useState(true);
-  const [valorAcoes, setValorAcoes] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  useEffect(() => {
-    // !!userFromApi && updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: userFromApi.shopInfo._id } })
-  }, [userFromApi])
-
-  // const itemsRef = useMemo(() => Array(items.length).fill(0).map(i => React.createRef<HTMLInputElement>()), [items]);
+  const { user, token, updateUser } = useAuth();
 
   const formRef = useRef<FormHandles>(null);
-  const [error, setError] = useState('');
 
   const router = useRouter();
 
-  useEffect(() => {
-    setLoading(true);
-    api.get('/account/detail').then(response => {
-      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
-      setLoading(false);
-      // return response.data as User;
-    }).catch(err => {
-      console.log(err)
-      setLoading(false);
-    });
-  }, [])
+  const { width } = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      return { width: window.innerWidth }
+    }
 
-  useEffect(() => {
-    setLoading(true);
+    return {
+      width: undefined
+    }
+  }, [process.browser]);
 
-    setItems(products.filter(product => {
-      return (!!product.name && (search === '' || product.name.toLowerCase().includes(search.toLowerCase())));
-    }));
+  const handleFileUpload = useCallback((uploads: File[]) => {
+    setFiles(uploads);
+  }, []);
 
-    setLoading(false);
-  }, [search, products]);
+  const handleImport = useCallback(async () => {
+    let importedProducts: ProductImport[] = []
 
-  useEffect(() => {
-    if (!!user) {
-      setLoading(true);
+    setLoading(true)
+    setError(false)
 
-      api.get('/product', {
-        headers: {
-          authorization: token,
-          shop_id: user.shopInfo._id,
+    files.map(async (file) => {
+      let reader = new FileReader()
+
+      reader.onload = async (e) => {
+        if (!e.target || e.target.result === null)
+          return
+
+        let data = e.target.result
+
+        if (!(data instanceof ArrayBuffer)) {
+          return
         }
-      }).then(response => {
 
-        let productsDto = response.data as Product[];
+        data = new Uint8Array(data)
 
-        productsDto = productsDto.map(product => {
-          let stockCount: number = 0;
+        let workbook = XLSX.read(data, { type: 'array' })
+        let result: any = {}
 
-          if (!!product.variations) {
-            product.variations.forEach(variation => {
-              stockCount = stockCount + Number(variation.stock);
-            })
-          }
-
-          product.stock = stockCount;
-          product.checked = false;
-
-          return product;
+        workbook.SheetNames.forEach((sheet) => {
+          let roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheet], { header: 1 })
+          if (roa.length)
+            result[sheet] = roa
         })
 
+        let count = 0;
+        let stop = false;
 
-        setProducts(productsDto)
-        setItems(productsDto)
+        if (!!result.Planilha1 || !!result.data) {
+          const sheet: any[] = result.Planilha1 ? result.Planilha1 : result.data
 
-        setLoading(false);
-      }).catch((error) => {
-        console.log(error)
-        setProducts([]);
-        setItems([])
+          console.log(sheet)
 
-        setLoading(false);
-      })
-    }
-  }, [user]);
+          sheet.forEach(async (line, i) => {
+            // Ignorar o cabeçalho
+            if (i > 1 && line.length > 0) {
+              count++;
 
-  const handleSubmit = useCallback(
-    async (data: SearchFormData) => {
-      try {
-        formRef.current?.setErrors({});
+              let productValidation: ProductImport = InitProductImport()
 
-        if (data.search !== search) {
-          setSeacrh(data.search);
-        }
+              if (!line[3]) {
+                handleModalMessage(true, {
+                  type: 'error',
+                  title: 'Id Agrupador não encontrado!',
+                  message: [`Não foi encontrado um id arupador na linha ${i + 1}`]
+                })
 
-      } catch (err) {
-        setError('Ocorreu um erro ao fazer login, cheque as credenciais.');
-      }
-    },
-    [search],
-  );
+                stop = true
 
-  const handleModalVisibility = useCallback(() => {
-    handleModalMessage(false);
-  }, [])
+                setError(true)
+              }
+              let size = line.length - 1;
+              for (let attrI = 0; attrI <= size && !stop; attrI++) {
+                const attribute = importLines[attrI]
 
-  const selectOrDeselectAllProducts = useCallback(async () => {
-    const produtos = items;
-    produtos.forEach(item => {
-      item.checked = !checked;
-    })
+                const validate = productValidation[attribute].validate
 
-    setItems(produtos);
-    setChecked(!checked);
-    setIsDisabledAcoes(checked);
-  }, [checked, products, items])
+                switch (attrI) {
+                  case 0:
+                    let value = line[attrI].split(">")
 
-  const handleCheckboxChange = useCallback(async (id: any, position: number) => {
+                    productValidation[attribute].value.nationality = value[0].trim()
+                    productValidation[attribute].value.category = value[1].trim()
+                    productValidation[attribute].value.subCategory = value[2].trim()
+                    break
+                  case 16:
+                    let gender = line[attrI].charAt(0).toUpperCase()
+                    productValidation[attribute].value = gender
 
-    // const index = products.findIndex(product => product._id === id);
-    // const updateProducts = [...products];
-    // updateProducts[index].checked = !updateProducts[position].checked;
+                    break;
 
-    const indexItem = items.findIndex(item => item._id === id);
-    const updateItems = [...items];
-    updateItems[indexItem].checked = !updateItems[position].checked;
+                  case 19:
+                  case 20:
+                  case 21:
+                  case 22:
+                  case 23:
+                  case 24:
+                    if (line[attrI])
+                      productValidation[attribute].value.push(line[attrI])
+                    break
+                  case 25:  
 
-    setChecked(updateItems.reduce((accumulator, item) => accumulator && item.checked, false));
+                  default:
+                    if (line[attrI])
+                      productValidation[attribute].value = line[attrI]
+                    break
+                }
 
-    let isChecked = true;
-    updateItems.map((item) => {
-      if (item.checked)
-        isChecked = false
-    });
-    setIsDisabledAcoes(isChecked);
+                if (validate && !validate(productValidation[attribute].value)) {
+                  const error = ErrorMessages[attribute]
 
-    // setProducts(updateProducts);
-    setItems(updateItems);
-  }, [products, items, isDisabledAcoes])
+                  if (error) {
+                    handleModalMessage(true, {
+                      type: 'error',
+                      title: error.title,
+                      message: [error.message.replace('%s', line[3]).replace('%d', (i + 1).toString())]
+                    })
+                  }
 
-  const getProducts = () => {
-    const produtosFiltrados = items.filter(p => p.checked)
-    let produtosCSV: any = []
-    produtosCSV.push(getHeader())
-    produtosFiltrados.forEach(produto => {
-      produtosCSV = [...produtosCSV, ...getVariations(produto)]
-    });
-    return produtosCSV
-  }
+                  setError(true)
 
-  const exportToCSV = () => {
-    const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-    const csvData = getProducts();
+                  return;
+                }
+              }
 
-    const ws = XLSX.utils.json_to_sheet(csvData);
-    const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const data = new Blob([excelBuffer], { type: fileType });
+              if (productValidation['image'].value.length < 2) {
+                const error = ErrorMessages['image']
 
-    const a = document.createElement('a');
-    a.download = "Produtos.xlsx";
-    a.href = URL.createObjectURL(data);
-    a.addEventListener('click', (e) => {
-      setTimeout(() => URL.revokeObjectURL(a.href), 30 * 1000);
-    });
-    a.click();
-  }
+                handleModalMessage(true, {
+                  type: 'error',
+                  title: error.title,
+                  message: [error.message.replace('%s', line[3]).replace('%d', (i + 1).toString())]
+                })
 
+                console.log(error.message.replace('%s', line[3]).replace('%d', (i + 1).toString()))
 
-  const setValorAcao = useCallback((value) => {
-    setValorAcoes(value.target.value);
-  }, [valorAcoes])
+                setError(true)
 
-  const executarAcao = () => {
-    if (valorAcoes === "1") {
-      exportToCSV();
-    }
-    if (valorAcoes === "2") {
-      setIsModalOpen(true);
-    }
-  }
+                return;
+              }
 
-  const findItems = useCallback(async () => {
-    api.get('/product', {
-      headers: {
-        authorization: token,
-        shop_id: user.shopInfo._id,
-      }
-    }).then(response => {
+              if (stop)
+                return
 
-      let productsDto = response.data as Product[];
-
-      productsDto = productsDto.map(product => {
-        let stockCount: number = 0;
-
-        if (!!product.variations) {
-          product.variations.forEach(variation => {
-            stockCount = stockCount + Number(variation.stock);
+              importedProducts.push(productValidation)
+            }
           })
+
+          if (count === 0) {
+            handleModalMessage(true, {
+              type: 'error',
+              title: 'Nenhum produto encontrado',
+              message: ['A planilha selecionada não possui nenhum registro válido']
+            })
+
+            setImports([])
+            return
+          }
+
+          // setImports(importedProducts)
+          importProducts(importedProducts)
+        }
+      }
+
+      reader.readAsArrayBuffer(file)
+    })
+
+
+  }, [files, isUploading, successfull, error]);
+
+
+  const importProducts = useCallback(async (imports: ProductImport[]) => {
+    let products: Product[] = []
+
+    try {
+      if (imports.length === 0) {
+        setLoading(false)
+        return
+      }
+
+
+      products = importToProduct(imports)
+
+      setLoading(true)
+
+      if (error) {
+        setLoading(false)
+        return
+      }
+
+      products.map(async (product) => {
+
+        // FIXME: Carregar as imagens e enviar os arquivos para o back-end
+        // console.log('[Init] Loading blobs')
+        // const blobs = product.images.map(img => {
+        //   return fetch(img.url)
+        //     .then((e) => {
+        //       return e.blob()
+        //     })
+        // })
+
+        // let files = await blobs.map(async (blob, i) => {
+        //   let b: any = await blob.then(b => b)
+        //   b.lastModifiedDate = new Date()
+        //   b.name = product.images[i].name
+
+        //   return b as File
+        // })
+
+        // console.log(files)
+        // console.log('[End] Loading blobs')
+
+        // let dataContainer = new FormData();
+
+        // await files.map(async (f) => {
+        //   await f.then((file) => {
+        //     if (!!file) {
+        //       console.log('Adding file to request: ')
+        //       console.log(file)
+
+        //       dataContainer.append("images", file, file.name)
+        //     }
+        //   })
+        // });
+
+        // console.log('Calling images upload')
+
+        // const imagesUrls = await api.post('/product/upload', dataContainer, {
+        //   headers: {
+        //     authorization: token,
+        //     shop_id: user.shopInfo._id,
+        //   }
+        // }).then(response => {
+        //   return response.data.urls
+        // }).catch(err => {
+        //   console.log(err)
+        // });
+        let isVariation = false;
+
+        const imagesUrls = product.images.map(img => img.url)
+
+        const nationalityIndex = nationalities.findIndex(nat => nat.name === product.nationality)
+        const nationality = nationalityIndex > -1 ? nationalities[nationalityIndex] : nationalities[0]
+
+        const categoryIndex = categories.findIndex(cat => cat.value === product.category)
+        const category = categoryIndex > -1 ? categories[categoryIndex] : categories[0]
+
+        const subCategories = await api.get(`/category/${category.code}/subcategories`).then(response => {
+          return response.data as SubCategory[]
+        }).catch(err => {
+          return []
+        })
+
+        const subCategoryIndex = subCategories.findIndex(sub => sub.value === product.subcategory)
+        const subcategory = subCategoryIndex > -1 ? subCategories[subCategoryIndex] : subCategories[0]
+
+        const {
+          // category,
+          // subcategory,
+          // nationality,
+          name,
+          description,
+          brand,
+          ean,
+          sku,
+          gender,
+          height,
+          width,
+          length,
+          weight,
+          price,
+          price_discounted,
+          variations
+        } = product;
+
+        const p = {
+          category: category.code,
+          subcategory: subcategory.code,
+          nationality: nationality.id as number,
+          name,
+          description,
+          brand,
+          ean,
+          sku,
+          gender,
+          height,
+          width,
+          length,
+          weight,
+          price: price?.toString(),
+          price_discounted: !price_discounted ? price?.toString() : price_discounted?.toString(),
+          images: imagesUrls,
+          variations
         }
 
-        product.stock = stockCount;
-        product.checked = false;
+        if (product._id) {
+          const newImages: string[] = product.images.map(img => { return img.url });
+          handleSubmit(product, newImages, products);
+        } else {
+          await api.post('/product', p, {
+            headers: {
+              authorization: token,
+              shop_id: user.shopInfo._id,
+            }
+          }).then(response => {
+            handleModalMessage(true, { title: 'Produtos cadastrados!', message: [`Foram cadastrados ${products.length} produtos e suas variações`], type: 'success' })
+          }).catch(err => {
+            console.log(err.response);
 
-        return product;
+            handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
+          });
+        }
       })
 
+      setLoading(false)
 
-      setProducts(productsDto)
-      setItems(productsDto)
 
-      setLoading(false);
-    }).catch((error) => {
-      console.log(error)
-      setProducts([]);
-      setItems([])
+      // FIXME: Realizar chamada na API para salvar as informações importadas
+      // await products.forEach(async (product) => {
+      //   try {
 
-      setLoading(false);
-    })
-  }, [products, items])
+      //   } catch (err) {
 
-  const deleteProducts = useCallback(async () => {
+      //   }
+      // });
+    } catch (err) {
+      console.log(err)
+      setLoading(false)
+    }
+  }, [user, token, categories, error])
+
+  const handleSubmit = useCallback(async (product, newImages, products) => {
     try {
-      setIsModalOpen(false);
-      const produtosFiltrados = items.filter(p => p.checked)
-      setLoading(true);
-      produtosFiltrados.forEach(produto => {
-        api.delete(`/product/${produto._id}`, {
+     /* if (!isVariation) {
+        //imagens - verificar se e necessario
+        await api.patch(`/product/${product._id}/images`, { images: newImages }, {
           headers: {
             authorization: token,
             shop_id: user.shopInfo._id,
           }
         }).then(response => {
-          console.log("produto deletado");
-        }).catch((error) => {
-          console.log(error);
+        })/
+      }*/
 
-          setLoading(false);
+      const {
+        variations
+      } = product
+        let price = product.price.toString();
+        let price_discounted = product.price_discounted.toString();
+        api.patch(`/product/${product._id}/price`, {
+          price,
+          price_discounted
+        }, {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          }
+        }).then(response => {
+
         })
 
-      });
-      setTimeout(() => {
-        setLoading(false);
-        handleModalMessage(true, { title: 'Produto(s) excluido(s)!', message: [`Foram excluido(s) ${produtosFiltrados.length} produto(s)`], type: 'success' });
-        setItems([]);
-        setProducts([]);
-        setIsDisabledAcoes(true);
-        findItems();
-      }, 1500)
-    } catch (err) {
-      console.log(err)
-      setLoading(false)
-    }
-  }, [isLoading, isModalOpen])
 
-  const handleActionModalVisibility = useCallback(() => {
-    setIsModalOpen(false)
-  }, [isModalOpen])
+      await variations.forEach(async (variation: VariationDTO, i: number) => {
+        if (!!product.grouperId && product.grouperId !== '') {
+          const variationId = product.grouperId
+          await api.patch(`/product/${product._id}/variation/${variationId}`, variation, {
+            headers: {
+              authorization: token,
+              shop_id: user.shopInfo._id,
+            }
+          }).then(response => {
+
+          })
+
+          return
+        }
+        delete variation._id
+      })
+        await api.patch(`/product/${product._id}`, product, {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          }
+        }).then(response => {
+          setLoading(false)
+          handleModalMessage(true, { title: 'Produtos alterados!', message: [`Foram alterados ${products.length} produtos e suas variações`], type: 'success' })
+          if (window.innerWidth >= 768) {
+            router.push('/products')
+            return
+          }
+
+          router.push('/products-mobile')
+        })
+    } catch (err) {
+      setLoading(false)
+      handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' })
+      console.log(err)
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err)
+        formRef.current?.setErrors(errors)
+
+        return
+      }
+    }
+  }, [router, token, user, files])
+
+  const handleModalVisibility = useCallback(() => {
+    handleModalMessage(false);
+  }, [])
+
+  useEffect(() => {
+    setLoading(true)
+    // isTokenValid(token).then(valid => {
+    //   if (valid) {
+    api.get(`auth/token/${token}`).then(response => {
+      const { isValid } = response.data
+
+      if (!isValid) {
+        setLoading(false)
+
+        signOut()
+        router.push('/')
+        return
+      }
+
+      api.get('/account/detail').then(response => {
+        updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id, userId: response.data.shopInfo.userId } })
+      }).catch(err => {
+        console.log(err)
+      });
+
+      api.get('/category/all').then(response => {
+        setCategories(response.data)
+
+        setLoading(false)
+      }).catch(err => {
+        console.log(err)
+
+        setLoading(false)
+
+        return []
+      })
+
+    }).catch((error) => {
+      signOut()
+      router.push('/')
+
+      setLoading(false)
+
+      return
+    })
+
+    // return
+    //   }
+    // })
+
+    setNationalities([{
+      id: '1',
+      name: 'Nacional',
+    }, {
+      id: '2',
+      name: 'Internacional',
+    }]);
+  }, [])
 
   return (
-    <div className={styles.productsContainer}>
-      <div className={styles.productsHeader}>
-        <BulletedButton
-          onClick={() => { }}
-          isActive>
-          Meus produtos
-        </BulletedButton>
-        <BulletedButton
-          onClick={() => { router.push('/products/create') }}>
-          Criar novo produto
-        </BulletedButton>
-        <BulletedButton
-          onClick={() => { router.push('/products/import') }}>
-          Importar ou exportar
-        </BulletedButton>
-      </div>
-      <div className={styles.productsContent}>
-
+    <>
+      <div className={styles.importContainer}>
+        <section className={styles.importHeader}>
+          <BulletedButton
+            onClick={() => { router.push((!!width && width < 768) ? "/products-mobile" : "/products") }}>
+            Meus produtos
+          </BulletedButton>
+          <BulletedButton
+            onClick={() => { router.push('/products/create') }}>
+            Criar novo produto
+          </BulletedButton>
+          <BulletedButton
+            onClick={() => { }}
+            isActive>
+            Importar ou exportar
+          </BulletedButton>
+        </section>
         <div className={styles.divider} />
-        <div className={styles.productsContent}>
-          <div className={styles.productsOptions}>
-            <div className={styles.contentFilters}>
-              <div className={styles.panelFooter}>
-                <select value={valorAcoes || ""} onChange={setValorAcao} className={styles.selectOption}>
-                  <option selected value="0">Ação em massa</option>
-                  <option value="1">Exportar Produto(s)</option>
-                  <option value="2">Excluir Produto(s)</option>
-                </select>
-                <button type='button' onClick={executarAcao} disabled={isDisabledAcoes}>Aplicar</button>
-              </div>
-              <div style={{ display: 'flex', flex: 1 }}>
-                <Form ref={formRef} onSubmit={handleSubmit}>
-                  <FilterInput
-                    name="search"
-                    icon={FiSearch}
-                    placeholder="Pesquise um produto..."
-                    autoComplete="off" />
-                </Form>
-              </div>
-
-
-            </div>
+        <section className={styles.importContent}>
+          <div className={styles.exportPanel}>
+            <FiDownloadCloud />
+            <h3>Exportar planilha inicial</h3>
+            <p>
+              A planilha inicial é um arquivo com todos os campos que você precisa preencher
+              para realizar a importação.
+            </p>
+            {/* <button type='button'> */}
+            <a href="/assets/CadastroProduto.xlsx" target="_blank" download>Exportar Planilha</a>
+            {/* </button> */}
           </div>
-        </div>
-        <div className={styles.tableContainer}>
-          {items.length > 0 ? (
-            <table className={styles.table}>
-              <thead className={styles.tableHeader}>
-                <tr>
-                  <th>
-                    <input className={styles.checkbox}
-                      type='checkbox'
-                      name='todos'
-                      value='todos'
-                      onChange={selectOrDeselectAllProducts}
-                      checked={checked}
-                      key={Math.random()}
-                    />
-                  </th>
-                  <th>Foto</th>
-                  <th>Nome do produto</th>
-                  <th>Marca</th>
-                  <th>SKU</th>
-                  <th>Valor</th>
-                  <th>Estoque</th>
-                  <th>Status</th>
-                  <th>Ação</th>
-                </tr>
-              </thead>
-              <tbody className={styles.tableBody}>
-                {items.map((item, i) => (
-                  <tr key={i}>
-                    <td>
-                      <input className={styles.checkboxDados}
-                        type="checkbox"
-                        onChange={() => handleCheckboxChange(item._id, i)}
-                        checked={item.checked}
-                        key={item._id}
-                      />
-                    </td>
-                    <td id={styles.imgCell} >
-                      {!!item.images ? <img src={item.images[0]} alt={item.name} /> : <FiCameraOff />}
-                    </td>
-                    <td id={styles.nameCell}>
-                      {item.name}
-                    </td>
-                    <td id={styles.nameCell}>
-                      {item.brand}
-                    </td>
-                    <td id={styles.nameCell}>
-                      {item.sku}
-                    </td>
-                    <td id={styles.valueCell}>
-                      {
-                        new Intl.NumberFormat('pt-BR', {
-                          style: 'currency',
-                          currency: 'BRL',
-                        }
-                        ).format(item.price)
-                      }
-                    </td>
-                    <td className={item.stock <= 0 ? styles.redText : styles.nameCell}>
-                      {new Intl.NumberFormat('pt-BR').format(item.stock)}
-                    </td>
-                    <td>
-                      <ProductTableItem
-                        key={i}
-                        item={item}
-                        products={products}
-                        setProducts={setProducts}
-                        userInfo={{
-                          token,
-                          shop_id: !user ? '' : !!user.shopInfo._id ? user.shopInfo._id : '',
-                        }}
-                        disabledActions={disabledActions}
-                        setDisabledActions={setDisableActions}
-                      />
-                    </td>
-                    <td id={styles.editCell}>
-                      <div onClick={() => {
-                        router.push({
-                          pathname: 'products/edit',
-                          query: {
-                            id: item._id,
-                          }
-                        })
-                      }}>
-                        <FiEdit />
-                        <span> Editar </span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <span className={styles.emptyList}> Nenhum item foi encontrado </span>
-          )}
-        </div>
+          <div className={styles.importPanel}>
+            <FiUploadCloud />
+            <h3>Importar ou Alterar Produto(s)</h3>
+            <p>Solte ou clique na caixa abaixo para realizar o upload</p>
+            <p className={styles.smallText}>São aceitas planilhas no formato *.xlsx, *.xls e *.csv com tamanho de até 10MB</p>
+            <Form ref={formRef} onSubmit={async () => {
+              await handleImport()
+            }}>
+              <Importzone name='import' onFileUploaded={handleFileUpload} />
+              <button type='submit'>Importar Planilha</button>
+            </Form>
+          </div>
+        </section>
+        {
+          isModalVisible && (
+            <MessageModal handleVisibility={() => setModalVisibility(false)} alterStyle={successfull}>
+              <div className={styles.modalContent}>
+                {isUploading &&
+                  (
+                    <>
+                      <div className={styles.loader} />
+                      <p>Importando a lista de produtos...</p>
+                    </>
+                  )}
+                {successfull && (
+                  <>
+                    <p>Produtos cadastrado</p>
+                    <p>com sucesso!</p>
+                  </>
+                )}
+                {error && (
+                  <>
+                    <FaExclamation />
+                    <p>Ops, tem algo errado na sua planilha.</p>
+                    <p>Revise os dados e faça o upload novamente</p>
+                  </>
+                )}
+              </div>
+            </MessageModal>
+          )
+        }
+        {
+          showMessage && (
+            <MessageModal handleVisibility={handleModalVisibility}>
+              <div className={styles.modalContent}>
+                {modalMessage.type === 'success' ? <FiCheck style={{ color: 'var(--green-100)' }} /> : <FiX style={{ color: 'var(--red-100)' }} />}
+                <p>{modalMessage.title}</p>
+                <p>{modalMessage.message}</p>
+              </div>
+            </MessageModal>
+          )
+        }
       </div>
       {
         isLoading && (
@@ -442,32 +614,11 @@ export function Products({ userFromApi }: ProductsProps) {
           </div>
         )
       }
-      {
-        showMessage && (
-          <MessageModal handleVisibility={handleModalVisibility}>
-            <div className={styles.modalContent}>
-              {modalMessage.type === 'success' ? <FiCheck style={{ color: 'var(--green-100)' }} /> : <FiX style={{ color: 'var(--red-100)' }} />}
-              <p>{modalMessage.title}</p>
-              <p>{modalMessage.message}</p>
-            </div>
-          </MessageModal>
-        )
-      }
-      {
-        isModalOpen && (
-          <ActionModal handleVisibility={handleActionModalVisibility} titulo="Excluir Produto(s)" mensagem="Deseja relmente excluir o(s) produto(s) selecionado(s) ?" execute={deleteProducts} />
-        )
-      }
-    </div>
+    </>
   )
 }
 
-export const getInitialProps = async () => {
-  return ({
-    props: {
-    },
-    revalidate: 10
-  });
+export default Import;
+function signOut() {
+  throw new Error('Function not implemented.');
 }
-
-export default Products;
