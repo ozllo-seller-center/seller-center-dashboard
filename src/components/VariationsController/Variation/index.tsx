@@ -2,15 +2,15 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useField } from '@unform/core';
 import { FiXCircle } from 'react-icons/fi';
 
-import Autocomplete from '../../Autocomplete';
-import Input from '../../Input';
 import { useEffect } from 'react';
 
-import styles from './styles.module.scss'
 import { useCallback } from 'react';
 import { boolean } from 'yup';
 import Checkbox from 'src/components/Checkbox';
 import { Attribute } from 'src/shared/types/category';
+import styles from './styles.module.scss';
+import Input from '../../Input';
+import Autocomplete from '../../Autocomplete';
 
 interface DefaultVariationDTO {
   _id?: string;
@@ -37,7 +37,9 @@ interface VariationProps {
   allowDelete?: boolean;
 }
 
-const Variation: React.FC<VariationProps> = ({ variation, index, attributes, allowDelete, handleDeleteVariation }) => {
+const VariationField: React.FC<VariationProps> = ({
+  variation, index, attributes, allowDelete, handleDeleteVariation,
+}) => {
   const idRef = useRef(null);
   const { registerField, fieldName, defaultValue = variation._id } = useField('_id');
 
@@ -45,13 +47,13 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
 
   const { width } = useMemo(() => {
     if (typeof window !== 'undefined') {
-      return { width: window.innerWidth, height: window.innerHeight }
+      return { width: window.innerWidth, height: window.innerHeight };
     }
 
     return {
       width: undefined,
       height: undefined,
-    }
+    };
   }, [process.browser]);
 
   useEffect(() => {
@@ -60,46 +62,43 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
       ref: idRef.current,
       path: 'value',
     });
-  }, [registerField, fieldName])
-
+  }, [registerField, fieldName]);
 
   useEffect(() => {
-    if (!!attributes) {
-      let attributeDefs: VariationAttributes[];
-
-      attributeDefs = attributes.map((attribute: Attribute) => {
+    if (attributes) {
+      const attributeDefs: VariationAttributes[] = attributes.map((attribute: Attribute) => {
         // let valueAt;
         let label;
         let placeholder;
 
         switch (attribute.name) {
           case 'color':
-            label = 'Cor'
-            placeholder = 'Escolha a cor'
+            label = 'Cor';
+            placeholder = 'Escolha a cor';
             break;
           case 'size':
-            label = 'Tamanho/medida'
-            placeholder = 'Tamanho/medida'
+            label = 'Tamanho/medida';
+            placeholder = 'Tamanho/medida';
             break;
           case 'flavor':
-            label = 'Sabor'
-            placeholder = 'Escolha o sabor'
+            label = 'Sabor';
+            placeholder = 'Escolha o sabor';
             break;
           case 'voltage':
-            label = 'Voltagens'
-            placeholder = 'Escolha o voltagem'
+            label = 'Voltagens';
+            placeholder = 'Escolha o voltagem';
             break;
           case 'gluten_free':
-            label = 'Sem glútem?'
-            placeholder = ''
+            label = 'Sem glútem?';
+            placeholder = '';
             break;
           case 'lactose_free':
-            label = 'Sem lactose?'
-            placeholder = ''
+            label = 'Sem lactose?';
+            placeholder = '';
             break;
           default:
-            label = ''
-            placeholder = ''
+            label = '';
+            placeholder = '';
             break;
         }
 
@@ -109,54 +108,64 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
           // valueAt,
           label,
           placeholder,
-        }
-      })
+        };
+      });
 
-      setVariationAttributes(attributeDefs)
+      setVariationAttributes(attributeDefs);
     }
-  }, [attributes])
+  }, [attributes]);
 
   const containerStyle = useMemo(() => {
-    let className = styles.variationContainer
+    let className = styles.variationContainer;
 
     if (!!width && width < 768) {
-      return styles.variationContainerMobile
+      return styles.variationContainerMobile;
     }
 
     switch (variationAttributes.length) {
       case 3:
-        return className = className.concat(' ').concat(styles.grid3)
+        className = className.concat(' ').concat(styles.grid3);
+        break;
       case 4:
-        return className = className.concat(' ').concat(styles.grid4)
+        className = className.concat(' ').concat(styles.grid4);
+        break;
+      default:
+        break;
     }
 
     return className;
-  }, [width, variationAttributes])
+  }, [width, variationAttributes]);
 
   const mobileContainerStyle = useMemo(() => {
-    let className = styles.fieldsContainer
+    let className = styles.fieldsContainer;
 
     switch (variationAttributes.length) {
       case 3:
-        return className = styles.gridMobile3
+        className = styles.gridMobile3;
+        break;
       case 4:
-        return className = styles.gridMobile4
+        className = styles.gridMobile4;
+        break;
+      default:
+        break;
     }
 
     return className;
-  }, [width, variationAttributes])
+  }, [variationAttributes]);
 
   return (
-    <>
-      <div key={index} className={containerStyle}>
-        <span>Variação {index + 1}</span>
+    <div key={index} className={containerStyle}>
+      <span>
+        Variação
+        {index + 1}
+      </span>
 
-        <input name='_id' style={{ display: 'none' }} ref={idRef} defaultValue={variation._id} />
+      <input name="_id" style={{ display: 'none' }} ref={idRef} defaultValue={variation._id} />
 
-        {(!!width && width < 768) ? (
-          <div className={styles.mobileDivisor}>
-            <div className={mobileContainerStyle}>
-              {
+      {(!!width && width < 768) ? (
+        <div className={styles.mobileDivisor}>
+          <div className={mobileContainerStyle}>
+            {
                 variationAttributes.map((variationAttribute, i) => {
                   switch (variationAttribute.type) {
                     case 'boolean':
@@ -168,7 +177,7 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
                           defaultValue={variation[variationAttribute.name]}
                           defaultChecked={variation[variationAttribute.name]}
                         />
-                      )
+                      );
                     case 'number':
                       return (
                         <Input
@@ -176,10 +185,10 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
                           name={variationAttribute.name}
                           label={variationAttribute.label}
                           placeholder={variationAttribute.placeholder}
-                          autoComplete='off'
+                          autoComplete="off"
                           defaultValue={variation[variationAttribute.name]}
                         />
-                      )
+                      );
                     default:
                       return (
                         <Autocomplete
@@ -188,40 +197,40 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
                           items={attributes[i].values}
                           label={variationAttribute.label}
                           placeholder={variationAttribute.placeholder}
-                          autoComplete='off'
+                          autoComplete="off"
                           defaultValue={variation[variationAttribute.name]}
                         />
-                      )
+                      );
                   }
                 })
               }
 
-              <Input
-                name='stock'
-                label={'Estoque'}
-                placeholder='Quantidade em estoque'
-                autoComplete='off'
-                defaultValue={variation.stock}
-                type='number'
-              />
+            <Input
+              name="stock"
+              label="Estoque"
+              placeholder="Quantidade em estoque"
+              autoComplete="off"
+              defaultValue={variation.stock}
+              type="number"
+            />
 
-            </div>
-            {
+          </div>
+          {
               allowDelete && (
                 <button
-                  type='button'
+                  type="button"
                   onClick={() => {
-                    handleDeleteVariation(index)
+                    handleDeleteVariation(index);
                   }}
                 >
                   <FiXCircle />
                 </button>
               )
             }
-          </div>
-        ) : (
-          <>
-            {
+        </div>
+      ) : (
+        <>
+          {
               variationAttributes.map((variationAttribute, i) => {
                 switch (variationAttribute.type) {
                   case 'boolean':
@@ -233,7 +242,7 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
                         placeholder={variationAttribute.placeholder}
                         defaultChecked={variation[variationAttribute.name]}
                       />
-                    )
+                    );
                   case 'number':
                     return (
                       <Input
@@ -241,10 +250,10 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
                         name={variationAttribute.name}
                         label={variationAttribute.label}
                         placeholder={variationAttribute.placeholder}
-                        autoComplete='off'
+                        autoComplete="off"
                         defaultValue={variation[variationAttribute.name]}
                       />
-                    )
+                    );
                   default:
                     return (
                       <Autocomplete
@@ -253,40 +262,39 @@ const Variation: React.FC<VariationProps> = ({ variation, index, attributes, all
                         items={attributes[i].values}
                         label={variationAttribute.label}
                         placeholder={variationAttribute.placeholder}
-                        autoComplete='off'
+                        autoComplete="off"
                         defaultValue={variation[variationAttribute.name]}
                       />
-                    )
+                    );
                 }
               })
             }
 
-            <Input
-              name='stock'
-              label={'Estoque'}
-              placeholder='Quantidade em estoque'
-              autoComplete='off'
-              defaultValue={variation.stock}
-              type='number'
-            />
+          <Input
+            name="stock"
+            label="Estoque"
+            placeholder="Quantidade em estoque"
+            autoComplete="off"
+            defaultValue={variation.stock}
+            type="number"
+          />
 
-            {
+          {
               allowDelete && (
                 <button
-                  type='button'
+                  type="button"
                   onClick={() => {
-                    handleDeleteVariation(index)
+                    handleDeleteVariation(index);
                   }}
                 >
                   <FiXCircle />
                 </button>
               )
             }
-          </>
-        )}
-      </div>
-    </>
-  )
-}
+        </>
+      )}
+    </div>
+  );
+};
 
-export default Variation;
+export default VariationField;

@@ -1,31 +1,29 @@
-import { ProductImport } from "../types/productImport";
+import { ProductImport } from '../types/productImport';
 
 export function valueDefined(v: string): boolean {
   return !!v;
 }
 
 export function descriptionValidate(v: any) {
-  return !!v && v.length <= 1800
+  return !!v && v.length <= 1800;
 }
 
 export function catalogueValidate(v: any) {
-  return !!v.category && !!v.subCategory && !!v.nationality
+  return !!v.category && !!v.subCategory && !!v.nationality;
 }
 
 export function discountValidate(v: number, validation: ProductImport): boolean {
+  if (v) { validation.price_discounted.value = validation.price.value; }
 
-  if (!!v)
-    validation['price_discounted'].value = validation['price'].value
-
-  return true
+  return true;
 }
 
 export function imagesValidate(v: string[]): boolean {
-  return !!v[0] && !!v[1]
+  return !!v[0] && !!v[1];
 }
 
 export function InitProductImport(): ProductImport {
-  let productValidation = {
+  const productValidation = {
     grouperId: {
       value: undefined,
     },
@@ -106,9 +104,9 @@ export function InitProductImport(): ProductImport {
       value: [],
     },
     _id: {
-      value: undefined
+      value: undefined,
     },
-  }
+  };
 
   return productValidation;
 }

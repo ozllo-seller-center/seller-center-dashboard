@@ -4,6 +4,7 @@ import React, {
   useRef,
   useState,
   useCallback,
+  useMemo,
 } from 'react';
 import { IconBaseProps } from 'react-icons';
 import { useField } from '@unform/core';
@@ -23,7 +24,9 @@ const Input: React.FC<InputProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
-  const { fieldName, defaultValue, error, registerField } = useField(name);
+  const {
+    fieldName, defaultValue, error, registerField,
+  } = useField(name);
 
   const handleInputFocused = useCallback(() => {
     setIsFocused(true);
@@ -43,10 +46,18 @@ const Input: React.FC<InputProps> = ({
     });
   }, [fieldName, registerField]);
 
+  const containerStyle = useMemo(() => {
+    if (error) { return styles.containerError; }
+    if (isFocused) { return styles.containerFocused; }
+    if (isFilled) { return styles.containerFilled; }
+
+    return styles.container;
+  }, [error, isFilled, isFocused]);
+
   return (
     <>
       <div
-        className={!!error ? styles.containerError : isFocused ? styles.containerFocused : isFilled ? styles.containerFilled : styles.container}
+        className={containerStyle}
       >
         {Icon && <Icon size={20} />}
         <input

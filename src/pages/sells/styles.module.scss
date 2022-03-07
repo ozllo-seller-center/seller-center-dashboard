@@ -190,10 +190,20 @@
             }
           }
 
-          #actionCell {
+          .action {
             width: 10rem;
             cursor: pointer;
+            color: var(--grafite);
             text-decoration: underline;
+
+            border: none;
+            background: transparent;
+
+            transition: color 0.3s ease-in-out;
+
+            &:hover {
+              color: var(--yellow-300);
+            }
           }
 
           #attachmentCell {

@@ -1,9 +1,7 @@
-import { FC } from 'react'
+import { FC } from 'react';
 
 const Footer: FC = () => (
-  <footer>
+  <footer />
+);
 
-  </footer>
-)
-
-export default Footer
+export default Footer;

@@ -4,6 +4,7 @@ import React, {
   useRef,
   useState,
   useCallback,
+  useMemo,
 } from 'react';
 
 import { useField } from '@unform/core';
@@ -13,14 +14,12 @@ import styles from './styles.module.scss';
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
   label: string;
-  containerStyle?: object;
   hint?: React.ReactNode;
 }
 
 const HintedInput: React.FC<InputProps> = ({
   name,
   label,
-  containerStyle = {},
   disabled,
   hint,
   ...rest
@@ -28,7 +27,9 @@ const HintedInput: React.FC<InputProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
-  const { fieldName, defaultValue, error, registerField } = useField(name);
+  const {
+    fieldName, defaultValue, error, registerField,
+  } = useField(name);
 
   const handleInputFocused = useCallback(() => {
     setIsFocused(true);
@@ -38,7 +39,7 @@ const HintedInput: React.FC<InputProps> = ({
     setIsFocused(false);
 
     setIsFilled(!!inputRef.current?.value || !!defaultValue);
-  }, []);
+  }, [defaultValue]);
 
   useEffect(() => {
     registerField({
@@ -48,11 +49,22 @@ const HintedInput: React.FC<InputProps> = ({
     });
   }, [fieldName, registerField]);
 
+  const containerStyle = useMemo(() => {
+    if (disabled) { return styles.containerDisabled; }
+
+    if (error) { return styles.containerError; }
+
+    if (isFocused) { return styles.containerFocused; }
+
+    if (isFilled) { return styles.containerFilled; }
+
+    return styles.container;
+  }, [disabled, error, isFilled, isFocused]);
+
   return (
     <div className={styles.parent}>
-      <div
-        className={disabled ? styles.containerDisabled : !!error ? styles.containerError : isFocused ? styles.containerFocused : isFilled ? styles.containerFilled : styles.container} >
-        <label className={styles.inputLabel}>{label}</label>
+      <div className={containerStyle}>
+        <span className={styles.inputLabel}>{label}</span>
         <div className={styles.hintedContainer}>
           <input
             type="text"

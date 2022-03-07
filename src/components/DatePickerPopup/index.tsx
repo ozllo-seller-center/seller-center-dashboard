@@ -1,8 +1,10 @@
-import DatePickerInput from '../DatePickerInput';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import React, { HTMLAttributes, useCallback, useRef, useState } from 'react';
+import React, {
+  HTMLAttributes, useCallback, useRef, useState,
+} from 'react';
 import { IconType } from 'react-icons';
+import DatePickerInput from '../DatePickerInput';
 
 import styles from './styles.module.scss';
 
@@ -19,22 +21,21 @@ interface DatePickerFormData {
   toDate: Date;
 }
 
-const DatePickerPopup: React.FC<DatePickerProps> = ({ formRef, setFromDateFilter, setToDateFilter, visibility, setVisibility, style, children }) => {
-
+const DatePickerPopup: React.FC<DatePickerProps> = ({
+  formRef, setFromDateFilter, setToDateFilter, visibility, setVisibility, style, children,
+}) => {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [error, setError] = useState('');
 
-  const handleDatePicker = useCallback(
-    async (data: DatePickerFormData) => {
-      data.fromDate.setHours(23, 59, 59, 999);
+  const handleDatePicker = useCallback(async (data: DatePickerFormData) => {
+    data.fromDate.setHours(23, 59, 59, 999);
 
-      setFromDateFilter(data.fromDate);
-      setToDateFilter(data.toDate);
+    setFromDateFilter(data.fromDate);
+    setToDateFilter(data.toDate);
 
-      setVisibility(false);
-    }, [setToDateFilter, setFromDateFilter]
-  )
+    setVisibility(false);
+  }, [setToDateFilter, setFromDateFilter]);
 
   const handleCancel = useCallback(() => {
     setVisibility(false);
@@ -59,6 +60,6 @@ const DatePickerPopup: React.FC<DatePickerProps> = ({ formRef, setFromDateFilter
       </Form>
     </div>
   );
-}
+};
 
 export default DatePickerPopup;

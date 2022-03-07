@@ -10,15 +10,15 @@ interface ImageCardProps extends React.HTMLAttributes<HTMLDivElement> {
   highlight?: boolean;
 }
 
-const ImageCard: React.FC<ImageCardProps> = ({ onClick, highlight, imgUrl, showOnly, ...rest }) => {
-  return (
-    <div className={styles.imageCard} {...rest}>
-      <img src={imgUrl} alt="Product Image" />
-      <div className={styles.imageDelete} onClick={onClick}>
-        {!showOnly && <FiX />}
-      </div>
+const ImageCard: React.FC<ImageCardProps> = ({
+  onClick, highlight, imgUrl, showOnly, ...rest
+}) => (
+  <div className={styles.imageCard} {...rest}>
+    <img src={imgUrl} alt="Product" />
+    <div className={styles.imageDelete} onClick={onClick}>
+      {!showOnly && <FiX />}
     </div>
-  )
-}
+  </div>
+);
 
 export default ImageCard;
