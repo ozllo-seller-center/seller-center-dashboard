@@ -43,11 +43,9 @@ export const Header: React.FC<HeaderProps> = ({ open, setOpen }) => {
 
     if (router.pathname.includes('sells')) {
       setTitle('Vendas')
-      setDescription(<div className={styles.vendas}>
-                      <span>Confira o resumo das suas vendas</span><br></br>
-                      <span className={styles.aviso}> Prazo de despacho 2 dias úteis </span><br></br>
-                      <span className={styles.aviso}>Uso obrigatório da etiqueta de despacho da B2W, Mercado Livre e Shopee que chegará em seu email</span>
-                    </div>)
+      setDescription(
+                      <span>Confira o resumo das suas vendas</span>
+                    )
       return
     }
 
