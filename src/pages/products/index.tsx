@@ -5,17 +5,14 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FiCameraOff, FiCheck, FiEdit, FiSearch, FiX } from 'react-icons/fi';
 import { Loader } from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
+import ActionModal from 'src/components/ModalAction';
 import ProductTableItem from 'src/components/ProductTableItem';
 import { useAuth, User } from 'src/hooks/auth';
 import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
 import api from 'src/services/api';
 import { getHeader, getVariations } from 'src/shared/functions/products';
-import { Categories } from 'src/shared/enums/Categories';
-import { Genres } from 'src/shared/enums/Genres';
-import { Nationalities } from 'src/shared/enums/Nationalities';
-import { Subcategories } from 'src/shared/enums/Subcategories';
-import { ProductSummary as Product, Variation } from 'src/shared/types/product';
+import { ProductSummary as Product } from 'src/shared/types/product';
 import XLSX from 'xlsx';
 import BulletedButton from '../../components/BulletedButton';
 import FilterInput from '../../components/FilterInput';
@@ -46,6 +43,7 @@ export function Products({ userFromApi }: ProductsProps) {
 
   const [isDisabledAcoes, setIsDisabledAcoes] = React.useState(true);
   const [valorAcoes, setValorAcoes] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     // !!userFromApi && updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: userFromApi.shopInfo._id } })
@@ -214,7 +212,87 @@ export function Products({ userFromApi }: ProductsProps) {
     if (valorAcoes === "1") {
       exportToCSV();
     }
+    if (valorAcoes === "2") {
+      setIsModalOpen(true);
+    }
   }
+
+  const findItems = useCallback(async () => {
+    api.get('/product', {
+      headers: {
+        authorization: token,
+        shop_id: user.shopInfo._id,
+      }
+    }).then(response => {
+
+      let productsDto = response.data as Product[];
+
+      productsDto = productsDto.map(product => {
+        let stockCount: number = 0;
+
+        if (!!product.variations) {
+          product.variations.forEach(variation => {
+            stockCount = stockCount + Number(variation.stock);
+          })
+        }
+
+        product.stock = stockCount;
+        product.checked = false;
+
+        return product;
+      })
+
+
+      setProducts(productsDto)
+      setItems(productsDto)
+
+      setLoading(false);
+    }).catch((error) => {
+      console.log(error)
+      setProducts([]);
+      setItems([])
+
+      setLoading(false);
+    })
+  }, [products, items])
+
+  const deleteProducts = useCallback(async () => {
+    try {
+      setIsModalOpen(false);
+      const produtosFiltrados = items.filter(p => p.checked)
+      setLoading(true);
+      produtosFiltrados.forEach(produto => {
+        api.delete(`/product/${produto._id}`, {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          }
+        }).then(response => {
+          console.log("produto deletado");
+        }).catch((error) => {
+          console.log(error);
+
+          setLoading(false);
+        })
+
+      });
+      setTimeout(() => {
+        setLoading(false);
+        handleModalMessage(true, { title: 'Produto(s) excluido(s)!', message: [`Foram excluido(s) ${produtosFiltrados.length} produto(s)`], type: 'success' });
+        setItems([]);
+        setProducts([]);
+        setIsDisabledAcoes(true);
+        findItems();
+      }, 1500)
+    } catch (err) {
+      console.log(err)
+      setLoading(false)
+    }
+  }, [isLoading, isModalOpen])
+
+  const handleActionModalVisibility = useCallback(() => {
+    setIsModalOpen(false)
+  }, [isModalOpen])
 
   return (
     <div className={styles.productsContainer}>
@@ -233,28 +311,34 @@ export function Products({ userFromApi }: ProductsProps) {
           Importar ou exportar
         </BulletedButton>
       </div>
-      <div className={styles.divider} />
       <div className={styles.productsContent}>
-        <div className={styles.productsOptions}>
-          <div className={styles.contentFilters}>
-            <Form ref={formRef} onSubmit={handleSubmit}>
-              <FilterInput
-                name="search"
-                icon={FiSearch}
-                placeholder="Pesquise um produto..."
-                autoComplete="off" />
-            </Form>
+
+        <div className={styles.divider} />
+        <div className={styles.productsContent}>
+          <div className={styles.productsOptions}>
+            <div className={styles.contentFilters}>
+              <div className={styles.panelFooter}>
+                <select value={valorAcoes || ""} onChange={setValorAcao} className={styles.selectOption}>
+                  <option selected value="0">Ação em massa</option>
+                  <option value="1">Exportar Produto(s)</option>
+                  <option value="2">Excluir Produto(s)</option>
+                </select>
+                <button type='button' onClick={executarAcao} disabled={isDisabledAcoes}>Aplicar</button>
+              </div>
+              <div style={{ display: 'flex', flex: 1 }}>
+                <Form ref={formRef} onSubmit={handleSubmit}>
+                  <FilterInput
+                    name="search"
+                    icon={FiSearch}
+                    placeholder="Pesquise um produto..."
+                    autoComplete="off" />
+                </Form>
+              </div>
+
+
+            </div>
           </div>
         </div>
-        <section className={styles.header}>
-          <div className={styles.panelFooter}>
-            <select value={valorAcoes || ""} onChange={setValorAcao} className={styles.selectOption}>
-              <option selected value="0">Ação em massa</option>
-              <option value="1">Exportar Produtos</option>
-            </select>
-            <button type='button' onClick={executarAcao} disabled={isDisabledAcoes}>Aplicar</button>
-          </div>
-        </section>
         <div className={styles.tableContainer}>
           {items.length > 0 ? (
             <table className={styles.table}>
@@ -367,6 +451,11 @@ export function Products({ userFromApi }: ProductsProps) {
               <p>{modalMessage.message}</p>
             </div>
           </MessageModal>
+        )
+      }
+      {
+        isModalOpen && (
+          <ActionModal handleVisibility={handleActionModalVisibility} titulo="Excluir Produto(s)" mensagem="Deseja relmente excluir o(s) produto(s) selecionado(s) ?" execute={deleteProducts} />
         )
       }
     </div>
