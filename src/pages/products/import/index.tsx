@@ -1,32 +1,31 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FormHandles } from '@unform/core';
+import { Form } from '@unform/web';
 import { useRouter } from 'next/router';
-
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FaExclamation } from 'react-icons/fa';
+import { FiCheck, FiDownloadCloud, FiUploadCloud, FiX } from 'react-icons/fi';
+import { Loader } from 'src/components/Loader';
+import { useAuth } from 'src/hooks/auth';
+import { useLoading } from 'src/hooks/loading';
+import { useModalMessage } from 'src/hooks/message';
+import api from 'src/services/api';
+import { importToProduct } from 'src/shared/converters/importToProduct';
+import { ErrorMessages } from 'src/shared/errors/ImportSheetError';
+import { Category, SubCategory } from 'src/shared/types/category';
+import { Nationality } from 'src/shared/types/nationality';
+import { Product } from 'src/shared/types/product';
+import { importLines, ProductImport } from 'src/shared/types/productImport';
+import { InitProductImport } from 'src/shared/validators/importValidators';
+import getValidationErrors from 'src/utils/getValidationErrors';
 import XLSX from 'xlsx';
-
+import * as Yup from 'yup';
 import BulletedButton from '../../../components/BulletedButton';
 import Importzone from '../../../components/Importzone';
 import MessageModal from '../../../components/MessageModal';
-
 import styles from './styles.module.scss';
-import { FiCheck, FiDownloadCloud, FiUploadCloud, FiX } from 'react-icons/fi';
-import { FaExclamation } from 'react-icons/fa';
-import { FormHandles } from '@unform/core';
-import { Form } from '@unform/web';
-import * as Yup from 'yup'
-import { importLines, ProductImport } from 'src/shared/types/productImport';
-import api from 'src/services/api';
-import { Nationality } from 'src/shared/types/nationality';
-import { Category, SubCategory } from 'src/shared/types/category';
-import { Loader } from 'src/components/Loader';
-import { useLoading } from 'src/hooks/loading';
-import { useModalMessage } from 'src/hooks/message';
-import { ErrorMessages } from 'src/shared/errors/ImportSheetError';
-import { InitProductImport } from 'src/shared/validators/importValidators';
-import { importToProduct } from 'src/shared/converters/importToProduct';
-import { Product } from 'src/shared/types/product';
-import { useAuth } from 'src/hooks/auth';
-import { isTokenValid } from 'src/utils/util';
-import getValidationErrors from 'src/utils/getValidationErrors';
+
+
+
 
 type VariationDTO = {
   _id?: string
@@ -158,6 +157,7 @@ function Import() {
                     if (line[attrI])
                       productValidation[attribute].value.push(line[attrI])
                     break
+                  case 25:  
 
                   default:
                     if (line[attrI])
@@ -227,163 +227,6 @@ function Import() {
 
   }, [files, isUploading, successfull, error]);
 
-  const handleAlteracao = useCallback(async () => {
-    let importedProducts: ProductImport[] = []
-
-    setLoading(true)
-    setError(false)
-
-    files.map(async (file) => {
-      let reader = new FileReader()
-
-      reader.onload = async (e) => {
-        if (!e.target || e.target.result === null)
-          return
-
-        let data = e.target.result
-
-        if (!(data instanceof ArrayBuffer)) {
-          return
-        }
-
-        data = new Uint8Array(data)
-
-        let workbook = XLSX.read(data, { type: 'array' })
-        let result: any = {}
-
-        workbook.SheetNames.forEach((sheet) => {
-          let roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheet], { header: 1 })
-          if (roa.length)
-            result[sheet] = roa
-        })
-
-        let count = 0;
-        let stop = false;
-
-        if (!!result.Planilha1 || !!result.data) {
-          const sheet: any[] = result.Planilha1 ? result.Planilha1 : result.data
-
-          console.log(sheet)
-
-          sheet.forEach(async (line, i) => {
-            // Ignorar o cabeçalho
-            if (i > 1 && line.length > 0) {
-              count++;
-
-              let productValidation: ProductImport = InitProductImport()
-
-              if (!line[3]) {
-                handleModalMessage(true, {
-                  type: 'error',
-                  title: 'Id Agrupador não encontrado!',
-                  message: [`Não foi encontrado um id arupador na linha ${i + 1}`]
-                })
-
-                stop = true
-
-                setError(true)
-              }
-              let size = line.length - 1;
-              for (let attrI = 0; attrI <= size && !stop; attrI++) {
-                const attribute = importLines[attrI]
-
-                const validate = productValidation[attribute].validate
-
-                switch (attrI) {
-                  case 0:
-                    let value = line[attrI]?.split(">")
-                    if (value && value != "") {
-                      productValidation[attribute].value.nationality = value[0].trim()
-                      productValidation[attribute].value.category = value[1].trim()
-                      productValidation[attribute].value.subCategory = value[2].trim()
-                    }
-                    break
-                  case 16:
-                    let gender = line[attrI]?.charAt(0).toUpperCase()
-                    if (gender && gender != "") {
-                      productValidation[attribute].value = gender
-                    }
-
-                    break;
-
-                  case 19:
-                  case 20:
-                  case 21:
-                  case 22:
-                  case 23:
-                  case 24:
-                    if (line[attrI])
-                      productValidation[attribute].value.push(line[attrI])
-                    break
-                  case 25:
-
-                  default:
-                    if (line[attrI])
-                      productValidation[attribute].value = line[attrI]
-                    break
-                }
-
-                if (validate && !validate(productValidation[attribute].value)) {
-                  const error = ErrorMessages[attribute]
-
-                  if (error) {
-                    handleModalMessage(true, {
-                      type: 'error',
-                      title: error.title,
-                      message: [error.message.replace('%s', line[3]).replace('%d', (i + 1).toString())]
-                    })
-                  }
-
-                  setError(true)
-
-                  return;
-                }
-
-              }
-
-              if (productValidation['image'].value.length < 2) {
-                const error = ErrorMessages['image']
-
-                handleModalMessage(true, {
-                  type: 'error',
-                  title: error.title,
-                  message: [error.message.replace('%s', line[3]).replace('%d', (i + 1).toString())]
-                })
-
-                console.log(error.message.replace('%s', line[3]).replace('%d', (i + 1).toString()))
-
-                setError(true)
-
-                return;
-              }
-
-              if (stop)
-                return
-
-              importedProducts.push(productValidation)
-            }
-          })
-
-          if (count === 0) {
-            handleModalMessage(true, {
-              type: 'error',
-              title: 'Nenhum produto encontrado',
-              message: ['A planilha selecionada não possui nenhum registro válido']
-            })
-
-            setImports([])
-            return
-          }
-
-          importProducts(importedProducts)
-        }
-      }
-
-      reader.readAsArrayBuffer(file)
-    })
-
-
-  }, [files, isUploading, successfull, error]);
 
   const importProducts = useCallback(async (imports: ProductImport[]) => {
     let products: Product[] = []
@@ -555,7 +398,6 @@ function Import() {
             shop_id: user.shopInfo._id,
           }
         }).then(response => {
-
         })/
       }*/
 
@@ -713,23 +555,11 @@ function Import() {
           </div>
           <div className={styles.importPanel}>
             <FiUploadCloud />
-            <h3>Importar</h3>
+            <h3>Importar ou Alterar Produto(s)</h3>
             <p>Solte ou clique na caixa abaixo para realizar o upload</p>
             <p className={styles.smallText}>São aceitas planilhas no formato *.xlsx, *.xls e *.csv com tamanho de até 10MB</p>
             <Form ref={formRef} onSubmit={async () => {
               await handleImport()
-            }}>
-              <Importzone name='import' onFileUploaded={handleFileUpload} />
-              <button type='submit'>Importar Planilha</button>
-            </Form>
-          </div>
-          <div className={styles.importPanel}>
-            <FiUploadCloud />
-            <h3>Alterar Produto(s)</h3>
-            <p>Solte ou clique na caixa abaixo para realizar o upload</p>
-            <p className={styles.smallText}>São aceitas planilhas no formato *.xlsx, *.xls e *.csv com tamanho de até 10MB</p>
-            <Form ref={formRef} onSubmit={async () => {
-              await handleAlteracao()
             }}>
               <Importzone name='import' onFileUploaded={handleFileUpload} />
               <button type='submit'>Importar Planilha</button>
@@ -791,4 +621,3 @@ export default Import;
 function signOut() {
   throw new Error('Function not implemented.');
 }
-
