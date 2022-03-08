@@ -1,20 +1,21 @@
 import { createTheme, MuiThemeProvider, Switch } from '@material-ui/core';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 import { FiLogIn } from 'react-icons/fi';
 import { useAuth } from 'src/hooks/auth';
 import { UserSummary } from 'src/shared/types/user';
 import styles from './styles.module.scss';
 
-
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#E2E2E2'
+      main: '#E2E2E2',
     },
     secondary: {
-      main: '#FFFFFF'
-    }
+      main: '#FFFFFF',
+    },
   },
 });
 
@@ -28,7 +29,9 @@ interface UserItemProps {
   }
 }
 
-const UserTableItem: React.FC<UserItemProps> = ({ item, users, setUsers, adminInfo }) => {
+const UserTableItem: React.FC<UserItemProps> = ({
+  item, users, setUsers, adminInfo,
+}) => {
   const [isActive, setIsActive] = useState(item.isActive);
 
   const itemRef = useRef<HTMLInputElement>(null);
@@ -38,25 +41,24 @@ const UserTableItem: React.FC<UserItemProps> = ({ item, users, setUsers, adminIn
   const router = useRouter();
 
   useEffect(() => {
-    const index = users.findIndex(user => user._id === item._id);
+    const index = users.findIndex((user) => user._id === item._id);
 
     const updateUsers = users;
 
     updateUsers[index].isActive = item.isActive;
 
     setUsers(updateUsers);
-  }, [item])
+  }, [item]);
 
   const handleLogin = useCallback(async (id: string) => {
     await adminSignIn({
       adminEmail: adminInfo.adminEmail,
-       userId: id,
-        authToken: adminInfo.token
-      });
-      
-      router.push('/')
-  }, [])
+      userId: id,
+      authToken: adminInfo.token,
+    });
 
+    router.push('/');
+  }, []);
 
   return (
     <tr className={styles.tableItem} key={item._id}>
@@ -75,14 +77,15 @@ const UserTableItem: React.FC<UserItemProps> = ({ item, users, setUsers, adminIn
       </td>
       <td id={styles.editCell}>
         <div onClick={() => {
-          handleLogin(item._id)
-        }}>
+          handleLogin(item._id);
+        }}
+        >
           <FiLogIn />
           <span> Logar </span>
         </div>
       </td>
     </tr>
-  )
-}
+  );
+};
 
 export default UserTableItem;

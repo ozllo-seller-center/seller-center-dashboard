@@ -1,6 +1,6 @@
 .container {
   margin: 0.25rem;
-  
+
   padding: 0.75rem 1rem;
 
   background: #FFFFFF;
@@ -12,7 +12,7 @@
   div {
     width: 100%;
 
-    label {
+    > span {
       color: var(--gray-250);
       font-size: .73rem;
 
@@ -54,7 +54,7 @@
 
     opacity: 0.5;
 
-    label {
+    > span {
       color: var(--gray-250);
       font-size: .73rem;
 
@@ -81,7 +81,7 @@
 
 .containerError {
   margin: 0.25rem;
-  
+
   padding: 0.75rem 1rem;
 
   background: #FFFFFF;
@@ -93,7 +93,7 @@
   div {
     width: 100%;
 
-    label {
+    > span {
       color: var(--red-100);
       font-size: .73rem;
 
@@ -132,7 +132,7 @@
   div {
     width: 100%;
 
-    label {
+    > span {
       color: var(--gray-300);
       font-size: .73rem;
 
@@ -172,7 +172,7 @@
   div {
     width: 100%;
 
-    label {
+    > span {
       color: var(--gray-300);
       font-size: .73rem;
 

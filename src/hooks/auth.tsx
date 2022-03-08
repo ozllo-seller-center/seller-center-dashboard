@@ -1,8 +1,11 @@
-import React, { createContext, useCallback, useState, useContext, useMemo } from 'react';
+import React, {
+  createContext, useCallback, useState, useContext, useMemo,
+} from 'react';
+import jwt_decode from 'jwt-decode';
+import InactiveUserError from 'src/shared/errors/InactiveUserError';
+import PersonInfo from 'src/shared/types/personInfo';
+import CompanyInfo from 'src/shared/types/companyInfo';
 import api from '../services/api';
-import jwt_decode from "jwt-decode";
-import { InactiveUserError } from 'src/shared/errors/InactiveUserError';
-import { CompanyInfo, PersonInfo } from 'src/shared/types/personalInfo';
 
 interface ApiToken {
   auth: boolean;
@@ -88,34 +91,19 @@ interface AuthContextData {
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 const AuthProvider: React.FC = ({ children }) => {
-  const [data, setData] = useState<AuthState>(() => {
-    // if (typeof window !== "undefined") {
-    //   const token = localStorage.getItem('@SellerCenter:token');
-    //   const user = localStorage.getItem('@SellerCenter:user');
-
-    //   if (token && user) {
-
-    //     api.defaults.headers.authorization = token;
-
-    //     const decodedToken = jwt_decode(token) as Token;
-
-    //     return { token, user: JSON.parse(user) };
-    //   }
-    // }
-
-    return {} as AuthState;
-  });
+  const [data, setData] = useState<AuthState>(() => ({} as AuthState));
 
   const adminSignIn = useCallback(async ({ adminEmail, userId, authToken }) => {
+    const response = await api.post(
+      'admin/login',
+      { admin: adminEmail, userId },
+      {
+        headers: {
+          authorization: authToken,
+        },
+      },
+    );
 
-    const response = await api.post('admin/login',
-    { admin: adminEmail, userId: userId },
-    {
-      headers: {
-        authorization: authToken
-      }
-    });
-    
     const { token } = response.data;
 
     const decodedToken = jwt_decode(token) as Token;
@@ -124,21 +112,23 @@ const AuthProvider: React.FC = ({ children }) => {
 
     api.defaults.headers.authorization = token;
 
-    console.log(`Api URL: ${process.env.NEXT_PUBLIC_API_URL}`)
+    console.log(`Api URL: ${process.env.NEXT_PUBLIC_API_URL}`);
 
-    await api.get('/account/detail').then(response => {
-      const isActive = user.isActive
+    await api.get('/account/detail').then((resp) => {
+      const isActive = user.isActive;
 
       // console.log('Auth data')
       // console.log(response.data);
 
-      user = { ...user, ...response.data, isActive, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' };
+      user = {
+        ...user, ...resp.data, isActive, userType: resp.data.personalInfo.cpf ? 'f' : 'j',
+      };
 
       if (!user.isActive) {
-        throw new InactiveUserError("Usuário inativado, login não pode ser realizado.");
+        throw new InactiveUserError('Usuário inativado, login não pode ser realizado.');
       }
-    }).catch(err => {
-      console.log(err)
+    }).catch((err) => {
+      console.log(err);
     });
 
     localStorage.setItem('@SellerCenter:token', token);
@@ -148,10 +138,9 @@ const AuthProvider: React.FC = ({ children }) => {
   }, []);
 
   const signIn = useCallback(async ({ email, password }) => {
-
     const response = await api.post('auth/login', { login: email, password });
 
-    //const { token, user } = response.data;
+    // const { token, user } = response.data;
     const { token } = response.data;
 
     const decodedToken = jwt_decode(token) as Token;
@@ -162,19 +151,21 @@ const AuthProvider: React.FC = ({ children }) => {
 
     // console.log(`Api URL: ${process.env.NEXT_PUBLIC_API_URL}`)
 
-    await api.get('/account/detail').then(response => {
-      const isActive = user.isActive
+    await api.get('/account/detail').then((resp) => {
+      const isActive = user.isActive;
 
       // console.log('Auth data')
       // console.log(response.data);
 
-      user = { ...user, ...response.data, isActive, userType: !!response.data.personalInfo['cpf'] ? 'f' : !!response.data.personalInfo['cnpj'] ? 'j' : '' };
+      user = {
+        ...user, ...resp.data, isActive, userType: resp.data.personalInfo.cpf ? 'f' : 'j',
+      };
 
       if (!user.isActive) {
-        throw new InactiveUserError("Usuário inativado, login não pode ser realizado.");
+        throw new InactiveUserError('Usuário inativado, login não pode ser realizado.');
       }
-    }).catch(err => {
-      console.log(err)
+    }).catch((err) => {
+      console.log(err);
     });
 
     localStorage.setItem('@SellerCenter:token', token);
@@ -222,26 +213,32 @@ const AuthProvider: React.FC = ({ children }) => {
     } catch (err) {
       return false;
     }
-  }, [])
+  }, []);
 
   const isRegisterCompleted = useMemo(() => {
-    if (!!data.user) {
-      return !!data.user.personalInfo && !!data.user.shopInfo && !!data.user.bankInfo && !!data.user.contact && !!data.user.address
+    if (data.user) {
+      return !!data.user.personalInfo && !!data.user.shopInfo && !!data.user.bankInfo && !!data.user.contact && !!data.user.address;
       // return !!data.user.shopInfo
     }
 
-    return false
+    return false;
   }, [data]);
 
-
-  const isAdmin  = async () => await api.get('/account/decode').then(response => {
-    return response.data.role === 'admin';
-  });
-
+  const isAdmin = async () => api.get('/account/decode').then((response) => response.data.role === 'admin');
 
   return (
     <AuthContext.Provider
-      value={{ user: data.user, token: data.token, signIn, signOut, updateUser, verifyUser, isRegisterCompleted, isAdmin, adminSignIn }}
+      value={{
+        user: data.user,
+        token: data.token,
+        signIn,
+        signOut,
+        updateUser,
+        verifyUser,
+        isRegisterCompleted,
+        isAdmin,
+        adminSignIn,
+      }}
     >
       {children}
     </AuthContext.Provider>

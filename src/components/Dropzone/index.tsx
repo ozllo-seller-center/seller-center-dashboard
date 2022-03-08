@@ -1,7 +1,9 @@
 import { useField } from '@unform/core';
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { useDropzone } from 'react-dropzone'
-import { FiCamera, FiAlertCircle } from 'react-icons/fi'
+import React, {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
+import { useDropzone } from 'react-dropzone';
+import { FiCamera, FiAlertCircle } from 'react-icons/fi';
 
 // import './styles.module.css';
 
@@ -21,9 +23,11 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, disabled }) => {
   const [err, setErr] = useState<string>();
 
   const dropZoneRef = useRef<InputRefProps>(null);
-  const { fieldName, registerField, defaultValue, error, clearError } = useField(name);
+  const {
+    fieldName, registerField, defaultValue, error, clearError,
+  } = useField(name);
 
-  const onDrop = useCallback(acceptedFiles => {
+  const onDrop = useCallback((acceptedFiles) => {
     setErr(undefined);
     clearError();
 
@@ -37,30 +41,28 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, disabled }) => {
     try {
       if (dropZoneRef.current) {
         // const file = acceptedFiles[0];
-        onFileUploaded(acceptedFiles, dropZoneRef)
+        onFileUploaded(acceptedFiles, dropZoneRef);
       }
-    } catch (err) {
-      console.log(err)
+    } catch (er: any) {
+      console.log(er);
 
-      setErr(err as string);
+      setErr(er as string);
       setTimeout(() => {
         setErr(undefined);
       }, 3000);
     }
-  }, [onFileUploaded])
+  }, [onFileUploaded]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: 'image/*',
-  })
+  });
 
   useEffect(() => {
     registerField({
       name: fieldName,
       ref: dropZoneRef.current,
-      getValue: (ref: InputRefProps) => {
-        return ref.acceptedFiles;
-      },
+      getValue: (ref: InputRefProps) => ref.acceptedFiles,
       clearValue: (ref: InputRefProps) => {
         ref.acceptedFiles = [];
         // setFilesUrl([]);
@@ -73,50 +75,38 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, disabled }) => {
   }, [fieldName, registerField]);
 
   return (
-    <div className='dropzone' {...getRootProps()} onClick={() => dropZoneRef.current?.click()}>
-      <input {...getInputProps()} accept='image/*' ref={dropZoneRef} />
-      {
-        // selectedFileUrl
-        //   ?
-        //   <img src={selectedFileUrl} alt='Point thumbnail' />
-        //   :
-        // !!disabled ?
-        //   <p>
-        //     <FiCamera />
-        //     Clique ou arraste
-        //     <br />
-        //     As fotos aqui
-        //   </p>
-        //   :
-          !!error ?
-            <p className='error'>
-              <FiAlertCircle />
-              {error}
-            </p>
-            :
-            !!err ?
-              <p className='error'>
-                <FiAlertCircle />
-                Erro com o arquivo selecionado
-                <br />
-                Tente novamente
-              </p>
-              :
-              isDragActive ?
-                <p>
-                  <FiCamera />
-                  Solte o arquivo aqui ...
-                </p>
-                :
-                <p>
-                  <FiCamera />
-                  Clique ou arraste
-                  <br />
-                  As fotos aqui
-                </p>
-      }
+    <div className="dropzone" {...getRootProps()} onClick={() => dropZoneRef.current?.click()}>
+      <input {...getInputProps()} accept="image/*" ref={dropZoneRef} />
+      {(error && !isDragActive) && (
+      <p className="error">
+        <FiAlertCircle />
+        {error}
+      </p>
+      )}
+      {(err && !isDragActive) && (
+      <p className="error">
+        <FiAlertCircle />
+        Erro com o arquivo selecionado
+        <br />
+        Tente novamente
+      </p>
+      )}
+      {isDragActive && (
+      <p>
+        <FiCamera />
+        Solte o arquivo aqui ...
+      </p>
+      )}
+      {(!isDragActive && !err && !error) && (
+      <p>
+        <FiCamera />
+        Clique ou arraste
+        <br />
+        As fotos aqui
+      </p>
+      )}
     </div>
-  )
-}
+  );
+};
 
 export default Dropzone;

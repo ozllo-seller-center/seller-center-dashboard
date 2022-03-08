@@ -399,7 +399,6 @@ function Import() {
             shop_id: user.shopInfo._id,
           }
         }).then(response => {
-
         })/
       }*/
 
@@ -623,4 +622,3 @@ export default Import;
 function signOut() {
   throw new Error('Function not implemented.');
 }
-

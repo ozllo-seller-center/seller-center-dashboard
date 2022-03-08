@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { Order } from 'src/shared/types/order'
-import { BiPackage } from 'react-icons/bi'
+import React, { useEffect, useState } from 'react';
+import { Order } from 'src/shared/types/order';
+import { BiPackage } from 'react-icons/bi';
 
-import Modal from '../Modal'
+import { FiCheck, FiMoreHorizontal, FiX } from 'react-icons/fi';
+import format from 'date-fns/format';
+import Modal from '../Modal';
 
-import styles from './styles.module.scss'
-import { FiCheck, FiMoreHorizontal, FiX } from 'react-icons/fi'
-import format from 'date-fns/format'
+import styles from './styles.module.scss';
 
 interface OrderDetailsModalProps {
   handleVisibility: React.MouseEventHandler
@@ -16,37 +16,45 @@ interface OrderDetailsModalProps {
 enum OrderStatus {
   Entregue = 'Entregue',
   Processando = 'Processando',
-  Retornado = 'Retornado',
   Cancelado = 'Cancelado',
-  Faturando = 'Faturado',
+  Faturando = 'Faturando',
+  Despachado = 'Despachado',
   Despachando = 'Despachando',
   EmBranco = ''
 }
 
 const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility, order }) => {
-
-  const [orderStatus, setOrderStatus] = useState<OrderStatus>(OrderStatus.EmBranco)
+  const [orderStatus, setOrderStatus] = useState<OrderStatus>(OrderStatus.EmBranco);
 
   useEffect(() => {
     switch (order.status.status) {
       case 'Pending':
-        setOrderStatus(OrderStatus.Processando)
+        setOrderStatus(OrderStatus.Processando);
+        break;
+      case 'Approved':
+        setOrderStatus(OrderStatus.Faturando);
+        break;
       case 'Invoiced':
-        setOrderStatus(OrderStatus.Faturando)
+        setOrderStatus(OrderStatus.Despachando);
+        break;
       case 'Shipped':
-        setOrderStatus(OrderStatus.Despachando)
+        setOrderStatus(OrderStatus.Despachado);
+        break;
       case 'Canceled':
-        setOrderStatus(OrderStatus.Cancelado)
+        setOrderStatus(OrderStatus.Cancelado);
+        break;
       case 'Delivered':
       case 'Completed':
-      case 'Approved':
-        setOrderStatus(OrderStatus.Entregue)
-    }
-  }, [order])
+        setOrderStatus(OrderStatus.Entregue);
+        break;
 
+      default:
+        break;
+    }
+  }, [order]);
 
   return (
-    <Modal handleVisibility={handleVisibility} title='Detalhes do pedido' cleanStyle>
+    <Modal handleVisibility={handleVisibility} title="Detalhes do pedido" cleanStyle>
       <div className={styles.container}>
         <div className={styles.normal}>
           <strong>Dados do pedido</strong>
@@ -108,22 +116,20 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
                 )
               }
               {
-                (orderStatus === OrderStatus.Cancelado) && (
+                (orderStatus === OrderStatus.Despachado) && (
                   <>
-                    <FiX className={styles.red} />
-                    <span className={styles.red}>
+                    <BiPackage className={styles.blue} />
+                    <span className={styles.blue}>
                       {orderStatus}
                     </span>
                   </>
                 )
               }
-
-              {/* FIXME: Determinar o status de devolução */}
               {
-                (orderStatus === OrderStatus.Retornado) && (
+                (orderStatus === OrderStatus.Cancelado) && (
                   <>
-                    <FiMoreHorizontal className={styles.orange} />
-                    <span className={styles.orange}>
+                    <FiX className={styles.red} />
+                    <span className={styles.red}>
                       {orderStatus}
                     </span>
                   </>
@@ -165,10 +171,26 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
                 <strong>CEP</strong>
                 <span>{order.shipping.address.zipCode}</span>
                 <strong>Endereço</strong>
-                <span>{order.shipping.address.address}, nº{order.shipping.address.number}</span>
+                <span>
+                  {order.shipping.address.address}
+                  , nº
+                  {order.shipping.address.number}
+                </span>
                 <span>{order.shipping.address.neighborhood}</span>
-                <span>{order.shipping.address.city} - {order.shipping.address.state}</span>
-                {order.shipping.address.additionalInfo && <span>Complemento: {order.shipping.address.additionalInfo}</span>}
+                <span>
+                  {order.shipping.address.city}
+                  {' '}
+                  -
+                  {' '}
+                  {order.shipping.address.state}
+                </span>
+                {order.shipping.address.additionalInfo && (
+                <span>
+                  Complemento:
+                  {' '}
+                  {order.shipping.address.additionalInfo}
+                </span>
+                )}
               </div>
               <div className={styles.column}>
                 <strong className={styles.subTitle}>Dados do envio</strong>
@@ -189,44 +211,45 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
           <div className={styles.content}>
             <div className={styles.products}>
               {
-                order.products.map(product => {
-                  return (
-                    <div key={product.idProduct} className={styles.product}>
-                      <strong className={styles.title}>Item</strong>
-                      <span>{product.name}</span>
-                      <div className={styles.details}>
-                        <div>
-                          <strong>Quantidade</strong>
-                          <span>{product.quantity}</span>
-                        </div>
-                        <div>
-                          <strong>Valor</strong>
-                          <span>{new Intl.NumberFormat('pt-BR', {
+                order.products.map((product) => (
+                  <div key={product.idProduct} className={styles.product}>
+                    <strong className={styles.title}>Item</strong>
+                    <span>{product.name}</span>
+                    <div className={styles.details}>
+                      <div>
+                        <strong>Quantidade</strong>
+                        <span>{product.quantity}</span>
+                      </div>
+                      <div>
+                        <strong>Valor</strong>
+                        <span>
+                          {new Intl.NumberFormat('pt-BR', {
                             style: 'currency',
                             currency: 'BRL',
-                          }
-                          ).format(product.price)}</span>
-                        </div>
-                        <div>
-                          <strong>Desconto</strong>
-                          <span>{new Intl.NumberFormat('pt-BR', {
+                          }).format(product.price)}
+                        </span>
+                      </div>
+                      <div>
+                        <strong>Desconto</strong>
+                        <span>
+                          {new Intl.NumberFormat('pt-BR', {
                             style: 'currency',
                             currency: 'BRL',
-                          }
-                          ).format(product.discount)}</span>
-                        </div>
-                        <div>
-                          <strong>Valor total</strong>
-                          <span>{new Intl.NumberFormat('pt-BR', {
+                          }).format(product.discount)}
+                        </span>
+                      </div>
+                      <div>
+                        <strong>Valor total</strong>
+                        <span>
+                          {new Intl.NumberFormat('pt-BR', {
                             style: 'currency',
                             currency: 'BRL',
-                          }
-                          ).format(product.price * product.quantity - product.discount)}</span>
-                        </div>
+                          }).format(product.price * product.quantity - product.discount)}
+                        </span>
                       </div>
                     </div>
-                  )
-                })
+                  </div>
+                ))
               }
             </div>
           </div>
@@ -237,42 +260,50 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
             <div className={styles.info}>
               <div className={styles.column}>
                 <strong>Total dos itens</strong>
-                <span>{new Intl.NumberFormat('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL',
-                }
-                ).format(order.payment.totalAmount)}</span>
+                <span>
+                  {new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                  }).format(order.payment.totalAmount)}
+
+                </span>
               </div>
               <div className={styles.column}>
                 <strong>Total descontado</strong>
-                <span>{new Intl.NumberFormat('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL',
-                }
-                ).format(order.payment.totalDiscount)}</span>
+                <span>
+                  {new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                  }).format(order.payment.totalDiscount)}
+
+                </span>
               </div>
               <div className={styles.column}>
                 <strong>Valor de envio</strong>
-                <span>{new Intl.NumberFormat('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL',
-                }
-                ).format(order.payment.totalAmountPlusShipping - order.payment.totalAmount)}</span>
+                <span>
+                  {new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                  }).format(order.payment.totalAmountPlusShipping - order.payment.totalAmount)}
+
+                </span>
               </div>
               <div className={styles.column}>
                 <strong>Total do pedido</strong>
-                <span>{new Intl.NumberFormat('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL',
-                }
-                ).format(order.payment.totalAmountPlusShipping)}</span>
+                <span>
+                  {new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                  }).format(order.payment.totalAmountPlusShipping)}
+
+                </span>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </Modal >
-  )
-}
+    </Modal>
+  );
+};
 
-export default OrderDetailsModal
+export default OrderDetailsModal;

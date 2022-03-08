@@ -1,10 +1,12 @@
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 import { FiSearch } from 'react-icons/fi';
 import FilterInput from 'src/components/FilterInput';
-import { Loader } from 'src/components/Loader';
+import Loader from 'src/components/Loader';
 import UserTableItem from 'src/components/UserTableItem';
 import { useAuth, User } from 'src/hooks/auth';
 import { useLoading } from 'src/hooks/loading';
@@ -12,7 +14,6 @@ import { useModalMessage } from 'src/hooks/message';
 import api from 'src/services/api';
 import { UserSummary } from 'src/shared/types/user';
 import styles from './styles.module.scss';
-
 
 interface SearchFormData {
   search: string;
@@ -34,7 +35,7 @@ export function Admin({ userFromApi }: ProductsProps) {
 
   useEffect(() => {
     // !!userFromApi && updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: userFromApi.shopInfo._id } })
-  }, [userFromApi])
+  }, [userFromApi]);
 
   // const itemsRef = useMemo(() => Array(items.length).fill(0).map(i => React.createRef<HTMLInputElement>()), [items]);
 
@@ -43,62 +44,56 @@ export function Admin({ userFromApi }: ProductsProps) {
 
   const router = useRouter();
 
-
-
   useEffect(() => {
     setLoading(true);
-    api.get('/account/decode').then(response => {
+    api.get('/account/decode').then((response) => {
       if (response.data.role !== 'admin') router.push('/');
-    }).catch(err => {
-      console.log(err)
+    }).catch((err) => {
+      console.log(err);
       setLoading(false);
     });
-  }, [])
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setLoading(true);
-    api.get('/account/detail').then(response => {
-      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } })
+    api.get('/account/detail').then((response) => {
+      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } });
       setLoading(false);
       // return response.data as User;
-    }).catch(err => {
-      console.log(err)
+    }).catch((err) => {
+      console.log(err);
       setLoading(false);
     });
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setLoading(true);
 
-    setItems(users.filter(user => {
-      return (!!user.email && (search === '' || user.email.toLowerCase().includes(search.toLowerCase())));
-    }));
+    setItems(users.filter((usr) => (!!usr.email && (search === '' || usr.email.toLowerCase().includes(search.toLowerCase())))));
 
     setLoading(false);
-  }, [search, users]);
+  }, [search, setLoading, users]);
 
   useEffect(() => {
-    if (!!user) {
+    if (user) {
       setLoading(true);
 
-      api.get('/admin/users').then(response => {
+      api.get('/admin/users').then((response) => {
+        const summary = response.data as UserSummary[];
 
-        const users = response.data as UserSummary[];
-
-        setUsers(users)
-        setItems(users)
-
-        setLoading(false);
-
-      }).catch((error) => {
-
-        console.log(error)
+        setUsers(summary);
+        setItems(summary);
 
         setLoading(false);
-      })
+      }).catch((err) => {
+        console.log(err);
+
+        setLoading(false);
+      });
     }
-  }, [user]);
+  }, [setLoading, user]);
 
   const handleSubmit = useCallback(
     async (data: SearchFormData) => {
@@ -108,7 +103,6 @@ export function Admin({ userFromApi }: ProductsProps) {
         if (data.search !== search) {
           setSeacrh(data.search);
         }
-
       } catch (err) {
         setError('Ocorreu um erro ao fazer login, cheque as credenciais.');
       }
@@ -118,7 +112,7 @@ export function Admin({ userFromApi }: ProductsProps) {
 
   const handleModalVisibility = useCallback(() => {
     handleModalMessage(false);
-  }, [])
+  }, [handleModalMessage]);
 
   return (
     <div className={styles.usersContainer}>
@@ -134,7 +128,8 @@ export function Admin({ userFromApi }: ProductsProps) {
                 name="search"
                 icon={FiSearch}
                 placeholder="Pesquise um usuário por email"
-                autoComplete="off" />
+                autoComplete="off"
+              />
             </Form>
           </div>
         </div>
@@ -150,13 +145,13 @@ export function Admin({ userFromApi }: ProductsProps) {
                 </tr>
               </thead>
               <tbody className={styles.tableBody}>
-                {items.map((item, i) => (
+                {items.map((item) => (
                   <UserTableItem
-                    key={i}
+                    key={item._id}
                     item={item}
                     users={users}
                     setUsers={setUsers}
-                    adminInfo={{ adminEmail: user.email, token: token }}
+                    adminInfo={{ adminEmail: user.email, token }}
                   />
                 ))}
               </tbody>
@@ -175,15 +170,13 @@ export function Admin({ userFromApi }: ProductsProps) {
         )
       }
     </div>
-  )
+  );
 }
 
-export const getInitialProps = async () => {
-  return ({
-    props: {
-    },
-    revalidate: 10
-  });
-}
+export const getInitialProps = async () => ({
+  props: {
+  },
+  revalidate: 10,
+});
 
 export default Admin;

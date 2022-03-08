@@ -2,7 +2,7 @@
 //     Errors
 //
 
-import { errorCode } from './errorCode'
+import { errorCode } from './errorCode';
 
 /**
  * Define Interface AppError
@@ -21,8 +21,8 @@ export const voidError: AppError = {
   errorCode: 0x000,
   description: 'It should never happen, call a developer.',
   tip: 'Miss developed.',
-  example: ['Do not use.']
-}
+  example: ['Do not use.'],
+};
 
 /**
  * ERROR - Login Fail
@@ -33,11 +33,11 @@ export const loginFail: AppError = {
   tip: 'Check your login and password.',
   example: [
     `{
-            \'login\': \'Your Login\',
-            \'password\': \'Your Passwor\'
-        }`
-  ]
-}
+            'login': 'Your Login',
+            'password': 'Your Passwor'
+        }`,
+  ],
+};
 
 /**
  * ERROR - Invalid Email
@@ -47,9 +47,9 @@ export const invalidEmail: AppError = {
   description: 'Email inválido.',
   tip: 'Cheque o campo de e-mail.',
   example: [
-    `example@mail.com`
-  ]
-}
+    'example@mail.com',
+  ],
+};
 
 /**
  * ERROR - Invalid Paswword
@@ -59,13 +59,13 @@ export const invalidPassword: AppError = {
   description: 'Senha inválida.',
   tip: 'Cheque o campo de senha, ela deve ser uma senha forte.',
   example: [
-    `A senha deve conter pelo menos 8 caracteres.`,
-    `A senha ter pelo menos uma letra maiúscula.`,
-    `A senha ter pelo menos uma letra minúscula.`,
-    `A senha ter pelo menos um número.`,
-    `A senha ter pelo menos um caracter especial.`,
-  ]
-}
+    'A senha deve conter pelo menos 8 caracteres.',
+    'A senha ter pelo menos uma letra maiúscula.',
+    'A senha ter pelo menos uma letra minúscula.',
+    'A senha ter pelo menos um número.',
+    'A senha ter pelo menos um caracter especial.',
+  ],
+};
 
 /**
  * ERROR - User already exists
@@ -74,8 +74,8 @@ export const userExists: AppError = {
   errorCode: 4,
   description: 'Usuário já existe.',
   tip: 'Tente realizar o login ou recuperar sua senha.',
-  example: [``]
-}
+  example: [''],
+};
 
 /**
  * ERROR - User does not exists
@@ -84,8 +84,8 @@ export const userNotExists: AppError = {
   errorCode: 5,
   description: 'Usuário não existe.',
   tip: 'Cheque o e-mail informado.',
-  example: [``]
-}
+  example: [''],
+};
 
 /**
  * ERROR - Invalid Activation Token
@@ -94,8 +94,8 @@ export const invalidActivationToken: AppError = {
   errorCode: 6,
   description: 'Token de ativação inválido.',
   tip: 'Cheque seu e-mail e entre com a URL de verificação.',
-  example: [``]
-}
+  example: [''],
+};
 
 /**
  * ERROR - Invalid User Reference
@@ -104,8 +104,8 @@ export const invalidUserReference: AppError = {
   errorCode: 7,
   description: 'Usuário inválido.',
   tip: 'O usuário passado como referência é inválido. Cheque seu ID de referência para realizar uma requisição.',
-  example: [``]
-}
+  example: [''],
+};
 
 /**
  * ERROR - Invalid First Name
@@ -116,8 +116,8 @@ export const invalidFirstName: AppError = {
   tip: 'Cheque o cmapo de nome.',
   example: [`
         O nome deve conter pelo menos 2 caracteres.
-    `]
-}
+    `],
+};
 
 /**
  * ERROR - Invalid Last Name
@@ -128,8 +128,8 @@ export const invalidLastName: AppError = {
   tip: 'Check last name field.',
   example: [`
         The last name is at least 2 characters long.
-    `]
-}
+    `],
+};
 
 /**
  * ERROR - Invalid CPF
@@ -140,8 +140,8 @@ export const invalidCPF: AppError = {
   tip: 'Cheque o campo de CPF.',
   example: [`
         Deve-se informar um registro valido de CPF.
-    `]
-}
+    `],
+};
 
 /**
  * ERROR - Invalid CPF
@@ -152,8 +152,8 @@ export const invalidRG: AppError = {
   tip: 'Cheque o campo de RG.',
   example: [`
         O RG deve conter pelo menos 2 caracteres.
-    `]
-}
+    `],
+};
 
 /**
  * ERROR - Invalid Birthday
@@ -164,8 +164,8 @@ export const invalidBirthday: AppError = {
   tip: 'Cheque o campo de data de nascimento.',
   example: [`
         01/01/1970
-    `]
-}
+    `],
+};
 
 /**
  * ERROR - Invalid CEP
@@ -175,10 +175,10 @@ export const invalidCEP: AppError = {
   description: 'CEP é inválido.',
   tip: 'Cheque o campo de CEP.',
   example: [
-    `O CEP deve conter no mínimo 7 caracteres, sem contar traços ou pontos.`,
-    `O CEP deve ser válido.`
-  ]
-}
+    'O CEP deve conter no mínimo 7 caracteres, sem contar traços ou pontos.',
+    'O CEP deve ser válido.',
+  ],
+};
 
 /**
  * ERROR - Invalid Address
@@ -189,8 +189,8 @@ export const invalidAddress: AppError = {
   tip: 'Cheque o campo de endereço.',
   example: [`
         O endereço deve conter pelo menos 2 caracteres.
-    `]
-}
+    `],
+};
 
 /**
  * ERROR - Invalid City
@@ -201,8 +201,8 @@ export const invalidCity: AppError = {
   tip: 'Cheque o campo de cidade.',
   example: [`
         A cidade deve conter pelo menos 2 caracteres.
-    `]
-}
+    `],
+};
 
 /**
  * ERROR - Invalid Complement
@@ -212,10 +212,10 @@ export const invalidComplement: AppError = {
   description: 'Complemento é inválido.',
   tip: 'Cheque o campo de complemento.',
   example: [
-    `O complemento deve conter pelo menos 4 caracteres.`,
-    `O complemento deve conter no máximo 24 caracteres.`
-  ]
-}
+    'O complemento deve conter pelo menos 4 caracteres.',
+    'O complemento deve conter no máximo 24 caracteres.',
+  ],
+};
 
 /**
  * ERROR - Invalid District
@@ -226,8 +226,8 @@ export const invalidDistrict: AppError = {
   tip: 'Cheque o campo de bairro.',
   example: [`
         O bairro deve conter pelo menos 2 caractres
-    `]
-}
+    `],
+};
 
 /**
  * ERROR - Invalid Address Number
@@ -238,8 +238,8 @@ export const invalidAddressNumber: AppError = {
   tip: 'Cheque o campo de número de endereço.',
   example: [`
         O número de endereço deve ter pelo menos 1 digito.
-    `]
-}
+    `],
+};
 
 /**
  * ERROR - Invalid CNPJ
@@ -249,10 +249,10 @@ export const invalidCNPJ: AppError = {
   description: 'CNPJ é inválido.',
   tip: 'Cheque o campo de CNPJ.',
   example: [
-    `Deve-se possuir um CNPJ válido para o cadastro.`,
-    `O CNPJ deve ter pelo menos 14 digitos.`
-  ]
-}
+    'Deve-se possuir um CNPJ válido para o cadastro.',
+    'O CNPJ deve ter pelo menos 14 digitos.',
+  ],
+};
 
 /**
  * ERROR - Invalid Shop name
@@ -263,8 +263,8 @@ export const invalidShopName: AppError = {
   tip: 'Cheque o campo de nome da loja.',
   example: [`
         O nome da loja deve conter pelo menos 2 caracteres.
-    `]
-}
+    `],
+};
 
 /**
  * ERROR - Invalid Bank Code
@@ -275,8 +275,8 @@ export const invalidBankCode: AppError = {
   tip: 'Cheque o campo de bawnco.',
   example: [`
         O código de banco informado não existe.
-    `]
-}
+    `],
+};
 
 /**
  * ERROR - Invalid Account
@@ -287,8 +287,8 @@ export const invalidAccount: AppError = {
   tip: 'Cheque o campo de conta.',
   example: [`
       A conta deve conter pelo menos 2 digitos.
-    `]
-}
+    `],
+};
 
 /**
  * ERROR - Invalid Agency Number
@@ -299,9 +299,8 @@ export const invalidAgency: AppError = {
   tip: 'Cheque o campo de agência.',
   example: [`
         A agência deve conter pelo menos 2 digitos.
-    `]
-}
-
+    `],
+};
 
 /**
  * ERROR - Invalid Product
@@ -312,8 +311,8 @@ export const invalidProduct: AppError = {
   tip: 'Cheque as informações.',
   example: [`
         Product invalid.
-    `]
-}
+    `],
+};
 
 /**
  * ERROR - Invalid Product Name
@@ -324,9 +323,8 @@ export const invalidProductName: AppError = {
   tip: 'Cheque o campo de nome.',
   example: [`
         O nome do produto deve conter pelo menos 2 caracteres.
-    `]
-}
-
+    `],
+};
 
 /**
  * Lista com todos os erros relacionados a Client
@@ -355,19 +353,15 @@ export const errorsList: AppError[] = [
   invalidBankCode,
   invalidAccount,
   invalidAgency,
-  invalidProduct
-]
-
+  invalidProduct,
+];
 
 /**
  * Retorna um error object dependendo do código referenciado
  *
  * @param errorCode
  */
-export const findError = (errorCode: errorCode) => {
-  return errorsList.find(error => error.errorCode === errorCode) || voidError
-}
-
+export const findError = (err: errorCode) => errorsList.find((error) => error.errorCode === err) || voidError;
 
 const errorField = [
   { errorCode: 0x001, errorField: 'email', errorBrief: '' },
@@ -393,8 +387,6 @@ const errorField = [
   { errorCode: 17, errorField: 'bankInfo.bank', errorBrief: '' },
   { errorCode: 20, errorField: 'bankInfo.account', errorBrief: '' },
   { errorCode: 21, errorField: 'bankInfo.agency', errorBrief: '' },
-]
+];
 
-export const getErrorField = (errorCode: errorCode) => {
-  return errorField.find(error => error.errorCode === errorCode) || ''
-}
+export const getErrorField = (err: errorCode) => errorField.find((error) => error.errorCode === err) || '';

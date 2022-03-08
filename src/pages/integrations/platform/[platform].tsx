@@ -1,32 +1,34 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Form } from '@unform/web'
-import { FormHandles } from '@unform/core'
-import { Alert, AlertColor, Snackbar } from '@mui/material'
-import router from 'next/router'
+import React, {
+  useCallback, useEffect, useMemo, useRef, useState,
+} from 'react';
+import { Form } from '@unform/web';
+import { FormHandles } from '@unform/core';
+import { Alert, AlertColor, Snackbar } from '@mui/material';
+import router from 'next/router';
 
-import styles from './styles.module.scss'
-import Input from 'src/components/Input'
+import Input from 'src/components/Input';
+import Textfield from 'src/components/Textfield';
+import Button from 'src/components/PrimaryButton';
+import styles from './styles.module.scss';
 
-import img1 from '../../../../public/assets/bling.png'
-import img2 from '../../../../public/assets/ecoys.jpg'
-import img3 from '../../../../public/assets/ihub.png'
-import img4 from '../../../../public/assets/infra.jpg'
-import img5 from '../../../../public/assets/linxC.png'
-import img6 from '../../../../public/assets/linxE.png'
-import img7 from '../../../../public/assets/linxO.png'
-import img8 from '../../../../public/assets/lojaI.png'
-import img9 from '../../../../public/assets/magento.png'
-import img10 from '../../../../public/assets/opencart.png'
-import img11 from '../../../../public/assets/tiny.png'
-import img12 from '../../../../public/assets/tray.png'
-import img13 from '../../../../public/assets/vtex.png'
-import img14 from '../../../../public/assets/woo.png'
-import img15 from '../../../../public/assets/magento2.png'
-import img16 from '../../../../public/assets/softvar.png'
-import img17 from '../../../../public/assets/Bseller.png'
-import img18 from '../../../../public/assets/idealeWare.png'
-import Textfield from 'src/components/Textfield'
-import Button from 'src/components/PrimaryButton'
+import img1 from '../../../../public/assets/bling.png';
+import img2 from '../../../../public/assets/ecoys.jpg';
+import img3 from '../../../../public/assets/ihub.png';
+import img4 from '../../../../public/assets/infra.jpg';
+import img5 from '../../../../public/assets/linxC.png';
+import img6 from '../../../../public/assets/linxE.png';
+import img7 from '../../../../public/assets/linxO.png';
+import img8 from '../../../../public/assets/lojaI.png';
+import img9 from '../../../../public/assets/magento.png';
+import img10 from '../../../../public/assets/opencart.png';
+import img11 from '../../../../public/assets/tiny.png';
+import img12 from '../../../../public/assets/tray.png';
+import img13 from '../../../../public/assets/vtex.png';
+import img14 from '../../../../public/assets/woo.png';
+import img15 from '../../../../public/assets/magento2.png';
+import img16 from '../../../../public/assets/softvar.png';
+import img17 from '../../../../public/assets/Bseller.png';
+import img18 from '../../../../public/assets/idealeWare.png';
 
 interface PlatformInfo {
   title: string,
@@ -62,23 +64,22 @@ interface PlatformInfo {
 }
 
 const Platform: React.FC = () => {
+  const [platformInfo, setPlatformInfo] = useState<PlatformInfo>({ title: '', img: '' });
 
-  const [platformInfo, setPlatformInfo] = useState<PlatformInfo>({ title: '', img: '' })
+  const [open, setOpen] = useState(false);
+  const [type, setType] = useState<AlertColor>('success');
+  const [message, setMessage] = useState('');
 
-  const [open, setOpen] = useState(false)
-  const [type, setType] = useState<AlertColor>('success')
-  const [message, setMessage] = useState('')
-
-  const formRef = useRef<FormHandles>(null)
+  const formRef = useRef<FormHandles>(null);
 
   const handleClose = useCallback((event, reason) => {
-    setOpen(false)
-  }, [])
+    setOpen(false);
+  }, []);
 
-  const { platform } = router.query
+  const { platform } = router.query;
 
   useEffect(() => {
-    let info: PlatformInfo
+    let info: PlatformInfo;
 
     switch (platform) {
       case 'bling':
@@ -86,24 +87,24 @@ const Platform: React.FC = () => {
         info = {
           title: 'Bling',
           img: img1.src,
-          apiKey: true
-        }
+          apiKey: true,
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'bseller':
 
         info = {
           title: 'Seller',
           img: img17.src,
-          apiKey: true
-        }
+          apiKey: true,
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'eccoys':
 
@@ -114,11 +115,11 @@ const Platform: React.FC = () => {
           apiKey: true,
           secret: true,
           ecommerceUrl: true,
-        }
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'idealaware':
 
@@ -128,11 +129,11 @@ const Platform: React.FC = () => {
           url: true,
           email: true,
           password: true,
-        }
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'ihub':
 
@@ -142,11 +143,11 @@ const Platform: React.FC = () => {
           apiUrl: true,
           jwt: true,
           sellerdId: true,
-        }
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'infracommerce':
 
@@ -157,11 +158,11 @@ const Platform: React.FC = () => {
           url: true,
           user: true,
           password: true,
-        }
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'linxc':
 
@@ -170,11 +171,11 @@ const Platform: React.FC = () => {
           img: img5.src,
           user: true,
           password: true,
-        }
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'linxe':
 
@@ -185,11 +186,11 @@ const Platform: React.FC = () => {
           user: true,
           password: true,
           eMillenium: true,
-        }
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'linxo':
 
@@ -201,11 +202,11 @@ const Platform: React.FC = () => {
           apiUrl: true,
           clientId: true,
           channelId: true,
-        }
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'lojaintegrada':
 
@@ -213,11 +214,11 @@ const Platform: React.FC = () => {
           title: 'Loja Integrada',
           img: img8.src,
           apiKey: true,
-        }
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'magento':
 
@@ -229,11 +230,11 @@ const Platform: React.FC = () => {
           userId: true,
           websiteId: true,
           storeView: true,
-        }
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'magento2':
 
@@ -242,11 +243,11 @@ const Platform: React.FC = () => {
           img: img15.src,
           token: true,
           url: true,
-        }
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'opencart':
 
@@ -256,11 +257,11 @@ const Platform: React.FC = () => {
           apiKey: true,
           url: true,
           adminIdOpenCart: true,
-        }
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'softvar':
 
@@ -271,11 +272,11 @@ const Platform: React.FC = () => {
           userId: true,
           shopId: true,
           stockId: true,
-        }
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'tiny':
 
@@ -284,11 +285,11 @@ const Platform: React.FC = () => {
           img: img11.src,
           token: true,
           ecommerceId: true,
-        }
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'trayio':
 
@@ -296,11 +297,11 @@ const Platform: React.FC = () => {
           title: 'Tray.io',
           img: img12.src,
           url: true,
-        }
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'vtex':
 
@@ -312,11 +313,11 @@ const Platform: React.FC = () => {
           vtexToken: true,
           sellerdId: true,
           vtexPoliticId: true,
-        }
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
 
       case 'woo':
 
@@ -326,15 +327,18 @@ const Platform: React.FC = () => {
           url: true,
           wooCommerceKey: true,
           wooCommerceConsumer: true,
-        }
+        };
 
-        setPlatformInfo(info)
+        setPlatformInfo(info);
 
-        break
+        break;
+
+      default:
+        break;
     }
-  }, [platform])
+  }, [platform]);
 
-  const handleSubmit = useCallback((data) => {
+  const handleSubmit = useCallback(() => {
     // const fieldKey = keyRef.current.value
 
     // if (!fieldKey) {
@@ -344,203 +348,248 @@ const Platform: React.FC = () => {
     //   return
     // }
 
-    setMessage("Enviado com sucesso")
-    setType("success")
-    setOpen(true)
-  }, [])
+    setMessage('Enviado com sucesso');
+    setType('success');
+    setOpen(true);
+  }, []);
 
-  const paperStyle = { padding: '1rem', height: '70vh', width: 350, margin: "1rem auto" }
-  const btnstyle = { margin: '0.5rem 0' }
+  const paperStyle = {
+    padding: '1rem', height: '70vh', width: 350, margin: '1rem auto',
+  };
+  const btnstyle = { margin: '0.5rem 0' };
 
   return (
     <div className={styles.container}>
       <Form
         ref={formRef}
-        onSubmit={handleSubmit}>
+        onSubmit={handleSubmit}
+      >
         <div className={styles.card}>
           {/* <img src={platformInfo.img} /> */}
-          <h1>Integração {platformInfo.title}</h1>
+          <h1>
+            Integração
+            {' '}
+            {platformInfo.title}
+          </h1>
 
-          {platformInfo.apiUrl &&
+          {platformInfo.apiUrl
+            && (
             <Textfield
-              name='apiUrl'
-              label='URL da API'
+              name="apiUrl"
+              label="URL da API"
               placeholder={`Insira o URL da API ${platformInfo.title}`}
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.apiKey &&
+          {platformInfo.apiKey
+            && (
             <Textfield
-              name='apiKey'
-              label='API Key'
+              name="apiKey"
+              label="API Key"
               placeholder={`Insira a API Key do ${platformInfo.title}`}
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.secret &&
+          {platformInfo.secret
+            && (
             <Textfield
-              name='secretKey'
-              label='Secret Key'
+              name="secretKey"
+              label="Secret Key"
               placeholder={`Insira a Secret Key de acesso ao ${platformInfo.title}`}
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.email &&
+          {platformInfo.email
+            && (
             <Textfield
-              name='email'
-              label='Email'
-              placeholder={`Insira o email`}
+              name="email"
+              label="Email"
+              placeholder="Insira o email"
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.password &&
+          {platformInfo.password
+            && (
             <Textfield
-              name='password'
-              label=''
-              placeholder={`Insira a senha`}
+              name="password"
+              label=""
+              placeholder="Insira a senha"
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.shopName &&
+          {platformInfo.shopName
+            && (
             <Textfield
-              name='shopName'
+              name="shopName"
               label={`Nome da loja ${platformInfo.title}`}
               placeholder={`Insira a API Key do ${platformInfo.title}`}
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.apiKey &&
+          {platformInfo.apiKey
+            && (
             <Textfield
-              name='apiKey'
-              label=''
+              name="apiKey"
+              label=""
               placeholder={`Insira a API Key do ${platformInfo.title}`}
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.apiKey &&
+          {platformInfo.apiKey
+            && (
             <Textfield
-              name='apiKey'
-              label=''
+              name="apiKey"
+              label=""
               placeholder={`Insira a API Key do ${platformInfo.title}`}
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.apiKey &&
+          {platformInfo.apiKey
+            && (
             <Textfield
-              name='apiKey'
-              label=''
+              name="apiKey"
+              label=""
               placeholder={`Insira a API Key do ${platformInfo.title}`}
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.apiKey &&
+          {platformInfo.apiKey
+            && (
             <Textfield
-              name='apiKey'
-              label=''
+              name="apiKey"
+              label=""
               placeholder={`Insira a API Key do ${platformInfo.title}`}
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.apiKey &&
+          {platformInfo.apiKey
+            && (
             <Textfield
-              name='apiKey'
-              label=''
+              name="apiKey"
+              label=""
               placeholder={`Insira a API Key do ${platformInfo.title}`}
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.apiKey &&
+          {platformInfo.apiKey
+            && (
             <Textfield
-              name='apiKey'
-              label=''
+              name="apiKey"
+              label=""
               placeholder={`Insira a API Key do ${platformInfo.title}`}
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.eMillenium &&
+          {platformInfo.eMillenium
+            && (
             <Textfield
-              name='eMillenium'
-              label='Vitrine da Loja E-millenium'
+              name="eMillenium"
+              label="Vitrine da Loja E-millenium"
               placeholder={`Insira a API Key do ${platformInfo.title}`}
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.url &&
+          {platformInfo.url
+            && (
             <Textfield
-              name='shopUrl'
-              label='URL da loja'
+              name="shopUrl"
+              label="URL da loja"
               placeholder={`Insira o URL da loja ${platformInfo.title}`}
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.ecommerceUrl &&
+          {platformInfo.ecommerceUrl
+            && (
             <Textfield
-              name='apiKey'
-              label='URL do Ecommerce'
-              placeholder={`Insira o URL do seu ecommerce`}
+              name="apiKey"
+              label="URL do Ecommerce"
+              placeholder="Insira o URL do seu ecommerce"
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.jwt &&
+          {platformInfo.jwt
+            && (
             <Textfield
-              name='jwt'
-              label='Token JWT da API'
+              name="jwt"
+              label="Token JWT da API"
               placeholder={`Insira o token JWT para a API ${platformInfo.title}`}
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.ecommerceId &&
+          {platformInfo.ecommerceId
+            && (
             <Textfield
-              name='ecommerceId'
-              label='Id Ecommerce'
-              placeholder={`Insira o Id Ecommerce para criação de pedidos (opcional)`}
+              name="ecommerceId"
+              label="Id Ecommerce"
+              placeholder="Insira o Id Ecommerce para criação de pedidos (opcional)"
               fullWidth
-            />}
+            />
+            )}
 
-          {platformInfo.channelId &&
+          {platformInfo.channelId
+            && (
             <Textfield
-              name='channelId'
-              label='ChannelId'
+              name="channelId"
+              label="ChannelId"
               placeholder={`Insira o channelId do ${platformInfo.title}`}
               fullWidth
               required
-            />}
+            />
+            )}
 
-          {platformInfo.clientId &&
+          {platformInfo.clientId
+            && (
             <Textfield
-              name='clientId'
-              label='ClientId'
+              name="clientId"
+              label="ClientId"
               placeholder={`Insira a clientId do ${platformInfo.title}`}
               fullWidth
               required
-            />}
+            />
+            )}
 
-          <Button type='submit' onClick={() => { formRef.current?.submitForm() }}>Cadastrar integração</Button>
+          <Button type="submit" onClick={() => { formRef.current?.submitForm(); }}>Cadastrar integração</Button>
         </div>
-        <Snackbar open={open} autoHideDuration={10000} anchorOrigin={{ vertical: 'top', horizontal: 'center', }} onClose={handleClose}>
+        <Snackbar open={open} autoHideDuration={10000} anchorOrigin={{ vertical: 'top', horizontal: 'center' }} onClose={handleClose}>
           <Alert severity={type} sx={{ width: '100%' }}>
             {message}
           </Alert>
         </Snackbar>
       </Form>
     </div>
-  )
-}
+  );
+};
 
-export default Platform
+export default Platform;

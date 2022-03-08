@@ -1,7 +1,8 @@
 import { useField } from '@unform/core';
-import React, { InputHTMLAttributes, useCallback, useMemo, useRef } from 'react';
-import { useEffect } from 'react';
-import { useState } from 'react';
+import React, {
+  InputHTMLAttributes, useCallback, useMemo, useRef,
+  useEffect, useState,
+} from 'react';
 
 import styles from './styles.module.scss';
 
@@ -12,11 +13,15 @@ interface AutocompleteProps extends InputHTMLAttributes<HTMLInputElement> {
   setSelectedItem?: Function,
 }
 
-const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, items, setSelectedItem, ...rest }) => {
+const Autocomplete: React.FC<AutocompleteProps> = ({
+  name, label, className, items, setSelectedItem, ...rest
+}) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { fieldName, defaultValue, error, registerField } = useField(name);
+  const {
+    fieldName, defaultValue, error, registerField,
+  } = useField(name);
 
   const [inputValue, setInputValue] = useState();
   const [isFocused, setIsFocused] = useState(false);
@@ -24,31 +29,29 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, ite
 
   const [selectedSuggestion, setSelectedSuggestion] = useState(-1);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([])
+  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
 
   const handleInputFocused = useCallback(() => {
     setIsFocused(true);
-  }, [selectedSuggestion]);
+  }, []);
 
   const handleInputBlur = useCallback(() => {
     setIsFocused(false);
-    setShowSuggestions(false)
+    setShowSuggestions(false);
     setFilteredSuggestions([]);
 
     if (selectedSuggestion === -1 && !!isFilled) {
-      if (!!inputRef.current)
-        inputRef.current.value = ''
+      if (inputRef.current) { inputRef.current.value = ''; }
     }
   }, [isFilled, selectedSuggestion]);
 
   const handleInputChange = useCallback((value: string) => {
     if (value.trim().length) {
       let count = 0;
-      const tempItems = items.filter(item => {
+      const tempItems = items.filter((item) => {
         const validItem = item.toString().toLocaleUpperCase().includes(value.trim().toLocaleUpperCase());
 
-        if (validItem)
-          count++;
+        if (validItem) { count += 1; }
 
         return validItem && count <= 4;
       });
@@ -60,8 +63,7 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, ite
       return;
     }
 
-    if (!!setSelectedItem)
-      setSelectedItem(undefined);
+    if (setSelectedItem) { setSelectedItem(undefined); }
 
     setSelectedSuggestion(-1);
     setShowSuggestions(false);
@@ -69,21 +71,19 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, ite
   }, [items]);
 
   const handleOnClick = useCallback((value: string) => {
-    const selectedIndex = items.findIndex(suggestion => suggestion === value);
+    const selectedIndex = items.findIndex((suggestion) => suggestion === value);
 
     setSelectedSuggestion(selectedIndex);
 
-    if (!!setSelectedItem)
-      setSelectedItem(items[selectedIndex]);
+    if (setSelectedItem) { setSelectedItem(items[selectedIndex]); }
 
-    if (!!inputRef.current)
-      inputRef.current.value = value;
+    if (inputRef.current) { inputRef.current.value = value; }
 
     setIsFilled(true);
     setShowSuggestions(false);
 
     setIsFocused(false);
-    setShowSuggestions(false)
+    setShowSuggestions(false);
     setFilteredSuggestions([]);
   }, [items, inputRef]);
 
@@ -93,7 +93,17 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, ite
       ref: inputRef.current,
       path: 'value',
     });
-  }, [fieldName, registerField])
+  }, [fieldName, registerField]);
+
+  const containerStyle = useMemo(() => {
+    if (error) return styles.containerError;
+
+    if (isFocused) return styles.containerFocused;
+
+    if (isFilled) return styles.containerFilled;
+
+    return styles.container;
+  }, [error, isFilled, isFocused]);
 
   return (
     <div
@@ -101,17 +111,17 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, ite
       onFocus={handleInputFocused}
       onBlur={handleInputBlur}
     >
-      <div ref={containerRef} className={!!error ? styles.containerError : isFocused ? styles.containerFocused : isFilled ? styles.containerFilled : styles.container}>
+      <div ref={containerRef} className={containerStyle}>
         <div>
           {
-            !!label ? (
+            label ? (
               <>
-                <label>{label}</label>
+                <label htmlFor={inputRef.current?.id}>{label}</label>
                 <input
                   ref={inputRef}
                   onChange={(e) => {
-                    setIsFilled(selectedSuggestion >= 0)
-                    handleInputChange(e.target.value)
+                    setIsFilled(selectedSuggestion >= 0);
+                    handleInputChange(e.target.value);
                   }}
                   {...rest}
                 />
@@ -120,8 +130,8 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, ite
               <input
                 ref={inputRef}
                 onChange={(e) => {
-                  setIsFilled(selectedSuggestion >= 0)
-                  handleInputChange(e.target.value)
+                  setIsFilled(selectedSuggestion >= 0);
+                  handleInputChange(e.target.value);
                 }}
                 {...rest}
               />
@@ -131,25 +141,24 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, ite
       </div>
       {
         !!filteredSuggestions && (
-          <ul className={styles.suggestions}
+          <ul
+            className={styles.suggestions}
             onMouseDown={(e) => e.preventDefault()}
             style={{ width: containerRef.current?.clientWidth }}
           >
             {
               filteredSuggestions.map((suggestion, i) => (
-                <>
-                  <li
-                    key={i}
-                    className={(i >= 0 && i < filteredSuggestions.length - 1) ? styles.divider : ''}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      handleOnClick(suggestion);
-                    }}
-                    style={suggestion === items[selectedSuggestion] ? { backgroundColor: 'var(--green-100-25)' } : {}}
-                  >
-                    {suggestion}
-                  </li>
-                </>
+                <li
+                  key={suggestion}
+                  className={(i >= 0 && i < filteredSuggestions.length - 1) ? styles.divider : ''}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    handleOnClick(suggestion);
+                  }}
+                  style={suggestion === items[selectedSuggestion] ? { backgroundColor: 'var(--green-100-25)' } : {}}
+                >
+                  {suggestion}
+                </li>
               ))
             }
           </ul>
@@ -161,7 +170,7 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ name, label, className, ite
         </p>
       )}
     </div>
-  )
-}
+  );
+};
 
 export default Autocomplete;

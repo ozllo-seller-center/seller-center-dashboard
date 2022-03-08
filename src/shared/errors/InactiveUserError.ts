@@ -1,4 +1,4 @@
-export class InactiveUserError {
+class InactiveUserError {
   message: string;
 
   constructor(message: string) {
@@ -9,3 +9,5 @@ export class InactiveUserError {
     return this.message;
   }
 }
+
+export default InactiveUserError;

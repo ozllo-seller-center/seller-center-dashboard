@@ -1,5 +1,4 @@
 import React, { LiHTMLAttributes, useCallback, useState } from 'react';
-import { FiChevronDown } from 'react-icons/fi';
 
 import styles from './styles.module.scss';
 
@@ -13,30 +12,33 @@ interface HeaderDropdownProps extends LiHTMLAttributes<HTMLLIElement> {
   setActiveItem: Function;
 }
 
-const HeaderDropdown: React.FC<HeaderDropdownProps> = ({ items, setActiveItem, children, ...rest }) => {
+const HeaderDropdown: React.FC<HeaderDropdownProps> = ({
+  items, setActiveItem, children, ...rest
+}) => {
   const [selectedItem, setSelectedItem] = useState(items[0].value);
   const [isFocused, setIsFocused] = useState(false);
 
   const handleInputFocused = useCallback(() => {
     setIsFocused(!isFocused);
-  }, []);
+  }, [isFocused]);
 
   const handleInputBlur = useCallback(() => {
     setIsFocused(false);
   }, []);
 
   return (
-    <nav role='menu' className={styles.nav}>
+    <nav role="menu" className={styles.nav}>
       <li
         onFocus={handleInputFocused}
         onBlur={handleInputBlur}
         className={styles.dropdownContainer}
-        {...rest}>
+        {...rest}
+      >
         <span>{items[items.findIndex((item) => item.value === selectedItem)].text}</span>
         <ul className={styles.dropdown}>
           {
             items.map((item) => {
-              if (item.value !== selectedItem)
+              if (item.value !== selectedItem) {
                 return (
                   <li onClick={() => {
                     setSelectedItem(item.value);
@@ -45,13 +47,14 @@ const HeaderDropdown: React.FC<HeaderDropdownProps> = ({ items, setActiveItem, c
                   >
                     {item.text}
                   </li>
-                )
+                );
+              }
             })
           }
         </ul>
       </li>
     </nav>
   );
-}
+};
 
 export default HeaderDropdown;

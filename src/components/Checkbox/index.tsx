@@ -4,21 +4,19 @@ import React, {
   useRef,
   useState,
   useCallback,
+  useMemo,
 } from 'react';
 
 import { useField } from '@unform/core';
 
-import styles from './styles.module.scss';
 import { CheckboxProps } from '@material-ui/core/Checkbox';
 import { Checkbox, withStyles } from '@material-ui/core';
-import { green } from '@material-ui/core/colors';
-import { FiCheck } from 'react-icons/fi';
 import { FaCheck } from 'react-icons/fa';
+import styles from './styles.module.scss';
 
 interface CheckBoxProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
   label: string;
-  containerStyle?: object;
 }
 
 const CustomCheckbox = withStyles({
@@ -36,7 +34,6 @@ const CustomCheckbox = withStyles({
 const CheckboxInput: React.FC<CheckBoxProps> = ({
   name,
   label,
-  containerStyle = {},
   disabled,
   ...rest
 }) => {
@@ -45,16 +42,17 @@ const CheckboxInput: React.FC<CheckBoxProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
 
-  const { fieldName, defaultValue, error, registerField } = useField(name);
+  const {
+    fieldName, defaultValue, error, registerField,
+  } = useField(name);
 
   const [isChecked, setChecked] = useState(rest.defaultChecked);
 
   const handleChecked = useCallback((e) => {
-    if (!!inputRef.current)
-      inputRef.current.checked = !isChecked
+    if (inputRef.current) { inputRef.current.checked = !isChecked; }
 
-    setChecked(!isChecked)
-  }, [inputRef, isChecked])
+    setChecked(!isChecked);
+  }, [inputRef, isChecked]);
 
   useEffect(() => {
     registerField({
@@ -64,11 +62,22 @@ const CheckboxInput: React.FC<CheckBoxProps> = ({
     });
   }, [fieldName, registerField]);
 
+  const containerStyle = useMemo(() => {
+    if (disabled) { return styles.containerDisabled; }
+
+    if (error) { return styles.containerError; }
+
+    if (isFocused) { return styles.containerFocused; }
+
+    if (isFilled) { return styles.containerFilled; }
+
+    return styles.container;
+  }, [disabled, error, isFilled, isFocused]);
+
   return (
     <div className={styles.parent}>
-      <div
-        className={disabled ? styles.containerDisabled : !!error ? styles.containerError : isFocused ? styles.containerFocused : isFilled ? styles.containerFilled : styles.container} >
-        <label>{label}</label>
+      <div className={containerStyle}>
+        <label htmlFor={inputRef.current?.id}>{label}</label>
         {/* <CustomCheckbox
             inputRef={inputRef}
             defaultChecked={defaultValue as boolean}
@@ -76,17 +85,17 @@ const CheckboxInput: React.FC<CheckBoxProps> = ({
           /> */}
         <input
           style={{ display: 'none' }}
-          type='checkbox'
+          type="checkbox"
           ref={inputRef}
           checked={isChecked}
           onChange={(e) => {
-            e.currentTarget.checked = !isChecked
+            e.currentTarget.checked = !isChecked;
           }}
         />
         <button
           className={isChecked ? styles.checked : styles.unchecked}
           onClick={handleChecked}
-          type='button'
+          type="button"
         >
           <FaCheck />
         </button>

@@ -1,11 +1,13 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback, useRef, useState,
+} from 'react';
 
 import { FiPaperclip } from 'react-icons/fi';
-import Tooltip from '../../components/Tooltip';
+import { Form } from '@unform/web';
+import { FormHandles, SubmitHandler } from '@unform/core';
+import Tooltip from '../Tooltip';
 
 import styles from './styles.module.scss';
-import { Form } from '@unform/web';
-import { FormHandles, SubmitHandler, useField } from '@unform/core';
 
 interface AttachControllerProps {
   name: string;
@@ -17,7 +19,9 @@ interface AttachControllerProps {
   handleAttachment: SubmitHandler<any>;
 }
 
-const AttachController: React.FC<AttachControllerProps> = ({ name, title, placeholder, isAttached, unattachedText, attachedText, handleAttachment }) => {
+const AttachController: React.FC<AttachControllerProps> = ({
+  name, title, placeholder, isAttached, unattachedText, attachedText, handleAttachment,
+}) => {
   const formRef = useRef<FormHandles>(null);
 
   const [openTooltip, setOpenTooltip] = useState(false);
@@ -35,37 +39,43 @@ const AttachController: React.FC<AttachControllerProps> = ({ name, title, placeh
   // }, [fieldName, registerField]);
 
   const handleTooltip = useCallback(() => {
-    setOpenTooltip(!openTooltip)
+    setOpenTooltip(!openTooltip);
   }, [openTooltip]);
 
   return (
     <div className={styles.container}>
-      <button onClick={(e) => {
-        handleTooltip()
-        setToolTipYOffset(e.clientY)
-      }}>
+      <button
+        type="button"
+        onClick={(e) => {
+          handleTooltip();
+          setToolTipYOffset(e.clientY);
+        }}
+      >
         <FiPaperclip />
         {isAttached ? <span>{attachedText}</span> : <span>{unattachedText}</span>}
       </button>
       {openTooltip && (
         <Tooltip title={title} closeTooltip={handleTooltip} offsetY={toolTipYOffset}>
-          <Form ref={formRef} onSubmit={(d, h, e) => {
-            setOpenTooltip(false);
-            handleAttachment(d, h, e);
-          }}>
+          <Form
+            ref={formRef}
+            onSubmit={(d, h, e) => {
+              setOpenTooltip(false);
+              handleAttachment(d, h, e);
+            }}
+          >
             <div className={styles.attachment}>
               <div className={styles.attachmentInput}>
                 <FiPaperclip />
-                <input name={name} placeholder={placeholder} ref={inputRef} autoComplete='off' autoCorrect='off' />
+                <input name={name} placeholder={placeholder} ref={inputRef} autoComplete="off" autoCorrect="off" />
               </div>
 
-              <button type='submit'>Confirmar</button>
+              <button type="submit">Confirmar</button>
             </div>
           </Form>
         </Tooltip>
       )}
     </div>
-  )
-}
+  );
+};
 
 export default AttachController;

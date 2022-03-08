@@ -1,11 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useRef, useState,
+} from 'react';
 import { IconBaseProps } from 'react-icons';
 
 import { FiCheck, FiX } from 'react-icons/fi';
 import { BsDot } from 'react-icons/bs';
 import ReactTooltip from 'react-tooltip';
 
-import styles from './styles.module.scss'
+import styles from './styles.module.scss';
 
 export type Rule = {
   state?: boolean,
@@ -19,33 +21,40 @@ interface RuledHintboxProps {
   rules: Rule[];
 }
 
-const RuledHintbox: React.FC<RuledHintboxProps> = ({ title, example, icon: Icon, rules }) => {
-
+const RuledHintbox: React.FC<RuledHintboxProps> = ({
+  title, example, icon: Icon, rules,
+}) => {
   const [ruleCheck, setRuleCheck] = useState(false);
 
   useEffect(() => {
-
     let check = true;
 
-    rules.map(rule => {
-      if (check && rule.state !== undefined)
-        check = rule.state
-    })
+    rules.map((rule) => {
+      if (check && rule.state !== undefined) { check = rule.state; }
+    });
 
-    setRuleCheck(check)
-  }, [rules])
+    setRuleCheck(check);
+  }, [rules]);
+
+  const spanStyles = useCallback((rule: Rule) => {
+    if (rule.state) { return ''; }
+
+    if (rule.state) { return styles.green; }
+
+    return styles.red;
+  }, []);
 
   return (
     <>
       <Icon
         className={ruleCheck ? styles.icon : styles.iconError}
         data-tip
-        data-for='global'
+        data-for="global"
       />
       <ReactTooltip
-        id='global'
-        effect='solid'
-        backgroundColor={'var(--white)'}
+        id="global"
+        effect="solid"
+        backgroundColor="var(--white)"
         className={styles.container}
       >
         {!!title && (
@@ -55,10 +64,11 @@ const RuledHintbox: React.FC<RuledHintboxProps> = ({ title, example, icon: Icon,
         )}
         <div>
           {
-            rules.map((rule, i) => (
-              <div key={i} className={styles.rulesContainer}>
-                {rule.state === undefined ? <BsDot /> : rule.state ? <FiCheck className={styles.green} /> : <FiX className={styles.red} />}
-                <span className={rule.state === undefined ? '' : rule.state === true ? styles.green : styles.red}>{rule.descr}</span>
+            rules.map((rule) => (
+              <div key={rule.descr} className={styles.rulesContainer}>
+                {!!rule.state && <BsDot /> }
+                {rule.state ? <FiCheck className={styles.green} /> : <FiX className={styles.red} />}
+                <span className={spanStyles(rule)}>{rule.descr}</span>
               </div>
             ))
           }
