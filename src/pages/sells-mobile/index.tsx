@@ -366,19 +366,15 @@ export const SellsMobile: React.FC = () => {
                     <div className={styles.products}>
                       <span style={{ marginBottom: '0.5rem' }}><b>Produtos</b></span>
                       {
-                        item.order.products.map((product, j) => (j < 2 && <p key={product.idProduct}>{product.name}</p>))
+                        item.order.products.map((product, j) => (j <= 2 && <p key={product.idProduct}>{product.name}</p>))
                       }
                       {
-                        item.order.products.length > 2 && (
+                        item.order.products.length > 3 && (
                           <Collapsible totalItems={item.order.products.length} toggleRef={collapsibleRefs ? collapsibleRefs[i] : undefined}>
                               {
-                                item.order.products.map((product, j) => {
-                                  if (j < 2) return null;
-
-                                  return (
-                                    <p key={product.idProduct}>{product.name}</p>
-                                  );
-                                })
+                                item.order.products.map((product) => (
+                                  <p key={product.idProduct}>{product.name}</p>
+                                ))
                               }
                           </Collapsible>
                         )

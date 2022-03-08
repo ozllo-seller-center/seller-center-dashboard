@@ -155,6 +155,8 @@ export function EditProductForm() {
         formRef.current?.setData(response.data);
         // setFormData(response.data)
 
+        setChanging(true);
+
         setLoading(false);
       }).catch((err) => {
         console.log(err);
@@ -296,6 +298,13 @@ export function EditProductForm() {
     const filesUpdate = files.filter((f, i) => i !== deletedIndex);
 
     formRef.current?.setFieldValue('images', filesUpdate);
+
+    const drop = formRef.current?.getFieldRef('images');
+
+    if (drop) {
+      drop.value = '';
+    }
+
     setFilesUrl(urlsUpdate);
     setFiles(filesUpdate);
   }, [filesUrl, files]);
@@ -345,7 +354,7 @@ export function EditProductForm() {
       filled += 1;
     }
 
-    data.variations.forEach((variation: Variation) => {
+    variations.forEach((variation) => {
       if (variation.size) { filled += 1; }
       if (variation.stock) { filled += 1; }
       if (variation.color) { filled += 1; }
@@ -368,8 +377,7 @@ export function EditProductForm() {
     setChanging(false);
 
     return filled;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [files, attributes, isChanging, formRef.current]);
+  }, [files, variations, attributes]);
 
   const yupVariationSchema = useCallback((): object => (attributes.findIndex((attribute) => attribute.name === 'flavor') >= 0
     ? {
@@ -631,7 +639,16 @@ export function EditProductForm() {
             ref={formRef}
             onSubmit={handleSubmit}
             // onChange={(e) => { calcFilledFields(formRef.current?.getData() as Product) }}
-            onChange={() => { setChanging(true); }}
+            onChange={() => {
+              if (formRef.current) {
+                const vars = formRef.current.getData().variations;
+
+                console.log('Changing - Variations:');
+                console.log(vars);
+
+                if (vars) { setVariations(vars); }
+              }
+            }}
           >
             <p className={styles.imagesTitle}>Fotos do produto</p>
             <ImageController

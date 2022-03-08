@@ -238,6 +238,13 @@ export function ProductForm() {
     const filesUpdate = files.filter((f, i) => i !== deletedIndex);
 
     formRef.current?.setFieldValue('images', filesUpdate);
+
+    const drop = formRef.current?.getFieldRef('images');
+
+    if (drop) {
+      drop.value = '';
+    }
+
     setFiles(filesUpdate);
 
     calcFilledFields(formRef.current?.getData() as Product);

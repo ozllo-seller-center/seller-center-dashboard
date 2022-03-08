@@ -68,7 +68,7 @@
       "jsx-a11y/label-has-associated-control": "off",
       "react/jsx-no-constructed-context-values": "off",
       "no-case-declarations": "off",
-      "no-nested-ternary": "off"
+      "linebreak-style": "off"
     },
     "settings": {
       "import/resolver": {
