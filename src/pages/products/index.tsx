@@ -317,6 +317,14 @@ export function Products({ userFromApi }: ProductsProps) {
         <div className={styles.productsContent}>
           <div className={styles.productsOptions}>
             <div className={styles.contentFilters}>
+              <div className={styles.panelFooter}>
+                <select value={valorAcoes || ""} onChange={setValorAcao} className={styles.selectOption}>
+                  <option selected value="0">Ação em massa</option>
+                  <option value="1">Exportar Produto(s)</option>
+                  <option value="2">Excluir Produto(s)</option>
+                </select>
+                <button type='button' onClick={executarAcao} disabled={isDisabledAcoes}>Aplicar</button>
+              </div>
               <div style={{ display: 'flex', flex: 1 }}>
                 <Form ref={formRef} onSubmit={handleSubmit}>
                   <FilterInput
@@ -325,14 +333,6 @@ export function Products({ userFromApi }: ProductsProps) {
                     placeholder="Pesquise um produto..."
                     autoComplete="off" />
                 </Form>
-              </div>
-              <div className={styles.panelFooter}>
-                <select value={valorAcoes || ""} onChange={setValorAcao} className={styles.selectOption}>
-                  <option selected value="0">Ação em massa</option>
-                  <option value="1">Exportar Produto(s)</option>
-                  <option value="2">Excluir Produto(s)</option>
-                </select>
-                <button type='button' onClick={executarAcao} disabled={isDisabledAcoes}>Aplicar</button>
               </div>
             </div>
           </div>
