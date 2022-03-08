@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react'
-import Modal from '../Modal'
-import styles from './styles.module.scss'
+import React, { useEffect } from 'react';
+import Modal from '../Modal';
+import styles from './styles.module.scss';
 
 interface ActionModalProps {
   handleVisibility: React.MouseEventHandler
@@ -9,32 +9,25 @@ interface ActionModalProps {
   execute:any
 }
 
-const ActionModal: React.FC<ActionModalProps> = ({ handleVisibility, titulo, mensagem, execute }) => {
-
-  useEffect(() => {
-
-  }, [])
-
-
-  return (
-    <Modal handleVisibility={handleVisibility} title={titulo} cleanStyle>
-      <div>
-        <div className={styles.normal}>
-          <div className={styles.content}>
-              <div className={styles.column}>
-                <strong>{mensagem}</strong>
-            </div>
+const ActionModal: React.FC<ActionModalProps> = ({
+  handleVisibility, titulo, mensagem, execute,
+}) => (
+  <Modal handleVisibility={handleVisibility} title={titulo} cleanStyle>
+    <div>
+      <div className={styles.normal}>
+        <div className={styles.content}>
+          <div className={styles.column}>
+            <strong>{mensagem}</strong>
           </div>
-          <div className={styles.content}>
-            <div className={styles.info}>
-              <button type='button' onClick={execute} >Confirmar</button>
-            </div>
+        </div>
+        <div className={styles.content}>
+          <div className={styles.info}>
+            <button type="button" onClick={execute}>Confirmar</button>
           </div>
         </div>
       </div>
-    </Modal >
-  )
-}
+    </div>
+  </Modal>
+);
 
-
-export default ActionModal
+export default ActionModal;
