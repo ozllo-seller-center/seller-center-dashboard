@@ -17,7 +17,6 @@ import XLSX from 'xlsx';
 import BulletedButton from '../../components/BulletedButton';
 import FilterInput from '../../components/FilterInput';
 import styles from './styles.module.scss';
-import ActionModal from 'src/components/ModalAction';
 
 interface SearchFormData {
   search: string;
