@@ -111,7 +111,7 @@ const ProductTableItem: React.FC<ProductItemProps> = ({
         console.log(err);
       });
     }
-  }, [isAvailable, disabledActions]);
+  }, [disabledActions, isAvailable, userInfo.token, userInfo.shop_id, item]);
 
   return (
     <div id={styles.switchCell}>
