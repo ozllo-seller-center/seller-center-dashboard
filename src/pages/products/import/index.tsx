@@ -17,7 +17,7 @@ import { importLines, ProductImport } from 'src/shared/types/productImport';
 import api from 'src/services/api';
 import { Nationality } from 'src/shared/types/nationality';
 import { Category, SubCategory } from 'src/shared/types/category';
-import { Loader } from 'src/components/Loader';
+import Loader from 'src/components/Loader';
 import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
 import { ErrorMessages } from 'src/shared/errors/ImportSheetError';
