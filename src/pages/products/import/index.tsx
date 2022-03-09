@@ -37,7 +37,7 @@ type VariationDTO = {
   color?: string,
 }
 
-function Import() {
+const Import: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);
 
   const [isModalVisible, setModalVisibility] = useState(false);
@@ -70,7 +70,11 @@ function Import() {
     return {
       screenWidth: undefined,
     };
-  }, [process.browser]);
+  }, []);
+
+  const handleFileUpload = useCallback((uploads: File[]) => {
+    setFiles(uploads);
+  }, []);
 
   const handleSubmit = useCallback(async (product, newImages, products) => {
     try {
@@ -82,7 +86,6 @@ function Import() {
             shop_id: user.shopInfo._id,
           }
         }).then(response => {
-
         })/
       } */
 
@@ -91,7 +94,7 @@ function Import() {
       } = product;
       const price = product.price.toString();
       const price_discounted = product.price_discounted.toString();
-      await api.patch(`/product/${product._id}/price`, {
+      api.patch(`/product/${product._id}/price`, {
         price,
         price_discounted,
       }, {
@@ -115,13 +118,12 @@ function Import() {
         }
         delete variation._id;
       });
-
       await api.patch(`/product/${product._id}`, product, {
         headers: {
           authorization: token,
           shop_id: user.shopInfo._id,
         },
-      }).then((response) => {
+      }).then(() => {
         setLoading(false);
         handleModalMessage(true, { title: 'Produtos alterados!', message: [`Foram alterados ${products.length} produtos e suas variações`], type: 'success' });
         if (window.innerWidth >= 768) {
@@ -142,20 +144,16 @@ function Import() {
     }
   }, [token, user.shopInfo._id, setLoading, handleModalMessage, router]);
 
-  const handleFileUpload = useCallback((uploads: File[]) => {
-    setFiles(uploads);
-  }, []);
-
-  const importProducts = useCallback(async (imps: ProductImport[]) => {
+  const importProducts = useCallback(async (imprts: ProductImport[]) => {
     let products: Product[] = [];
 
     try {
-      if (imps.length === 0) {
+      if (imprts.length === 0) {
         setLoading(false);
         return;
       }
 
-      products = importToProduct(imps);
+      products = importToProduct(imprts);
 
       setLoading(true);
 
@@ -297,7 +295,7 @@ function Import() {
       console.log(err);
       setLoading(false);
     }
-  }, [user, token, categories, error]);
+  }, [setLoading, error, nationalities, categories, handleSubmit, token, user.shopInfo._id, handleModalMessage]);
 
   const handleImport = useCallback(async () => {
     const importedProducts: ProductImport[] = [];
@@ -333,6 +331,8 @@ function Import() {
         if (!!result.Planilha1 || !!result.data) {
           const sheet: any[] = result.Planilha1 ? result.Planilha1 : result.data;
 
+          console.log(sheet);
+
           sheet.forEach(async (line, i) => {
             // Ignorar o cabeçalho
             if (i > 1 && line.length > 0) {
@@ -357,19 +357,16 @@ function Import() {
 
                 const validate = productValidation[attribute].validate;
 
-                let value;
-                let gender;
-
                 switch (attrI) {
                   case 0:
-                    value = line[attrI].split('>');
+                    const value = line[attrI].split('>');
 
                     productValidation[attribute].value.nationality = value[0].trim();
                     productValidation[attribute].value.category = value[1].trim();
                     productValidation[attribute].value.subCategory = value[2].trim();
                     break;
                   case 16:
-                    gender = line[attrI].charAt(0).toUpperCase();
+                    const gender = line[attrI].charAt(0).toUpperCase();
                     productValidation[attribute].value = gender;
 
                     break;
@@ -382,7 +379,9 @@ function Import() {
                   case 24:
                     if (line[attrI]) { productValidation[attribute].value.push(line[attrI]); }
                     break;
-
+                  case 25:
+                    if (line[attrI]) { productValidation[attribute].value = line[attrI]; }
+                    break;
                   default:
                     if (line[attrI]) { productValidation[attribute].value = line[attrI]; }
                     break;
@@ -445,160 +444,9 @@ function Import() {
     });
   }, [files, isUploading, successfull, error]);
 
-  const handleAlteracao = useCallback(async () => {
-    const importedProducts: ProductImport[] = [];
-
-    setLoading(true);
-    setError(false);
-
-    files.map(async (file) => {
-      const reader = new FileReader();
-
-      reader.onload = async (e) => {
-        if (!e.target || e.target.result === null) { return; }
-
-        let data = e.target.result;
-
-        if (!(data instanceof ArrayBuffer)) {
-          return;
-        }
-
-        data = new Uint8Array(data);
-
-        const workbook = XLSX.read(data, { type: 'array' });
-        const result: any = {};
-
-        workbook.SheetNames.forEach((sheet) => {
-          const roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheet], { header: 1 });
-          if (roa.length) { result[sheet] = roa; }
-        });
-
-        let count = 0;
-        let stop = false;
-
-        if (!!result.Planilha1 || !!result.data) {
-          const sheet: any[] = result.Planilha1 ? result.Planilha1 : result.data;
-
-          sheet.forEach(async (line, i) => {
-            // Ignorar o cabeçalho
-            if (i > 1 && line.length > 0) {
-              count += 1;
-
-              const productValidation: ProductImport = InitProductImport();
-
-              if (!line[3]) {
-                handleModalMessage(true, {
-                  type: 'error',
-                  title: 'Id Agrupador não encontrado!',
-                  message: [`Não foi encontrado um id arupador na linha ${i + 1}`],
-                });
-
-                stop = true;
-
-                setError(true);
-              }
-              const size = line.length - 1;
-              for (let attrI = 0; attrI <= size && !stop; attrI += 1) {
-                const attribute = importLines[attrI];
-
-                const validate = productValidation[attribute].validate;
-
-                let value;
-                let gender;
-
-                switch (attrI) {
-                  case 0:
-                    value = line[attrI]?.split('>');
-                    if (value && value !== '') {
-                      productValidation[attribute].value.nationality = value[0].trim();
-                      productValidation[attribute].value.category = value[1].trim();
-                      productValidation[attribute].value.subCategory = value[2].trim();
-                    }
-                    break;
-                  case 16:
-                    gender = line[attrI]?.charAt(0).toUpperCase();
-                    if (gender && gender !== '') {
-                      productValidation[attribute].value = gender;
-                    }
-
-                    break;
-
-                  case 19:
-                  case 20:
-                  case 21:
-                  case 22:
-                  case 23:
-                  case 24:
-                    if (line[attrI]) { productValidation[attribute].value.push(line[attrI]); }
-                    break;
-                  case 25:
-                    if (line[attrI]) { productValidation[attribute].value = line[attrI]; }
-                    break;
-
-                  default:
-                    if (line[attrI]) { productValidation[attribute].value = line[attrI]; }
-                    break;
-                }
-
-                if (validate && !validate(productValidation[attribute].value)) {
-                  const err = ErrorMessages[attribute];
-
-                  if (err) {
-                    handleModalMessage(true, {
-                      type: 'error',
-                      title: err.title,
-                      message: [err.message.replace('%s', line[3]).replace('%d', (i + 1).toString())],
-                    });
-                  }
-
-                  setError(true);
-
-                  return;
-                }
-              }
-
-              if (productValidation.image.value.length < 2) {
-                const err = ErrorMessages.image;
-
-                handleModalMessage(true, {
-                  type: 'error',
-                  title: err.title,
-                  message: [err.message.replace('%s', line[3]).replace('%d', (i + 1).toString())],
-                });
-
-                setError(true);
-
-                return;
-              }
-
-              if (stop) { return; }
-
-              importedProducts.push(productValidation);
-            }
-          });
-
-          if (count === 0) {
-            handleModalMessage(true, {
-              type: 'error',
-              title: 'Nenhum produto encontrado',
-              message: ['A planilha selecionada não possui nenhum registro válido'],
-            });
-
-            setImports([]);
-            return;
-          }
-
-          importProducts(importedProducts);
-        }
-      };
-
-      reader.readAsArrayBuffer(file);
-    });
-  }, [setLoading, files, importProducts, handleModalMessage]);
-
   const handleModalVisibility = useCallback(() => {
     handleModalMessage(false);
-  }, [handleModalMessage]);
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -650,6 +498,7 @@ function Import() {
       id: '2',
       name: 'Internacional',
     }]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -687,28 +536,13 @@ function Import() {
           </div>
           <div className={styles.importPanel}>
             <FiUploadCloud />
-            <h3>Importar</h3>
+            <h3>Importar ou Alterar Produto(s)</h3>
             <p>Solte ou clique na caixa abaixo para realizar o upload</p>
             <p className={styles.smallText}>São aceitas planilhas no formato *.xlsx, *.xls e *.csv com tamanho de até 10MB</p>
             <Form
               ref={formRef}
               onSubmit={async () => {
                 await handleImport();
-              }}
-            >
-              <Importzone name="import" onFileUploaded={handleFileUpload} />
-              <button type="submit">Importar Planilha</button>
-            </Form>
-          </div>
-          <div className={styles.importPanel}>
-            <FiUploadCloud />
-            <h3>Alterar Produto(s)</h3>
-            <p>Solte ou clique na caixa abaixo para realizar o upload</p>
-            <p className={styles.smallText}>São aceitas planilhas no formato *.xlsx, *.xls e *.csv com tamanho de até 10MB</p>
-            <Form
-              ref={formRef}
-              onSubmit={async () => {
-                await handleAlteracao();
               }}
             >
               <Importzone name="import" onFileUploaded={handleFileUpload} />
@@ -765,6 +599,6 @@ function Import() {
       }
     </>
   );
-}
+};
 
 export default Import;

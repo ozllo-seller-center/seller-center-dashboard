@@ -87,7 +87,20 @@ const Sells: React.FC = () => {
         shop_id: user.shopInfo._id,
       },
     }).then((response) => {
-      setOrders(response.data as OrderParent[]);
+      const ords: OrderParent[] = response.data;
+
+      ords.forEach((order) => {
+        const products = order.order.products;
+
+        products.push(products[0]);
+        products.push(products[0]);
+      });
+
+      setOrders(ords);
+
+      console.log(ords);
+
+      // setOrders(response.data as OrderParent[]);
 
       setLoading(false);
     }).catch((err) => {
@@ -258,6 +271,9 @@ const Sells: React.FC = () => {
 
   return (
     <div className={styles.sellsContainer}>
+      <span className={styles.aviso}> Prazo de despacho 2 dias úteis </span>
+      <span className={styles.aviso}>Uso obrigatório da etiqueta de despacho da B2W, Mercado Livre e Shopee que chegará em seu email</span>
+      <br />
       <div className={styles.sellsHeader}>
         <BulletedButton
           onClick={() => setStatus(SellStatus.Todos)}
@@ -397,19 +413,15 @@ const Sells: React.FC = () => {
                   </td>
                   <td id={styles.itemsCell}>
                     {
-                      item.order.products.map((product, j) => (i < 2 && <p key={product.idProduct}>{product.name}</p>))
+                      item.order.products.map((product, j) => (j <= 2 && <p key={product.idProduct}>{product.name}</p>))
                     }
                     {
-                      item.order.products.length > 2 && (
+                      item.order.products.length > 3 && (
                         <Collapsible totalItems={item.order.products.length} toggleRef={collapsibleRefs ? collapsibleRefs[i] : undefined}>
                             {
-                              item.order.products.map((product, j) => {
-                                if (j < 2) return null;
-
-                                return (
-                                  <p key={product.idProduct}>{product.name}</p>
-                                );
-                              })
+                              item.order.products.map((product) => (
+                                <p key={product.idProduct}>{product.name}</p>
+                              ))
                             }
                         </Collapsible>
                       )
