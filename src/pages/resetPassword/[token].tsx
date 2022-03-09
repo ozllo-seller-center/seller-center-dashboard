@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useEffect, useRef, useState,
+  useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { useRouter } from 'next/router';
 import * as Yup from 'yup';
@@ -143,6 +143,46 @@ const ResetPassword: React.FC = () => {
     if (successfull) { router.push('/'); }
   }, [router, successfull]);
 
+  const lengthStyle = useMemo(() => {
+    if (passwordCheck === '') { return styles.empty; }
+
+    if (passwordCheck.length >= 8) { return styles.check; }
+
+    return styles.error;
+  }, [passwordCheck]);
+
+  const lowerCaseStyle = useMemo(() => {
+    if (passwordCheck === '') { return styles.empty; }
+
+    if (/[a-z]/.test(passwordCheck)) { return styles.check; }
+
+    return styles.error;
+  }, [passwordCheck]);
+
+  const upperCaseStyle = useMemo(() => {
+    if (passwordCheck === '') { return styles.empty; }
+
+    if (/[A-Z]/.test(passwordCheck)) { return styles.check; }
+
+    return styles.error;
+  }, [passwordCheck]);
+
+  const numberStyle = useMemo(() => {
+    if (passwordCheck === '') { return styles.empty; }
+
+    if (/[0-9]/.test(passwordCheck)) { return styles.check; }
+
+    return styles.error;
+  }, [passwordCheck]);
+
+  const specialCharStyle = useMemo(() => {
+    if (passwordCheck === '') { return styles.empty; }
+
+    if (/[!@#$%^&*]/.test(passwordCheck)) { return styles.check; }
+
+    return styles.error;
+  }, [passwordCheck]);
+
   return (
     <div className={styles.container}>
       {
@@ -200,48 +240,50 @@ const ResetPassword: React.FC = () => {
                       A senha deve cumprir os seguintes critérios
                     </span>
                     <div>
-                      {
-                        passwordCheck === ''
-                          ? <VscCircleFilled className={styles.empty} />
-                          : passwordCheck.length >= 8 ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
-                      }
-                      <span className={passwordCheck === '' ? styles.empty : passwordCheck.length >= 8 ? styles.check : styles.error}>
+                      {passwordCheck === '' && <VscCircleFilled className={styles.empty} />}
+                      {passwordCheck.length >= 8 && <FiCheck className={styles.check} />}
+                      {(passwordCheck !== '' && passwordCheck.length < 8) && <FiX className={styles.error} />}
+                      <span className={lengthStyle}>
                         A senha deve conter pelo menos 8 caractéres
                       </span>
 
                       {
                         passwordCheck === ''
-                          ? <VscCircleFilled className={styles.empty} />
-                          : (/[a-z]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                          && <VscCircleFilled className={styles.empty} />
                       }
-                      <span className={passwordCheck === '' ? styles.empty : (/[a-z]/.test(passwordCheck)) ? styles.check : styles.error}>
+                      {(/[a-z]/.test(passwordCheck)) && <FiCheck className={styles.check} />}
+                      {(passwordCheck !== '' && (/[a-z]/.test(passwordCheck))) && <FiX className={styles.error} />}
+                      <span className={lowerCaseStyle}>
                         Deve conter pelo menos uma letra minúscula
                       </span>
 
                       {
                         passwordCheck === ''
-                          ? <VscCircleFilled className={styles.empty} />
-                          : (/[A-Z]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                          && <VscCircleFilled className={styles.empty} />
                       }
-                      <span className={passwordCheck === '' ? styles.empty : (/[A-Z]/.test(passwordCheck)) ? styles.check : styles.error}>
+                      {(/[A-Z]/.test(passwordCheck)) && <FiCheck className={styles.check} />}
+                      {(passwordCheck !== '' && (/[A-Z]/.test(passwordCheck))) && <FiX className={styles.error} />}
+                      <span className={upperCaseStyle}>
                         Deve conter pelo menos uma letra maiúscula
                       </span>
 
                       {
                         passwordCheck === ''
-                          ? <VscCircleFilled className={styles.empty} />
-                          : (/[0-9]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                          && <VscCircleFilled className={styles.empty} />
                       }
-                      <span className={passwordCheck === '' ? styles.empty : (/[0-9]/.test(passwordCheck)) ? styles.check : styles.error}>
+                      {(/[0-9]/.test(passwordCheck)) && <FiCheck className={styles.check} />}
+                      {(passwordCheck !== '' && (/[0-9]/.test(passwordCheck))) && <FiX className={styles.error} />}
+                      <span className={numberStyle}>
                         Deve conter pelo menos um digito numérico
                       </span>
 
                       {
                         passwordCheck === ''
-                          ? <VscCircleFilled className={styles.empty} />
-                          : (/[!@#$%^&*]/.test(passwordCheck)) ? <FiCheck className={styles.check} /> : <FiX className={styles.error} />
+                          && <VscCircleFilled className={styles.empty} />
                       }
-                      <span className={passwordCheck === '' ? styles.empty : (/[!@#$%^&*]/.test(passwordCheck)) ? styles.check : styles.error}>
+                      {(/[!@#$%^&*]/.test(passwordCheck)) && <FiCheck className={styles.check} />}
+                      {(passwordCheck !== '' && (/[!@#$%^&*]/.test(passwordCheck))) && <FiX className={styles.error} />}
+                      <span className={specialCharStyle}>
                         Deve conter pelo menos um caractére especial
                       </span>
 

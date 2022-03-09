@@ -4,6 +4,7 @@ import React, {
   useRef,
   useState,
   useCallback,
+  useMemo,
 } from 'react';
 
 import { useField } from '@unform/core';
@@ -20,7 +21,6 @@ interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
 const TextArea: React.FC<TextAreaProps> = ({
   name,
   label,
-  containerStyle = {},
   disabled,
   ...rest
 }) => {
@@ -49,10 +49,19 @@ const TextArea: React.FC<TextAreaProps> = ({
     });
   }, [fieldName, registerField]);
 
+  const containerStyle = useMemo(() => {
+    if (disabled) { return styles.containerDisabled; }
+    if (error) { return styles.containerError; }
+    if (isFocused) { return styles.containerFocused; }
+    if (isFilled) { return styles.containerFilled; }
+
+    return styles.container;
+  }, [disabled, error, isFilled, isFocused]);
+
   return (
     <div className={styles.parent}>
       <div
-        className={disabled ? styles.containerDisabled : error ? styles.containerError : isFocused ? styles.containerFocused : isFilled ? styles.containerFilled : styles.container}
+        className={containerStyle}
       >
         <label className={styles.inputLabel}>{label}</label>
         <textarea

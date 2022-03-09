@@ -392,7 +392,7 @@ const Products: React.FC = () => {
                         setProducts={setProducts}
                         userInfo={{
                           token,
-                          shop_id: !user ? '' : user.shopInfo._id ? user.shopInfo._id : '',
+                          shop_id: (user && user.shopInfo._id) ? user.shopInfo._id : '',
                         }}
                         disabledActions={disabledActions}
                         setDisabledActions={setDisableActions}
