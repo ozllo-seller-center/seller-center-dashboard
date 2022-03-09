@@ -89,16 +89,7 @@ const Sells: React.FC = () => {
     }).then((response) => {
       const ords: OrderParent[] = response.data;
 
-      ords.forEach((order) => {
-        const products = order.order.products;
-
-        products.push(products[0]);
-        products.push(products[0]);
-      });
-
       setOrders(ords);
-
-      console.log(ords);
 
       // setOrders(response.data as OrderParent[]);
 
