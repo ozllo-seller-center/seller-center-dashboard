@@ -66,9 +66,45 @@
       font-weight: lighter;
     }
   }
-  .checkbox{
-    width: 30px;
-    height: 19px;
+
+  .checkboxDados{
+    appearance: none;
+    background-color: #fff;
+    margin: 0;
+    font: inherit;
+    color: var(--grafite);
+    width: 1.15em;
+    height: 1.15em;
+    border: 0.15em solid var(--grafite);
+    border-radius: 0.15em;
+    transform: translateY(-0.075em);
+
+    display: grid;
+    place-content: center;
+
+    &::before {
+      content: "";
+      width: 0.65rem;
+      height: 0.65rem;
+      transform: scale(0);
+      transition: 50ms transform;
+      box-shadow: inset 1rem 1rem var(--grafite);
+
+      transform-origin: center;
+      clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+
+      /* Windows High Contrast Mode */
+      background-color: CanvasText;
+    }
+
+    &:checked::before {
+      transform: scale(1);
+    }
+
+    &:focus {
+      outline: max(2px, 0.15rem) solid var(--grafite);
+      outline-offset: max(2px, 0.15rem);
+    }
   }
 }
 

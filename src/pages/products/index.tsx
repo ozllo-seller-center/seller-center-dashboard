@@ -5,13 +5,13 @@ import React, {
   useCallback, useEffect, useRef, useState,
 } from 'react';
 import {
-  FiCameraOff, FiCheck, FiEdit, FiSearch, FiX,
+  FiCheck, FiSearch, FiX,
 } from 'react-icons/fi';
 import Loader from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
 import ActionModal from 'src/components/ModalAction';
 import ProductTableItem from 'src/components/ProductTableItem';
-import { useAuth, User } from 'src/hooks/auth';
+import { useAuth } from 'src/hooks/auth';
 import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
 import api from 'src/services/api';
@@ -141,14 +141,15 @@ const Products: React.FC = () => {
     setIsDisabledAcoes(checked);
   }, [checked, items]);
 
-  const handleCheckboxChange = useCallback(async (id: any, position: number) => {
+  const handleCheckboxChange = useCallback(async (id: any) => {
     // const index = products.findIndex(product => product._id === id);
     // const updateProducts = [...products];
     // updateProducts[index].checked = !updateProducts[position].checked;
 
     const indexItem = items.findIndex((item) => item._id === id);
     const updateItems = [...items];
-    updateItems[indexItem].checked = !updateItems[position].checked;
+
+    updateItems[indexItem].checked = !updateItems[indexItem].checked;
 
     setChecked(updateItems.reduce((accumulator, item) => accumulator && item.checked, false));
 
@@ -322,103 +323,54 @@ const Products: React.FC = () => {
 
             </div>
           </div>
-        </div>
-        <div className={styles.tableContainer}>
-          {items.length > 0 ? (
-            <table className={styles.table}>
-              <thead className={styles.tableHeader}>
-                <tr>
-                  <th>
-                    <input
-                      className={styles.checkbox}
-                      type="checkbox"
-                      name="todos"
-                      value="todos"
-                      onChange={selectOrDeselectAllProducts}
-                      checked={checked}
-                      key={Math.random()}
-                    />
-                  </th>
-                  <th>Foto</th>
-                  <th>Nome do produto</th>
-                  <th>Marca</th>
-                  <th>SKU</th>
-                  <th>Valor</th>
-                  <th>Estoque</th>
-                  <th>Status</th>
-                  <th>Ação</th>
-                </tr>
-              </thead>
-              <tbody className={styles.tableBody}>
-                {items.map((item, i) => (
-                  <tr key={item._id}>
-                    <td>
+          <div className={styles.tableContainer}>
+            {items.length > 0 ? (
+              <table className={styles.table}>
+                <thead className={styles.tableHeader}>
+                  <tr>
+                    <th>
                       <input
-                        className={styles.checkboxDados}
+                        className={styles.checkbox}
                         type="checkbox"
-                        onChange={() => handleCheckboxChange(item._id, i)}
-                        checked={item.checked}
-                        key={item._id}
+                        name="todos"
+                        value="todos"
+                        onChange={selectOrDeselectAllProducts}
+                        checked={checked}
+                        key={Math.random()}
                       />
-                    </td>
-                    <td id={styles.imgCell}>
-                      {item.images ? <img src={item.images[0]} alt={item.name} /> : <FiCameraOff />}
-                    </td>
-                    <td id={styles.nameCell}>
-                      {item.name}
-                    </td>
-                    <td id={styles.nameCell}>
-                      {item.brand}
-                    </td>
-                    <td id={styles.nameCell}>
-                      {item.sku}
-                    </td>
-                    <td id={styles.valueCell}>
-                      {
-                          new Intl.NumberFormat('pt-BR', {
-                            style: 'currency',
-                            currency: 'BRL',
-                          }).format(item.price)
-                        }
-                    </td>
-                    <td className={item.stock <= 0 ? styles.redText : styles.nameCell}>
-                      {new Intl.NumberFormat('pt-BR').format(item.stock)}
-                    </td>
-                    <td>
-                      <ProductTableItem
-                        key={item._id}
-                        item={item}
-                        products={products}
-                        setProducts={setProducts}
-                        userInfo={{
-                          token,
-                          shop_id: (user && user.shopInfo._id) ? user.shopInfo._id : '',
-                        }}
-                        disabledActions={disabledActions}
-                        setDisabledActions={setDisableActions}
-                      />
-                    </td>
-                    <td id={styles.editCell}>
-                      <div onClick={() => {
-                        router.push({
-                          pathname: 'products/edit',
-                          query: {
-                            id: item._id,
-                          },
-                        });
-                      }}
-                      >
-                        <FiEdit />
-                        <span> Editar </span>
-                      </div>
-                    </td>
+                    </th>
+                    <th>Foto</th>
+                    <th>Nome do produto</th>
+                    <th>Marca</th>
+                    <th>SKU</th>
+                    <th>Valor</th>
+                    <th>Estoque</th>
+                    <th>Status</th>
+                    <th>Ação</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <span className={styles.emptyList}> Nenhum item foi encontrado </span>
-          )}
+                </thead>
+                <tbody className={styles.tableBody}>
+                  {items.map((item) => (
+                    <ProductTableItem
+                      key={item._id}
+                      item={item}
+                      products={products}
+                      setProducts={setProducts}
+                      userInfo={{
+                        token,
+                        shop_id: (user && user.shopInfo._id) ? user.shopInfo._id : '',
+                      }}
+                      handleCheckboxChange={handleCheckboxChange}
+                      disabledActions={disabledActions}
+                      setDisabledActions={setDisableActions}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <span className={styles.emptyList}> Nenhum item foi encontrado </span>
+            )}
+          </div>
         </div>
       </div>
       {
