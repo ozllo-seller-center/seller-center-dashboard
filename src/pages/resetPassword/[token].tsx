@@ -252,7 +252,7 @@ const ResetPassword: React.FC = () => {
                           && <VscCircleFilled className={styles.empty} />
                       }
                       {(/[a-z]/.test(passwordCheck)) && <FiCheck className={styles.check} />}
-                      {(passwordCheck !== '' && (/[a-z]/.test(passwordCheck))) && <FiX className={styles.error} />}
+                      {(passwordCheck !== '' && !(/[a-z]/.test(passwordCheck))) && <FiX className={styles.error} />}
                       <span className={lowerCaseStyle}>
                         Deve conter pelo menos uma letra minúscula
                       </span>
@@ -262,7 +262,7 @@ const ResetPassword: React.FC = () => {
                           && <VscCircleFilled className={styles.empty} />
                       }
                       {(/[A-Z]/.test(passwordCheck)) && <FiCheck className={styles.check} />}
-                      {(passwordCheck !== '' && (/[A-Z]/.test(passwordCheck))) && <FiX className={styles.error} />}
+                      {(passwordCheck !== '' && !(/[A-Z]/.test(passwordCheck))) && <FiX className={styles.error} />}
                       <span className={upperCaseStyle}>
                         Deve conter pelo menos uma letra maiúscula
                       </span>
@@ -272,7 +272,7 @@ const ResetPassword: React.FC = () => {
                           && <VscCircleFilled className={styles.empty} />
                       }
                       {(/[0-9]/.test(passwordCheck)) && <FiCheck className={styles.check} />}
-                      {(passwordCheck !== '' && (/[0-9]/.test(passwordCheck))) && <FiX className={styles.error} />}
+                      {(passwordCheck !== '' && !(/[0-9]/.test(passwordCheck))) && <FiX className={styles.error} />}
                       <span className={numberStyle}>
                         Deve conter pelo menos um digito numérico
                       </span>
@@ -282,14 +282,12 @@ const ResetPassword: React.FC = () => {
                           && <VscCircleFilled className={styles.empty} />
                       }
                       {(/[!@#$%^&*]/.test(passwordCheck)) && <FiCheck className={styles.check} />}
-                      {(passwordCheck !== '' && (/[!@#$%^&*]/.test(passwordCheck))) && <FiX className={styles.error} />}
+                      {(passwordCheck !== '' && !(/[!@#$%^&*]/.test(passwordCheck))) && <FiX className={styles.error} />}
                       <span className={specialCharStyle}>
                         Deve conter pelo menos um caractére especial
                       </span>
-
                     </div>
                   </div>
-
                 </div>
               </div>
 

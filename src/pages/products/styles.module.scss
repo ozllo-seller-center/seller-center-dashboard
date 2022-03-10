@@ -103,6 +103,7 @@
 
         .tableHeader {
           flex: 1;
+
           th {
             text-align: left;
             padding: 1rem 1rem;
@@ -111,7 +112,9 @@
           }
 
           th:first-child {
-            padding-left: 1rem;
+            // padding-left: 1rem;
+            align-items: center;
+            justify-self: center;
           }
         }
 
@@ -131,7 +134,7 @@
     float: left;
     display: flex;
     padding: 0 1rem;
-  
+
     button {
       margin-left: -12px;
       width: 62px;
@@ -143,9 +146,9 @@
       font-size: 0.75rem;
       color: var(--white);
       background-color: var(--grafite);
-  
+
       transition: color 0.5s, background-color 0.5s, font-weight 0.5s;
-  
+
       &:hover {
         color: var(--grafite);
         background-color: var(--yellow-300);
@@ -193,56 +196,6 @@
   .checkbox{
     width: 30px;
     height: 19px;
-    text-align: center;
-  }
-  .checkboxDados{
-    width: 30px;
-    height: 19px;
-    text-align: center;
-    margin-left: 16px;
-  }
-  #imgCell {
-    width: 10rem;
-    padding: 0 1rem;
-  
-    svg {
-      width: 1.5rem;
-      height: 1.5rem;
-    }
-  
-    img {
-      height: 6rem;
-      object-fit: fill;
-      // max-height: 5rem;
-    }
-  }
-  
-  #nameCell {
-    text-align: center;
-  }
-  
-  #valueCell {
-    width: 12rem;
-    text-align: center;
-  }
-  
-  #switchCell {
-    width: 3.5rem;
-    // display: flex;
-  
-    // justify-content: center;
-    // flex-direction: column;
-  
-    .switchSubtitle {
-      font-size: 0.8rem;
-      font-weight: lighter;
-    }
-    text-align: center;
-  }
-  
-  #editCell {
-    width: 8rem;
-    cursor: pointer;
     text-align: center;
   }
 }

@@ -1,7 +1,9 @@
 import { createTheme, MuiThemeProvider, Switch } from '@material-ui/core';
+import { useRouter } from 'next/router';
 import React, {
   useCallback, useEffect, useRef, useState,
 } from 'react';
+import { FiCameraOff, FiEdit } from 'react-icons/fi';
 import api from 'src/services/api';
 import { Product, ProductSummary } from 'src/shared/types/product';
 import styles from './styles.module.scss';
@@ -25,19 +27,22 @@ interface ProductItemProps {
   userInfo: {
     token: string,
     shop_id: string,
-  }
+  },
+  handleCheckboxChange: (id: any) => Promise<void>,
   disabledActions?: boolean,
   setDisabledActions?: Function,
 }
 
 const ProductTableItem: React.FC<ProductItemProps> = ({
-  item, products, setProducts, userInfo, disabledActions, setDisabledActions,
+  item, products, setProducts, userInfo, disabledActions, setDisabledActions, handleCheckboxChange,
 }) => {
   const [isAvailable, setIsAvailable] = useState(item.is_active);
 
   const itemRef = useRef<HTMLInputElement>(null);
 
   const [count, setCount] = useState(0);
+
+  const router = useRouter();
 
   useEffect(() => {
     const index = products.findIndex((product) => product._id === item._id);
@@ -114,23 +119,56 @@ const ProductTableItem: React.FC<ProductItemProps> = ({
   }, [disabledActions, isAvailable, userInfo.token, userInfo.shop_id, item]);
 
   return (
-    <div id={styles.switchCell}>
-      <MuiThemeProvider theme={theme}>
-        <Switch
-          inputRef={itemRef}
-          checked={item.is_active}
-          onClick={() => {
-            handleAvailability(item._id);
+    <tr key={item._id} className={styles.tableItem}>
+      <td>
+        <input
+          className={styles.checkboxDados}
+          type="checkbox"
+          onChange={() => handleCheckboxChange(item._id)}
+          checked={item.checked}
+          key={item._id}
+        />
+      </td>
+      <td id={styles.imgCell}>
+        {item.images ? <img src={item.images[0]} alt={item.name} /> : <FiCameraOff />}
+      </td>
+      <td id={styles.nameCell}>
+        {item.name}
+      </td>
+      <td id={styles.nameCell}>
+        {item.brand}
+      </td>
+      <td id={styles.nameCell}>
+        {item.sku}
+      </td>
+      <td id={styles.valueCell}>
+        {
+          new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+          }).format(item.price)
+        }
+      </td>
+      <td className={item.stock <= 0 ? styles.redText : styles.nameCell}>
+        {new Intl.NumberFormat('pt-BR').format(item.stock)}
+      </td>
+      <td id={styles.switchCell}>
+        <MuiThemeProvider theme={theme}>
+          <Switch
+            inputRef={itemRef}
+            checked={item.is_active}
+            onClick={() => {
+              handleAvailability(item._id);
 
-            if (!disabledActions && !!setDisabledActions) {
-              setDisabledActions(true);
+              if (!disabledActions && !!setDisabledActions) {
+                setDisabledActions(true);
 
-              setTimeout(() => {
-                setDisabledActions(false);
-              }, 1500);
-            }
-          }}
-          classes={
+                setTimeout(() => {
+                  setDisabledActions(false);
+                }, 1500);
+              }
+            }}
+            classes={
             disabledActions
               ? {
                 root: switchStyles.root,
@@ -145,10 +183,25 @@ const ProductTableItem: React.FC<ProductItemProps> = ({
                 checked: switchStyles.checked,
               }
           }
-        />
-      </MuiThemeProvider>
-      <span className={styles.switchSubtitle}>{isAvailable ? 'Ativado' : 'Desativado'}</span>
-    </div>
+          />
+        </MuiThemeProvider>
+        <span className={styles.switchSubtitle}>{isAvailable ? 'Ativado' : 'Desativado'}</span>
+      </td>
+      <td id={styles.editCell}>
+        <div onClick={() => {
+          router.push({
+            pathname: 'products/edit',
+            query: {
+              id: item._id,
+            },
+          });
+        }}
+        >
+          <FiEdit />
+          <span> Editar </span>
+        </div>
+      </td>
+    </tr>
   );
 };
 
