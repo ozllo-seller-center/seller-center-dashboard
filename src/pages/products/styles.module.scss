@@ -23,7 +23,7 @@
       display: flex;
       flex-direction: row;
 
-      button + button {
+      button+button {
         margin-left: 2rem;
       }
     }
@@ -51,7 +51,7 @@
       .orderStatusButtons {
         margin-right: 2.25rem;
 
-        > div + div {
+        >div+div {
           margin-top: 1rem;
         }
       }
@@ -67,7 +67,7 @@
 
         align-items: center;
 
-        button + button {
+        button+button {
           margin-left: 1rem;
         }
 
@@ -97,7 +97,7 @@
 
         border: 1px solid var(--yellow-300);
         border-radius: 4px;
-        box-shadow: 0 2px 3px rgba(0,0,0,0.09), 0 6px 6px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 3px rgba(0, 0, 0, 0.09), 0 6px 6px rgba(0, 0, 0, 0.05);
 
         margin-top: 0.5rem;
 
@@ -127,6 +127,7 @@
       }
     }
   }
+
   .panelFooter {
     margin-left: -20px;
     flex: 1;
@@ -155,6 +156,7 @@
         font-weight: bold;
       }
     }
+
     .selectOption {
       margin: 0.25rem;
       border-radius: 24px !important;
@@ -184,7 +186,7 @@
         background: #FFFFFF;
         border: none;
         border-radius: 4px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.15), 0 0 6px rgba(0,0,0,0.20);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15), 0 0 6px rgba(0, 0, 0, 0.20);
 
         outline: 0;
 
@@ -193,7 +195,8 @@
       }
     }
   }
-  .checkbox{
+
+  .checkbox {
     width: 30px;
     height: 19px;
     text-align: center;
@@ -262,7 +265,7 @@
     color: var(--grafite);
   }
 
-  > svg {
+  >svg {
     width: 5rem;
     height: 5rem;
 

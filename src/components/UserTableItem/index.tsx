@@ -1,8 +1,6 @@
 import { createTheme, MuiThemeProvider, Switch } from '@material-ui/core';
 import { useRouter } from 'next/router';
-import React, {
-  useCallback, useEffect, useRef, useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FiLogIn } from 'react-icons/fi';
 import { useAuth } from 'src/hooks/auth';
 import { UserSummary } from 'src/shared/types/user';
@@ -20,17 +18,20 @@ const theme = createTheme({
 });
 
 interface UserItemProps {
-  users: UserSummary[],
-  setUsers: Function,
-  item: UserSummary,
+  users: UserSummary[];
+  setUsers: React.Dispatch<any>;
+  item: UserSummary;
   adminInfo: {
-    adminEmail: string,
-    token: string
-  }
+    adminEmail: string;
+    token: string;
+  };
 }
 
 const UserTableItem: React.FC<UserItemProps> = ({
-  item, users, setUsers, adminInfo,
+  item,
+  users,
+  setUsers,
+  adminInfo,
 }) => {
   const [isActive, setIsActive] = useState(item.isActive);
 
@@ -41,7 +42,7 @@ const UserTableItem: React.FC<UserItemProps> = ({
   const router = useRouter();
 
   useEffect(() => {
-    const index = users.findIndex((user) => user._id === item._id);
+    const index = users.findIndex(user => user._id === item._id);
 
     const updateUsers = users;
 
@@ -62,23 +63,21 @@ const UserTableItem: React.FC<UserItemProps> = ({
 
   return (
     <tr className={styles.tableItem} key={item._id}>
-      <td id={styles.nameCell}>
-        {item.email}
-      </td>
+      <td id={styles.nameCell}>{item.email}</td>
 
       <td id={styles.switchCell}>
         <MuiThemeProvider theme={theme}>
-          <Switch
-            inputRef={itemRef}
-            checked={item.isActive}
-          />
+          <Switch inputRef={itemRef} checked={item.isActive} />
         </MuiThemeProvider>
-        <span className={styles.switchSubtitle}>{isActive ? 'Ativado' : 'Desativado'}</span>
+        <span className={styles.switchSubtitle}>
+          {isActive ? 'Ativado' : 'Desativado'}
+        </span>
       </td>
       <td id={styles.editCell}>
-        <div onClick={() => {
-          handleLogin(item._id);
-        }}
+        <div
+          onClick={() => {
+            handleLogin(item._id);
+          }}
         >
           <FiLogIn />
           <span> Logar </span>

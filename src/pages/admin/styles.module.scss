@@ -24,7 +24,7 @@
       display: flex;
       flex-direction: row;
 
-      button + button {
+      button+button {
         margin-left: 2rem;
       }
     }
@@ -54,7 +54,7 @@
       .orderStatusButtons {
         margin-right: 2.25rem;
 
-        > div + div {
+        >div+div {
           margin-top: 1rem;
         }
       }
@@ -71,7 +71,7 @@
 
         align-items: center;
 
-        button + button {
+        button+button {
           margin-left: 1rem;
         }
 
@@ -103,7 +103,7 @@
 
         border: 1px solid var(--yellow-300);
         border-radius: 4px;
-        box-shadow: 0 2px 3px rgba(0,0,0,0.09), 0 6px 6px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 3px rgba(0, 0, 0, 0.09), 0 6px 6px rgba(0, 0, 0, 0.05);
 
         margin-top: 0.5rem;
 
@@ -193,7 +193,7 @@
     color: var(--grafite);
   }
 
-  > svg {
+  >svg {
     width: 5rem;
     height: 5rem;
 

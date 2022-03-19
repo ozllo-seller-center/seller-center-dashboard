@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useRef, useState, useMemo,
-} from 'react';
+import React, { useCallback, useRef, useState, useMemo } from 'react';
 
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
@@ -27,11 +25,11 @@ import Button from '../../components/PrimaryButton';
 import MessageModal from '../../components/MessageModal';
 
 type SignUpFormData = {
-  name: string,
-  email: string,
-  password: string,
-  password_confirmation: string,
-}
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+};
 
 const SignUp: React.FC = () => {
   const { isLoading, setLoading } = useLoading();
@@ -63,9 +61,7 @@ const SignUp: React.FC = () => {
             .test(
               'email-validation',
               'Informe um e-mail válido',
-              (value) => (
-                !!value && isEmailValid(value)
-              ),
+              value => !!value && isEmailValid(value),
             ),
           password: Yup.string()
             .required('Senha obrigatória')
@@ -73,27 +69,23 @@ const SignUp: React.FC = () => {
             .test(
               'password-validation',
               'A senha não cumpre os critérios de segurança indicados abaixo',
-              (value) => (
-                !!value && isPasswordSecure(value)
-              ),
+              value => !!value && isPasswordSecure(value),
             ),
           password_confirmation: Yup.string()
             .required('Confirme sua senha')
             .test(
               'password-validation',
               ' ',
-              (value) => (
-                !!value && isPasswordSecure(value)
-              ),
+              value => !!value && isPasswordSecure(value),
             )
-            .oneOf([Yup.ref('password')], 'A confirmação deve ser igual a senha'),
+            .oneOf(
+              [Yup.ref('password')],
+              'A confirmação deve ser igual a senha',
+            ),
         });
         await schema.validate(data, { abortEarly: false });
 
-        const {
-          email,
-          password,
-        } = data;
+        const { email, password } = data;
 
         await api.post('/auth/create', { email, password });
 
@@ -101,7 +93,10 @@ const SignUp: React.FC = () => {
         setSuccessfull(true);
         setLoading(false);
         setTitle('Cadastro realizado com sucesso!');
-        setMessages(['Cheque seu e-mail para autenticar sua conta.', 'Caso a conta não seja autenticada em algumas horas, o cadastro será cancelado.']);
+        setMessages([
+          'Cheque seu e-mail para autenticar sua conta.',
+          'Caso a conta não seja autenticada em algumas horas, o cadastro será cancelado.',
+        ]);
       } catch (err: any) {
         setLoading(false);
 
@@ -114,7 +109,11 @@ const SignUp: React.FC = () => {
 
         // console.log(err.response.data)
 
-        if (err.response.data.errors.findIndex((er: AppError) => er.errorCode === 4) >= 0) {
+        if (
+          err.response.data.errors.findIndex(
+            (er: AppError) => er.errorCode === 4,
+          ) >= 0
+        ) {
           setModalVisibility(true);
           setSuccessfull(false);
           setTitle('Usuário já existe');
@@ -125,7 +124,9 @@ const SignUp: React.FC = () => {
         setModalVisibility(true);
         setSuccessfull(false);
         setTitle('Oops...');
-        setMessages(['Ocorreu um erro durante o cadastro, tente novamente em alguns instantes.']);
+        setMessages([
+          'Ocorreu um erro durante o cadastro, tente novamente em alguns instantes.',
+        ]);
         // addToast({
         //   type: 'error',
         //   title: 'Erro na atualização',
@@ -140,7 +141,9 @@ const SignUp: React.FC = () => {
   const handleModalVisibility = useCallback(() => {
     setModalVisibility(false);
 
-    if (successfull) { router.push('/'); }
+    if (successfull) {
+      router.push('/');
+    }
   }, [router, successfull]);
 
   // TODO: Implementar avatar no cadastro e perfil do usuário no back-end
@@ -159,41 +162,61 @@ const SignUp: React.FC = () => {
   // );
 
   const lengthStyle = useMemo(() => {
-    if (passwordCheck === '') { return styles.empty; }
+    if (passwordCheck === '') {
+      return styles.empty;
+    }
 
-    if (passwordCheck.length >= 8) { return styles.check; }
+    if (passwordCheck.length >= 8) {
+      return styles.check;
+    }
 
     return styles.error;
   }, [passwordCheck]);
 
   const lowerCaseStyle = useMemo(() => {
-    if (passwordCheck === '') { return styles.empty; }
+    if (passwordCheck === '') {
+      return styles.empty;
+    }
 
-    if (/[a-z]/.test(passwordCheck)) { return styles.check; }
+    if (/[a-z]/.test(passwordCheck)) {
+      return styles.check;
+    }
 
     return styles.error;
   }, [passwordCheck]);
 
   const upperCaseStyle = useMemo(() => {
-    if (passwordCheck === '') { return styles.empty; }
+    if (passwordCheck === '') {
+      return styles.empty;
+    }
 
-    if (/[A-Z]/.test(passwordCheck)) { return styles.check; }
+    if (/[A-Z]/.test(passwordCheck)) {
+      return styles.check;
+    }
 
     return styles.error;
   }, [passwordCheck]);
 
   const numberStyle = useMemo(() => {
-    if (passwordCheck === '') { return styles.empty; }
+    if (passwordCheck === '') {
+      return styles.empty;
+    }
 
-    if (/[0-9]/.test(passwordCheck)) { return styles.check; }
+    if (/[0-9]/.test(passwordCheck)) {
+      return styles.check;
+    }
 
     return styles.error;
   }, [passwordCheck]);
 
   const specialCharStyle = useMemo(() => {
-    if (passwordCheck === '') { return styles.empty; }
+    if (passwordCheck === '') {
+      return styles.empty;
+    }
 
-    if (/[!@#$%^&*]/.test(passwordCheck)) { return styles.check; }
+    if (/[!@#$%^&*]/.test(passwordCheck)) {
+      return styles.check;
+    }
 
     return styles.error;
   }, [passwordCheck]);
@@ -231,17 +254,13 @@ const SignUp: React.FC = () => {
             <div className={styles.personal}>
               <h3>Sua conta Ozllo</h3>
 
-              <Input
-                name="email"
-                placeholder="E-mail"
-                autoComplete="off"
-              />
+              <Input name="email" placeholder="E-mail" autoComplete="off" />
 
               <Input
                 name="password"
                 type="password"
                 placeholder="Senha"
-                onChange={(e) => {
+                onChange={e => {
                   setPasswordCheck(e.target.value);
                 }}
               />
@@ -253,94 +272,106 @@ const SignUp: React.FC = () => {
               />
 
               <div className={styles.passwordPanel}>
-                <span>
-                  A senha deve cumprir os seguintes critérios
-                </span>
+                <span>A senha deve cumprir os seguintes critérios</span>
                 <div>
-                  {
-                    passwordCheck === ''
-                      && <VscCircleFilled className={styles.empty} />
-                  }
-                  {passwordCheck.length >= 8 && <FiCheck className={styles.check} />}
-                  {(passwordCheck !== '' && passwordCheck.length < 8) && <FiX className={styles.error} />}
+                  {passwordCheck === '' && (
+                    <VscCircleFilled className={styles.empty} />
+                  )}
+                  {passwordCheck.length >= 8 && (
+                    <FiCheck className={styles.check} />
+                  )}
+                  {passwordCheck !== '' && passwordCheck.length < 8 && (
+                    <FiX className={styles.error} />
+                  )}
                   <span className={lengthStyle}>
                     A senha deve conter pelo menos 8 caractéres
                   </span>
 
-                  {
-                    passwordCheck === ''
-                      && <VscCircleFilled className={styles.empty} />
-                  }
-                  {(/[a-z]/.test(passwordCheck)) && <FiCheck className={styles.check} />}
-                  {(passwordCheck !== '' && !(/[a-z]/.test(passwordCheck))) && <FiX className={styles.error} />}
+                  {passwordCheck === '' && (
+                    <VscCircleFilled className={styles.empty} />
+                  )}
+                  {/[a-z]/.test(passwordCheck) && (
+                    <FiCheck className={styles.check} />
+                  )}
+                  {passwordCheck !== '' && !/[a-z]/.test(passwordCheck) && (
+                    <FiX className={styles.error} />
+                  )}
                   <span className={lowerCaseStyle}>
                     Deve conter pelo menos uma letra minúscula
                   </span>
 
-                  {
-                    passwordCheck === ''
-                      && <VscCircleFilled className={styles.empty} />
-                  }
-                  {(/[A-Z]/.test(passwordCheck)) && <FiCheck className={styles.check} />}
-                  {(passwordCheck !== '' && !(/[A-Z]/.test(passwordCheck))) && <FiX className={styles.error} />}
+                  {passwordCheck === '' && (
+                    <VscCircleFilled className={styles.empty} />
+                  )}
+                  {/[A-Z]/.test(passwordCheck) && (
+                    <FiCheck className={styles.check} />
+                  )}
+                  {passwordCheck !== '' && !/[A-Z]/.test(passwordCheck) && (
+                    <FiX className={styles.error} />
+                  )}
                   <span className={upperCaseStyle}>
                     Deve conter pelo menos uma letra maiúscula
                   </span>
 
-                  {
-                    passwordCheck === ''
-                      && <VscCircleFilled className={styles.empty} />
-                  }
-                  {(/[0-9]/.test(passwordCheck)) && <FiCheck className={styles.check} />}
-                  {(passwordCheck !== '' && !(/[0-9]/.test(passwordCheck))) && <FiX className={styles.error} />}
+                  {passwordCheck === '' && (
+                    <VscCircleFilled className={styles.empty} />
+                  )}
+                  {/[0-9]/.test(passwordCheck) && (
+                    <FiCheck className={styles.check} />
+                  )}
+                  {passwordCheck !== '' && !/[0-9]/.test(passwordCheck) && (
+                    <FiX className={styles.error} />
+                  )}
                   <span className={numberStyle}>
                     Deve conter pelo menos um digito numérico
                   </span>
 
-                  {
-                    passwordCheck === ''
-                      && <VscCircleFilled className={styles.empty} />
-                  }
-                  {(/[!@#$%^&*]/.test(passwordCheck)) && <FiCheck className={styles.check} />}
-                  {(passwordCheck !== '' && !(/[!@#$%^&*]/.test(passwordCheck))) && <FiX className={styles.error} />}
+                  {passwordCheck === '' && (
+                    <VscCircleFilled className={styles.empty} />
+                  )}
+                  {/[!@#$%^&*]/.test(passwordCheck) && (
+                    <FiCheck className={styles.check} />
+                  )}
+                  {passwordCheck !== '' &&
+                    !/[!@#$%^&*]/.test(passwordCheck) && (
+                      <FiX className={styles.error} />
+                    )}
                   <span className={specialCharStyle}>
                     Deve conter pelo menos um caractére especial
                   </span>
-
                 </div>
               </div>
-
             </div>
           </div>
 
-          <Button type="submit" customStyle={{ className: styles.saveButton }}>Cadastrar</Button>
-
+          <Button type="submit" customStyle={{ className: styles.saveButton }}>
+            Cadastrar
+          </Button>
         </Form>
       </div>
-      {
-        isLoading && (
-          <div className={styles.loadingContainer}>
-            <Loader />
+      {isLoading && (
+        <div className={styles.loadingContainer}>
+          <Loader />
+        </div>
+      )}
+      {isModalVisible && (
+        <MessageModal
+          handleVisibility={handleModalVisibility}
+          alterStyle={successfull}
+        >
+          <div className={styles.modalContent}>
+            {successfull ? (
+              <FiCheck style={{ color: 'var(--green-100)' }} />
+            ) : (
+              <FiX style={{ color: 'var(--red-100)' }} />
+            )}
+            <p>{title}</p>
+            {messages.map(message => (
+              <p key={message}> {message} </p>
+            ))}
           </div>
-        )
-      }
-      {
-        isModalVisible && (
-          <MessageModal handleVisibility={handleModalVisibility} alterStyle={successfull}>
-            <div className={styles.modalContent}>
-              {successfull ? <FiCheck style={{ color: 'var(--green-100)' }} /> : <FiX style={{ color: 'var(--red-100)' }} />}
-              <p>{title}</p>
-              {messages.map((message) => (
-                <p>
-                  {' '}
-                  {message}
-                  {' '}
-                </p>
-              ))}
-            </div>
-          </MessageModal>
-        )
-      }
+        </MessageModal>
+      )}
     </div>
   );
 };

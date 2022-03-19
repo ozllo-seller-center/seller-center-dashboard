@@ -3,6 +3,7 @@
     opacity: 0;
     padding: 0;
   }
+
   100% {
     opacity: 1;
     padding: 1rem;
@@ -18,7 +19,7 @@
 
   overflow-y: auto;
 
-  > div + div {
+  >div+div {
     margin-left: 1rem;
   }
 

@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useEffect, useRef, useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
@@ -23,12 +21,16 @@ import styles from './styles.module.scss';
 import Loader from '../Loader';
 
 interface NfeModalContentProps {
-  item: OrderParent
-  closeModal: Function
-  onNfeSent?: Function
+  item: OrderParent;
+  closeModal: () => void;
+  onNfeSent?: () => void;
 }
 
-const NfeModalContent: React.FC<NfeModalContentProps> = ({ item, onNfeSent, closeModal }) => {
+const NfeModalContent: React.FC<NfeModalContentProps> = ({
+  item,
+  onNfeSent,
+  closeModal,
+}) => {
   const formRef = useRef<FormHandles>(null);
 
   const [nfeFile, setNfeFile] = useState<File>();
@@ -43,69 +45,105 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({ item, onNfeSent, clos
   const { isLoading, setLoading } = useLoading();
 
   useEffect(() => {
-    api.get('/account/detail').then((response) => {
-      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id, userId: response.data.shopInfo.userId } });
-    }).catch(() => {
-      router.push('/');
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    api
+      .get('/account/detail')
+      .then(response => {
+        updateUser({
+          ...user,
+          shopInfo: {
+            ...user.shopInfo,
+            _id: response.data.shopInfo._id,
+            userId: response.data.shopInfo.userId,
+          },
+        });
+      })
+      .catch(() => {
+        router.push('/');
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSubmit = useCallback(async (data) => {
-    // var dataContainer = new FormData()
+  const handleSubmit = useCallback(
+    async data => {
+      // var dataContainer = new FormData()
 
-    // const blob = new Blob([nfeFile], { type: 'text/xml' })
+      // const blob = new Blob([nfeFile], { type: 'text/xml' })
 
-    // dataContainer.append("xml", blob, nfeFile.name)
+      // dataContainer.append("xml", blob, nfeFile.name)
 
-    const schema = Yup.object().shape({
-      key: Yup.string().required('Campo obrigatório').min(44, 'Deve conter 44 caracteres'),
-      series: Yup.string().required('Campo obrigatório'),
-      cfop: Yup.string().required('Campo obrigatório').min(4, 'Deve conter 4 caracteres'),
-      number: Yup.string().required('Campo obrigatório'),
-    });
-
-    try {
-      await schema.validate(data, { abortEarly: false });
-
-      delete data.nfe;
-
-      const nfe = {
-        ...data,
-        issuedDate: (!nfeData) ? isoDateHub2b(new Date().toISOString()) : nfeData.issueDate,
-      };
-
-      api.post(`/order/${item.order.reference.id}/invoice`, nfe, {
-        headers: {
-          authorization: token,
-          shop_id: user.shopInfo._id,
-        },
-      }).then(() => {
-        setLoading(false);
-
-        setSuccess(true);
-
-        if (onNfeSent) { onNfeSent(); }
-      }).catch(() => {
-        setLoading(false);
-        setSuccess(false);
-
-        handleModalMessage(true, { title: 'Erro', message: ['Erro ao enviar NF-e'], type: 'error' });
+      const schema = Yup.object().shape({
+        key: Yup.string()
+          .required('Campo obrigatório')
+          .min(44, 'Deve conter 44 caracteres'),
+        series: Yup.string().required('Campo obrigatório'),
+        cfop: Yup.string()
+          .required('Campo obrigatório')
+          .min(4, 'Deve conter 4 caracteres'),
+        number: Yup.string().required('Campo obrigatório'),
       });
-    } catch (err) {
-      setLoading(false);
 
-      if (err instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(err);
+      try {
+        await schema.validate(data, { abortEarly: false });
 
-        formRef.current?.setErrors(errors);
+        delete data.nfe;
 
-        return;
+        const nfe = {
+          ...data,
+          issuedDate: !nfeData
+            ? isoDateHub2b(new Date().toISOString())
+            : nfeData.issueDate,
+        };
+
+        api
+          .post(`/order/${item.order.reference.id}/invoice`, nfe, {
+            headers: {
+              authorization: token,
+              shop_id: user.shopInfo._id,
+            },
+          })
+          .then(() => {
+            setLoading(false);
+
+            setSuccess(true);
+
+            if (onNfeSent) {
+              onNfeSent();
+            }
+          })
+          .catch(() => {
+            setLoading(false);
+            setSuccess(false);
+
+            handleModalMessage(true, {
+              title: 'Erro',
+              message: ['Erro ao enviar NF-e'],
+              type: 'error',
+            });
+          });
+      } catch (err) {
+        setLoading(false);
+
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
+
+          formRef.current?.setErrors(errors);
+
+          return;
+        }
+
+        console.log(err);
       }
-
-      console.log(err);
-    }
-  }, [handleModalMessage, item.order.reference.id, nfeData, onNfeSent, setLoading, token, user.shopInfo._id]);
+    },
+    [
+      handleModalMessage,
+      item.order.reference.id,
+      nfeData,
+      onNfeSent,
+      setLoading,
+      token,
+      user.shopInfo._id,
+    ],
+  );
 
   return (
     <div>
@@ -148,35 +186,43 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({ item, onNfeSent, clos
             />
           </div>
           <div className={styles.divider} />
-          <span className={styles.nfeTip}>Anexe a NF-e abaixo para preencher os campos automaticamente</span>
+          <span className={styles.nfeTip}>
+            Anexe a NF-e abaixo para preencher os campos automaticamente
+          </span>
           <NfeDropzone
             name="nfe"
             onFileUploaded={async (file: File) => {
               setLoading(true);
 
-              const xml = await file.text().then((data) => data);
+              const xml = await file.text().then(data => data);
 
               const nfeFromFile = {} as OrderNFe;
 
               const parser = new xml2js.Parser();
 
-              const res = await parser.parseStringPromise(xml).then((result: any) => {
-                const read = result.nfeProc;
+              const res = await parser
+                .parseStringPromise(xml)
+                .then((result: any) => {
+                  const read = result.nfeProc;
 
-                nfeFromFile.key = read.protNFe[0].infProt[0].chNFe;
-                nfeFromFile.series = read.NFe[0].infNFe[0].$.versao;
-                nfeFromFile.cfop = read.NFe[0].infNFe[0].det[0].prod[0].CFOP[0];
-                nfeFromFile.number = read.NFe[0].infNFe[0].ide[0].cNF[0];
-                nfeFromFile.issueDate = isoDateHub2b(read.NFe[0].infNFe[0].ide[0].dhEmi[0]);
+                  nfeFromFile.key = read.protNFe[0].infProt[0].chNFe;
+                  nfeFromFile.series = read.NFe[0].infNFe[0].$.versao;
+                  nfeFromFile.cfop =
+                    read.NFe[0].infNFe[0].det[0].prod[0].CFOP[0];
+                  nfeFromFile.number = read.NFe[0].infNFe[0].ide[0].cNF[0];
+                  nfeFromFile.issueDate = isoDateHub2b(
+                    read.NFe[0].infNFe[0].ide[0].dhEmi[0],
+                  );
 
-                return true;
-              }).catch((err) => {
-                // Failed
+                  return true;
+                })
+                .catch(err => {
+                  // Failed
 
-                console.log(err);
+                  console.log(err);
 
-                return false;
-              });
+                  return false;
+                });
 
               if (nfeFromFile) {
                 setNfeFile(file);
@@ -195,7 +241,9 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({ item, onNfeSent, clos
             }}
           />
 
-          <button type="submit" className={styles.button}>Confirmar</button>
+          <button type="submit" className={styles.button}>
+            Confirmar
+          </button>
         </Form>
       ) : (
         <div className={styles.sucessParent}>
@@ -203,13 +251,11 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({ item, onNfeSent, clos
           <span>NF-e enviada com sucesso!</span>
         </div>
       )}
-      {
-        isLoading && (
-          <div className={styles.loadingContainer}>
-            <Loader />
-          </div>
-        )
-      }
+      {isLoading && (
+        <div className={styles.loadingContainer}>
+          <Loader />
+        </div>
+      )}
     </div>
   );
 };

@@ -27,9 +27,7 @@ const HintedInput: React.FC<InputProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
-  const {
-    fieldName, defaultValue, error, registerField,
-  } = useField(name);
+  const { fieldName, defaultValue, error, registerField } = useField(name);
 
   const handleInputFocused = useCallback(() => {
     setIsFocused(true);
@@ -50,13 +48,21 @@ const HintedInput: React.FC<InputProps> = ({
   }, [fieldName, registerField]);
 
   const containerStyle = useMemo(() => {
-    if (disabled) { return styles.containerDisabled; }
+    if (disabled) {
+      return styles.containerDisabled;
+    }
 
-    if (error) { return styles.containerError; }
+    if (error) {
+      return styles.containerError;
+    }
 
-    if (isFocused) { return styles.containerFocused; }
+    if (isFocused) {
+      return styles.containerFocused;
+    }
 
-    if (isFilled) { return styles.containerFilled; }
+    if (isFilled) {
+      return styles.containerFilled;
+    }
 
     return styles.container;
   }, [disabled, error, isFilled, isFocused]);
@@ -79,11 +85,7 @@ const HintedInput: React.FC<InputProps> = ({
           {hint}
         </div>
       </div>
-      {error && (
-        <p className={styles.error}>
-          {error}
-        </p>
-      )}
+      {error && <p className={styles.error}>{error}</p>}
     </div>
   );
 };

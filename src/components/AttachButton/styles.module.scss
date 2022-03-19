@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
 
-  > button {
+  >button {
     flex: 1;
     display: flex;
 
@@ -19,12 +19,12 @@
 
     transition: background-color 0.2s;
 
-    > span {
+    >span {
       flex: 1;
       text-align: center;
     }
 
-    > svg {
+    >svg {
       color: var(--gray-400);
       background-color: var(--white);
       border-radius: 50%;
@@ -38,7 +38,7 @@
     &:hover {
       background-color: var(--gray-200);
 
-      > svg {
+      >svg {
         color: var(--grafite);
       }
     }

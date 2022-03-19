@@ -8,17 +8,18 @@ type UserTypeButtonProps = HTMLAttributes<HTMLDivElement> & {
   title: string;
   subtitle: string;
   icon: IconType;
-}
+};
 
 const UserTypeButton: React.FC<UserTypeButtonProps> = ({
-  title, subtitle, icon: Icon, onClick,
+  title,
+  subtitle,
+  icon: Icon,
+  onClick,
 }) => (
   <div onClick={onClick} className={styles.container}>
     <Icon />
     <span className={styles.title}>{title}</span>
-    <p>
-      {subtitle}
-    </p>
+    <p>{subtitle}</p>
 
     {/* <div className={styles.link} onClick={onClick}>
         <a>Ver mais</a>

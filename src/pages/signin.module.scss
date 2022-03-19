@@ -5,6 +5,7 @@
     opacity: 0;
     transform: translateX(-20rem);
   }
+
   100% {
     opacity: 1;
     transform: translateX(0);
@@ -15,6 +16,7 @@
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
     color: transparent;
@@ -26,6 +28,7 @@
   0% {
     background-color: var(--grafite);
   }
+
   50%,
   100% {
     background-color: var(--grey-300);
@@ -49,7 +52,8 @@
   margin-bottom: .5rem;
 }
 
-.dotFlashing::before, .dotFlashing::after {
+.dotFlashing::before,
+.dotFlashing::after {
   content: '';
   display: inline-block;
   position: absolute;
@@ -114,7 +118,7 @@
     margin-bottom: 5rem;
   }
 
-  > a {
+  >a {
     font-size: 1.2rem;
     color: var(--yellow-300);
     margin-top: 2rem;

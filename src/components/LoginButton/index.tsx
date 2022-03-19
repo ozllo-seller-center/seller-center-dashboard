@@ -5,7 +5,10 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const Button: React.FC<ButtonProps> = ({
-  children, className, loading, ...rest
+  children,
+  className,
+  loading,
+  ...rest
 }) => (
   <button type="button" className={className} {...rest}>
     {loading ? 'Carregando...' : children}

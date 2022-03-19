@@ -1,6 +1,11 @@
 import { useField } from '@unform/core';
 import React, {
-  InputHTMLAttributes, useCallback, useEffect, useMemo, useRef, useState,
+  InputHTMLAttributes,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from 'react';
 
 // import '../DatePickerInput/datepickerstyles.module.css';
@@ -15,12 +20,19 @@ interface InputRefProps extends InputHTMLAttributes<HTMLInputElement> {
   inputRef?: React.RefObject<any>;
   name: string;
   defaultValue?: any;
-  setIsFocused: Function;
-  setIsFilled: Function;
+  setIsFocused: React.Dispatch<any>;
+  setIsFilled: React.Dispatch<any>;
 }
 
 const InputDefault: React.FC<InputRefProps> = ({
-  inputRef, name, placeholder, disabled, defaultValue, setIsFocused, setIsFilled, ...rest
+  inputRef,
+  name,
+  placeholder,
+  disabled,
+  defaultValue,
+  setIsFocused,
+  setIsFilled,
+  ...rest
 }) => {
   const handleInputFocused = useCallback(() => {
     setIsFocused(true);
@@ -55,9 +67,7 @@ const Input: React.FC<InputProps> = ({
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const {
-    fieldName, defaultValue, error, registerField,
-  } = useField(name);
+  const { fieldName, defaultValue, error, registerField } = useField(name);
 
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(!!defaultValue);
@@ -71,19 +81,25 @@ const Input: React.FC<InputProps> = ({
   }, [fieldName, registerField]);
 
   const containerStyle = useMemo(() => {
-    if (disabled) { return styles.containerDisabled; }
-    if (error) { return styles.containerError; }
-    if (isFocused) { return styles.containerFocused; }
-    if (isFilled) { return styles.containerFilled; }
+    if (disabled) {
+      return styles.containerDisabled;
+    }
+    if (error) {
+      return styles.containerError;
+    }
+    if (isFocused) {
+      return styles.containerFocused;
+    }
+    if (isFilled) {
+      return styles.containerFilled;
+    }
 
     return styles.container;
   }, [disabled, error, isFilled, isFocused]);
 
   return (
     <div>
-      <div
-        className={containerStyle}
-      >
+      <div className={containerStyle}>
         <InputDefault
           inputRef={inputRef}
           name={name}
@@ -95,11 +111,7 @@ const Input: React.FC<InputProps> = ({
           {...rest}
         />
       </div>
-      {error && (
-        <p className={styles.error}>
-          {error}
-        </p>
-      )}
+      {error && <p className={styles.error}>{error}</p>}
     </div>
   );
 };

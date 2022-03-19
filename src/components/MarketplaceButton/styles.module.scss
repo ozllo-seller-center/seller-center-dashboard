@@ -25,7 +25,7 @@
     height: 8rem;
   }
 
-  > img {
+  >img {
     width: 100%;
     object-fit: cover;
 
@@ -41,7 +41,7 @@
 
   &:hover {
 
-    > img {
+    >img {
       filter: grayscale(0);
       opacity: 1;
     }

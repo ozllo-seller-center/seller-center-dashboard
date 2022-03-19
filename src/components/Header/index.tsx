@@ -7,8 +7,8 @@ import ProfileButton from '../ProfileButton';
 import styles from './styles.module.scss';
 
 interface HeaderProps {
-  open: boolean
-  setOpen: Function
+  open: boolean;
+  setOpen: React.Dispatch<any>;
 }
 
 const Header: React.FC<HeaderProps> = ({ open, setOpen }) => {
@@ -22,13 +22,21 @@ const Header: React.FC<HeaderProps> = ({ open, setOpen }) => {
   useEffect(() => {
     if (router.pathname === '/' || router.pathname.includes('dashboard')) {
       setTitle('Bem-vindo(a)');
-      setDescription(<span>Essa é a sua área de controle de vendas da Ozllo</span>);
+      setDescription(
+        <span>Essa é a sua área de controle de vendas da Ozllo</span>,
+      );
       return;
     }
 
     if (router.pathname.includes('profile')) {
       setTitle('Perfil');
-      setDescription(isRegisterCompleted ? <span>As informações da sua conta Ozllo</span> : <span> Finalize seu cadastro para acessar a plataforma </span>);
+      setDescription(
+        isRegisterCompleted ? (
+          <span>As informações da sua conta Ozllo</span>
+        ) : (
+          <span> Finalize seu cadastro para acessar a plataforma </span>
+        ),
+      );
       return;
     }
 
@@ -48,11 +56,7 @@ const Header: React.FC<HeaderProps> = ({ open, setOpen }) => {
       setTitle('Cadastrar novo Produto');
       setDescription(
         <span>
-          Preencha
-          {' '}
-          <b>todos</b>
-          {' '}
-          os campos
+          Preencha <b>todos</b> os campos
         </span>,
       );
       return;
@@ -60,7 +64,9 @@ const Header: React.FC<HeaderProps> = ({ open, setOpen }) => {
 
     if (router.pathname.includes('marketplaces')) {
       setTitle('Marketplaces');
-      setDescription(<span>Clique em cada marketplace para acompanhar a sua loja</span>);
+      setDescription(
+        <span>Clique em cada marketplace para acompanhar a sua loja</span>,
+      );
       return;
     }
 
@@ -72,11 +78,15 @@ const Header: React.FC<HeaderProps> = ({ open, setOpen }) => {
 
     if (router.pathname.includes('integrations')) {
       setTitle('Integrações');
-      setDescription(<span>Integre suas informações a partir do seu ERP ou E-commerce</span>);
+      setDescription(
+        <span>Integre suas informações a partir do seu ERP ou E-commerce</span>,
+      );
     }
 
     setTitle('Produtos');
-    setDescription(<span>Adicione produtos manualmente ou através de um planilha</span>);
+    setDescription(
+      <span>Adicione produtos manualmente ou através de um planilha</span>,
+    );
   }, [isRegisterCompleted, router]);
 
   return (

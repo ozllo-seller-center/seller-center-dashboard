@@ -1,5 +1,9 @@
 import React, {
-  useCallback, useEffect, useMemo, useRef, useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from 'react';
 import { useRouter } from 'next/router';
 
@@ -7,9 +11,7 @@ import { FormHandles, Scope } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 
-import {
-  FiCheck, FiChevronLeft, FiInfo, FiX,
-} from 'react-icons/fi';
+import { FiCheck, FiChevronLeft, FiInfo, FiX } from 'react-icons/fi';
 
 import api from 'src/services/api';
 import { useAuth } from 'src/hooks/auth';
@@ -35,14 +37,14 @@ import Input from '../../../components/Input';
 import Button from '../../../components/PrimaryButton';
 
 type VariationDTO = {
-  _id?: string
-  size?: number | string,
-  stock?: number,
-  color?: string,
-  flavor?: string,
-  gluten_free?: boolean,
-  lactose_free?: boolean,
-}
+  _id?: string;
+  size?: number | string;
+  stock?: number;
+  color?: string;
+  flavor?: string;
+  gluten_free?: boolean;
+  lactose_free?: boolean;
+};
 
 export function EditProductForm() {
   const [files, setFiles] = useState<ProductImage[]>([]);
@@ -68,16 +70,20 @@ export function EditProductForm() {
 
   const router = useRouter();
 
-  const {
-    user, token, updateUser, signOut,
-  } = useAuth();
+  const { user, token, updateUser, signOut } = useAuth();
   const { isLoading, setLoading } = useLoading();
-  const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
+  const {
+    showModalMessage: showMessage,
+    modalMessage,
+    handleModalMessage,
+  } = useModalMessage();
 
   const [attributes, setAttributes] = useState<Attribute[]>([]);
 
   const hintRules = useMemo(() => {
-    if (isHintDisabled) { return []; }
+    if (isHintDisabled) {
+      return [];
+    }
 
     const rules = [
       { state: !brandInName, descr: 'Não deve conter o nome da marca' },
@@ -85,7 +91,9 @@ export function EditProductForm() {
       { descr: 'Use palavras chave' },
     ] as Rule[];
 
-    if (attributes.findIndex((attr) => attr.name === 'color') >= 0) { rules.splice(1, 0, { state: !colorInName, descr: 'Não deve conter cor' }); }
+    if (attributes.findIndex(attr => attr.name === 'color') >= 0) {
+      rules.splice(1, 0, { state: !colorInName, descr: 'Não deve conter cor' });
+    }
 
     return rules;
   }, [attributes, brandInName, colorInName, isHintDisabled]);
@@ -93,32 +101,38 @@ export function EditProductForm() {
   useEffect(() => {
     // setLoading(true)
 
-    api.get(`auth/token/${token}`).then((response) => {
-      const { isValid } = response.data;
+    api
+      .get(`auth/token/${token}`)
+      .then(response => {
+        const { isValid } = response.data;
 
-      if (!isValid) {
+        if (!isValid) {
+          signOut();
+          router.push('/');
+          return;
+        }
+
+        api
+          .get('/account/detail')
+          .then(resp => {
+            updateUser({
+              ...user,
+              shopInfo: {
+                ...user.shopInfo,
+                _id: resp.data.shopInfo._id,
+                userId: resp.data.shopInfo.userId,
+              },
+            });
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      })
+      .catch(() => {
         signOut();
         router.push('/');
-        return;
-      }
-
-      api.get('/account/detail').then((resp) => {
-        updateUser({
-          ...user,
-          shopInfo: {
-            ...user.shopInfo,
-            _id: resp.data.shopInfo._id,
-            userId: resp.data.shopInfo.userId,
-          },
-        });
-      }).catch((err) => {
-        console.log(err);
       });
-    }).catch(() => {
-      signOut();
-      router.push('/');
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -127,43 +141,57 @@ export function EditProductForm() {
 
       const { id } = router.query;
 
-      api.get(`/product/${id}`, {
-        headers: {
-          authorization: token,
-          shop_id: user.shopInfo._id,
-        },
-      }).then((response) => {
-        const urls = response.data.images.filter((url: string) => (!!url && url !== null));
-        setFilesUrl(urls);
+      api
+        .get(`/product/${id}`, {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          },
+        })
+        .then(response => {
+          const urls = response.data.images.filter(
+            (url: string) => !!url && url !== null,
+          );
+          setFilesUrl(urls);
 
-        const fs: ProductImage[] = urls.map((url: string) => ({
-          url,
-          uploaded: true,
-        } as ProductImage));
+          const fs: ProductImage[] = urls.map(
+            (url: string) =>
+              ({
+                url,
+                uploaded: true,
+              } as ProductImage),
+          );
 
-        setFiles(fs);
+          setFiles(fs);
 
-        setGenderRadio(response.data.gender);
+          // setGenderRadio(response.data.gender);
 
-        setVariations(response.data.variations);
-        setOldStock(response.data.variations.map((v: VariationDTO) => v.stock));
+          setVariations(response.data.variations);
+          setOldStock(
+            response.data.variations.map((v: VariationDTO) => v.stock),
+          );
 
-        setNationality(response.data.nationality);
-        setCategory(response.data.category);
-        setSubCategory(response.data.subcategory);
+          setNationality(response.data.nationality);
+          setCategory(response.data.category);
+          setSubCategory(response.data.subcategory);
 
-        formRef.current?.setData(response.data);
-        // setFormData(response.data)
+          formRef.current?.setData(response.data);
+          // setFormData(response.data)
 
-        setChanging(true);
+          setChanging(true);
 
-        setLoading(false);
-      }).catch((err) => {
-        console.log(err);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.log(err);
 
-        setLoading(false);
-        handleModalMessage(true, { title: 'Erro', message: ['Erro ao carregar o produto'], type: 'error' });
-      });
+          setLoading(false);
+          handleModalMessage(true, {
+            title: 'Erro',
+            message: ['Erro ao carregar o produto'],
+            type: 'error',
+          });
+        });
     }
   }, [user, formRef, token, setLoading, router.query, handleModalMessage]);
 
@@ -171,21 +199,24 @@ export function EditProductForm() {
     setLoading(true);
 
     if (category) {
-      api.get(`/category/${category}/attributes`).then((response) => {
-        setAttributes(response.data[0].attributes);
+      api
+        .get(`/category/${category}/attributes`)
+        .then(response => {
+          setAttributes(response.data[0].attributes);
 
-        response.data[0].attributes.map((attr: Attribute) => {
-          if (attr.name === 'flavor') {
-            setHintDisabled(true);
-          }
+          response.data[0].attributes.map((attr: Attribute) => {
+            if (attr.name === 'flavor') {
+              setHintDisabled(true);
+            }
+          });
+
+          setLoading(false);
+        })
+        .catch(err => {
+          console.log(err);
+
+          setLoading(false);
         });
-
-        setLoading(false);
-      }).catch((err) => {
-        console.log(err);
-
-        setLoading(false);
-      });
     }
   }, [category, setLoading]);
 
@@ -198,169 +229,233 @@ export function EditProductForm() {
     setTotalFields(10 + (attributes.length + 1));
   }, [variations, attributes]);
 
-  const setNameChecks = useCallback((name: string) => {
-    if (!name || name.length === 0 || !formRef.current?.getFieldValue('brand') || isHintDisabled) {
-      setBrandInName(false);
-      setColorInName(false);
-      return;
-    }
-
-    const brandCheck = matchingWords(name, formRef.current?.getFieldValue('brand'));
-
-    setBrandInName(brandCheck);
-
-    let colorCheck = false;
-
-    attributes.map(async (attr) => {
-      if (attr.name === 'color') {
-        attr.values?.map((color) => {
-          if (colorCheck) { return; }
-
-          colorCheck = matchingWords(name, color);
-        });
+  const setNameChecks = useCallback(
+    (name: string) => {
+      if (
+        !name ||
+        name.length === 0 ||
+        !formRef.current?.getFieldValue('brand') ||
+        isHintDisabled
+      ) {
+        setBrandInName(false);
+        setColorInName(false);
+        return;
       }
-    });
 
-    setColorInName(colorCheck);
+      const brandCheck = matchingWords(
+        name,
+        formRef.current?.getFieldValue('brand'),
+      );
 
-    if (brandCheck || colorCheck) {
-      formRef.current?.setFieldError('name', brandCheck ? 'Não insira a marca no nome do produto' : 'Não informe a cor no nome do produto');
-      return;
-    }
+      setBrandInName(brandCheck);
 
-    formRef.current?.setFieldError('name', '');
-  }, [attributes, isHintDisabled]);
+      let colorCheck = false;
+
+      attributes.map(async attr => {
+        if (attr.name === 'color') {
+          attr.values?.map(color => {
+            if (colorCheck) {
+              return;
+            }
+
+            colorCheck = matchingWords(name, color);
+          });
+        }
+      });
+
+      setColorInName(colorCheck);
+
+      if (brandCheck || colorCheck) {
+        formRef.current?.setFieldError(
+          'name',
+          brandCheck
+            ? 'Não insira a marca no nome do produto'
+            : 'Não informe a cor no nome do produto',
+        );
+        return;
+      }
+
+      formRef.current?.setFieldError('name', '');
+    },
+    [attributes, isHintDisabled],
+  );
 
   const handleModalVisibility = useCallback(() => {
     handleModalMessage(false);
   }, [handleModalMessage]);
 
-  const handleOnFileUpload = useCallback((acceptedFiles: File[], dropZoneRef: React.RefObject<any>) => {
-    const accepted = acceptedFiles.filter((f, i) => {
-      if (files.length + (i + 1) > 6) {
-        handleModalMessage(true, {
-          type: 'error',
-          title: 'Muitas fotos!',
-          message: ['Um produto pode ter no máximo 6 fotos'],
-        });
+  const handleOnFileUpload = useCallback(
+    (acceptedFiles: File[], dropZoneRef: React.RefObject<any>) => {
+      const accepted = acceptedFiles.filter((f, i) => {
+        if (files.length + (i + 1) > 6) {
+          handleModalMessage(true, {
+            type: 'error',
+            title: 'Muitas fotos!',
+            message: ['Um produto pode ter no máximo 6 fotos'],
+          });
 
-        return false;
+          return false;
+        }
+
+        return true;
+      });
+
+      const newFiles = accepted.map(
+        f =>
+          ({
+            file: f,
+          } as ProductImage),
+      );
+
+      setLoading(true);
+
+      const urls: string[] = [];
+      newFiles.forEach(f => {
+        if (f.file) {
+          f.uploaded = false;
+
+          const compressor = new Compressor(f.file, {
+            width: 1000,
+            height: 1000,
+            success(result) {
+              const url = URL.createObjectURL(result);
+
+              urls.push(url);
+
+              f.file = result as File;
+              f.url = url;
+
+              setLoading(false);
+            },
+            error(err) {
+              console.log(err.message);
+
+              setLoading(false);
+            },
+          });
+        }
+      });
+
+      dropZoneRef.current.acceptedFiles = [...files, ...newFiles].map(
+        f => f.url,
+      );
+
+      setFiles([...files, ...newFiles]);
+      setFilesUrl([...filesUrl, ...urls]);
+    },
+    [files, filesUrl, handleModalMessage, setLoading],
+  );
+
+  const handleDeleteFile = useCallback(
+    (url: string) => {
+      URL.revokeObjectURL(url);
+
+      const deletedIndex = files.findIndex(f => f.url === url);
+
+      const urlsUpdate = filesUrl.filter((f, i) => i !== deletedIndex);
+      const filesUpdate = files.filter((f, i) => i !== deletedIndex);
+
+      formRef.current?.setFieldValue('images', filesUpdate);
+
+      const drop = formRef.current?.getFieldRef('images');
+
+      if (drop) {
+        drop.value = '';
       }
 
-      return true;
-    });
+      setFilesUrl(urlsUpdate);
+      setFiles(filesUpdate);
+    },
+    [filesUrl, files],
+  );
 
-    const newFiles = accepted.map((f) => ({
-      file: f,
-    } as ProductImage));
-
-    setLoading(true);
-
-    const urls: string[] = [];
-    newFiles.forEach((f) => {
-      if (f.file) {
-        f.uploaded = false;
-
-        const compressor = new Compressor(f.file, {
-          width: 1000,
-          height: 1000,
-          success(result) {
-            const url = URL.createObjectURL(result);
-
-            urls.push(url);
-
-            f.file = result as File;
-            f.url = url;
-
-            setLoading(false);
-          },
-          error(err) {
-            console.log(err.message);
-
-            setLoading(false);
-          },
-        });
+  const handleFileOrder = useCallback(
+    (draggedFile: number, droppedAt: number) => {
+      if (draggedFile === droppedAt) {
+        return;
       }
-    });
 
-    dropZoneRef.current.acceptedFiles = [...files, ...newFiles].map((f) => f.url);
+      let newFiles = [...files];
 
-    setFiles([...files, ...newFiles]);
-    setFilesUrl([...filesUrl, ...urls]);
-  }, [files, filesUrl, handleModalMessage, setLoading]);
+      const auxFile = newFiles[draggedFile];
 
-  const handleDeleteFile = useCallback((url: string) => {
-    URL.revokeObjectURL(url);
+      newFiles = newFiles.filter((item, i) => i !== draggedFile);
 
-    const deletedIndex = files.findIndex((f) => f.url === url);
+      newFiles.splice(droppedAt, 0, auxFile);
 
-    const urlsUpdate = filesUrl.filter((f, i) => i !== deletedIndex);
-    const filesUpdate = files.filter((f, i) => i !== deletedIndex);
-
-    formRef.current?.setFieldValue('images', filesUpdate);
-
-    const drop = formRef.current?.getFieldRef('images');
-
-    if (drop) {
-      drop.value = '';
-    }
-
-    setFilesUrl(urlsUpdate);
-    setFiles(filesUpdate);
-  }, [filesUrl, files]);
-
-  const handleFileOrder = useCallback((draggedFile: number, droppedAt: number) => {
-    if (draggedFile === droppedAt) { return; }
-
-    let newFiles = [...files];
-
-    const auxFile = newFiles[draggedFile];
-
-    newFiles = newFiles.filter((item, i) => i !== draggedFile);
-
-    newFiles.splice(droppedAt, 0, auxFile);
-
-    setFiles([...newFiles]);
-  }, [files]);
+      setFiles([...newFiles]);
+    },
+    [files],
+  );
 
   const filledFields = useMemo(() => {
-    if (!formRef.current) { return 0; }
+    if (!formRef.current) {
+      return 0;
+    }
 
     const data = formRef.current?.getData() as Product;
 
-    if (!data) { return 0; }
+    if (!data) {
+      return 0;
+    }
 
     let filled = 0;
 
-    if (data.name) { filled += 1; }
+    if (data.name) {
+      filled += 1;
+    }
 
-    if (data.brand) { filled += 1; }
+    if (data.brand) {
+      filled += 1;
+    }
 
-    if (data.description) { filled += 1; }
+    if (data.description) {
+      filled += 1;
+    }
 
-    if (data.sku) { filled += 1; }
+    if (data.sku) {
+      filled += 1;
+    }
 
-    if (data.height) { filled += 1; }
+    if (data.height) {
+      filled += 1;
+    }
 
-    if (data.width) { filled += 1; }
+    if (data.width) {
+      filled += 1;
+    }
 
-    if (data.length) { filled += 1; }
+    if (data.length) {
+      filled += 1;
+    }
 
-    if (data.weight) { filled += 1; }
+    if (data.weight) {
+      filled += 1;
+    }
 
-    if (data.price) { filled += 1; }
+    if (data.price) {
+      filled += 1;
+    }
 
     if (files.length >= 2) {
       filled += 1;
     }
 
-    variations.forEach((variation) => {
-      if (variation.size) { filled += 1; }
-      if (variation.stock) { filled += 1; }
-      if (variation.color) { filled += 1; }
-      if (variation.flavor) { filled += 1; }
+    variations.forEach(variation => {
+      if (variation.size) {
+        filled += 1;
+      }
+      if (variation.stock) {
+        filled += 1;
+      }
+      if (variation.color) {
+        filled += 1;
+      }
+      if (variation.flavor) {
+        filled += 1;
+      }
 
-      attributes.forEach((attribute) => {
+      attributes.forEach(attribute => {
         switch (attribute.name) {
           case 'gluten_free':
             filled += 1;
@@ -379,142 +474,215 @@ export function EditProductForm() {
     return filled;
   }, [files, variations, attributes]);
 
-  const yupVariationSchema = useCallback((): object => (attributes.findIndex((attribute) => attribute.name === 'flavor') >= 0
-    ? {
-      variations: Yup.array().required().of(Yup.object().shape({
-        size: Yup.string().required('Campo obrigatório'),
-        flavor: Yup.string().required('Campo obrigatório'),
-        stock: Yup.number().typeError('Campo obrigatório').required('Campo obrigatório').min(0, 'Valor mínimo 0'),
-      })),
-    }
-    : {
-      variations: Yup.array().required().of(Yup.object().shape({
-        size: Yup.string().required('Campo obrigatório'),
-        color: Yup.string().required('Campo obrigatório'),
-        stock: Yup.number().typeError('Campo obrigatório').required('Campo obrigatório').min(0, 'Valor mínimo 0'),
-      })),
-    }), [attributes]);
-
-  const handleSubmit = useCallback(async (data) => {
-    if (filledFields < totalFields) {
-      handleModalMessage(true, { type: 'error', title: 'Formulário incompleto', message: ['Preencha todas as informações obrigatórias antes de continuar.'] });
-      return;
-    }
-
-    if (colorInName || brandInName) {
-      handleModalMessage(true, { type: 'error', title: 'Nome de produto inválido', message: [brandInName ? 'Remova a marca do nome do produto.' : 'Remova a cor do nome do produto.', 'Quando necessário o sistema adicionará essas informações ao nome do produto.'] });
-      return;
-    }
-
-    if (data.price_discounted === '') {
-      data.price_discounted = data.price;
-    }
-
-    try {
-      setLoading(true);
-      formRef.current?.setErrors({});
-
-      const schema = Yup.object().shape({
-        images: Yup.array().min(2, 'Escolha pelo menos duas imagens').max(8, 'Pode atribuir no máximo 8 imagens'),
-        name: Yup.string().required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres'),
-        description: Yup.string()
-          .required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres').max(1800, 'Deve conter no máximo 1800 caracteres'),
-        brand: Yup.string().required('Campo obrigatório').min(2, 'Deve conter pelo menos 2 caracteres'),
-        ean: Yup.string(),
-        sku: Yup.string().required('Campo obrigatório'),
-        height: Yup.number().min(10, 'Mínimo de 10cm'),
-        width: Yup.number().min(10, 'Mínimo de 10cm'),
-        length: Yup.number().min(10, 'Mínimo de 10cm'),
-        weight: Yup.number().required('Campo obrigatório'),
-        gender: Yup.string(),
-        price: Yup.number().required('Campo obrigatório'),
-        price_discounted: Yup.number().nullable().min(0, 'Valor mínimo de R$ 0').max(data.price, `Valor máximo de R$ ${data.price}`),
-        ...yupVariationSchema(),
-      });
-
-      await schema.validate(data, { abortEarly: false });
-
-      const {
-        id,
-      } = router.query;
-
-      const dataContainer = new FormData();
-
-      files.forEach((f, i) => (!!f.file && !f.uploaded) && dataContainer.append('images', f.file, f.file.name));
-
-      const oldImages = files.map((f) => {
-        if (!!f.url && f.uploaded) return f.url;
-      });
-
-      let newImages = await api.post('/product/upload', dataContainer, {
-        headers: {
-          authorization: token,
-          shop_id: user.shopInfo._id,
-        },
-      }).then((response) => response.data.urls as string[]);
-
-      if (oldImages) newImages = [...oldImages as string[], ...newImages];
-
-      await api.patch(`/product/${id}/images`, { images: newImages }, {
-        headers: {
-          authorization: token,
-          shop_id: user.shopInfo._id,
-        },
-      });
-
-      const {
-        name,
-        description,
-        brand,
-        ean,
-        sku,
-        gender,
-        height,
-        width,
-        length,
-        weight,
-        price,
-        price_discounted,
-        vars = data.variations,
-      } = data;
-
-      if (priceChanged) {
-        api.patch(`/product/${id}/price`, {
-          price,
-          price_discounted,
-        }, {
-          headers: {
-            authorization: token,
-            shop_id: user.shopInfo._id,
+  const yupVariationSchema = useCallback(
+    (): object =>
+      attributes.findIndex(attribute => attribute.name === 'flavor') >= 0
+        ? {
+            variations: Yup.array()
+              .required()
+              .of(
+                Yup.object().shape({
+                  size: Yup.string().required('Campo obrigatório'),
+                  flavor: Yup.string().required('Campo obrigatório'),
+                  stock: Yup.number()
+                    .typeError('Campo obrigatório')
+                    .required('Campo obrigatório')
+                    .min(0, 'Valor mínimo 0'),
+                }),
+              ),
+          }
+        : {
+            variations: Yup.array()
+              .required()
+              .of(
+                Yup.object().shape({
+                  size: Yup.string().required('Campo obrigatório'),
+                  color: Yup.string().required('Campo obrigatório'),
+                  stock: Yup.number()
+                    .typeError('Campo obrigatório')
+                    .required('Campo obrigatório')
+                    .min(0, 'Valor mínimo 0'),
+                }),
+              ),
           },
+    [attributes],
+  );
+
+  const handleSubmit = useCallback(
+    async data => {
+      if (filledFields < totalFields) {
+        handleModalMessage(true, {
+          type: 'error',
+          title: 'Formulário incompleto',
+          message: [
+            'Preencha todas as informações obrigatórias antes de continuar.',
+          ],
         });
+        return;
       }
 
-      const product = {
-        category,
-        subcategory: subCategory,
-        nationality,
-        name,
-        description,
-        brand,
-        ean,
-        sku,
-        gender,
-        height,
-        width,
-        length,
-        weight,
-        images: newImages,
-      };
+      if (colorInName || brandInName) {
+        handleModalMessage(true, {
+          type: 'error',
+          title: 'Nome de produto inválido',
+          message: [
+            brandInName
+              ? 'Remova a marca do nome do produto.'
+              : 'Remova a cor do nome do produto.',
+            'Quando necessário o sistema adicionará essas informações ao nome do produto.',
+          ],
+        });
+        return;
+      }
 
-      await vars.forEach(async (variation: VariationDTO, i: number) => {
-        if (!!variation._id && variation._id !== '') {
-          const variationId = variation._id;
+      if (data.price_discounted === '') {
+        data.price_discounted = data.price;
+      }
 
-          if (oldStock[i] !== variation.stock) {
-            api.patch(
+      try {
+        setLoading(true);
+        formRef.current?.setErrors({});
+
+        const schema = Yup.object().shape({
+          images: Yup.array()
+            .min(2, 'Escolha pelo menos duas imagens')
+            .max(8, 'Pode atribuir no máximo 8 imagens'),
+          name: Yup.string()
+            .required('Campo obrigatório')
+            .min(2, 'Deve conter pelo menos 2 caracteres'),
+          description: Yup.string()
+            .required('Campo obrigatório')
+            .min(2, 'Deve conter pelo menos 2 caracteres')
+            .max(1800, 'Deve conter no máximo 1800 caracteres'),
+          brand: Yup.string()
+            .required('Campo obrigatório')
+            .min(2, 'Deve conter pelo menos 2 caracteres'),
+          ean: Yup.string(),
+          sku: Yup.string().required('Campo obrigatório'),
+          height: Yup.number().min(10, 'Mínimo de 10cm'),
+          width: Yup.number().min(10, 'Mínimo de 10cm'),
+          length: Yup.number().min(10, 'Mínimo de 10cm'),
+          weight: Yup.number().required('Campo obrigatório'),
+          gender: Yup.string(),
+          price: Yup.number().required('Campo obrigatório'),
+          price_discounted: Yup.number()
+            .nullable()
+            .min(0, 'Valor mínimo de R$ 0')
+            .max(data.price, `Valor máximo de R$ ${data.price}`),
+          ...yupVariationSchema(),
+        });
+
+        await schema.validate(data, { abortEarly: false });
+
+        const { id } = router.query;
+
+        const dataContainer = new FormData();
+
+        files.forEach(
+          (f, i) =>
+            !!f.file &&
+            !f.uploaded &&
+            dataContainer.append('images', f.file, f.file.name),
+        );
+
+        const oldImages = files.map(f => {
+          if (!!f.url && f.uploaded) return f.url;
+        });
+
+        let newImages = await api
+          .post('/product/upload', dataContainer, {
+            headers: {
+              authorization: token,
+              shop_id: user.shopInfo._id,
+            },
+          })
+          .then(response => response.data.urls as string[]);
+
+        if (oldImages) newImages = [...(oldImages as string[]), ...newImages];
+
+        await api.patch(
+          `/product/${id}/images`,
+          { images: newImages },
+          {
+            headers: {
+              authorization: token,
+              shop_id: user.shopInfo._id,
+            },
+          },
+        );
+
+        const {
+          name,
+          description,
+          brand,
+          ean,
+          sku,
+          gender,
+          height,
+          width,
+          length,
+          weight,
+          price,
+          price_discounted,
+          vars = data.variations,
+        } = data;
+
+        if (priceChanged) {
+          api.patch(
+            `/product/${id}/price`,
+            {
+              price,
+              price_discounted,
+            },
+            {
+              headers: {
+                authorization: token,
+                shop_id: user.shopInfo._id,
+              },
+            },
+          );
+        }
+
+        const product = {
+          category,
+          subcategory: subCategory,
+          nationality,
+          name,
+          description,
+          brand,
+          ean,
+          sku,
+          gender,
+          height,
+          width,
+          length,
+          weight,
+          images: newImages,
+        };
+
+        await vars.forEach(async (variation: VariationDTO, i: number) => {
+          if (!!variation._id && variation._id !== '') {
+            const variationId = variation._id;
+
+            if (oldStock[i] !== variation.stock) {
+              api.patch(
+                `/product/${id}/variation/${variationId}`,
+                { stock: variation.stock },
+                {
+                  headers: {
+                    authorization: token,
+                    shop_id: user.shopInfo._id,
+                  },
+                },
+              );
+            }
+
+            delete variation._id;
+            delete variation.stock;
+
+            await api.patch(
               `/product/${id}/variation/${variationId}`,
-              { stock: variation.stock },
+              variation,
               {
                 headers: {
                   authorization: token,
@@ -522,74 +690,90 @@ export function EditProductForm() {
                 },
               },
             );
+
+            return;
           }
 
-          delete variation._id;
-          delete variation.stock;
-
-          await api.patch(`/product/${id}/variation/${variationId}`, variation, {
+          await api.post(`/product/${id}/variation`, variation, {
             headers: {
               authorization: token,
               shop_id: user.shopInfo._id,
             },
           });
-
-          return;
-        }
-
-        await api.post(`/product/${id}/variation`, variation, {
-          headers: {
-            authorization: token,
-            shop_id: user.shopInfo._id,
-          },
         });
+
+        await api
+          .patch(`/product/${id}`, product, {
+            headers: {
+              authorization: token,
+              shop_id: user.shopInfo._id,
+            },
+          })
+          .then(() => {
+            setLoading(false);
+
+            if (window.innerWidth >= 768) {
+              router.push('/products');
+              return;
+            }
+
+            router.push('/products-mobile');
+          });
+      } catch (err) {
+        setLoading(false);
+        console.log(err);
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
+          formRef.current?.setErrors(errors);
+        }
+      }
+    },
+    [
+      filledFields,
+      totalFields,
+      colorInName,
+      brandInName,
+      handleModalMessage,
+      setLoading,
+      yupVariationSchema,
+      router,
+      files,
+      token,
+      user.shopInfo._id,
+      priceChanged,
+      category,
+      subCategory,
+      nationality,
+      oldStock,
+    ],
+  );
+
+  const handleDeleteVariation = useCallback(
+    async (deletedIndex: number): Promise<void> => {
+      const vars = formRef.current?.getData().variations;
+
+      const tempVars = vars.filter((v: any, i: number) => i !== deletedIndex);
+      const deletedVariation = variations[deletedIndex];
+
+      formRef.current?.setFieldValue('variations', [...tempVars]);
+      formRef.current?.setData({
+        ...formRef.current?.getData(),
+        variations: tempVars,
       });
 
-      await api.patch(`/product/${id}`, product, {
+      const { id } = router.query;
+      await api.delete(`/product/${id}/variation/${deletedVariation._id}`, {
         headers: {
           authorization: token,
           shop_id: user.shopInfo._id,
         },
-      }).then(() => {
-        setLoading(false);
-
-        if (window.innerWidth >= 768) {
-          router.push('/products');
-          return;
-        }
-
-        router.push('/products-mobile');
       });
-    } catch (err) {
-      setLoading(false);
-      console.log(err);
-      if (err instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(err);
-        formRef.current?.setErrors(errors);
-      }
-    }
-  }, [filledFields, totalFields, colorInName, brandInName, handleModalMessage, setLoading, yupVariationSchema, router, files, token, user.shopInfo._id, priceChanged, category, subCategory, nationality, oldStock]);
 
-  const handleDeleteVariation = useCallback(async (deletedIndex: number): Promise<void> => {
-    const vars = formRef.current?.getData().variations;
-
-    const tempVars = vars.filter((v: any, i: number) => i !== deletedIndex);
-    const deletedVariation = variations[deletedIndex];
-
-    formRef.current?.setFieldValue('variations', [...tempVars]);
-    formRef.current?.setData({ ...formRef.current?.getData(), variations: tempVars });
-
-    const { id } = router.query;
-    await api.delete(`/product/${id}/variation/${deletedVariation._id}`, {
-      headers: {
-        authorization: token,
-        shop_id: user.shopInfo._id,
-      },
-    });
-
-    setVariations([...tempVars]);
-    setChanging(true);
-  }, [variations, token, user, router]);
+      setVariations([...tempVars]);
+      setChanging(true);
+    },
+    [variations, token, user, router],
+  );
 
   const handleAddVariation = useCallback(() => {
     setVariations([...variations, {}]);
@@ -646,7 +830,9 @@ export function EditProductForm() {
                 console.log('Changing - Variations:');
                 console.log(vars);
 
-                if (vars) { setVariations(vars); }
+                if (vars) {
+                  setVariations(vars);
+                }
               }
             }}
           >
@@ -658,23 +844,32 @@ export function EditProductForm() {
               handleDeleteFile={handleDeleteFile}
             />
             <div className={styles.doubleInputContainer}>
-              <HintedInput
+              {/* <HintedInput
                 name="name"
                 label="Nome do produto"
                 placeholder="Insira o nome do produto"
                 autoComplete="off"
                 maxLength={100}
-                hint={!isHintDisabled && (
-                  <RuledHintbox
-                    title="Orientações para nomeação"
-                    rules={hintRules}
-                    example="Ex.: Sapato Cano Alto Fit"
-                    icon={FiInfo}
-                  />
-                )}
-                onChange={(e) => {
+                hint={
+                  !isHintDisabled && (
+                    <RuledHintbox
+                      title="Orientações para nomeação"
+                      rules={hintRules}
+                      example="Ex.: Sapato Cano Alto Fit"
+                      icon={FiInfo}
+                    />
+                  )
+                }
+                onChange={e => {
                   setNameChecks(e.currentTarget.value);
                 }}
+              /> */}
+              <Input
+                name="name"
+                label="Nome do produto"
+                placeholder="Insira o nome do produto"
+                autoComplete="off"
+                maxLength={100}
               />
               <Input
                 name="brand"
@@ -682,7 +877,6 @@ export function EditProductForm() {
                 placeholder="Insira a marca"
                 autoComplete="off"
               />
-
             </div>
 
             <div className={styles.singleInputContainer}>
@@ -703,7 +897,8 @@ export function EditProductForm() {
                 radios={[
                   { name: 'masculino', value: 'M', label: 'Masculino' },
                   { name: 'feminino', value: 'F', label: 'Feminino' },
-                  { name: 'unissex', value: 'U', label: 'Unissex' }]}
+                  { name: 'unissex', value: 'U', label: 'Unissex' },
+                ]}
               />
             </div>
             <div className={styles.multipleInputContainer}>
@@ -718,7 +913,7 @@ export function EditProductForm() {
                 label="SKU"
                 placeholder="SKU do produto"
                 autoComplete="off"
-              // disabled //TODO: gerar automagico o SKU
+                // disabled //TODO: gerar automagico o SKU
               />
               <Input
                 name="price"
@@ -778,28 +973,25 @@ export function EditProductForm() {
                 <div className={styles.variationsTitle}>
                   <h3>Informações das variações do produto</h3>
                   <span>
-                    Preencha
-                    {' '}
-                    <b>todos</b>
-                    {' '}
-                    os campos
+                    Preencha <b>todos</b> os campos
                   </span>
                 </div>
               </div>
               <VariationsController handleAddVariation={handleAddVariation}>
-                {
-                  variations.map((variation, i) => (
-                    <Scope key={variation._id ? variation._id : i} path={`variations[${i}]`}>
-                      <VariationField
-                        variation={variation}
-                        index={i}
-                        handleDeleteVariation={handleDeleteVariation}
-                        attributes={attributes}
-                        allowDelete={i >= 1}
-                      />
-                    </Scope>
-                  ))
-                }
+                {variations.map((variation, i) => (
+                  <Scope
+                    key={variation._id ? variation._id : i}
+                    path={`variations[${i}]`}
+                  >
+                    <VariationField
+                      variation={variation}
+                      index={i}
+                      handleDeleteVariation={handleDeleteVariation}
+                      attributes={attributes}
+                      allowDelete={i >= 1}
+                    />
+                  </Scope>
+                ))}
               </VariationsController>
             </div>
           </Form>
@@ -808,33 +1000,42 @@ export function EditProductForm() {
 
       <div className={styles.footerContainer}>
         <span>
-          {filledFields}
-          /
-          {totalFields}
-          {' '}
-          Informações inseridas
+          {filledFields}/{totalFields} Informações inseridas
         </span>
-        {filledFields >= totalFields && <Button type="submit" onClick={() => { formRef.current?.submitForm(); }}>Cadastrar produto</Button>}
+        {filledFields >= totalFields && (
+          <Button
+            type="submit"
+            onClick={() => {
+              formRef.current?.submitForm();
+            }}
+          >
+            Cadastrar produto
+          </Button>
+        )}
       </div>
 
-      {
-        isLoading && (
-          <div className={styles.loadingContainer}>
-            <Loader />
+      {isLoading && (
+        <div className={styles.loadingContainer}>
+          <Loader />
+        </div>
+      )}
+      {showMessage && (
+        <MessageModal handleVisibility={handleModalVisibility}>
+          <div className={styles.modalContent}>
+            {modalMessage.type === 'success' ? (
+              <FiCheck style={{ color: 'var(--green-100)' }} />
+            ) : (
+              <FiX style={{ color: 'var(--red-100)' }} />
+            )}
+            <p className={styles.title}>{modalMessage.title}</p>
+            {modalMessage.message.map((message, i) => (
+              <p key={message} className={styles.messages}>
+                {message}
+              </p>
+            ))}
           </div>
-        )
-      }
-      {
-        showMessage && (
-          <MessageModal handleVisibility={handleModalVisibility}>
-            <div className={styles.modalContent}>
-              {modalMessage.type === 'success' ? <FiCheck style={{ color: 'var(--green-100)' }} /> : <FiX style={{ color: 'var(--red-100)' }} />}
-              <p className={styles.title}>{modalMessage.title}</p>
-              {modalMessage.message.map((message, i) => <p key={message} className={styles.messages}>{message}</p>)}
-            </div>
-          </MessageModal>
-        )
-      }
+        </MessageModal>
+      )}
     </>
   );
 }

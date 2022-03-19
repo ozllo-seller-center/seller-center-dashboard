@@ -5,17 +5,23 @@ import styles from './styles.module.scss';
 type Item = {
   text: string;
   value: string;
-}
+};
 
 interface HeaderDropdownProps extends LiHTMLAttributes<HTMLLIElement> {
   items: Item[];
-  setActiveItem: Function;
+  setActiveItem: React.Dispatch<any>;
+  defaultItem?: Item;
 }
 
 const HeaderDropdown: React.FC<HeaderDropdownProps> = ({
-  items, setActiveItem, children, ...rest
+  items,
+  setActiveItem,
+  defaultItem,
+  ...rest
 }) => {
-  const [selectedItem, setSelectedItem] = useState(items[0].value);
+  const [selectedItem, setSelectedItem] = useState(
+    !defaultItem ? items[0].value : defaultItem,
+  );
   const [isFocused, setIsFocused] = useState(false);
 
   const handleInputFocused = useCallback(() => {
@@ -34,23 +40,24 @@ const HeaderDropdown: React.FC<HeaderDropdownProps> = ({
         className={styles.dropdownContainer}
         {...rest}
       >
-        <span>{items[items.findIndex((item) => item.value === selectedItem)].text}</span>
+        <span>
+          {items[items.findIndex(item => item.value === selectedItem)].text}
+        </span>
         <ul className={styles.dropdown}>
-          {
-            items.map((item) => {
-              if (item.value !== selectedItem) {
-                return (
-                  <li onClick={() => {
+          {items.map(item => {
+            if (item.value !== selectedItem) {
+              return (
+                <li
+                  onClick={() => {
                     setSelectedItem(item.value);
                     setActiveItem(item.value);
                   }}
-                  >
-                    {item.text}
-                  </li>
-                );
-              }
-            })
-          }
+                >
+                  {item.text}
+                </li>
+              );
+            }
+          })}
         </ul>
       </li>
     </nav>

@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -20,7 +18,9 @@ interface CategoriesDTO {
   nationalities: Nationality[];
 }
 
-export function NewProduct({ nationalities: nationalitiesFromApi }: CategoriesDTO) {
+export function NewProduct({
+  nationalities: nationalitiesFromApi,
+}: CategoriesDTO) {
   const [nationality, setNationality] = useState<Nationality>();
   const [category, setCategory] = useState<Category>();
   const [subCategory, setSubCategory] = useState<SubCategory>();
@@ -48,17 +48,20 @@ export function NewProduct({ nationalities: nationalitiesFromApi }: CategoriesDT
 
     setNationalities(nationalitiesFromApi);
 
-    api.get('/category/all').then((response) => {
-      setCategories(response.data);
+    api
+      .get('/category/all')
+      .then(response => {
+        setCategories(response.data);
 
-      setLoading(false);
-    }).catch((err) => {
-      console.log(err);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.log(err);
 
-      setLoading(false);
+        setLoading(false);
 
-      return [];
-    });
+        return [];
+      });
   }, [nationalitiesFromApi, setLoading]);
 
   useEffect(() => {
@@ -67,45 +70,57 @@ export function NewProduct({ nationalities: nationalitiesFromApi }: CategoriesDT
       // setSubCategories(sub_categories.filter((sc: SubCategory) => sc.categoryCode === category.code))
       // setLoading(false);
 
-      api.get(`/category/${category.code}/subcategories`).then((response) => {
-        setSubCategories(response.data);
+      api
+        .get(`/category/${category.code}/subcategories`)
+        .then(response => {
+          setSubCategories(response.data);
 
-        setLoading(false);
-      }).catch((err) => {
-        console.log(err);
-        setLoading(false);
-      });
+          setLoading(false);
+        })
+        .catch(err => {
+          console.log(err);
+          setLoading(false);
+        });
     }
 
     setSubCategories([]);
   }, [category, setLoading]);
 
-  const handleNationality = useCallback((n: Nationality) => {
-    if (nationality?.id === n.id) {
-      setNationality(undefined);
-      return;
-    }
+  const handleNationality = useCallback(
+    (n: Nationality) => {
+      if (nationality?.id === n.id) {
+        setNationality(undefined);
+        return;
+      }
 
-    setNationality(n);
-  }, [nationality]);
+      setNationality(n);
+    },
+    [nationality],
+  );
 
-  const handleCategory = useCallback((c: Category) => {
-    if (category?.code === c.code) {
-      setCategory(undefined);
-      return;
-    }
+  const handleCategory = useCallback(
+    (c: Category) => {
+      if (category?.code === c.code) {
+        setCategory(undefined);
+        return;
+      }
 
-    setCategory(c);
-  }, [category]);
+      setCategory(c);
+    },
+    [category],
+  );
 
-  const handleSubCategory = useCallback((sc: SubCategory) => {
-    if (subCategory?.code === sc.code) {
-      setSubCategory(undefined);
-      return;
-    }
+  const handleSubCategory = useCallback(
+    (sc: SubCategory) => {
+      if (subCategory?.code === sc.code) {
+        setSubCategory(undefined);
+        return;
+      }
 
-    setSubCategory(sc);
-  }, [subCategory]);
+      setSubCategory(sc);
+    },
+    [subCategory],
+  );
 
   const handleRegisterPage = useCallback(() => {
     router.push({
@@ -118,23 +133,32 @@ export function NewProduct({ nationalities: nationalitiesFromApi }: CategoriesDT
         subCategoryName: subCategory?.value,
       },
     });
-  }, [router, nationality?.id, category?.code, category?.value, subCategory?.code, subCategory?.value]);
+  }, [
+    router,
+    nationality?.id,
+    category?.code,
+    category?.value,
+    subCategory?.code,
+    subCategory?.value,
+  ]);
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <BulletedButton
-          onClick={() => { router.push((!!width && width < 768) ? '/products-mobile' : '/products'); }}
+          onClick={() => {
+            router.push(
+              !!width && width < 768 ? '/products-mobile' : '/products',
+            );
+          }}
         >
           Meus produtos
         </BulletedButton>
+        <BulletedButton isActive>Criar novo produto</BulletedButton>
         <BulletedButton
-          isActive
-        >
-          Criar novo produto
-        </BulletedButton>
-        <BulletedButton
-          onClick={() => { router.push('/products/import'); }}
+          onClick={() => {
+            router.push('/products/import');
+          }}
         >
           Importar ou exportar
         </BulletedButton>
@@ -147,77 +171,66 @@ export function NewProduct({ nationalities: nationalitiesFromApi }: CategoriesDT
         </div>
         <div className={styles.contentBody}>
           <div className={styles.nationalityContainer}>
-            {
-              nationalities.map((n) => (
-                <StateButton
-                  key={n.id}
-                  onClick={() => handleNationality(n)}
-                  isActive={nationality?.id === n.id}
-                  pointer={(!!width && width >= 768)}
-                >
-                  {n.name}
-                </StateButton>
-              ))
-            }
+            {nationalities.map(n => (
+              <StateButton
+                key={n.id}
+                onClick={() => handleNationality(n)}
+                isActive={nationality?.id === n.id}
+                pointer={!!width && width >= 768}
+              >
+                {n.name}
+              </StateButton>
+            ))}
           </div>
-          {
-            !!nationality && (
-              <div className={styles.categoriesContainer}>
-                <div className={styles.categoryContainer}>
-                  {
-                    categories.map((c: Category) => (
-                      <StateButton
-                        key={c.code}
-                        onClick={() => handleCategory(c)}
-                        isActive={category?.code === c.code}
-                        pointer={(!!width && width >= 768)}
-                        borders
-                      >
-                        {c.value}
-                      </StateButton>
-                    ))
-                  }
-                </div>
-                {
-                  (!!category && !isLoading) && (
-                    <div className={styles.subcategoryContainer}>
-                      {
-                        (!!subCategories && subCategories.length > 0) && (
-                          <div className={styles.subCategories}>
-                            {
-                              subCategories.map((sc) => (
-                                <Button
-                                  key={sc.code}
-                                  onClick={() => handleSubCategory(sc)}
-                                  isActive={subCategory?.code === sc.code}
-                                  customStyle={{ className: styles.subCategoryButton, activeClassName: styles.subCategoryActiveButton }}
-                                >
-                                  {sc.value}
-                                </Button>
-                              ))
-                            }
-                          </div>
-                        )
-                      }
-                      <Button
-                        onClick={handleRegisterPage}
-                        customStyle={{ className: styles.createButton }}
-                      >
-                        Cadastrar Produto
-                      </Button>
-                    </div>
-                  )
-                }
-                {
-                  (!!category && isLoading) && (
-                    <div className={styles.loadingContainer}>
-                      <Loader />
-                    </div>
-                  )
-                }
+          {!!nationality && (
+            <div className={styles.categoriesContainer}>
+              <div className={styles.categoryContainer}>
+                {categories.map((c: Category) => (
+                  <StateButton
+                    key={c.code}
+                    onClick={() => handleCategory(c)}
+                    isActive={category?.code === c.code}
+                    pointer={!!width && width >= 768}
+                    borders
+                  >
+                    {c.value}
+                  </StateButton>
+                ))}
               </div>
-            )
-          }
+              {!!category && !isLoading && (
+                <div className={styles.subcategoryContainer}>
+                  {!!subCategories && subCategories.length > 0 && (
+                    <div className={styles.subCategories}>
+                      {subCategories.map(sc => (
+                        <Button
+                          key={sc.code}
+                          onClick={() => handleSubCategory(sc)}
+                          isActive={subCategory?.code === sc.code}
+                          customStyle={{
+                            className: styles.subCategoryButton,
+                            activeClassName: styles.subCategoryActiveButton,
+                          }}
+                        >
+                          {sc.value}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
+                  <Button
+                    onClick={handleRegisterPage}
+                    customStyle={{ className: styles.createButton }}
+                  >
+                    Cadastrar Produto
+                  </Button>
+                </div>
+              )}
+              {!!category && isLoading && (
+                <div className={styles.loadingContainer}>
+                  <Loader />
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -228,17 +241,20 @@ export default NewProduct;
 
 export const getStaticProps: GetStaticProps = async () => {
   const data: CategoriesDTO = {
-    nationalities: [{
-      id: '1',
-      name: 'Nacional',
-    }, {
-      id: '2',
-      name: 'Internacional',
-    }],
+    nationalities: [
+      {
+        id: '1',
+        name: 'Nacional',
+      },
+      {
+        id: '2',
+        name: 'Internacional',
+      },
+    ],
   };
 
-  return ({
+  return {
     props: { ...data },
     revalidate: 10,
-  });
+  };
 };

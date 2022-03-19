@@ -5,10 +5,13 @@ import { ProductImport } from '../types/productImport';
 function importToProduct(importProducts: ProductImport[]): Product[] {
   const products: Product[] = [];
 
-  const groups = groupBy(importProducts, (i: ProductImport) => i.grouperId.value);
+  const groups = groupBy(
+    importProducts,
+    (i: ProductImport) => i.grouperId.value,
+  );
   const keys = Array.from(groups.keys());
 
-  keys.forEach((grouperId) => {
+  keys.forEach(grouperId => {
     const group = groups.get(grouperId) as ProductImport[];
 
     const product: Product = {} as Product;
@@ -43,16 +46,20 @@ function importToProduct(importProducts: ProductImport[]): Product[] {
       });
     });
 
-    product.variations = group.map((v) => {
+    product.variations = group.map(v => {
       const variation = {
         size: v.size.value,
         stock: v.stock.value,
         color: v.color.value,
       } as Variation;
 
-      if (v.gluten_free.value) { variation.gluten_free = v.gluten_free.value; }
+      if (v.gluten_free.value) {
+        variation.gluten_free = v.gluten_free.value;
+      }
 
-      if (v.lactose_free.value) { variation.lactose_free = v.lactose_free.value; }
+      if (v.lactose_free.value) {
+        variation.lactose_free = v.lactose_free.value;
+      }
 
       return variation;
     });

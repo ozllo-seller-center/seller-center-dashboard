@@ -1,6 +1,4 @@
-import React, {
-  createContext, useState, useCallback, useContext,
-} from 'react';
+import React, { createContext, useState, useCallback, useContext } from 'react';
 
 import { ModalMessage } from 'src/shared/types/modalMessage';
 
@@ -10,21 +8,35 @@ interface ModalMessageContextData {
   handleModalMessage(show: boolean, modal?: ModalMessage): void;
 }
 
-const MessageContext = createContext<ModalMessageContextData>({} as ModalMessageContextData);
+const MessageContext = createContext<ModalMessageContextData>(
+  {} as ModalMessageContextData,
+);
 
 const ModalMessageProvider: React.FC = ({ children }) => {
   const [showModalMessage, setShowingModalMessage] = useState(false);
-  const [modalMessage, setModalMessage] = useState<ModalMessage>({ type: 'error', title: '', message: [] });
+  const [modalMessage, setModalMessage] = useState<ModalMessage>({
+    type: 'error',
+    title: '',
+    message: [],
+  });
 
   const handleMessage = useCallback((show: boolean, modal?: ModalMessage) => {
     setShowingModalMessage(show);
 
-    if (modal) { setModalMessage(modal); } else { setModalMessage({ type: 'error', title: '', message: [] }); }
+    if (modal) {
+      setModalMessage(modal);
+    } else {
+      setModalMessage({ type: 'error', title: '', message: [] });
+    }
   }, []);
 
   return (
     <MessageContext.Provider
-      value={{ showModalMessage, modalMessage, handleModalMessage: handleMessage }}
+      value={{
+        showModalMessage,
+        modalMessage,
+        handleModalMessage: handleMessage,
+      }}
     >
       {children}
     </MessageContext.Provider>
@@ -34,7 +46,9 @@ const ModalMessageProvider: React.FC = ({ children }) => {
 function useModalMessage(): ModalMessageContextData {
   const context = useContext(MessageContext);
 
-  if (!context) { throw new Error('useMessage must be used within an ModalMessageProvider'); }
+  if (!context) {
+    throw new Error('useMessage must be used within an ModalMessageProvider');
+  }
 
   return context;
 }

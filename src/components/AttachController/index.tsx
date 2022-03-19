@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useRef, useState,
-} from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 
 import { FiPaperclip } from 'react-icons/fi';
 import { Form } from '@unform/web';
@@ -20,7 +18,13 @@ interface AttachControllerProps {
 }
 
 const AttachController: React.FC<AttachControllerProps> = ({
-  name, title, placeholder, isAttached, unattachedText, attachedText, handleAttachment,
+  name,
+  title,
+  placeholder,
+  isAttached,
+  unattachedText,
+  attachedText,
+  handleAttachment,
 }) => {
   const formRef = useRef<FormHandles>(null);
 
@@ -46,16 +50,24 @@ const AttachController: React.FC<AttachControllerProps> = ({
     <div className={styles.container}>
       <button
         type="button"
-        onClick={(e) => {
+        onClick={e => {
           handleTooltip();
           setToolTipYOffset(e.clientY);
         }}
       >
         <FiPaperclip />
-        {isAttached ? <span>{attachedText}</span> : <span>{unattachedText}</span>}
+        {isAttached ? (
+          <span>{attachedText}</span>
+        ) : (
+          <span>{unattachedText}</span>
+        )}
       </button>
       {openTooltip && (
-        <Tooltip title={title} closeTooltip={handleTooltip} offsetY={toolTipYOffset}>
+        <Tooltip
+          title={title}
+          closeTooltip={handleTooltip}
+          offsetY={toolTipYOffset}
+        >
           <Form
             ref={formRef}
             onSubmit={(d, h, e) => {
@@ -66,7 +78,13 @@ const AttachController: React.FC<AttachControllerProps> = ({
             <div className={styles.attachment}>
               <div className={styles.attachmentInput}>
                 <FiPaperclip />
-                <input name={name} placeholder={placeholder} ref={inputRef} autoComplete="off" autoCorrect="off" />
+                <input
+                  name={name}
+                  placeholder={placeholder}
+                  ref={inputRef}
+                  autoComplete="off"
+                  autoCorrect="off"
+                />
               </div>
 
               <button type="submit">Confirmar</button>

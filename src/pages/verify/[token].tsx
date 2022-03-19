@@ -21,54 +21,51 @@ const Verify: React.FC = () => {
       router.push('/');
     }
 
-    api.get(`/auth/activate/${token}`).then((response) => {
-      if (verifyUser(response.data)) {
+    api
+      .get(`/auth/activate/${token}`)
+      .then(response => {
+        if (verifyUser(response.data)) {
+          setVerifying(false);
+          setVerified(true);
+
+          setTimeout(() => {
+            router.push('/dashboard');
+          }, 3000);
+
+          return;
+        }
+
         setVerifying(false);
-        setVerified(true);
-
-        setTimeout(() => {
-          router.push('/dashboard');
-        }, 3000);
-
-        return;
-      }
-
-      setVerifying(false);
-      setVerified(false);
-    }).catch(() => {
-      setVerifying(false);
-      setVerified(false);
-    });
+        setVerified(false);
+      })
+      .catch(() => {
+        setVerifying(false);
+        setVerified(false);
+      });
   }, []);
 
   return (
     <div className={styles.container}>
-      {
-        isVerifying && (
-          <div className={styles.verifying}>
-            <div className={styles.dotFlashing} />
-            <p>Estamos confirmando seu e-mail e autenticando o acesso</p>
-          </div>
-        )
-      }
-      {
-        (isVerified && !isVerifying) && (
-          <div className={styles.verified}>
-            <FiCheck />
-            <h2>Conta verificada!</h2>
-            <p>Iremos te redirecionar a página inicial em alguns instantes</p>
-          </div>
-        )
-      }
-      {
-        (!isVerified && !isVerifying) && (
-          <div className={styles.notVerified}>
-            <FiX />
-            <h2>Conta não verificada!</h2>
-            <p>Confira o link de verificação e tente novamente</p>
-          </div>
-        )
-      }
+      {isVerifying && (
+        <div className={styles.verifying}>
+          <div className={styles.dotFlashing} />
+          <p>Estamos confirmando seu e-mail e autenticando o acesso</p>
+        </div>
+      )}
+      {isVerified && !isVerifying && (
+        <div className={styles.verified}>
+          <FiCheck />
+          <h2>Conta verificada!</h2>
+          <p>Iremos te redirecionar a página inicial em alguns instantes</p>
+        </div>
+      )}
+      {!isVerified && !isVerifying && (
+        <div className={styles.notVerified}>
+          <FiX />
+          <h2>Conta não verificada!</h2>
+          <p>Confira o link de verificação e tente novamente</p>
+        </div>
+      )}
     </div>
   );
 };

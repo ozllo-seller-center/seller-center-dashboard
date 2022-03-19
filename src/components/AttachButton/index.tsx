@@ -1,6 +1,4 @@
-import React, {
-  ButtonHTMLAttributes,
-} from 'react';
+import React, { ButtonHTMLAttributes } from 'react';
 
 import { FiPaperclip } from 'react-icons/fi';
 
@@ -16,7 +14,13 @@ interface AttachButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const AttachButton: React.FC<AttachButtonProps> = ({
-  name, title, placeholder, isAttached, unattachedText, attachedText, ...rest
+  name,
+  title,
+  placeholder,
+  isAttached,
+  unattachedText,
+  attachedText,
+  ...rest
 }) => (
   <div className={styles.container}>
     <button type="button" {...rest}>

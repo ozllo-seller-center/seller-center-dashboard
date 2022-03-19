@@ -1,6 +1,6 @@
 export type SheetLines = {
-  [key: number]: string
-}
+  [key: number]: string;
+};
 
 export const importLines: SheetLines = {
   0: 'catalogue',
@@ -32,25 +32,25 @@ export const importLines: SheetLines = {
 };
 
 type SheetAttr = {
-  value: any,
+  value: any;
   validate?: (v: any) => boolean;
-}
+};
 
 export type ProductImport = {
-  [key: string]: SheetAttr,
-}
+  [key: string]: SheetAttr;
+};
 
 export type VariationDTO = {
-  size: SheetAttr,
-  stock: SheetAttr,
-  color: SheetAttr,
-  gluten_free?: SheetAttr,
-  lactose_free?: SheetAttr,
-}
+  size: SheetAttr;
+  stock: SheetAttr;
+  color: SheetAttr;
+  gluten_free?: SheetAttr;
+  lactose_free?: SheetAttr;
+};
 
 export type ProductDTO = {
-  grouperId: string,
-  variations: VariationDTO[],
-  properties: ProductImport[]
-  images: ProductImport[]
-}
+  grouperId: string;
+  variations: VariationDTO[];
+  properties: ProductImport[];
+  images: ProductImport[];
+};

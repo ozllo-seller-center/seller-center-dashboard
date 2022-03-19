@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { throttle } from '../utils/util';
 
 interface WindowDimension {
-  width: number | undefined
-  height: number | undefined
+  width: number | undefined;
+  height: number | undefined;
 }
 
 export default function useWindowSize(interval = 500) {

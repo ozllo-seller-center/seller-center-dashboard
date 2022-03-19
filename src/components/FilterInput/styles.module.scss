@@ -11,12 +11,12 @@
   color: var(--grafite);
   transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
 
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.12);
 
   display: flex;
   align-items: center;
 
-  & + div {
+  &+div {
     margin-top: 1.5rem;
   }
 
@@ -31,7 +31,7 @@
     }
   }
 
-  > button {
+  >button {
     border: 0;
     background: none;
 
@@ -44,155 +44,155 @@
 }
 
 .containerError {
-    background: #FFFFFF;
-    border-radius: 24px;
-    padding: 0.5rem 1.25rem;
-    width: 100%;
+  background: #FFFFFF;
+  border-radius: 24px;
+  padding: 0.5rem 1.25rem;
+  width: 100%;
 
-    font-size: 0.7rem;
-    font-weight: lighter;
+  font-size: 0.7rem;
+  font-weight: lighter;
 
-    /* border: 1px solid var(--grafite); */
-    color: #FC2A58;
-    transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
+  /* border: 1px solid var(--grafite); */
+  color: #FC2A58;
+  transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
 
-    color: #FC2A58;
-    border-color: #FC2A58;
+  color: #FC2A58;
+  border-color: #FC2A58;
 
-    box-shadow: 0 2px 6px #FC2A5826, 0 2px 4px #FC2A5833;
+  box-shadow: 0 2px 6px #FC2A5826, 0 2px 4px #FC2A5833;
 
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 
-    & + div {
-      margin-top: 1.5rem;
+  &+div {
+    margin-top: 1.5rem;
+  }
+
+  input {
+    color: var(--grafite);
+    flex: 1;
+    background: transparent;
+    border: 0;
+
+    &::placeholder {
+      color: var(--gray-300);
     }
+  }
 
-    input {
-      color: var(--grafite);
-      flex: 1;
-      background: transparent;
-      border: 0;
+  >button {
+    border: 0;
+    background: none;
 
-      &::placeholder {
-        color: var(--gray-300);
-      }
+    svg {
+      color: #FC2A58;
+      cursor: pointer;
+      margin-left: 1rem;
     }
-
-    > button {
-      border: 0;
-      background: none;
-
-      svg {
-        color: #FC2A58;
-        cursor: pointer;
-        margin-left: 1rem;
-      }
-    }
+  }
 }
 
 .containerFocused {
-    background: #FFFFFF;
-    border-radius: 24px;
-    padding: 0.5rem 1.25rem;
-    width: 100%;
+  background: #FFFFFF;
+  border-radius: 24px;
+  padding: 0.5rem 1.25rem;
+  width: 100%;
 
-    font-size: 0.7rem;
-    font-weight: lighter;
+  font-size: 0.7rem;
+  font-weight: lighter;
 
-    /* border: 1px solid var(--grafite); */
-    transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
+  /* border: 1px solid var(--grafite); */
+  transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
 
-    color: #FFCF4B;
-    border-color: #FFCF4B;
+  color: #FFCF4B;
+  border-color: #FFCF4B;
 
-    box-shadow: 0 2px 6px #FFCF4B26, 0 2px 4px #FFCF4B33;
+  box-shadow: 0 2px 6px #FFCF4B26, 0 2px 4px #FFCF4B33;
 
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 
-    & + div {
-      margin-top: 1.5rem;
+  &+div {
+    margin-top: 1.5rem;
+  }
+
+  input {
+    color: var(--grafite);
+    flex: 1;
+    background: transparent;
+    border: 0;
+
+    &::placeholder {
+      color: var(--gray-300);
     }
+  }
 
-    input {
-      color: var(--grafite);
-      flex: 1;
-      background: transparent;
-      border: 0;
+  >button {
+    border: 0;
+    background: none;
 
-      &::placeholder {
-        color: var(--gray-300);
-      }
+    svg {
+      color: #FFCF4B;
+      cursor: pointer;
+      margin-left: 1rem;
     }
-
-    > button {
-      border: 0;
-      background: none;
-
-      svg {
-        color: #FFCF4B;
-        cursor: pointer;
-        margin-left: 1rem;
-      }
-    }
+  }
 }
 
 .containerFilled {
-    background: #FFFFFF;
-    border-radius: 24px;
-    padding: 0.5rem 1.25rem;
-    width: 100%;
+  background: #FFFFFF;
+  border-radius: 24px;
+  padding: 0.5rem 1.25rem;
+  width: 100%;
 
-    font-size: 0.7rem;
-    font-weight: lighter;
+  font-size: 0.7rem;
+  font-weight: lighter;
 
-    /* border: 1px solid var(--grafite); */
-    transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
+  /* border: 1px solid var(--grafite); */
+  transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
 
-    color: #88AFDD;
-    border-color: #88AFDD;
+  color: #88AFDD;
+  border-color: #88AFDD;
 
-    box-shadow: 0 2px 6px #88AFDD29, 0 2px 4px #88AFDB36;
+  box-shadow: 0 2px 6px #88AFDD29, 0 2px 4px #88AFDB36;
 
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 
-    & + div {
-      margin-top: 1.5rem;
+  &+div {
+    margin-top: 1.5rem;
+  }
+
+  input {
+    color: var(--grafite);
+    flex: 1;
+    background: transparent;
+    border: 0;
+
+    &::placeholder {
+      color: var(--gray-300);
     }
+  }
 
-    input {
-      color: var(--grafite);
-      flex: 1;
-      background: transparent;
-      border: 0;
+  >button {
+    border: 0;
+    background: none;
 
-      &::placeholder {
-        color: var(--gray-300);
-      }
+    svg {
+      color: #88AFDD;
+      cursor: pointer;
+      margin-left: 1rem;
     }
-
-    > button {
-      border: 0;
-      background: none;
-
-      svg {
-        color: #88AFDD;
-        cursor: pointer;
-        margin-left: 1rem;
-      }
-    }
+  }
 }
 
 
 .error {
-    width: 100%;
-    text-align: left;
+  width: 100%;
+  text-align: left;
 
-    padding-left: 1rem;
+  padding-left: 1rem;
 
-    color: #FC2A58;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
+  color: #FC2A58;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }

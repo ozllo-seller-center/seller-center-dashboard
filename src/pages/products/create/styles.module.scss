@@ -2,14 +2,15 @@
 
 @keyframes appear {
   0% {
-     opacity: 0;
-   }
-   100% {
-     opacity: 1;
-   }
- }
+    opacity: 0;
+  }
 
-.container{
+  100% {
+    opacity: 1;
+  }
+}
+
+.container {
   height: calc(100vh - 4rem);
 
   @media screen and (min-width: $desktop-small-size) {
@@ -33,7 +34,7 @@
 
     display: flex;
 
-    button + button {
+    button+button {
       margin-left: 2rem;
     }
 
@@ -42,7 +43,7 @@
       grid-template-columns: 1fr 1fr 1fr 1fr 1fr .5fr;
       column-gap: 1.5rem;
 
-      button + button {
+      button+button {
         margin-left: 0;
       }
     }
@@ -52,7 +53,7 @@
       flex-direction: row;
       column-gap: 0;
 
-      button + button {
+      button+button {
         margin-left: 1.5rem;
       }
     }
@@ -62,7 +63,7 @@
       grid-template-columns: 1fr 1fr 1fr 1fr 1fr .5fr;
       column-gap: 1.5rem;
 
-      button + button {
+      button+button {
         margin-left: 0;
       }
     }
@@ -72,7 +73,7 @@
       flex-direction: row;
       column-gap: 0;
 
-      button + button {
+      button+button {
         margin-left: 1.5rem;
       }
     }
@@ -116,7 +117,7 @@
           cursor: not-allowed;
 
           opacity: 0.25;
-          filter:grayscale(1);
+          filter: grayscale(1);
         }
       }
     }
@@ -134,7 +135,7 @@
       .nationalityContainer {
         display: flex;
 
-        > button + button {
+        >button+button {
           margin-left: 0.5rem;
         }
 
@@ -143,7 +144,7 @@
 
           margin-bottom: 0;
 
-          > button + button {
+          >button+button {
             margin-left: 0;
             margin-top: 0.5rem;
           }
@@ -178,28 +179,32 @@
 
           overflow: auto;
 
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
+          -ms-overflow-style: none;
+          /* IE and Edge */
+          scrollbar-width: none;
+          /* Firefox */
 
           &::-webkit-scrollbar {
             display: none;
           }
 
-          > button + button {
+          >button+button {
             margin-left: 0.5rem;
           }
 
           @media screen and (min-width: $tablet_vertical) {
             flex-direction: column;
 
-            -ms-overflow-style: auto;  /* IE and Edge */
-            scrollbar-width: auto;  /* Firefox */
+            -ms-overflow-style: auto;
+            /* IE and Edge */
+            scrollbar-width: auto;
+            /* Firefox */
 
             &::-webkit-scrollbar {
               display: auto;
             }
 
-            > button + button {
+            >button+button {
               margin-left: 0;
               margin-top: 0.5rem;
             }
@@ -258,7 +263,7 @@
 
             background-color: var(--white);
             border-radius: 4px;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.09), 0 3px 5px rgba(0,0,0,0.12);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.09), 0 3px 5px rgba(0, 0, 0, 0.12);
 
             animation: appear 0.5s;
 

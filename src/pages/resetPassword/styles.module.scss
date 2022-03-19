@@ -134,7 +134,7 @@
         display: flex;
         flex-direction: column;
 
-        > div + div {
+        >div+div {
           margin-top: .75rem;
         }
 
@@ -155,7 +155,7 @@
 
           border-radius: 6px;
 
-          > span {
+          >span {
             width: 100%;
 
             font-size: 1.05rem;
@@ -165,7 +165,7 @@
             margin-bottom: 0.5rem;
           }
 
-          > div {
+          >div {
             // width: 100%;
 
             display: grid;
@@ -183,7 +183,7 @@
 
               .empty {
                 width: 0.85rem;
-              height: 0.85rem;
+                height: 0.85rem;
               }
             }
 
@@ -222,8 +222,10 @@
 
   .loader {
     align-self: center;
-    border: 1rem solid var(--gray-100); /* Light grey */
-    border-top: 1rem solid var(--grafite); /* Blue */
+    border: 1rem solid var(--gray-100);
+    /* Light grey */
+    border-top: 1rem solid var(--grafite);
+    /* Blue */
     border-radius: 50%;
     width: 6.5rem;
     height: 6.5rem;
@@ -236,7 +238,7 @@
     color: var(--grafite);
   }
 
-  > svg {
+  >svg {
     width: 5rem;
     height: 5rem;
 
@@ -272,7 +274,8 @@
   margin-bottom: 3rem;
 }
 
-.dotFlashing::before, .dotFlashing::after {
+.dotFlashing::before,
+.dotFlashing::after {
   content: '';
   display: inline-block;
   position: absolute;
@@ -305,6 +308,7 @@
   0% {
     background-color: var(--yellow-300);
   }
+
   50%,
   100% {
     background-color: var(--yellow-100);

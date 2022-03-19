@@ -10,14 +10,20 @@ interface PanelItemProps {
   valueColor: string;
 }
 
-const MenuButton: React.FC<PanelItemProps> = ({ title, value, valueColor }: PanelItemProps) => {
+const MenuButton: React.FC<PanelItemProps> = ({
+  title,
+  value,
+  valueColor,
+}: PanelItemProps) => {
   const router = useRouter();
 
   return (
     <div className={styles.panelItemContainer}>
       <p className={styles.title}>{title}</p>
       <span className={styles[`${valueColor}`]}>{value}</span>
-      <button type="button"><FiPlusCircle /></button>
+      <button type="button">
+        <FiPlusCircle />
+      </button>
     </div>
   );
 };

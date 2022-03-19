@@ -1,9 +1,11 @@
-import React, {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import {
-  FiChevronLeft, FiHome, FiPackage, FiUser, FiShoppingCart,
+  FiChevronLeft,
+  FiHome,
+  FiPackage,
+  FiUser,
+  FiShoppingCart,
 } from 'react-icons/fi';
 import { FaRegMoneyBillAlt } from 'react-icons/fa';
 import { RiStore2Line } from 'react-icons/ri';
@@ -14,7 +16,7 @@ import styles from './styles.module.scss';
 
 interface MenuProps {
   open: boolean;
-  setOpen: Function;
+  setOpen: React.Dispatch<any>;
   visible: boolean;
 }
 
@@ -35,9 +37,13 @@ const Menu: React.FC<MenuProps> = ({ open, setOpen, visible }) => {
   // console.log(`Route? ${selected}/${route.pathname}`);
 
   const visibility = useMemo(() => {
-    if (!visible) { return styles.invisibleMenu; }
+    if (!visible) {
+      return styles.invisibleMenu;
+    }
 
-    if (open) { return styles.menuOpen; }
+    if (open) {
+      return styles.menuOpen;
+    }
 
     return styles.menuClosed;
   }, [open, visible]);
@@ -49,13 +55,40 @@ const Menu: React.FC<MenuProps> = ({ open, setOpen, visible }) => {
           <img src="/assets/logo_white.png" alt="Ozllo" />
           <FiChevronLeft color="#FFFFFF" onClick={() => setOpen(!open)} />
         </div>
-        <MenuItem to="/dashboard" name="Home" setSelected={setSelected} iconLib={FiHome} />
-        <MenuItem to={(!!width && width < 768) ? '/sells-mobile' : '/sells'} name="Minhas vendas" setSelected={setSelected} iconLib={FaRegMoneyBillAlt} />
-        <MenuItem to={(!!width && width < 768) ? '/products-mobile' : '/products'} name="Produtos" setSelected={setSelected} iconLib={FiPackage} />
-        <MenuItem to="/marketplaces" name="Marketplaces" setSelected={setSelected} iconLib={RiStore2Line} />
-        {/* <MenuItem to="/integrations" name="Integrações" setSelected={setSelected} iconLib={MdOutlineIntegrationInstructions} /> */}
+        <MenuItem
+          to="/dashboard"
+          name="Home"
+          setSelected={setSelected}
+          iconLib={FiHome}
+        />
+        <MenuItem
+          to={!!width && width < 768 ? '/sells-mobile' : '/sells'}
+          name="Minhas vendas"
+          setSelected={setSelected}
+          iconLib={FaRegMoneyBillAlt}
+        />
+        <MenuItem
+          to={!!width && width < 768 ? '/products-mobile' : '/products'}
+          name="Produtos"
+          setSelected={setSelected}
+          iconLib={FiPackage}
+        />
+        <MenuItem
+          to="/marketplaces"
+          name="Marketplaces"
+          setSelected={setSelected}
+          iconLib={RiStore2Line}
+        />
+        {/* <MenuItem
+          to="/integrations"
+          name="Integrações"
+          setSelected={setSelected}
+          iconLib={MdOutlineIntegrationInstructions}
+        /> */}
       </div>
-      {(!!width && width < 768 && open) && <div className={styles.outside} onClick={() => setOpen(!open)} />}
+      {!!width && width < 768 && open && (
+        <div className={styles.outside} onClick={() => setOpen(!open)} />
+      )}
     </>
   );
 };

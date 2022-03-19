@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 import api from 'src/services/api';
@@ -26,11 +24,10 @@ const Layout: React.FC = ({ children }) => {
 
   const [open, setOpen] = useState(true);
   const [visible, setVisible] = useState(true);
-  const {
-    user, isRegisterCompleted, signOut, token, isAdmin,
-  } = useAuth();
+  const { user, isRegisterCompleted, signOut, token, isAdmin } = useAuth();
   const { isLoading } = useLoading();
-  const { showModalMessage, modalMessage, handleModalMessage } = useModalMessage();
+  const { showModalMessage, modalMessage, handleModalMessage } =
+    useModalMessage();
 
   const [showMessage, setShowMessage] = useState(showModalMessage);
 
@@ -65,17 +62,20 @@ const Layout: React.FC = ({ children }) => {
 
     // isTokenValid(token).then(valid => {
     // if (valid) {
-    api.get(`auth/token/${token}`).then((response) => {
-      const { isValid } = response.data;
+    api
+      .get(`auth/token/${token}`)
+      .then(response => {
+        const { isValid } = response.data;
 
-      if (!isValid) {
+        if (!isValid) {
+          signOut();
+          router.push('/');
+        }
+      })
+      .catch(() => {
         signOut();
         router.push('/');
-      }
-    }).catch(() => {
-      signOut();
-      router.push('/');
-    });
+      });
 
     // return;
     // }
@@ -87,9 +87,13 @@ const Layout: React.FC = ({ children }) => {
   }, [user, router, token, isRegisterCompleted, signOut]);
 
   const visibility = useMemo(() => {
-    if (!visible) { return styles.closedMenu; }
+    if (!visible) {
+      return styles.closedMenu;
+    }
 
-    if (open) { return styles.openMenu; }
+    if (open) {
+      return styles.openMenu;
+    }
 
     return styles.closedMenu;
   }, [open, visible]);

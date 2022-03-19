@@ -12,8 +12,13 @@ export function catalogueValidate(v: any) {
   return !!v.category && !!v.subCategory && !!v.nationality;
 }
 
-export function discountValidate(v: number, validation: ProductImport): boolean {
-  if (v) { validation.price_discounted.value = validation.price.value; }
+export function discountValidate(
+  v: number,
+  validation: ProductImport,
+): boolean {
+  if (v) {
+    validation.price_discounted.value = validation.price.value;
+  }
 
   return true;
 }

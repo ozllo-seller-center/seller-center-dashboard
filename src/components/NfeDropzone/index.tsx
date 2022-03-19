@@ -1,5 +1,9 @@
 import React, {
-  useCallback, useEffect, useMemo, useRef, useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from 'react';
 import { useField } from '@unform/core';
 import { useDropzone } from 'react-dropzone';
@@ -22,29 +26,30 @@ const NfeDropzone: React.FC<Props> = ({ name, onFileUploaded }) => {
 
   const dropZoneRef = useRef<InputRefProps>(null);
 
-  const {
-    fieldName, registerField, defaultValue = [], error,
-  } = useField(name);
+  const { fieldName, registerField, defaultValue = [], error } = useField(name);
 
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    setErr(false);
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      setErr(false);
 
-    try {
-      if (dropZoneRef.current) {
-        const valid = await onFileUploaded(acceptedFiles[0]);
+      try {
+        if (dropZoneRef.current) {
+          const valid = await onFileUploaded(acceptedFiles[0]);
 
-        if (valid) {
-          setselectedFile([URL.createObjectURL(acceptedFiles[0])]);
-          return;
+          if (valid) {
+            setselectedFile([URL.createObjectURL(acceptedFiles[0])]);
+            return;
+          }
+
+          setErr(true);
         }
-
+      } catch (er) {
+        console.log(er);
         setErr(true);
       }
-    } catch (er) {
-      console.log(er);
-      setErr(true);
-    }
-  }, [selectedFile, onFileUploaded]);
+    },
+    [selectedFile, onFileUploaded],
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -62,65 +67,64 @@ const NfeDropzone: React.FC<Props> = ({ name, onFileUploaded }) => {
       setValue: (ref: InputRefProps, value) => {
         ref.acceptedFiles = value;
 
-        if (value) { setselectedFile([URL.createObjectURL(value[0])]); }
+        if (value) {
+          setselectedFile([URL.createObjectURL(value[0])]);
+        }
       },
     });
   }, [fieldName, registerField]);
 
   const containerStyles = useMemo(() => {
-    if (error) { return styles.error; }
+    if (error) {
+      return styles.error;
+    }
 
-    if (selectedFile.length >= 1) { return styles.uploaded; }
+    if (selectedFile.length >= 1) {
+      return styles.uploaded;
+    }
 
     return styles.importzone;
   }, [error, selectedFile.length]);
 
   return (
     <div className={styles.parent}>
-      {selectedFile.length >= 1
-        && (
-        <FiX onClick={() => {
-          if (dropZoneRef.current) { dropZoneRef.current.acceptedFiles = []; }
+      {selectedFile.length >= 1 && (
+        <FiX
+          onClick={() => {
+            if (dropZoneRef.current) {
+              dropZoneRef.current.acceptedFiles = [];
+            }
 
-          setselectedFile([]);
-        }}
+            setselectedFile([]);
+          }}
         />
-        )}
+      )}
       <div
         className={containerStyles}
         {...getRootProps()}
         onClick={() => dropZoneRef.current?.click()}
       >
         <input {...getInputProps()} accept="text/xml" ref={dropZoneRef} />
-        {(!!error || err)
-            && (
-              <p>
-                Erro com o arquivon selecionado
-                <br />
-                Certifique-se que o arquivo é um XML válido
-              </p>
-            )}
-        { selectedFile.length >= 1
-              && (
-                <>
-                  <FiCheck />
-                  <p>
-                    XML da NFe carregado
-                  </p>
-                </>
-              ) }
-        {isDragActive
-                && (
-                  <p>
-                    Solte o arquivo XML aqui ...
-                  </p>
-                )}
-        {(!isDragActive && selectedFile.length <= 0 && !error && !err) && (
-        <p>
-          Clique ou arraste o
-          <br />
-          XML da NFe aqui
-        </p>
+        {(!!error || err) && (
+          <p>
+            Erro com o arquivon selecionado
+            <br />
+            Certifique-se que o arquivo é um XML válido
+          </p>
+        )}
+        {selectedFile.length >= 1 && (
+          <>
+            <FiCheck />
+            <p>XML da NFe carregado</p>
+          </>
+        )}
+        {isDragActive && <p>Solte o arquivo XML aqui ...</p>}
+        {!isDragActive && selectedFile.length <= 0 && !error && !err && (
+          <p>
+            Clique ou arraste o
+            <br />
+            XML da NFe aqui
+          </p>
         )}
       </div>
     </div>

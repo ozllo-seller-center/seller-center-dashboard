@@ -1,5 +1,9 @@
 import React, {
-  useCallback, useRef, ChangeEvent, useState, useMemo,
+  useCallback,
+  useRef,
+  ChangeEvent,
+  useState,
+  useMemo,
 } from 'react';
 
 import { FormHandles, Scope } from '@unform/core';
@@ -18,7 +22,11 @@ import CompanyInfo from 'src/shared/types/companyInfo';
 import UserTypeButton from 'src/components/UserTypeButton';
 import { FaUserTie, FaStore } from 'react-icons/fa';
 import { useModalMessage } from 'src/hooks/message';
-import { AppError, findError, getErrorField } from 'src/shared/errors/api/errors';
+import {
+  AppError,
+  findError,
+  getErrorField,
+} from 'src/shared/errors/api/errors';
 import MessageModal from 'src/components/MessageModal';
 import { FiCheck, FiX } from 'react-icons/fi';
 import MaskedInput from 'src/components/MaskedInput';
@@ -31,59 +39,59 @@ import api from '../../services/api';
 import { useAuth } from '../../hooks/auth';
 
 interface PersonalInfoDTO {
-  isPF: boolean,
-  firstName: string,
-  lastName: string,
-  cpf: string,
+  isPF: boolean;
+  firstName: string;
+  lastName: string;
+  cpf: string;
   // birthday?: string,
-  day: number,
-  month: number,
-  year: number,
+  day: number;
+  month: number;
+  year: number;
 }
 
 type ProfileFormData = {
-  personalInfo: PersonalInfoDTO | CompanyInfo,
+  personalInfo: PersonalInfoDTO | CompanyInfo;
 
   address: {
-    cep: string,
-    address: string,
-    number: number,
-    complement: string,
-    district: string,
-    city: string,
-  }
+    cep: string;
+    address: string;
+    number: number;
+    complement: string;
+    district: string;
+    city: string;
+  };
 
-  email: string,
+  email: string;
   // phone?: string,
 
   // commission: number,
   // role: string,
 
   bankInfo: {
-    bank: string,
-    name: string,
-    account: string,
-    agency: string,
-    pix?: string,
-  }
+    bank: string;
+    name: string;
+    account: string;
+    agency: string;
+    pix?: string;
+  };
 
   contact: {
-    phone?: string,
-    url?: string,
-  }
+    phone?: string;
+    url?: string;
+  };
 
   shopInfo: {
-    _id: string,
-    name: string,
-    cnpj: string,
+    _id: string;
+    name: string;
+    cnpj: string;
 
     // address: string,
     // district: string,
     // city: string,
     // complement: string,
     // number: number,
-  }
-}
+  };
+};
 
 const TYPE_INDEX = -1;
 const PERSONAL_INDEX = 0;
@@ -93,12 +101,14 @@ const SELLER_INDEX = 3;
 const STORE_INDEX = 4;
 
 const Profile: React.FC = () => {
-  const {
-    user, updateUser, token, signOut,
-  } = useAuth();
+  const { user, updateUser, token, signOut } = useAuth();
   const { isLoading, setLoading } = useLoading();
 
-  const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
+  const {
+    showModalMessage: showMessage,
+    modalMessage,
+    handleModalMessage,
+  } = useModalMessage();
 
   const [flowIntent, setFlowIntent] = useState(true);
   const [flowStep, setFlowStep] = useState(-1);
@@ -126,17 +136,20 @@ const Profile: React.FC = () => {
 
     // isTokenValid(token).then(valid => {
     // if (valid) {
-    api.get(`auth/token/${token}`).then((response) => {
-      const { isValid } = response.data;
+    api
+      .get(`auth/token/${token}`)
+      .then(response => {
+        const { isValid } = response.data;
 
-      if (!isValid) {
+        if (!isValid) {
+          signOut();
+          router.push('/');
+        }
+      })
+      .catch(error => {
         signOut();
         router.push('/');
-      }
-    }).catch((error) => {
-      signOut();
-      router.push('/');
-    });
+      });
 
     // return
     // }
@@ -146,8 +159,16 @@ const Profile: React.FC = () => {
   const userData = useMemo(() => {
     const userDTO = { ...user } as any;
     if (!!userDTO.personalInfo && !!userDTO.personalInfo.cpf) {
-      const parts = userDTO.personalInfo.birthday ? userDTO.personalInfo.birthday.split('-') : [];
-      const dateRaw = userDTO.personalInfo.birthday ? new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10)) : undefined;
+      const parts = userDTO.personalInfo.birthday
+        ? userDTO.personalInfo.birthday.split('-')
+        : [];
+      const dateRaw = userDTO.personalInfo.birthday
+        ? new Date(
+            parseInt(parts[2], 10),
+            parseInt(parts[1], 10) - 1,
+            parseInt(parts[0], 10),
+          )
+        : undefined;
 
       return {
         ...userDTO,
@@ -165,50 +186,73 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    api.get('/account/detail').then((response) => {
-      updateUser({ ...user, ...response.data, userType: response.data.personalInfo.cpf ? 'f' : 'j' });
-
-      const userInfo = { ...response.data };
-
-      if (userInfo.personalInfo.cpf) {
-        const parts = userInfo.personalInfo.birthday ? userInfo.personalInfo.birthday.split('-') : [];
-        const dateRaw = userInfo.personalInfo.birthday ? new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10)) : undefined;
-
-        formRef.current?.setData({
+    api
+      .get('/account/detail')
+      .then(response => {
+        updateUser({
           ...user,
-          ...userInfo,
-          personalInfo: {
-            ...userInfo.personalInfo,
-            day: dateRaw ? dateRaw.getDate() : '',
-            month: dateRaw ? dateRaw.getMonth() + 1 : '',
-            year: dateRaw ? dateRaw.getFullYear() : '',
-          },
-        } as ProfileFormData);
+          ...response.data,
+          userType: response.data.personalInfo.cpf ? 'f' : 'j',
+        });
 
-        console.log(`Loading false? ${isLoading}`);
+        const userInfo = { ...response.data };
+
+        if (userInfo.personalInfo.cpf) {
+          const parts = userInfo.personalInfo.birthday
+            ? userInfo.personalInfo.birthday.split('-')
+            : [];
+          const dateRaw = userInfo.personalInfo.birthday
+            ? new Date(
+                parseInt(parts[2], 10),
+                parseInt(parts[1], 10) - 1,
+                parseInt(parts[0], 10),
+              )
+            : undefined;
+
+          formRef.current?.setData({
+            ...user,
+            ...userInfo,
+            personalInfo: {
+              ...userInfo.personalInfo,
+              day: dateRaw ? dateRaw.getDate() : '',
+              month: dateRaw ? dateRaw.getMonth() + 1 : '',
+              year: dateRaw ? dateRaw.getFullYear() : '',
+            },
+          } as ProfileFormData);
+
+          console.log(`Loading false? ${isLoading}`);
+
+          setLoading(false);
+
+          return;
+        }
+
+        formRef.current?.setData({ ...user, ...userInfo });
 
         setLoading(false);
+      })
+      .catch(err => {
+        console.log(err);
 
-        return;
-      }
-
-      formRef.current?.setData({ ...user, ...userInfo });
-
-      setLoading(false);
-    }).catch((err) => {
-      console.log(err);
-
-      setLoading(false);
-    });
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
     if (user) {
-      api.get('/bank/all').then((response) => {
-        setBanks(response.data.map((bank: any) => ({ code: bank.value, name: bank.name })));
-      }).catch((err) => {
-        console.log(err);
-      });
+      api
+        .get('/bank/all')
+        .then(response => {
+          setBanks(
+            response.data.map((bank: any) => ({
+              code: bank.value,
+              name: bank.name,
+            })),
+          );
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   }, [user]);
 
@@ -334,22 +378,39 @@ const Profile: React.FC = () => {
             personalInfo: Yup.object().shape({
               name: Yup.string().required('Nome obrigatório'),
               razaoSocial: Yup.string().required('Razão Social obrigatório'),
-              cnpj: Yup.string().required('CNPJ obrigatório').min(14, 'CNPJ deve ter 14 digitos'),
+              cnpj: Yup.string()
+                .required('CNPJ obrigatório')
+                .min(14, 'CNPJ deve ter 14 digitos'),
             }),
           };
         }
 
         return {
           personalInfo: Yup.object().shape({
-            firstName: Yup.string().required('Nome obrigatório').min(2, 'Mínimo de 2 caracteres'),
-            lastName: Yup.string().required('Sobrenome obrigatório').min(2, 'Mínimo de 2 caracteres'),
-            cpf: Yup.string().required('CPF obrigatório').min(11, 'O CPF deve ter 11 digitos'),
+            firstName: Yup.string()
+              .required('Nome obrigatório')
+              .min(2, 'Mínimo de 2 caracteres'),
+            lastName: Yup.string()
+              .required('Sobrenome obrigatório')
+              .min(2, 'Mínimo de 2 caracteres'),
+            cpf: Yup.string()
+              .required('CPF obrigatório')
+              .min(11, 'O CPF deve ter 11 digitos'),
             // birthday: Yup.date(),
-            year: Yup.number().min(1900, 'O ano mínimo aceito é 1900').max(2021, 'O ano não pode ser maior que o ano atual').required('')
+            year: Yup.number()
+              .min(1900, 'O ano mínimo aceito é 1900')
+              .max(2021, 'O ano não pode ser maior que o ano atual')
+              .required('')
               .typeError(''),
-            month: Yup.number().min(1, 'Mês validos vão de 1-12').max(12, 'Mês validos vão de 1-12').required('')
+            month: Yup.number()
+              .min(1, 'Mês validos vão de 1-12')
+              .max(12, 'Mês validos vão de 1-12')
+              .required('')
               .typeError(''),
-            day: Yup.number().min(1, 'Dia válidos vão de 1-31').max(31, 'Dia válidos vão de 1-31').required('Data de nascimento obrigatória')
+            day: Yup.number()
+              .min(1, 'Dia válidos vão de 1-31')
+              .max(31, 'Dia válidos vão de 1-31')
+              .required('Data de nascimento obrigatória')
               .typeError(''),
           }),
 
@@ -358,43 +419,66 @@ const Profile: React.FC = () => {
       case ADDRESS_INDEX:
         return {
           address: Yup.object().shape({
-            cep: Yup.string().required('CEP deve ser preenchido').min(7, 'CEP deve ter pelo menos 7 digitos').max(9, 'CEP não pode passar de 9 digitos'),
-            address: Yup.string().required('Endereço deve ser preenchido').min(2, 'Mínimo de 2 caracteres'),
+            cep: Yup.string()
+              .required('CEP deve ser preenchido')
+              .min(7, 'CEP deve ter pelo menos 7 digitos')
+              .max(9, 'CEP não pode passar de 9 digitos'),
+            address: Yup.string()
+              .required('Endereço deve ser preenchido')
+              .min(2, 'Mínimo de 2 caracteres'),
             number: Yup.string().required('Número obrigaório'), // .typeError('Número obrigatório')
             complement: Yup.string(),
-            district: Yup.string().required('Bairro obrigaório').min(2, 'Mínimo de 2 caracteres'),
-            city: Yup.string().required('Cidade obrigaória').min(2, 'Mínimo de 2 caracteres'),
+            district: Yup.string()
+              .required('Bairro obrigaório')
+              .min(2, 'Mínimo de 2 caracteres'),
+            city: Yup.string()
+              .required('Cidade obrigaória')
+              .min(2, 'Mínimo de 2 caracteres'),
           }),
         };
       case CONTACT_INDEX:
         if (!!user.personalInfo && user.userType === 'f') {
           return {
             contact: Yup.object().shape({
-              phone: Yup.string().min(12, 'O telefone/celular deve ter pelo menos 10 digitos').required('O telefone/celular deve ser preenchido'),
+              phone: Yup.string()
+                .min(12, 'O telefone/celular deve ter pelo menos 10 digitos')
+                .required('O telefone/celular deve ser preenchido'),
             }),
           };
         }
 
         return {
           contact: Yup.object().shape({
-            phone: Yup.string().min(10, 'O telefone/celular deve ter pelo menos 10 digitos').required('O telefone/celular deve ser preenchido'),
-            url: Yup.string().url('A URL deve seguir o padrão: http://<url>.<domínio(s)> ou https://<url>.<domínio(s)>'),
+            phone: Yup.string()
+              .min(10, 'O telefone/celular deve ter pelo menos 10 digitos')
+              .required('O telefone/celular deve ser preenchido'),
+            url: Yup.string().url(
+              'A URL deve seguir o padrão: http://<url>.<domínio(s)> ou https://<url>.<domínio(s)>',
+            ),
           }),
         };
       case SELLER_INDEX:
         return {
           bankInfo: Yup.object().shape({
-            bank: Yup.string().min(3, 'O banco deve ter pelo menos 3 digitos').required(''),
+            bank: Yup.string()
+              .min(3, 'O banco deve ter pelo menos 3 digitos')
+              .required(''),
             name: Yup.string().required('Banco obrigatório'),
-            account: Yup.string().min(2, 'A conta deve ter pelo menos 2 caracteres').required('Conta obrigatório'),
-            agency: Yup.string().min(4, 'A agência deve ter pelo menos 4 digitos').required('Agência obrigatório'),
+            account: Yup.string()
+              .min(2, 'A conta deve ter pelo menos 2 caracteres')
+              .required('Conta obrigatório'),
+            agency: Yup.string()
+              .min(4, 'A agência deve ter pelo menos 4 digitos')
+              .required('Agência obrigatório'),
             pix: Yup.string(),
           }),
         };
       case STORE_INDEX:
         return {
           shopInfo: Yup.object().shape({
-            name: Yup.string().required('Nome obrigatório').min(2, 'Mínimo de 2 caracteres'),
+            name: Yup.string()
+              .required('Nome obrigatório')
+              .min(2, 'Mínimo de 2 caracteres'),
           }),
         };
 
@@ -425,40 +509,56 @@ const Profile: React.FC = () => {
     }
   }, [isStepCompleted, flowIntent]);
 
-  const handlePersonType = useCallback((personType: string) => {
-    if (personType === 'j') {
-      updateUser({
-        ...user,
-        userType: 'j',
-      });
-    } else {
-      updateUser({
-        ...user,
-        userType: 'f',
-      });
-    }
+  const handlePersonType = useCallback(
+    (personType: string) => {
+      if (personType === 'j') {
+        updateUser({
+          ...user,
+          userType: 'j',
+        });
+      } else {
+        updateUser({
+          ...user,
+          userType: 'f',
+        });
+      }
 
-    setFlowStep(flowStep + 1);
-  }, [flowStep]);
+      setFlowStep(flowStep + 1);
+    },
+    [flowStep],
+  );
 
   const handleSubmit = useCallback(
     async (data: ProfileFormData) => {
       setStepCompleted(false);
       setLoading(true);
 
-      if (data.contact.phone) { data.contact.phone = data.contact.phone.replaceAll('_', ''); }
+      if (data.contact.phone) {
+        data.contact.phone = data.contact.phone.replaceAll('_', '');
+      }
 
-      data.bankInfo.agency = data.bankInfo.agency.replaceAll('_', '').replace('-', '');
-      data.bankInfo.account = data.bankInfo.account.replaceAll('_', '').replace('-', '');
+      data.bankInfo.agency = data.bankInfo.agency
+        .replaceAll('_', '')
+        .replace('-', '');
+      data.bankInfo.account = data.bankInfo.account
+        .replaceAll('_', '')
+        .replace('-', '');
 
       if (user.userType !== 'f') {
         data.personalInfo = data.personalInfo as CompanyInfo;
 
-        data.personalInfo.cnpj = data.personalInfo.cnpj.replaceAll('_', '').replaceAll('.', '').replace('/', '').replace('-', '');
+        data.personalInfo.cnpj = data.personalInfo.cnpj
+          .replaceAll('_', '')
+          .replaceAll('.', '')
+          .replace('/', '')
+          .replace('-', '');
       } else {
         data.personalInfo = data.personalInfo as PersonalInfoDTO;
 
-        data.personalInfo.cpf = data.personalInfo.cpf.replaceAll('_', '').replaceAll('.', '').replace('-', '');
+        data.personalInfo.cpf = data.personalInfo.cpf
+          .replaceAll('_', '')
+          .replaceAll('.', '')
+          .replace('-', '');
       }
 
       try {
@@ -481,58 +581,81 @@ const Profile: React.FC = () => {
             let personalInfo;
 
             if (user.userType === 'f') {
-              const {
-                firstName,
-                lastName,
-                cpf,
-                day,
-                month,
-                year,
-              } = data.personalInfo as PersonalInfoDTO;
+              const { firstName, lastName, cpf, day, month, year } =
+                data.personalInfo as PersonalInfoDTO;
 
               personalInfo = {
                 isPF: true,
                 firstName,
                 lastName,
                 cpf,
-                birthday: format(new Date(year, (month - 1), day), 'dd-MM-yyyy'),
+                birthday: format(new Date(year, month - 1, day), 'dd-MM-yyyy'),
                 // birthday: !!birthday ? format(new Date(birthday), 'dd-MM-yyyy') : null,
               } as PersonInfo;
 
-              await api.post('/account/personalInfo', personalInfo).then((response) => {
-                const updatedUser = { ...user, personalInfo: { ...response.data } };
+              await api
+                .post('/account/personalInfo', personalInfo)
+                .then(response => {
+                  const updatedUser = {
+                    ...user,
+                    personalInfo: { ...response.data },
+                  };
 
-                updateUser(updatedUser);
+                  updateUser(updatedUser);
 
-                setStepCompleted(true);
-              }).catch((err) => {
-                setStepCompleted(false);
+                  setStepCompleted(true);
+                })
+                .catch(err => {
+                  setStepCompleted(false);
 
-                err.response.data.errors.forEach((error: AppError) => {
-                  const apiError = findError(error.errorCode);
-                  const errorField = getErrorField(error.errorCode);
+                  err.response.data.errors.forEach((error: AppError) => {
+                    const apiError = findError(error.errorCode);
+                    const errorField = getErrorField(error.errorCode);
 
-                  if (errorField) {
-                    if (errorField.errorField === 'personalInfo.birthday') {
-                      formRef.current?.setFieldError('personalInfo.day', 'Informe uma data de nascimento válida');
-                      formRef.current?.setFieldError('personalInfo.month', ' ');
-                      formRef.current?.setFieldError('personalInfo.year', ' ');
-                      return;
+                    if (errorField) {
+                      if (errorField.errorField === 'personalInfo.birthday') {
+                        formRef.current?.setFieldError(
+                          'personalInfo.day',
+                          'Informe uma data de nascimento válida',
+                        );
+                        formRef.current?.setFieldError(
+                          'personalInfo.month',
+                          ' ',
+                        );
+                        formRef.current?.setFieldError(
+                          'personalInfo.year',
+                          ' ',
+                        );
+                        return;
+                      }
+
+                      formRef.current?.setFieldError(
+                        errorField.errorField,
+                        apiError.example
+                          ? apiError.example.join('\n')
+                          : 'Erro indefinido',
+                      );
+                      handleModalMessage(true, {
+                        title: apiError.description
+                          ? apiError.description
+                          : 'Erro',
+                        message: apiError.example
+                          ? apiError.example
+                          : ['Erro indefinido'],
+                        type: 'error',
+                      });
+                    } else {
+                      handleModalMessage(true, {
+                        title: 'Erro',
+                        message: ['Ocorreu um erro inesperado'],
+                        type: 'error',
+                      });
                     }
-
-                    formRef.current?.setFieldError(errorField.errorField, apiError.example ? apiError.example.join('\n') : 'Erro indefinido');
-                    handleModalMessage(true, { title: apiError.description ? apiError.description : 'Erro', message: apiError.example ? apiError.example : ['Erro indefinido'], type: 'error' });
-                  } else {
-                    handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' });
-                  }
+                  });
                 });
-              });
             } else {
-              const {
-                name,
-                razaoSocial,
-                cnpj,
-              } = data.personalInfo as CompanyInfo;
+              const { name, razaoSocial, cnpj } =
+                data.personalInfo as CompanyInfo;
 
               personalInfo = {
                 isPJ: true,
@@ -541,40 +664,57 @@ const Profile: React.FC = () => {
                 cnpj: cnpjValidator.format(cnpj),
               };
 
-              await api.post('/account/personalInfo', personalInfo).then((response) => {
-                const updatedUser = { ...user, personalInfo: { ...response.data } };
+              await api
+                .post('/account/personalInfo', personalInfo)
+                .then(response => {
+                  const updatedUser = {
+                    ...user,
+                    personalInfo: { ...response.data },
+                  };
 
-                updateUser(updatedUser);
-                setStepCompleted(true);
-              }).catch((err) => {
-                console.log(err.response.data);
+                  updateUser(updatedUser);
+                  setStepCompleted(true);
+                })
+                .catch(err => {
+                  console.log(err.response.data);
 
-                setStepCompleted(false);
+                  setStepCompleted(false);
 
-                err.response.data.errors.forEach((error: AppError) => {
-                  const apiError = findError(error.errorCode);
-                  const errorField = getErrorField(error.errorCode);
+                  err.response.data.errors.forEach((error: AppError) => {
+                    const apiError = findError(error.errorCode);
+                    const errorField = getErrorField(error.errorCode);
 
-                  if (errorField) {
-                    formRef.current?.setFieldError(errorField.errorField, apiError.example ? apiError.example.join('\n') : 'Erro indefinido');
-                    handleModalMessage(true, { title: apiError.description ? apiError.description : 'Erro', message: apiError.example ? apiError.example : ['Erro indefinido'], type: 'error' });
-                  } else {
-                    handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' });
-                  }
+                    if (errorField) {
+                      formRef.current?.setFieldError(
+                        errorField.errorField,
+                        apiError.example
+                          ? apiError.example.join('\n')
+                          : 'Erro indefinido',
+                      );
+                      handleModalMessage(true, {
+                        title: apiError.description
+                          ? apiError.description
+                          : 'Erro',
+                        message: apiError.example
+                          ? apiError.example
+                          : ['Erro indefinido'],
+                        type: 'error',
+                      });
+                    } else {
+                      handleModalMessage(true, {
+                        title: 'Erro',
+                        message: ['Ocorreu um erro inesperado'],
+                        type: 'error',
+                      });
+                    }
+                  });
                 });
-              });
             }
 
             break;
           case ADDRESS_INDEX:
-            const {
-              cep,
-              address,
-              city,
-              complement,
-              district,
-              number,
-            } = data.address;
+            const { cep, address, city, complement, district, number } =
+              data.address;
 
             // var cepFormatted = cep.replaceAll("-", "")
             // cepFormatted = cepFormatted.slice(0, 5) + "-" + cepFormatted.slice(5, cep.length)
@@ -583,7 +723,10 @@ const Profile: React.FC = () => {
               if (complement.length < 4) {
                 setStepCompleted(false);
                 setLoading(false);
-                formRef?.current?.setFieldError('address.complement', 'Mínimo de 4 caracteres');
+                formRef?.current?.setFieldError(
+                  'address.complement',
+                  'Mínimo de 4 caracteres',
+                );
                 return;
               }
             }
@@ -597,67 +740,112 @@ const Profile: React.FC = () => {
               number,
             };
 
-            await api.post('/account/address', addressInfo).then((response) => {
-              updateUser({ ...user, address: { ...response.data } });
-              setStepCompleted(true);
-            }).catch((err) => {
-              console.log(err.response.data);
+            await api
+              .post('/account/address', addressInfo)
+              .then(response => {
+                updateUser({ ...user, address: { ...response.data } });
+                setStepCompleted(true);
+              })
+              .catch(err => {
+                console.log(err.response.data);
 
-              setStepCompleted(false);
+                setStepCompleted(false);
 
-              err.response.data.errors.forEach((error: AppError) => {
-                const apiError = findError(error.errorCode);
-                const errorField = getErrorField(error.errorCode);
+                err.response.data.errors.forEach((error: AppError) => {
+                  const apiError = findError(error.errorCode);
+                  const errorField = getErrorField(error.errorCode);
 
-                if (errorField) {
-                  let errorMessage;
+                  if (errorField) {
+                    let errorMessage;
 
-                  if (errorField.errorBrief) { errorMessage = errorField.errorBrief; } else if (apiError.example) { errorMessage = apiError.example.join('\n'); } else { errorMessage = 'Erro indefinido'; }
+                    if (errorField.errorBrief) {
+                      errorMessage = errorField.errorBrief;
+                    } else if (apiError.example) {
+                      errorMessage = apiError.example.join('\n');
+                    } else {
+                      errorMessage = 'Erro indefinido';
+                    }
 
-                  formRef.current?.setFieldError(errorField.errorField, errorMessage);
-                  handleModalMessage(true, { title: apiError.description ? apiError.description : 'Erro', message: apiError.example ? apiError.example : ['Erro indefinido'], type: 'error' });
-                } else {
-                  handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' });
-                }
+                    formRef.current?.setFieldError(
+                      errorField.errorField,
+                      errorMessage,
+                    );
+                    handleModalMessage(true, {
+                      title: apiError.description
+                        ? apiError.description
+                        : 'Erro',
+                      message: apiError.example
+                        ? apiError.example
+                        : ['Erro indefinido'],
+                      type: 'error',
+                    });
+                  } else {
+                    handleModalMessage(true, {
+                      title: 'Erro',
+                      message: ['Ocorreu um erro inesperado'],
+                      type: 'error',
+                    });
+                  }
+                });
               });
-            });
 
             break;
           case CONTACT_INDEX:
-            const {
-              phone,
-              url,
-            } = data.contact;
+            const { phone, url } = data.contact;
 
             const contact = {
               phone,
               url,
             };
 
-            await api.post('/account/contact', contact).then((response) => {
-              updateUser({ ...user, contact: { ...response.data } });
-              setStepCompleted(true);
-            }).catch((err) => {
-              console.log(err.response.data);
+            await api
+              .post('/account/contact', contact)
+              .then(response => {
+                updateUser({ ...user, contact: { ...response.data } });
+                setStepCompleted(true);
+              })
+              .catch(err => {
+                console.log(err.response.data);
 
-              setStepCompleted(false);
+                setStepCompleted(false);
 
-              err.response.data.errors.forEach((error: AppError) => {
-                const apiError = findError(error.errorCode);
-                const errorField = getErrorField(error.errorCode);
+                err.response.data.errors.forEach((error: AppError) => {
+                  const apiError = findError(error.errorCode);
+                  const errorField = getErrorField(error.errorCode);
 
-                if (errorField) {
-                  let errorMessage;
+                  if (errorField) {
+                    let errorMessage;
 
-                  if (errorField.errorBrief) { errorMessage = errorField.errorBrief; } else if (apiError.example) { errorMessage = apiError.example.join('\n'); } else { errorMessage = 'Erro indefinido'; }
+                    if (errorField.errorBrief) {
+                      errorMessage = errorField.errorBrief;
+                    } else if (apiError.example) {
+                      errorMessage = apiError.example.join('\n');
+                    } else {
+                      errorMessage = 'Erro indefinido';
+                    }
 
-                  formRef.current?.setFieldError(errorField.errorField, errorMessage);
-                  handleModalMessage(true, { title: apiError.description ? apiError.description : 'Erro', message: apiError.example ? apiError.example : ['Erro indefinido'], type: 'error' });
-                } else {
-                  handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' });
-                }
+                    formRef.current?.setFieldError(
+                      errorField.errorField,
+                      errorMessage,
+                    );
+                    handleModalMessage(true, {
+                      title: apiError.description
+                        ? apiError.description
+                        : 'Erro',
+                      message: apiError.example
+                        ? apiError.example
+                        : ['Erro indefinido'],
+                      type: 'error',
+                    });
+                  } else {
+                    handleModalMessage(true, {
+                      title: 'Erro',
+                      message: ['Ocorreu um erro inesperado'],
+                      type: 'error',
+                    });
+                  }
+                });
               });
-            });
 
             break;
           case SELLER_INDEX:
@@ -677,30 +865,54 @@ const Profile: React.FC = () => {
               pix,
             };
 
-            await api.post('/account/bankInfo', bankInfo).then((response) => {
-              updateUser({ ...user, bankInfo: { ...response.data } });
-              setStepCompleted(true);
-            }).catch((err) => {
-              console.log(err.response.data);
+            await api
+              .post('/account/bankInfo', bankInfo)
+              .then(response => {
+                updateUser({ ...user, bankInfo: { ...response.data } });
+                setStepCompleted(true);
+              })
+              .catch(err => {
+                console.log(err.response.data);
 
-              setStepCompleted(false);
+                setStepCompleted(false);
 
-              err.response.data.errors.forEach((error: AppError) => {
-                const apiError = findError(error.errorCode);
-                const errorField = getErrorField(error.errorCode);
+                err.response.data.errors.forEach((error: AppError) => {
+                  const apiError = findError(error.errorCode);
+                  const errorField = getErrorField(error.errorCode);
 
-                if (errorField) {
-                  let errorMessage;
+                  if (errorField) {
+                    let errorMessage;
 
-                  if (errorField.errorBrief) { errorMessage = errorField.errorBrief; } else if (apiError.example) { errorMessage = apiError.example.join('\n'); } else { errorMessage = 'Erro indefinido'; }
+                    if (errorField.errorBrief) {
+                      errorMessage = errorField.errorBrief;
+                    } else if (apiError.example) {
+                      errorMessage = apiError.example.join('\n');
+                    } else {
+                      errorMessage = 'Erro indefinido';
+                    }
 
-                  formRef.current?.setFieldError(errorField.errorField, errorMessage);
-                  handleModalMessage(true, { title: apiError.description ? apiError.description : 'Erro', message: apiError.example ? apiError.example : ['Erro indefinido'], type: 'error' });
-                } else {
-                  handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' });
-                }
+                    formRef.current?.setFieldError(
+                      errorField.errorField,
+                      errorMessage,
+                    );
+                    handleModalMessage(true, {
+                      title: apiError.description
+                        ? apiError.description
+                        : 'Erro',
+                      message: apiError.example
+                        ? apiError.example
+                        : ['Erro indefinido'],
+                      type: 'error',
+                    });
+                  } else {
+                    handleModalMessage(true, {
+                      title: 'Erro',
+                      message: ['Ocorreu um erro inesperado'],
+                      type: 'error',
+                    });
+                  }
+                });
               });
-            });
 
             break;
           case STORE_INDEX:
@@ -708,30 +920,54 @@ const Profile: React.FC = () => {
 
             const shopInfo = { name: storeName };
 
-            await api.post('/account/shopInfo', shopInfo).then((response) => {
-              updateUser({ ...user, shopInfo: { ...response.data } });
-              setStepCompleted(true);
-            }).catch((err) => {
-              console.log(err.response.data);
+            await api
+              .post('/account/shopInfo', shopInfo)
+              .then(response => {
+                updateUser({ ...user, shopInfo: { ...response.data } });
+                setStepCompleted(true);
+              })
+              .catch(err => {
+                console.log(err.response.data);
 
-              setStepCompleted(false);
+                setStepCompleted(false);
 
-              err.response.data.errors.forEach((error: AppError) => {
-                const apiError = findError(error.errorCode);
-                const errorField = getErrorField(error.errorCode);
+                err.response.data.errors.forEach((error: AppError) => {
+                  const apiError = findError(error.errorCode);
+                  const errorField = getErrorField(error.errorCode);
 
-                if (errorField) {
-                  let errorMessage;
+                  if (errorField) {
+                    let errorMessage;
 
-                  if (errorField.errorBrief) { errorMessage = errorField.errorBrief; } else if (apiError.example) { errorMessage = apiError.example.join('\n'); } else { errorMessage = 'Erro indefinido'; }
+                    if (errorField.errorBrief) {
+                      errorMessage = errorField.errorBrief;
+                    } else if (apiError.example) {
+                      errorMessage = apiError.example.join('\n');
+                    } else {
+                      errorMessage = 'Erro indefinido';
+                    }
 
-                  formRef.current?.setFieldError(errorField.errorField, errorMessage);
-                  handleModalMessage(true, { title: apiError.description ? apiError.description : 'Erro', message: apiError.example ? apiError.example : ['Erro indefinido'], type: 'error' });
-                } else {
-                  handleModalMessage(true, { title: 'Erro', message: ['Ocorreu um erro inesperado'], type: 'error' });
-                }
+                    formRef.current?.setFieldError(
+                      errorField.errorField,
+                      errorMessage,
+                    );
+                    handleModalMessage(true, {
+                      title: apiError.description
+                        ? apiError.description
+                        : 'Erro',
+                      message: apiError.example
+                        ? apiError.example
+                        : ['Erro indefinido'],
+                      type: 'error',
+                    });
+                  } else {
+                    handleModalMessage(true, {
+                      title: 'Erro',
+                      message: ['Ocorreu um erro inesperado'],
+                      type: 'error',
+                    });
+                  }
+                });
               });
-            });
 
             // updateUser({ ...user, shopInfo: { ...shopInfo } })
 
@@ -756,47 +992,50 @@ const Profile: React.FC = () => {
     [isChanged, flowIntent],
   );
 
-  const handleAvatarChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files) {
-        const data = new FormData();
+  const handleAvatarChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const data = new FormData();
 
-        data.append('avatar', e.target.files[0]);
+      data.append('avatar', e.target.files[0]);
 
-        // api.patch('/users/avatar', data).then(response => {
-        //   updateUser(response.data)
+      // api.patch('/users/avatar', data).then(response => {
+      //   updateUser(response.data)
 
-        //   // addToast({
-        //   //   type: 'success',
-        //   //   title: 'Avatar atualizado!',
-        //   // })
-        // })
+      //   // addToast({
+      //   //   type: 'success',
+      //   //   title: 'Avatar atualizado!',
+      //   // })
+      // })
+    }
+  }, []);
+
+  const handleSetBankCode = useCallback(
+    (bank: string) => {
+      if (bank) {
+        setChanged(true);
+        const index = banks.findIndex(b => bank === b.name);
+        formRef.current?.setFieldValue('bankInfo.bank', banks[index].code);
+        return;
       }
+
+      formRef.current?.setFieldValue('bankInfo.bank', '');
     },
-    [],
+    [banks],
   );
 
-  const handleSetBankCode = useCallback((bank: string) => {
-    if (bank) {
-      setChanged(true);
-      const index = banks.findIndex((b) => bank === b.name);
-      formRef.current?.setFieldValue('bankInfo.bank', banks[index].code);
-      return;
-    }
+  const handleSetBankName = useCallback(
+    (code: string) => {
+      if (code) {
+        setChanged(true);
+        const index = banks.findIndex(b => code === b.code);
+        formRef.current?.setFieldValue('bankInfo.name', banks[index].name);
+        return;
+      }
 
-    formRef.current?.setFieldValue('bankInfo.bank', '');
-  }, [banks]);
-
-  const handleSetBankName = useCallback((code: string) => {
-    if (code) {
-      setChanged(true);
-      const index = banks.findIndex((b) => code === b.code);
-      formRef.current?.setFieldValue('bankInfo.name', banks[index].name);
-      return;
-    }
-
-    formRef.current?.setFieldValue('bankInfo.name', '');
-  }, [banks]);
+      formRef.current?.setFieldValue('bankInfo.name', '');
+    },
+    [banks],
+  );
 
   const handleReturn = useCallback(() => {
     setFlowIntent(false);
@@ -828,10 +1067,11 @@ const Profile: React.FC = () => {
         >
           <div className={styles.controllerContainer}>
             <div className={styles.formsContainer}>
-              <div
-                className={typeClassName}
-              >
-                <div className={styles.typeButtonsContainer} style={{ height: '100%' }}>
+              <div className={typeClassName}>
+                <div
+                  className={styles.typeButtonsContainer}
+                  style={{ height: '100%' }}
+                >
                   <h3>Tipo de cadastro</h3>
 
                   <div className={styles.buttons}>
@@ -855,35 +1095,31 @@ const Profile: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <div
-                className={personalClassName}
-              >
-                {
-                  !!user && user.userType === 'f' ? (
-                    <>
-                      <h3>Seus dados pessoais</h3>
+              <div className={personalClassName}>
+                {!!user && user.userType === 'f' ? (
+                  <>
+                    <h3>Seus dados pessoais</h3>
 
-                      <Scope path="personalInfo">
+                    <Scope path="personalInfo">
+                      <Input
+                        name="firstName"
+                        placeholder="Nome"
+                        autoComplete="off"
+                        onChange={() => {
+                          setChanged(true);
+                        }}
+                      />
 
-                        <Input
-                          name="firstName"
-                          placeholder="Nome"
-                          autoComplete="off"
-                          onChange={() => {
-                            setChanged(true);
-                          }}
-                        />
+                      <Input
+                        name="lastName"
+                        placeholder="Sobrenome"
+                        autoComplete="off"
+                        onChange={() => {
+                          setChanged(true);
+                        }}
+                      />
 
-                        <Input
-                          name="lastName"
-                          placeholder="Sobrenome"
-                          autoComplete="off"
-                          onChange={() => {
-                            setChanged(true);
-                          }}
-                        />
-
-                        {/* <Input
+                      {/* <Input
                           name='birthday'
                           placeholder='Date de Nascimento'
                           autoComplete='off'
@@ -897,46 +1133,45 @@ const Profile: React.FC = () => {
                         // defaultValue={!!user?.personalInfo && !!user?.personalInfo.birthday ? user.personalInfo.birthday : ''}
                         /> */}
 
-                        <div className={styles.dateField}>
-                          <Input
-                            name="day"
-                            placeholder="Dia de nascimento"
-                            autoComplete="off"
-                            onChange={() => {
-                              setChanged(true);
-                            }}
+                      <div className={styles.dateField}>
+                        <Input
+                          name="day"
+                          placeholder="Dia de nascimento"
+                          autoComplete="off"
+                          onChange={() => {
+                            setChanged(true);
+                          }}
                           // type='numeric'
                           // maxLength={2}
-                          />
+                        />
 
-                          <Input
-                            name="month"
-                            placeholder="Mês de nascimento"
-                            autoComplete="off"
-                            onChange={() => {
-                              setChanged(true);
-                            }}
-                            type="numeric"
-                            maxLength={2}
-                          />
+                        <Input
+                          name="month"
+                          placeholder="Mês de nascimento"
+                          autoComplete="off"
+                          onChange={() => {
+                            setChanged(true);
+                          }}
+                          type="numeric"
+                          maxLength={2}
+                        />
 
-                          <Input
-                            name="year"
-                            placeholder="Ano de nascimento"
-                            autoComplete="off"
-                            onChange={() => {
-                              setChanged(true);
-                            }}
-                            type="numeric"
-                            minLength={4}
-                            maxLength={4}
-                          />
-                        </div>
+                        <Input
+                          name="year"
+                          placeholder="Ano de nascimento"
+                          autoComplete="off"
+                          onChange={() => {
+                            setChanged(true);
+                          }}
+                          type="numeric"
+                          minLength={4}
+                          maxLength={4}
+                        />
+                      </div>
+                    </Scope>
 
-                      </Scope>
-
-                      <Scope path="personalInfo">
-                        {/* <Input
+                    <Scope path="personalInfo">
+                      {/* <Input
                           name='cpf'
                           placeholder='CPF'
                           autoComplete='off'
@@ -948,57 +1183,56 @@ const Profile: React.FC = () => {
                           maxLength={11}
                         // value={!!user?.cpf ? user.cpf : ''}
                         /> */}
-                        <MaskedInput
-                          name="cpf"
-                          placeholder="CPF"
-                          mask="999.999.999-99"
-                          // maskChar="_"
-                          autoComplete="off"
-                          onChange={() => {
-                            setChanged(true);
-                          }}
-                        />
-                      </Scope>
-                    </>
-                  ) : (
-                    <>
-                      <h3>Seus dados empresariais</h3>
+                      <MaskedInput
+                        name="cpf"
+                        placeholder="CPF"
+                        mask="999.999.999-99"
+                        // maskChar="_"
+                        autoComplete="off"
+                        onChange={() => {
+                          setChanged(true);
+                        }}
+                      />
+                    </Scope>
+                  </>
+                ) : (
+                  <>
+                    <h3>Seus dados empresariais</h3>
 
-                      <Scope path="personalInfo">
-                        <Input
-                          name="name"
-                          placeholder="Nome"
-                          autoComplete="off"
-                          onChange={() => {
-                            setChanged(true);
-                          }}
-                        />
+                    <Scope path="personalInfo">
+                      <Input
+                        name="name"
+                        placeholder="Nome"
+                        autoComplete="off"
+                        onChange={() => {
+                          setChanged(true);
+                        }}
+                      />
 
-                        <Input
-                          name="razaoSocial"
-                          placeholder="Razão social"
-                          autoComplete="off"
-                          onChange={() => {
-                            setChanged(true);
-                          }}
-                        />
+                      <Input
+                        name="razaoSocial"
+                        placeholder="Razão social"
+                        autoComplete="off"
+                        onChange={() => {
+                          setChanged(true);
+                        }}
+                      />
 
-                        <MaskedInput
-                          name="cnpj"
-                          placeholder="CNPJ"
-                          autoComplete="off"
-                          // isMasked
-                          mask="99.999.999/9999-99"
-                          onChange={() => {
-                            setChanged(true);
-                          }}
+                      <MaskedInput
+                        name="cnpj"
+                        placeholder="CNPJ"
+                        autoComplete="off"
+                        // isMasked
+                        mask="99.999.999/9999-99"
+                        onChange={() => {
+                          setChanged(true);
+                        }}
                         // maxLength={14}
                         // value={!!user?.cpf ? user.cpf : ''}
-                        />
-                      </Scope>
-                    </>
-                  )
-                }
+                      />
+                    </Scope>
+                  </>
+                )}
               </div>
 
               <div className={contactClassName}>
@@ -1020,19 +1254,17 @@ const Profile: React.FC = () => {
                     onChange={() => {
                       setChanged(true);
                     }}
-                  // maxLength={11}
+                    // maxLength={11}
                   />
 
-                  {!!user && user.userType === 'j'
-                    && (
+                  {!!user && user.userType === 'j' && (
                     <Input
                       name="url"
                       placeholder="URL Site"
                       autoComplete="off"
                     />
-                    )}
+                  )}
                 </Scope>
-
               </div>
 
               <Scope path="address">
@@ -1109,7 +1341,7 @@ const Profile: React.FC = () => {
                     <Autocomplete
                       name="name"
                       placeholder="Banco"
-                      items={banks.map((bank) => bank.name)}
+                      items={banks.map(bank => bank.name)}
                       setSelectedItem={handleSetBankCode}
                       autoComplete="off"
                       autoCorrect="off"
@@ -1118,7 +1350,7 @@ const Profile: React.FC = () => {
                     <Autocomplete
                       name="bank"
                       placeholder="Código"
-                      items={banks.map((bank) => bank.code)}
+                      items={banks.map(bank => bank.code)}
                       setSelectedItem={handleSetBankName}
                       autoComplete="off"
                       type="number"
@@ -1137,8 +1369,8 @@ const Profile: React.FC = () => {
                       setChanged(true);
                       // setAgencyMask(e.target.value.length <= 4 ? '999-9' : '9999-9')
                     }}
-                  // type={'number'}
-                  // maxLength={5}
+                    // type={'number'}
+                    // maxLength={5}
                   />
 
                   <MaskedInput
@@ -1150,8 +1382,8 @@ const Profile: React.FC = () => {
                     onChange={() => {
                       setChanged(true);
                     }}
-                  // type={'number'}
-                  // maxLength={10}
+                    // type={'number'}
+                    // maxLength={10}
                   />
 
                   <Input
@@ -1179,7 +1411,6 @@ const Profile: React.FC = () => {
                 placeholder='Categoria'
                 autoComplete='off'
               /> */}
-
                 </div>
               </Scope>
 
@@ -1232,39 +1463,37 @@ const Profile: React.FC = () => {
               </Scope>
             </div>
           </div>
-          {
-            flowStep >= 0 && (
-              <div className={styles.buttonsContainer}>
-                <Button
-                  type="submit"
-                  onClick={(e) => {
-                    e.preventDefault();
+          {flowStep >= 0 && (
+            <div className={styles.buttonsContainer}>
+              <Button
+                type="submit"
+                onClick={e => {
+                  e.preventDefault();
 
-                    handleReturn();
+                  handleReturn();
 
-                    // handleFlowStep()
-                  }}
-                  customStyle={{ className: styles.backButton }}
-                  disabled={(flowStep === PERSONAL_INDEX || flowStep === -1)}
-                >
-                  Voltar
-                </Button>
-                <Button
-                  type="submit"
-                  customStyle={{ className: styles.nextButton }}
-                  onClick={(e) => {
-                    e.preventDefault();
+                  // handleFlowStep()
+                }}
+                customStyle={{ className: styles.backButton }}
+                disabled={flowStep === PERSONAL_INDEX || flowStep === -1}
+              >
+                Voltar
+              </Button>
+              <Button
+                type="submit"
+                customStyle={{ className: styles.nextButton }}
+                onClick={e => {
+                  e.preventDefault();
 
-                    handleAdvance();
+                  handleAdvance();
 
-                    // handleFlowStep()
-                  }}
-                >
-                  {(flowStep !== STORE_INDEX) ? 'Avançar' : 'Confirmar'}
-                </Button>
-              </div>
-            )
-          }
+                  // handleFlowStep()
+                }}
+              >
+                {flowStep !== STORE_INDEX ? 'Avançar' : 'Confirmar'}
+              </Button>
+            </div>
+          )}
         </Form>
 
         {/* <div className={styles.indicatorContainer}>
@@ -1274,25 +1503,27 @@ const Profile: React.FC = () => {
           <div className={styles.indicator} style={(flowStep === 3) ? { width: '0.75rem', height: '0.75rem', opacity: 1 } : {}} />
         </div> */}
       </div>
-      {
-        isLoading && (
-          <div className={styles.loadingContainer}>
-            <Loader />
+      {isLoading && (
+        <div className={styles.loadingContainer}>
+          <Loader />
+        </div>
+      )}
+      {showMessage && (
+        <MessageModal handleVisibility={handleModalVisibility}>
+          <div className={styles.modalContent}>
+            {modalMessage.type === 'success' ? (
+              <FiCheck style={{ color: 'var(--green-100)' }} />
+            ) : (
+              <FiX style={{ color: 'var(--red-100)' }} />
+            )}
+            <p>{modalMessage.title}</p>
+            {modalMessage.message.map(msg => (
+              <span key={msg}>{msg}</span>
+            ))}
+            {/* <p>{modalMessage.message}</p> */}
           </div>
-        )
-      }
-      {
-        showMessage && (
-          <MessageModal handleVisibility={handleModalVisibility}>
-            <div className={styles.modalContent}>
-              {modalMessage.type === 'success' ? <FiCheck style={{ color: 'var(--green-100)' }} /> : <FiX style={{ color: 'var(--red-100)' }} />}
-              <p>{modalMessage.title}</p>
-              {modalMessage.message.map((msg) => <span key={msg}>{msg}</span>)}
-              {/* <p>{modalMessage.message}</p> */}
-            </div>
-          </MessageModal>
-        )
-      }
+        </MessageModal>
+      )}
     </div>
   );
 };

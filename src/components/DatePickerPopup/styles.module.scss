@@ -9,7 +9,7 @@
 
   border-radius: 4px;
   background: var(--yellow-300);
-  box-shadow: 0px 0px 3rem rgba(0,0,0,0.12), 0 0px 2rem rgba(0,0,0,0.11);
+  box-shadow: 0px 0px 3rem rgba(0, 0, 0, 0.12), 0 0px 2rem rgba(0, 0, 0, 0.11);
 
   transition: display 0.2s;
 
@@ -22,7 +22,7 @@
 
     align-items: center;
 
-    > button {
+    >button {
       cursor: pointer;
       // width: 4rem;
       padding: 0.5rem 1.5rem;
@@ -43,7 +43,7 @@
       }
     }
 
-    > span {
+    >span {
       cursor: pointer;
       font-size: 1rem;
       font-weight: lighter;

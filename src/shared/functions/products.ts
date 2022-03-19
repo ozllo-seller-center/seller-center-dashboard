@@ -7,9 +7,11 @@ import { Variation } from '../types/product';
 export const getGender = (produto: any) => {
   if (Genres.Masculino === produto.gender.trim()) {
     return Genres.M;
-  } if (Genres.Feminino === produto.gender.trim()) {
+  }
+  if (Genres.Feminino === produto.gender.trim()) {
     return Genres.F;
-  } if (Genres.Unissex === produto.gender.trim()) {
+  }
+  if (Genres.Unissex === produto.gender.trim()) {
     return Genres.U;
   }
   return '';
@@ -25,7 +27,10 @@ export const getCategory = (produto: any) => {
 export const getImages = (images: any) => {
   let objetoImagem = {};
   for (let i = 0; i <= 5; i += 1) {
-    objetoImagem = { ...objetoImagem, [`image_${i + 1}`]: images[i] ? images[i] : '' };
+    objetoImagem = {
+      ...objetoImagem,
+      [`image_${i + 1}`]: images[i] ? images[i] : '',
+    };
   }
   return objetoImagem;
 };
@@ -33,7 +38,10 @@ export const getImages = (images: any) => {
 export const getImagesHeader = () => {
   let objetoImagem = {};
   for (let i = 0; i <= 5; i += 1) {
-    objetoImagem = { ...objetoImagem, [`image_${i + 1}`]: i <= 1 ? 'Obrigatório' : 'Opcional' };
+    objetoImagem = {
+      ...objetoImagem,
+      [`image_${i + 1}`]: i <= 1 ? 'Obrigatório' : 'Opcional',
+    };
   }
   return objetoImagem;
 };

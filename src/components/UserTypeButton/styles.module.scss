@@ -10,7 +10,7 @@
   align-items: center;
 
   border-radius: 4px;
-  box-shadow: 0 2px 3px rgba(0,0,0,0.09), 0 6px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.09), 0 6px 6px rgba(0, 0, 0, 0.05);
 
   border: 1px solid var(--gray-200);
   transition: border 0.5s, border-color 0.5s, background-color 0.5s;
@@ -26,7 +26,7 @@
     border: 1px solid var(--yellow-300);
     background-color: var(--white);
 
-    > svg {
+    >svg {
       color: var(--yellow-300);
     }
 
@@ -35,7 +35,7 @@
     }
   }
 
-  > svg {
+  >svg {
     width: 2.5rem;
     height: 2.5rem;
     color: var(--grafite);

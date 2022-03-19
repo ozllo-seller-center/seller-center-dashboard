@@ -3,14 +3,17 @@ import Modal from '../Modal';
 import styles from './styles.module.scss';
 
 interface ActionModalProps {
-  handleVisibility: React.MouseEventHandler
-  titulo: string,
-  mensagem: string,
-  execute:any
+  handleVisibility: React.MouseEventHandler;
+  titulo: string;
+  mensagem: string;
+  execute: any;
 }
 
 const ActionModal: React.FC<ActionModalProps> = ({
-  handleVisibility, titulo, mensagem, execute,
+  handleVisibility,
+  titulo,
+  mensagem,
+  execute,
 }) => (
   <Modal handleVisibility={handleVisibility} title={titulo} cleanStyle>
     <div>
@@ -22,7 +25,9 @@ const ActionModal: React.FC<ActionModalProps> = ({
         </div>
         <div className={styles.content}>
           <div className={styles.info}>
-            <button type="button" onClick={execute}>Confirmar</button>
+            <button type="button" onClick={execute}>
+              Confirmar
+            </button>
           </div>
         </div>
       </div>

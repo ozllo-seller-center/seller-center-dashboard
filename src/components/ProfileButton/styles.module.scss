@@ -66,11 +66,12 @@
     padding-top: 0;
   }
 
-  &:hover, &:active {
+  &:hover,
+  &:active {
     height: 10rem;
     // padding: 1rem;
 
-    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
     background-color: var(--white);
 
     transition: height .5s, display .5s, box-shadow .5s, background-color .5s;
@@ -103,7 +104,7 @@
     margin-top: 0.6rem;
   }
 
-  > img {
+  >img {
     width: 2.5rem;
     height: 2.5rem;
     object-fit: cover;
@@ -119,7 +120,7 @@
     }
   }
 
-  > svg {
+  >svg {
     width: 2.5rem;
     height: 2.5rem;
 
@@ -131,7 +132,7 @@
     }
   }
 
-  > span {
+  >span {
     font-size: 0.8rem;
     font-weight: 700;
   }
@@ -187,7 +188,7 @@
         font-size: 1rem;
         margin-left: 1rem;
 
-        @media screen and (min-width: $tablet_vertical){
+        @media screen and (min-width: $tablet_vertical) {
           font-size: 1.1rem;
         }
 
