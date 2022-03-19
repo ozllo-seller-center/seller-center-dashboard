@@ -44,25 +44,19 @@ export const ProfileButton: React.FC = () => {
   }, [user]);
 
   return (
-    <div className={!isLoading ? styles.profileContainer : styles.profileContainerDisabled}>
+    <div
+      className={
+        !isLoading ? styles.profileContainer : styles.profileContainerDisabled
+      }
+    >
       <div className={styles.info}>
         {name ? (
-          <span>
-            {' '}
-            Olá,
-            {' '}
-            {name}
-            {' '}
-          </span>
-        ) : !!user && (
-        <span style={{ fontSize: '0.75rem' }}>
-          {' '}
-          {user.email}
-          {' '}
-        </span>
+          <span> Olá, {name} </span>
+        ) : (
+          !!user && <span style={{ fontSize: '0.75rem' }}> {user.email} </span>
         )}
         {/* {user ? <img src={!user.avatar_url ? 'https://www.projetodraft.com/wp-content/uploads/2019/06/ozllo_logo.jpg' : user.avatar_url} alt={user.name} /> : <FiUser size={52} color='var(--grafite)' />} */}
-        {(!!name) && <FiUser color="var(--grafite)" />}
+        {!!name && <FiUser color="var(--grafite)" />}
       </div>
       <div className={styles.profileContent}>
         <div className={styles.divider} />
@@ -74,7 +68,12 @@ export const ProfileButton: React.FC = () => {
             </a>
           </Link>
 
-          <div className={styles.menuItem} onClick={() => { signOut(); }}>
+          <div
+            className={styles.menuItem}
+            onClick={() => {
+              signOut();
+            }}
+          >
             <FiLogOut />
             <span>Sair</span>
           </div>

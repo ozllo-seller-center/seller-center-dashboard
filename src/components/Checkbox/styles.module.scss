@@ -3,11 +3,13 @@
     opacity: 0;
     padding: 0;
   }
+
   50% {
     opacity: 0.1;
     padding: 1.25rem;
   }
-  100%{
+
+  100% {
     opacity: 0;
     padding: 0
   }
@@ -133,7 +135,7 @@
 
   background: var(--gray-100);
   border-radius: 4px;
-  box-shadow: 0 0 24px rgba(0,0,0,0.05), 0 0 6px rgba(0,0,0,0.1);
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.05), 0 0 6px rgba(0, 0, 0, 0.1);
 
   opacity: 0.9;
 

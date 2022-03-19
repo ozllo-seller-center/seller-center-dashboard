@@ -89,7 +89,8 @@
   margin-bottom: 3rem;
 }
 
-.dotFlashing::before, .dotFlashing::after {
+.dotFlashing::before,
+.dotFlashing::after {
   content: '';
   display: inline-block;
   position: absolute;
@@ -122,6 +123,7 @@
   0% {
     background-color: var(--yellow-300);
   }
+
   50%,
   100% {
     background-color: var(--yellow-100);

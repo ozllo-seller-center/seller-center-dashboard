@@ -12,19 +12,29 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({
-  handleVisibility, cleanStyle, alterStyle, title, icon: Icon, children,
+  handleVisibility,
+  cleanStyle,
+  alterStyle,
+  title,
+  icon: Icon,
+  children,
 }) => (
   <div className={styles.parent}>
     <div onClick={handleVisibility} className={styles.modalBackground} />
-    <div className={styles.modalContainer} style={{ backgroundColor: !alterStyle ? 'var(--white)' : 'var(--yellow-300)' }}>
-      <div className={cleanStyle ? styles.modalClearHeader : styles.modalHeader}>
-        {
-            Icon && <Icon />
-          }
-        {
-            title && <span>{title}</span>
-          }
-        <button onClick={handleVisibility} type="button">X</button>
+    <div
+      className={styles.modalContainer}
+      style={{
+        backgroundColor: !alterStyle ? 'var(--white)' : 'var(--yellow-300)',
+      }}
+    >
+      <div
+        className={cleanStyle ? styles.modalClearHeader : styles.modalHeader}
+      >
+        {Icon && <Icon />}
+        {title && <span>{title}</span>}
+        <button onClick={handleVisibility} type="button">
+          X
+        </button>
       </div>
       {children}
     </div>

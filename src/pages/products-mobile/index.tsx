@@ -1,5 +1,9 @@
 import React, {
-  useCallback, useEffect, useMemo, useRef, useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from 'react';
 import { GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
@@ -43,49 +47,63 @@ export function Products({ userFromApi }: ProductsProps) {
 
   useEffect(() => {
     if (user) {
-      api.get('/product', {
-        headers: {
-          authorization: token,
-          shop_id: user.shopInfo._id,
-        },
-      }).then((response) => {
-        // console.log(response.data)
+      api
+        .get('/product', {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          },
+        })
+        .then(response => {
+          // console.log(response.data)
 
-        let productsDto = response.data as Product[];
+          let productsDto = response.data as Product[];
 
-        productsDto = productsDto.map((product) => {
-          let stockCount = 0;
+          productsDto = productsDto.map(product => {
+            let stockCount = 0;
 
-          if (!!product.variations && Array.isArray(product.variations)) {
-            product.variations.forEach((variation) => {
-              stockCount += Number(variation.stock);
-            });
-          }
+            if (!!product.variations && Array.isArray(product.variations)) {
+              product.variations.forEach(variation => {
+                stockCount += Number(variation.stock);
+              });
+            }
 
-          product.stock = stockCount;
+            product.stock = stockCount;
 
-          return product;
+            return product;
+          });
+
+          setProducts(productsDto);
+          setItems(productsDto);
+        })
+        .catch(err => {
+          console.log(err);
+
+          setProducts([]);
+          setItems([]);
         });
-
-        setProducts(productsDto);
-        setItems(productsDto);
-      }).catch((err) => {
-        console.log(err);
-
-        setProducts([]);
-        setItems([]);
-      });
     }
   }, [user]);
 
   useEffect(() => {
-    if (userFromApi) { updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: userFromApi.shopInfo._id } }); }
+    if (userFromApi) {
+      updateUser({
+        ...user,
+        shopInfo: { ...user.shopInfo, _id: userFromApi.shopInfo._id },
+      });
+    }
   }, [userFromApi]);
 
   useEffect(() => {
     setLoading(true);
 
-    setItems(products.filter((product) => (search === '' || product.name.toLowerCase().includes(search.toLowerCase()))));
+    setItems(
+      products.filter(
+        product =>
+          search === '' ||
+          product.name.toLowerCase().includes(search.toLowerCase()),
+      ),
+    );
 
     setLoading(false);
   }, [search, products]);
@@ -109,18 +127,24 @@ export function Products({ userFromApi }: ProductsProps) {
     <div className={styles.productsContainer}>
       <div className={styles.productsHeader}>
         <BulletedButton
-          onClick={() => { router.push('/products-mobile'); }}
+          onClick={() => {
+            router.push('/products-mobile');
+          }}
           isActive
         >
           Meus produtos
         </BulletedButton>
         <BulletedButton
-          onClick={() => { router.push('/products/create'); }}
+          onClick={() => {
+            router.push('/products/create');
+          }}
         >
           Criar novo produto
         </BulletedButton>
         <BulletedButton
-          onClick={() => { router.push('/products/import'); }}
+          onClick={() => {
+            router.push('/products/import');
+          }}
         >
           Importar ou exportar
         </BulletedButton>
@@ -142,10 +166,14 @@ export function Products({ userFromApi }: ProductsProps) {
         {items.length > 0 ? (
           items.map((item, i) => (
             <ProductItemCard
+              key={item._id}
               products={products}
               setProducts={setProducts}
               item={item}
-              userInfo={{ token, shop_id: (!user || !user.shopInfo._id) ? '' : user.shopInfo._id }}
+              userInfo={{
+                token,
+                shop_id: !user || !user.shopInfo._id ? '' : user.shopInfo._id,
+              }}
             />
           ))
         ) : (
@@ -157,16 +185,19 @@ export function Products({ userFromApi }: ProductsProps) {
 }
 
 export const getInitialProps = async () => {
-  const user = api.get('/account/detail').then((response) => response.data as User).catch((err) => {
-    console.log(err);
-  });
+  const user = api
+    .get('/account/detail')
+    .then(response => response.data as User)
+    .catch(err => {
+      console.log(err);
+    });
 
-  return ({
+  return {
     props: {
       userFromApi: user,
     },
     revalidate: 10,
-  });
+  };
 };
 
 export default Products;

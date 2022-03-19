@@ -6,12 +6,18 @@ interface BulletButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isActive?: boolean;
 }
 
-const BulletedButton: React.FC<BulletButtonProps> = ({ isActive, children, ...rest }) => (
-  <button type="button" className={isActive ? styles.buttonActive : styles.button} {...rest}>
+const BulletedButton: React.FC<BulletButtonProps> = ({
+  isActive,
+  children,
+  ...rest
+}) => (
+  <button
+    type="button"
+    className={isActive ? styles.buttonActive : styles.button}
+    {...rest}
+  >
     <div className={styles.bullet} />
-    <div className={styles.content}>
-      {children}
-    </div>
+    <div className={styles.content}>{children}</div>
   </button>
 );
 

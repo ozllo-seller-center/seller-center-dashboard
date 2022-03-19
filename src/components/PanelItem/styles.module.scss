@@ -10,7 +10,7 @@
 
   padding: 1.5rem 0.5rem;
 
-  & + div {
+  &+div {
     border-left: 1px solid var(--gray-100);
   }
 

@@ -17,7 +17,7 @@ export default function useTimer() {
     let interval: any = null;
     if (isActive) {
       interval = setInterval(() => {
-        setSeconds((sec) => sec + 1);
+        setSeconds(sec => sec + 1);
       }, 1000);
     } else if (!isActive && seconds !== 0) {
       clearInterval(interval);

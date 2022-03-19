@@ -1,12 +1,18 @@
 import { GroupTypeBase, Styles } from 'react-select';
 
-const customStyles: Partial<Styles<{
-  value: string;
-  label: string;
-}, false, GroupTypeBase<{
-  value: string;
-  label: string;
-}>>> = {
+const customStyles: Partial<
+  Styles<
+    {
+      value: string;
+      label: string;
+    },
+    false,
+    GroupTypeBase<{
+      value: string;
+      label: string;
+    }>
+  >
+> = {
   container: () => ({
     flex: 1,
     display: 'flex',
@@ -29,7 +35,10 @@ const customStyles: Partial<Styles<{
     const transition = 'opacity 300ms';
 
     return {
-      ...provided, opacity, transition, display: 'inline-flex',
+      ...provided,
+      opacity,
+      transition,
+      display: 'inline-flex',
     };
   },
   indicatorSeparator: () => ({

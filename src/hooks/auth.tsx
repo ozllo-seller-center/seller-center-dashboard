@@ -1,5 +1,9 @@
 import React, {
-  createContext, useCallback, useState, useContext, useMemo,
+  createContext,
+  useCallback,
+  useState,
+  useContext,
+  useMemo,
 } from 'react';
 import jwt_decode from 'jwt-decode';
 import InactiveUserError from 'src/shared/errors/InactiveUserError';
@@ -15,23 +19,23 @@ interface Token {
   data: User;
 }
 export interface User {
-  email: string,
-  isActive: boolean,
+  email: string;
+  isActive: boolean;
 
-  userType: 'f' | 'j' | '',
-  personalInfo: PersonInfo | CompanyInfo,
+  userType: 'f' | 'j' | '';
+  personalInfo: PersonInfo | CompanyInfo;
 
   contact: {
-    phone: string,
-  },
+    phone: string;
+  };
 
   address: {
-    address: string,
-    number: number,
-    complement?: string,
-    district: string,
-    city: string,
-  },
+    address: string;
+    number: number;
+    complement?: string;
+    district: string;
+    city: string;
+  };
 
   // phone?: string,
 
@@ -39,25 +43,25 @@ export interface User {
   // role: string,
 
   bankInfo: {
-    bank: string,
-    name: string,
-    account: string,
-    agency: string,
-    pix?: string,
-  },
+    bank: string;
+    name: string;
+    account: string;
+    agency: string;
+    pix?: string;
+  };
 
   shopInfo: {
-    _id?: string,
-    userId: string,
-    name: string,
-    cnpj: string,
+    _id?: string;
+    userId: string;
+    name: string;
+    cnpj: string;
 
     // address: string,
     // district: string,
     // city: string,
     // complement: string,
     // number: number,
-  },
+  };
 }
 
 interface AuthState {
@@ -114,22 +118,30 @@ const AuthProvider: React.FC = ({ children }) => {
 
     console.log(`Api URL: ${process.env.NEXT_PUBLIC_API_URL}`);
 
-    await api.get('/account/detail').then((resp) => {
-      const isActive = user.isActive;
+    await api
+      .get('/account/detail')
+      .then(resp => {
+        const isActive = user.isActive;
 
-      // console.log('Auth data')
-      // console.log(response.data);
+        // console.log('Auth data')
+        // console.log(response.data);
 
-      user = {
-        ...user, ...resp.data, isActive, userType: resp.data.personalInfo.cpf ? 'f' : 'j',
-      };
+        user = {
+          ...user,
+          ...resp.data,
+          isActive,
+          userType: resp.data.personalInfo.cpf ? 'f' : 'j',
+        };
 
-      if (!user.isActive) {
-        throw new InactiveUserError('Usuário inativado, login não pode ser realizado.');
-      }
-    }).catch((err) => {
-      console.log(err);
-    });
+        if (!user.isActive) {
+          throw new InactiveUserError(
+            'Usuário inativado, login não pode ser realizado.',
+          );
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
 
     localStorage.setItem('@SellerCenter:token', token);
     localStorage.setItem('@SellerCenter:user', JSON.stringify(user));
@@ -151,22 +163,30 @@ const AuthProvider: React.FC = ({ children }) => {
 
     // console.log(`Api URL: ${process.env.NEXT_PUBLIC_API_URL}`)
 
-    await api.get('/account/detail').then((resp) => {
-      const isActive = user.isActive;
+    await api
+      .get('/account/detail')
+      .then(resp => {
+        const isActive = user.isActive;
 
-      // console.log('Auth data')
-      // console.log(response.data);
+        // console.log('Auth data')
+        // console.log(response.data);
 
-      user = {
-        ...user, ...resp.data, isActive, userType: resp.data.personalInfo.cpf ? 'f' : 'j',
-      };
+        user = {
+          ...user,
+          ...resp.data,
+          isActive,
+          userType: resp.data.personalInfo.cpf ? 'f' : 'j',
+        };
 
-      if (!user.isActive) {
-        throw new InactiveUserError('Usuário inativado, login não pode ser realizado.');
-      }
-    }).catch((err) => {
-      console.log(err);
-    });
+        if (!user.isActive) {
+          throw new InactiveUserError(
+            'Usuário inativado, login não pode ser realizado.',
+          );
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
 
     localStorage.setItem('@SellerCenter:token', token);
     localStorage.setItem('@SellerCenter:user', JSON.stringify(user));
@@ -217,14 +237,21 @@ const AuthProvider: React.FC = ({ children }) => {
 
   const isRegisterCompleted = useMemo(() => {
     if (data.user) {
-      return !!data.user.personalInfo && !!data.user.shopInfo && !!data.user.bankInfo && !!data.user.contact && !!data.user.address;
+      return (
+        !!data.user.personalInfo &&
+        !!data.user.shopInfo &&
+        !!data.user.bankInfo &&
+        !!data.user.contact &&
+        !!data.user.address
+      );
       // return !!data.user.shopInfo
     }
 
     return false;
   }, [data]);
 
-  const isAdmin = async () => api.get('/account/decode').then((response) => response.data.role === 'admin');
+  const isAdmin = async () =>
+    api.get('/account/decode').then(response => response.data.role === 'admin');
 
   return (
     <AuthContext.Provider

@@ -4,7 +4,7 @@ import styles from './styles.module.scss';
 
 interface BurgerProps {
   open: boolean;
-  setOpen: Function;
+  setOpen: React.Dispatch<any>;
 }
 
 const MenuButton: React.FC<BurgerProps> = ({ open, setOpen }: BurgerProps) => (

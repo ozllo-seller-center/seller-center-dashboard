@@ -6,12 +6,12 @@ export enum SellStatus {
   Faturando = 'Aprovado',
   Despachado = 'Despachado',
   Despachando = 'Despachando',
-  Todos = '?'
+  Todos = '?',
 }
 
 export enum Filter {
   Hoje = 0,
   Semana = 1,
   Mes = 3,
-  Custom = 4
+  Custom = 4,
 }

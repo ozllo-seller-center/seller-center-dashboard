@@ -15,7 +15,7 @@
 
   padding: .25rem;
 
-  > svg {
+  >svg {
     color: var(--grafite);
     width: 1.75rem;
     height: 1.75rem;
@@ -35,7 +35,7 @@
     color: var(--yellow-300);
 
 
-    > svg {
+    >svg {
       color: var(--yellow-300);
       border-color: var(--yellow-300);
     }
@@ -54,7 +54,7 @@
 
   transition: color 0.5s, background-color 0.5s, font-weight 0.5s;
 
-  > svg {
+  >svg {
     color: var(--grafite);
     width: 1.25rem;
     height: 1.25rem;

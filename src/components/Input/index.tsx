@@ -16,18 +16,11 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
 }
 
-const Input: React.FC<InputProps> = ({
-  name,
-  label,
-  disabled,
-  ...rest
-}) => {
+const Input: React.FC<InputProps> = ({ name, label, disabled, ...rest }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
-  const {
-    fieldName, defaultValue, error, registerField,
-  } = useField(name);
+  const { fieldName, defaultValue, error, registerField } = useField(name);
 
   const handleInputFocused = useCallback(() => {
     setIsFocused(true);
@@ -48,20 +41,28 @@ const Input: React.FC<InputProps> = ({
   }, [fieldName, registerField]);
 
   const containerStyle = useMemo(() => {
-    if (disabled) { return styles.containerDisabled; }
-    if (error) { return styles.containerError; }
-    if (isFocused) { return styles.containerFocused; }
-    if (isFilled) { return styles.containerFilled; }
+    if (disabled) {
+      return styles.containerDisabled;
+    }
+    if (error) {
+      return styles.containerError;
+    }
+    if (isFocused) {
+      return styles.containerFocused;
+    }
+    if (isFilled) {
+      return styles.containerFilled;
+    }
 
     return styles.container;
   }, [disabled, error, isFilled, isFocused]);
 
   return (
     <div className={styles.parent}>
-      <div
-        className={containerStyle}
-      >
-        <label htmlFor={inputRef.current?.id} className={styles.inputLabel}>{label}</label>
+      <div className={containerStyle}>
+        <label htmlFor={inputRef.current?.id} className={styles.inputLabel}>
+          {label}
+        </label>
         <input
           type="text"
           name={name}
@@ -73,11 +74,7 @@ const Input: React.FC<InputProps> = ({
           {...rest}
         />
       </div>
-      {error && (
-        <p className={styles.error}>
-          {error}
-        </p>
-      )}
+      {error && <p className={styles.error}>{error}</p>}
     </div>
   );
 };

@@ -7,15 +7,15 @@ interface LoadingContextData {
   setLoading(loading: boolean): void;
 }
 
-const LoadingContext = createContext<LoadingContextData>({} as LoadingContextData);
+const LoadingContext = createContext<LoadingContextData>(
+  {} as LoadingContextData,
+);
 
 const LoadingProvider: React.FC = ({ children }) => {
   const [isLoading, setLoading] = useState(false);
 
   return (
-    <LoadingContext.Provider
-      value={{ isLoading, setLoading }}
-    >
+    <LoadingContext.Provider value={{ isLoading, setLoading }}>
       {children}
     </LoadingContext.Provider>
   );
@@ -24,7 +24,9 @@ const LoadingProvider: React.FC = ({ children }) => {
 function useLoading(): LoadingContextData {
   const context = useContext(LoadingContext);
 
-  if (!context) { throw new Error('useLoading must be used within an LoagindProvider'); }
+  if (!context) {
+    throw new Error('useLoading must be used within an LoagindProvider');
+  }
 
   return context;
 }

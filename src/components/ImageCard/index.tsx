@@ -11,7 +11,11 @@ interface ImageCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const ImageCard: React.FC<ImageCardProps> = ({
-  onClick, highlight, imgUrl, showOnly, ...rest
+  onClick,
+  highlight,
+  imgUrl,
+  showOnly,
+  ...rest
 }) => (
   <div className={styles.imageCard} {...rest}>
     <img src={imgUrl} alt="Product" />

@@ -1,7 +1,5 @@
 import { useField } from '@unform/core';
-import React, {
-  useCallback, useEffect, useRef, useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { FiCamera, FiAlertCircle } from 'react-icons/fi';
 
@@ -9,7 +7,10 @@ import { FiCamera, FiAlertCircle } from 'react-icons/fi';
 
 interface Props {
   name: string;
-  onFileUploaded: (acceptedFiles: File[], dropZoneRef: React.RefObject<any>) => void;
+  onFileUploaded: (
+    acceptedFiles: File[],
+    dropZoneRef: React.RefObject<any>,
+  ) => void;
   disabled?: boolean;
 }
 
@@ -23,35 +24,37 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, disabled }) => {
   const [err, setErr] = useState<string>();
 
   const dropZoneRef = useRef<InputRefProps>(null);
-  const {
-    fieldName, registerField, defaultValue, error, clearError,
-  } = useField(name);
+  const { fieldName, registerField, defaultValue, error, clearError } =
+    useField(name);
 
-  const onDrop = useCallback((acceptedFiles) => {
-    setErr(undefined);
-    clearError();
+  const onDrop = useCallback(
+    acceptedFiles => {
+      setErr(undefined);
+      clearError();
 
-    // if (disabled && dropZoneRef.current) {
-    //   const popped = acceptedFiles.pop()
+      // if (disabled && dropZoneRef.current) {
+      //   const popped = acceptedFiles.pop()
 
-    //   dropZoneRef.current.acceptedFiles = popped
-    //   return
-    // }
+      //   dropZoneRef.current.acceptedFiles = popped
+      //   return
+      // }
 
-    try {
-      if (dropZoneRef.current) {
-        // const file = acceptedFiles[0];
-        onFileUploaded(acceptedFiles, dropZoneRef);
+      try {
+        if (dropZoneRef.current) {
+          // const file = acceptedFiles[0];
+          onFileUploaded(acceptedFiles, dropZoneRef);
+        }
+      } catch (er: any) {
+        console.log(er);
+
+        setErr(er as string);
+        setTimeout(() => {
+          setErr(undefined);
+        }, 3000);
       }
-    } catch (er: any) {
-      console.log(er);
-
-      setErr(er as string);
-      setTimeout(() => {
-        setErr(undefined);
-      }, 3000);
-    }
-  }, [onFileUploaded]);
+    },
+    [onFileUploaded],
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -75,35 +78,39 @@ const Dropzone: React.FC<Props> = ({ name, onFileUploaded, disabled }) => {
   }, [fieldName, registerField]);
 
   return (
-    <div className="dropzone" {...getRootProps()} onClick={() => dropZoneRef.current?.click()}>
+    <div
+      className="dropzone"
+      {...getRootProps()}
+      onClick={() => dropZoneRef.current?.click()}
+    >
       <input {...getInputProps()} accept="image/*" ref={dropZoneRef} />
-      {(error && !isDragActive) && (
-      <p className="error">
-        <FiAlertCircle />
-        {error}
-      </p>
+      {error && !isDragActive && (
+        <p className="error">
+          <FiAlertCircle />
+          {error}
+        </p>
       )}
-      {(err && !isDragActive) && (
-      <p className="error">
-        <FiAlertCircle />
-        Erro com o arquivo selecionado
-        <br />
-        Tente novamente
-      </p>
+      {err && !isDragActive && (
+        <p className="error">
+          <FiAlertCircle />
+          Erro com o arquivo selecionado
+          <br />
+          Tente novamente
+        </p>
       )}
       {isDragActive && (
-      <p>
-        <FiCamera />
-        Solte o arquivo aqui ...
-      </p>
+        <p>
+          <FiCamera />
+          Solte o arquivo aqui ...
+        </p>
       )}
-      {(!isDragActive && !err && !error) && (
-      <p>
-        <FiCamera />
-        Clique ou arraste
-        <br />
-        As fotos aqui
-      </p>
+      {!isDragActive && !err && !error && (
+        <p>
+          <FiCamera />
+          Clique ou arraste
+          <br />
+          As fotos aqui
+        </p>
       )}
     </div>
   );

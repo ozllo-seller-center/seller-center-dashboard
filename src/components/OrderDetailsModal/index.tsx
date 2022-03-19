@@ -9,8 +9,8 @@ import Modal from '../Modal';
 import styles from './styles.module.scss';
 
 interface OrderDetailsModalProps {
-  handleVisibility: React.MouseEventHandler
-  order: Order
+  handleVisibility: React.MouseEventHandler;
+  order: Order;
 }
 
 enum OrderStatus {
@@ -20,11 +20,16 @@ enum OrderStatus {
   Faturando = 'Faturando',
   Despachado = 'Despachado',
   Despachando = 'Despachando',
-  EmBranco = ''
+  EmBranco = '',
 }
 
-const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility, order }) => {
-  const [orderStatus, setOrderStatus] = useState<OrderStatus>(OrderStatus.EmBranco);
+const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
+  handleVisibility,
+  order,
+}) => {
+  const [orderStatus, setOrderStatus] = useState<OrderStatus>(
+    OrderStatus.EmBranco,
+  );
 
   useEffect(() => {
     switch (order.status.status) {
@@ -54,7 +59,11 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
   }, [order]);
 
   return (
-    <Modal handleVisibility={handleVisibility} title="Detalhes do pedido" cleanStyle>
+    <Modal
+      handleVisibility={handleVisibility}
+      title="Detalhes do pedido"
+      cleanStyle
+    >
       <div className={styles.container}>
         <div className={styles.normal}>
           <strong>Dados do pedido</strong>
@@ -68,73 +77,51 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
               </div>
               <div className={styles.column}>
                 <strong>Data do pedido</strong>
-                <span>{format(new Date(order.payment.purchaseDate), 'dd/MM/yyyy')}</span>
+                <span>
+                  {format(new Date(order.payment.purchaseDate), 'dd/MM/yyyy')}
+                </span>
                 <strong>Enviado por</strong>
                 <span>{order.shipping.provider}</span>
               </div>
             </div>
             <div className={styles.status}>
               <strong>Status</strong>
-              {
-                (orderStatus === OrderStatus.Entregue) && (
-                  <>
-                    <FiCheck className={styles.green} />
-                    <span className={styles.green}>
-                      {orderStatus}
-                    </span>
-                  </>
-                )
-              }
-              {
-                (orderStatus === OrderStatus.Processando) && (
-                  <>
-                    <FiMoreHorizontal className={styles.blue} />
-                    <span className={styles.blue}>
-                      {orderStatus}
-                    </span>
-                  </>
-                )
-              }
-              {
-                (orderStatus === OrderStatus.Faturando) && (
-                  <>
-                    <FiMoreHorizontal className={styles.blue} />
-                    <span className={styles.blue}>
-                      {orderStatus}
-                    </span>
-                  </>
-                )
-              }
-              {
-                (orderStatus === OrderStatus.Despachando) && (
-                  <>
-                    <BiPackage className={styles.blue} />
-                    <span className={styles.blue}>
-                      {orderStatus}
-                    </span>
-                  </>
-                )
-              }
-              {
-                (orderStatus === OrderStatus.Despachado) && (
-                  <>
-                    <BiPackage className={styles.blue} />
-                    <span className={styles.blue}>
-                      {orderStatus}
-                    </span>
-                  </>
-                )
-              }
-              {
-                (orderStatus === OrderStatus.Cancelado) && (
-                  <>
-                    <FiX className={styles.red} />
-                    <span className={styles.red}>
-                      {orderStatus}
-                    </span>
-                  </>
-                )
-              }
+              {orderStatus === OrderStatus.Entregue && (
+                <>
+                  <FiCheck className={styles.green} />
+                  <span className={styles.green}>{orderStatus}</span>
+                </>
+              )}
+              {orderStatus === OrderStatus.Processando && (
+                <>
+                  <FiMoreHorizontal className={styles.blue} />
+                  <span className={styles.blue}>{orderStatus}</span>
+                </>
+              )}
+              {orderStatus === OrderStatus.Faturando && (
+                <>
+                  <FiMoreHorizontal className={styles.blue} />
+                  <span className={styles.blue}>{orderStatus}</span>
+                </>
+              )}
+              {orderStatus === OrderStatus.Despachando && (
+                <>
+                  <BiPackage className={styles.blue} />
+                  <span className={styles.blue}>{orderStatus}</span>
+                </>
+              )}
+              {orderStatus === OrderStatus.Despachado && (
+                <>
+                  <BiPackage className={styles.blue} />
+                  <span className={styles.blue}>{orderStatus}</span>
+                </>
+              )}
+              {orderStatus === OrderStatus.Cancelado && (
+                <>
+                  <FiX className={styles.red} />
+                  <span className={styles.red}>{orderStatus}</span>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -144,7 +131,9 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
             <div className={styles.info}>
               <div className={styles.column}>
                 <strong>Nome</strong>
-                <span style={{ textTransform: 'capitalize' }}>{order.customer.name.toLocaleLowerCase()}</span>
+                <span style={{ textTransform: 'capitalize' }}>
+                  {order.customer.name.toLocaleLowerCase()}
+                </span>
                 <strong>CPF/CNPJ</strong>
                 <span>{order.customer.documentNumber}</span>
               </div>
@@ -167,29 +156,24 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
               <div className={styles.column}>
                 <strong className={styles.subTitle}>Dados da entrega</strong>
                 <strong>Recebedor</strong>
-                <span style={{ textTransform: 'capitalize' }}>{order.shipping.receiverName.toLocaleLowerCase()}</span>
+                <span style={{ textTransform: 'capitalize' }}>
+                  {order.shipping.receiverName.toLocaleLowerCase()}
+                </span>
                 <strong>CEP</strong>
                 <span>{order.shipping.address.zipCode}</span>
                 <strong>Endereço</strong>
                 <span>
-                  {order.shipping.address.address}
-                  , nº
+                  {order.shipping.address.address}, nº
                   {order.shipping.address.number}
                 </span>
                 <span>{order.shipping.address.neighborhood}</span>
                 <span>
-                  {order.shipping.address.city}
-                  {' '}
-                  -
-                  {' '}
-                  {order.shipping.address.state}
+                  {order.shipping.address.city} - {order.shipping.address.state}
                 </span>
                 {order.shipping.address.additionalInfo && (
-                <span>
-                  Complemento:
-                  {' '}
-                  {order.shipping.address.additionalInfo}
-                </span>
+                  <span>
+                    Complemento: {order.shipping.address.additionalInfo}
+                  </span>
                 )}
               </div>
               <div className={styles.column}>
@@ -201,7 +185,14 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
                 <strong>Responsável</strong>
                 <span>{order.shipping.responsible}</span>
                 <strong>Previsão de entrega</strong>
-                <span>{order.shipping.estimatedDeliveryDate ? format(new Date(order.shipping.estimatedDeliveryDate), 'dd/MM/yyyy - hh:mm:ss') : 'Sem previsão'}</span>
+                <span>
+                  {order.shipping.estimatedDeliveryDate
+                    ? format(
+                        new Date(order.shipping.estimatedDeliveryDate),
+                        'dd/MM/yyyy - hh:mm:ss',
+                      )
+                    : 'Sem previsão'}
+                </span>
               </div>
             </div>
           </div>
@@ -210,47 +201,47 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
           <strong>Itens do pedido</strong>
           <div className={styles.content}>
             <div className={styles.products}>
-              {
-                order.products.map((product) => (
-                  <div key={product.idProduct} className={styles.product}>
-                    <strong className={styles.title}>Item</strong>
-                    <span>{product.name}</span>
-                    <div className={styles.details}>
-                      <div>
-                        <strong>Quantidade</strong>
-                        <span>{product.quantity}</span>
-                      </div>
-                      <div>
-                        <strong>Valor</strong>
-                        <span>
-                          {new Intl.NumberFormat('pt-BR', {
-                            style: 'currency',
-                            currency: 'BRL',
-                          }).format(product.price)}
-                        </span>
-                      </div>
-                      <div>
-                        <strong>Desconto</strong>
-                        <span>
-                          {new Intl.NumberFormat('pt-BR', {
-                            style: 'currency',
-                            currency: 'BRL',
-                          }).format(product.discount)}
-                        </span>
-                      </div>
-                      <div>
-                        <strong>Valor total</strong>
-                        <span>
-                          {new Intl.NumberFormat('pt-BR', {
-                            style: 'currency',
-                            currency: 'BRL',
-                          }).format(product.price * product.quantity - product.discount)}
-                        </span>
-                      </div>
+              {order.products.map(product => (
+                <div key={product.idProduct} className={styles.product}>
+                  <strong className={styles.title}>Item</strong>
+                  <span>{product.name}</span>
+                  <div className={styles.details}>
+                    <div>
+                      <strong>Quantidade</strong>
+                      <span>{product.quantity}</span>
+                    </div>
+                    <div>
+                      <strong>Valor</strong>
+                      <span>
+                        {new Intl.NumberFormat('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL',
+                        }).format(product.price)}
+                      </span>
+                    </div>
+                    <div>
+                      <strong>Desconto</strong>
+                      <span>
+                        {new Intl.NumberFormat('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL',
+                        }).format(product.discount)}
+                      </span>
+                    </div>
+                    <div>
+                      <strong>Valor total</strong>
+                      <span>
+                        {new Intl.NumberFormat('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL',
+                        }).format(
+                          product.price * product.quantity - product.discount,
+                        )}
+                      </span>
                     </div>
                   </div>
-                ))
-              }
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -265,7 +256,6 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
                     style: 'currency',
                     currency: 'BRL',
                   }).format(order.payment.totalAmount)}
-
                 </span>
               </div>
               <div className={styles.column}>
@@ -275,7 +265,6 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
                     style: 'currency',
                     currency: 'BRL',
                   }).format(order.payment.totalDiscount)}
-
                 </span>
               </div>
               <div className={styles.column}>
@@ -284,8 +273,10 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
                   {new Intl.NumberFormat('pt-BR', {
                     style: 'currency',
                     currency: 'BRL',
-                  }).format(order.payment.totalAmountPlusShipping - order.payment.totalAmount)}
-
+                  }).format(
+                    order.payment.totalAmountPlusShipping -
+                      order.payment.totalAmount,
+                  )}
                 </span>
               </div>
               <div className={styles.column}>
@@ -295,7 +286,6 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ handleVisibility,
                     style: 'currency',
                     currency: 'BRL',
                   }).format(order.payment.totalAmountPlusShipping)}
-
                 </span>
               </div>
             </div>

@@ -2,6 +2,7 @@
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
@@ -40,7 +41,7 @@
 
       transition: color 0.2s, border-color 0.2s;
 
-      > svg {
+      >svg {
         width: 1.5rem;
         height: 1.5rem;
         color: var(--grafite);
@@ -54,7 +55,7 @@
         border-color: var(--yellow-300);
         color: var(--yellow-300);
 
-        > svg {
+        >svg {
           color: var(--yellow-300);
         }
       }
@@ -92,7 +93,7 @@
 
       overflow-y: auto;
 
-      > div + div {
+      >div+div {
         margin-left: 1rem;
       }
     }
@@ -109,7 +110,7 @@
       margin-top: 2rem;
     }
 
-    .doubleInputContainer + .doubleInputContainer {
+    .doubleInputContainer+.doubleInputContainer {
       margin-top: 1rem;
     }
 
@@ -123,7 +124,7 @@
       margin-top: 2rem;
     }
 
-    .multipleInputContainer + .multipleInputContainer {
+    .multipleInputContainer+.multipleInputContainer {
       margin-top: 1rem;
     }
 
@@ -196,7 +197,7 @@
 
   background-color: var(--yellow-50);
 
-  box-shadow: 0 0 20px rgba(0,0,0,0.10), 0 -3px 6px rgba(0,0,0,0.11);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.10), 0 -3px 6px rgba(0, 0, 0, 0.11);
 
   span {
     font-size: 1.5rem;

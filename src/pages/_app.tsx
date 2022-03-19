@@ -17,7 +17,11 @@ import ResetPassword from './resetPassword/[token]';
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <AuthProvider>
-      {Component === SignIn || Component === SignUp || Component === Verify || Component === ResetPassword || Component === ForgotPassword ? (
+      {Component === SignIn ||
+      Component === SignUp ||
+      Component === Verify ||
+      Component === ResetPassword ||
+      Component === ForgotPassword ? (
         <LoadingProvider>
           <Component {...pageProps} />
         </LoadingProvider>
@@ -30,7 +34,6 @@ function MyApp({ Component, pageProps }: AppProps) {
           </LoadingProvider>
         </Layout>
       )}
-
     </AuthProvider>
   );
 }
@@ -40,7 +43,9 @@ MyApp.getInitialProps = async (props: AppContext) => {
   const { req, res }: NextPageContext = ctx;
 
   let pageProps: any = {};
-  if (Component.getInitialProps) { pageProps = await Component.getInitialProps(ctx); }
+  if (Component.getInitialProps) {
+    pageProps = await Component.getInitialProps(ctx);
+  }
 
   return { pageProps };
 };

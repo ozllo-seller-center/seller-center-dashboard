@@ -1,7 +1,7 @@
 .radioContainer {
   display: flex;
 
-  .radio + .radio {
+  .radio+.radio {
     margin-left: 1rem;
   }
 
@@ -29,7 +29,7 @@
         height: 0;
       }
 
-      input + .radioControl::before {
+      input+.radioControl::before {
         content: "";
         width: 1.25rem;
         height: 1.25rem;
@@ -39,7 +39,7 @@
         transform: scale(0);
       }
 
-      input:checked + .radioControl::before {
+      input:checked+.radioControl::before {
         transform: scale(1);
       }
     }

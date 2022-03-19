@@ -13,14 +13,14 @@
     grid-template-columns: .35fr 1fr 1fr 1fr .25fr; //.6fr .75fr .75fr .6fr;
     column-gap: .75rem;
 
-    > span {
+    >span {
       align-self: center;
       text-align: left;
       font-size: 1.1rem;
       font-weight: bold;
     }
 
-    > button {
+    >button {
       border: none;
       background: none;
 
@@ -39,7 +39,7 @@
     }
   }
 
-  .variationContainer + .variationContainer {
+  .variationContainer+.variationContainer {
     margin-top: 1rem;
   }
 
@@ -51,7 +51,7 @@
     display: flex;
     flex-direction: column;
 
-    > span {
+    >span {
       text-align: left;
       font-size: 1.1rem;
       font-weight: bold;
@@ -65,7 +65,7 @@
       grid-template-columns: 1fr 1fr 1fr .5fr; //.6fr .75fr .75fr .6fr;
       column-gap: .75rem;
 
-      > button {
+      >button {
         border: none;
         background: none;
 
@@ -85,7 +85,7 @@
     }
   }
 
-  .variationContainerMobile + .variationContainerMobile {
+  .variationContainerMobile+.variationContainerMobile {
     margin-top: 1rem;
   }
 }

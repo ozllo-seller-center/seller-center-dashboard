@@ -2,14 +2,18 @@ import React, { ButtonHTMLAttributes } from 'react';
 
 import styles from './styles.module.scss';
 
-interface MarketplaceButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  name: string,
-  url: string,
-  image: string,
+interface MarketplaceButtonProps
+  extends ButtonHTMLAttributes<HTMLButtonElement> {
+  name: string;
+  url: string;
+  image: string;
 }
 
 const MarketplaceButton: React.FC<MarketplaceButtonProps> = ({
-  name, url, image, ...rest
+  name,
+  url,
+  image,
+  ...rest
 }) => (
   <button
     type="button"
@@ -17,7 +21,9 @@ const MarketplaceButton: React.FC<MarketplaceButtonProps> = ({
     onClick={() => {
       const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
 
-      if (newWindow) { newWindow.opener = null; }
+      if (newWindow) {
+        newWindow.opener = null;
+      }
     }}
     {...rest}
   >

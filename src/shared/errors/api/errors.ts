@@ -8,11 +8,11 @@ import { errorCode } from './errorCode';
  * Define Interface AppError
  */
 export type AppError = {
-  errorCode: errorCode
-  description: string
-  tip: string
-  example?: string[]
-}
+  errorCode: errorCode;
+  description: string;
+  tip: string;
+  example?: string[];
+};
 
 /**
  * NEVER USE
@@ -46,9 +46,7 @@ export const invalidEmail: AppError = {
   errorCode: 2,
   description: 'Email inválido.',
   tip: 'Cheque o campo de e-mail.',
-  example: [
-    'example@mail.com',
-  ],
+  example: ['example@mail.com'],
 };
 
 /**
@@ -114,9 +112,11 @@ export const invalidFirstName: AppError = {
   errorCode: 8,
   description: 'Nome inválido.',
   tip: 'Cheque o cmapo de nome.',
-  example: [`
+  example: [
+    `
         O nome deve conter pelo menos 2 caracteres.
-    `],
+    `,
+  ],
 };
 
 /**
@@ -126,9 +126,11 @@ export const invalidLastName: AppError = {
   errorCode: 9,
   description: 'Sobrenome inválido.',
   tip: 'Check last name field.',
-  example: [`
+  example: [
+    `
         The last name is at least 2 characters long.
-    `],
+    `,
+  ],
 };
 
 /**
@@ -138,9 +140,11 @@ export const invalidCPF: AppError = {
   errorCode: 16,
   description: 'CPF inválido.',
   tip: 'Cheque o campo de CPF.',
-  example: [`
+  example: [
+    `
         Deve-se informar um registro valido de CPF.
-    `],
+    `,
+  ],
 };
 
 /**
@@ -150,9 +154,11 @@ export const invalidRG: AppError = {
   errorCode: 12,
   description: 'RG é inválido.',
   tip: 'Cheque o campo de RG.',
-  example: [`
+  example: [
+    `
         O RG deve conter pelo menos 2 caracteres.
-    `],
+    `,
+  ],
 };
 
 /**
@@ -162,9 +168,11 @@ export const invalidBirthday: AppError = {
   errorCode: 10,
   description: 'Data de nascimento inválida.',
   tip: 'Cheque o campo de data de nascimento.',
-  example: [`
+  example: [
+    `
         01/01/1970
-    `],
+    `,
+  ],
 };
 
 /**
@@ -187,9 +195,11 @@ export const invalidAddress: AppError = {
   errorCode: 12,
   description: 'Endereço é inválido.',
   tip: 'Cheque o campo de endereço.',
-  example: [`
+  example: [
+    `
         O endereço deve conter pelo menos 2 caracteres.
-    `],
+    `,
+  ],
 };
 
 /**
@@ -199,9 +209,11 @@ export const invalidCity: AppError = {
   errorCode: 11,
   description: 'Cidade é inválida.',
   tip: 'Cheque o campo de cidade.',
-  example: [`
+  example: [
+    `
         A cidade deve conter pelo menos 2 caracteres.
-    `],
+    `,
+  ],
 };
 
 /**
@@ -224,9 +236,11 @@ export const invalidDistrict: AppError = {
   errorCode: 15,
   description: 'Bairro é inválido.',
   tip: 'Cheque o campo de bairro.',
-  example: [`
+  example: [
+    `
         O bairro deve conter pelo menos 2 caractres
-    `],
+    `,
+  ],
 };
 
 /**
@@ -236,9 +250,11 @@ export const invalidAddressNumber: AppError = {
   errorCode: 16,
   description: 'Número de endereço é inválido.',
   tip: 'Cheque o campo de número de endereço.',
-  example: [`
+  example: [
+    `
         O número de endereço deve ter pelo menos 1 digito.
-    `],
+    `,
+  ],
 };
 
 /**
@@ -261,9 +277,11 @@ export const invalidShopName: AppError = {
   errorCode: 18,
   description: 'Nome da loja é inválido.',
   tip: 'Cheque o campo de nome da loja.',
-  example: [`
+  example: [
+    `
         O nome da loja deve conter pelo menos 2 caracteres.
-    `],
+    `,
+  ],
 };
 
 /**
@@ -273,9 +291,11 @@ export const invalidBankCode: AppError = {
   errorCode: 17,
   description: 'Código de banco inválido.',
   tip: 'Cheque o campo de bawnco.',
-  example: [`
+  example: [
+    `
         O código de banco informado não existe.
-    `],
+    `,
+  ],
 };
 
 /**
@@ -285,9 +305,11 @@ export const invalidAccount: AppError = {
   errorCode: 20,
   description: 'Conta bancária inválida.',
   tip: 'Cheque o campo de conta.',
-  example: [`
+  example: [
+    `
       A conta deve conter pelo menos 2 digitos.
-    `],
+    `,
+  ],
 };
 
 /**
@@ -297,9 +319,11 @@ export const invalidAgency: AppError = {
   errorCode: 21,
   description: 'Agência bancária inválida.',
   tip: 'Cheque o campo de agência.',
-  example: [`
+  example: [
+    `
         A agência deve conter pelo menos 2 digitos.
-    `],
+    `,
+  ],
 };
 
 /**
@@ -309,9 +333,11 @@ export const invalidProduct: AppError = {
   errorCode: 0x016,
   description: 'Produto é inválido.',
   tip: 'Cheque as informações.',
-  example: [`
+  example: [
+    `
         Product invalid.
-    `],
+    `,
+  ],
 };
 
 /**
@@ -321,9 +347,11 @@ export const invalidProductName: AppError = {
   errorCode: 32,
   description: 'Nome do produto é inválido.',
   tip: 'Cheque o campo de nome.',
-  example: [`
+  example: [
+    `
         O nome do produto deve conter pelo menos 2 caracteres.
-    `],
+    `,
+  ],
 };
 
 /**
@@ -361,7 +389,8 @@ export const errorsList: AppError[] = [
  *
  * @param errorCode
  */
-export const findError = (err: errorCode) => errorsList.find((error) => error.errorCode === err) || voidError;
+export const findError = (err: errorCode) =>
+  errorsList.find(error => error.errorCode === err) || voidError;
 
 const errorField = [
   { errorCode: 0x001, errorField: 'email', errorBrief: '' },
@@ -379,7 +408,11 @@ const errorField = [
   { errorCode: 13, errorField: 'address.cep', errorBrief: '' },
   { errorCode: 12, errorField: 'address.address', errorBrief: '' },
   { errorCode: 11, errorField: 'address.city', errorBrief: '' },
-  { errorCode: 14, errorField: 'address.complement', errorBrief: 'Entre 4 a 24 caracteres' },
+  {
+    errorCode: 14,
+    errorField: 'address.complement',
+    errorBrief: 'Entre 4 a 24 caracteres',
+  },
   { errorCode: 15, errorField: 'address.district', errorBrief: '' },
   { errorCode: 16, errorField: 'address.number', errorBrief: '' },
   { errorCode: 19, errorField: 'personalInfo.cnpj', errorBrief: '' },
@@ -389,4 +422,5 @@ const errorField = [
   { errorCode: 21, errorField: 'bankInfo.agency', errorBrief: '' },
 ];
 
-export const getErrorField = (err: errorCode) => errorField.find((error) => error.errorCode === err) || '';
+export const getErrorField = (err: errorCode) =>
+  errorField.find(error => error.errorCode === err) || '';

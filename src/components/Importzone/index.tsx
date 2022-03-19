@@ -1,5 +1,9 @@
 import React, {
-  useCallback, useEffect, useMemo, useRef, useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from 'react';
 import { useField } from '@unform/core';
 import { useDropzone } from 'react-dropzone';
@@ -9,7 +13,7 @@ import styles from './styles.module.scss';
 
 interface Props {
   name: string;
-  onFileUploaded: Function;
+  onFileUploaded: (param: any) => void;
 }
 
 interface InputRefProps extends HTMLInputElement {
@@ -22,20 +26,23 @@ const Importzone: React.FC<Props> = ({ name, onFileUploaded }) => {
 
   const dropZoneRef = useRef<InputRefProps>(null);
 
-  const {
-    fieldName, registerField, defaultValue = [], error,
-  } = useField(name);
+  const { fieldName, registerField, defaultValue = [], error } = useField(name);
 
-  const onDrop = useCallback((acceptedFiles) => {
-    try {
-      if (dropZoneRef.current) {
-        onFileUploaded(acceptedFiles);
-        setselectedFile(acceptedFiles.map((f: File) => URL.createObjectURL(f)));
+  const onDrop = useCallback(
+    acceptedFiles => {
+      try {
+        if (dropZoneRef.current) {
+          onFileUploaded(acceptedFiles);
+          setselectedFile(
+            acceptedFiles.map((f: File) => URL.createObjectURL(f)),
+          );
+        }
+      } catch (err) {
+        console.log(err);
       }
-    } catch (err) {
-      console.log(err);
-    }
-  }, [onFileUploaded]);
+    },
+    [onFileUploaded],
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -58,56 +65,60 @@ const Importzone: React.FC<Props> = ({ name, onFileUploaded }) => {
   }, [fieldName, registerField]);
 
   const containerStyle = useMemo(() => {
-    if (error) { return styles.error; }
+    if (error) {
+      return styles.error;
+    }
 
-    if (selectedFile.length >= 1) { return styles.uploaded; }
+    if (selectedFile.length >= 1) {
+      return styles.uploaded;
+    }
 
     return styles.importzone;
   }, [error, selectedFile]);
 
   return (
     <div className={styles.parent}>
-      {selectedFile.length >= 1
-        && (
-        <FiX onClick={() => {
-          if (dropZoneRef.current) { dropZoneRef.current.acceptedFiles = []; }
+      {selectedFile.length >= 1 && (
+        <FiX
+          onClick={() => {
+            if (dropZoneRef.current) {
+              dropZoneRef.current.acceptedFiles = [];
+            }
 
-          setselectedFile([]);
-        }}
+            setselectedFile([]);
+          }}
         />
-        )}
+      )}
       <div
         className={containerStyle}
         {...getRootProps()}
         onClick={() => dropZoneRef.current?.click()}
       >
         <input {...getInputProps()} ref={dropZoneRef} />
-        {(error && !isDragActive) && (
-        <p>
-          Erro com o(s) arquivo(s) selecionado(s)
-          <br />
-          Tente novamente
-        </p>
+        {error && !isDragActive && (
+          <p>
+            Erro com o(s) arquivo(s) selecionado(s)
+            <br />
+            Tente novamente
+          </p>
         )}
         {selectedFile.length >= 1 && (
           <>
             <FiCheck />
             <p>
-              {selectedFile.length > 1 ? 'Arquivos carregados' : 'Arquivo carregado'}
+              {selectedFile.length > 1
+                ? 'Arquivos carregados'
+                : 'Arquivo carregado'}
             </p>
           </>
         )}
-        {isDragActive && (
-        <p>
-          Solte o arquivo aqui ...
-        </p>
-        )}
-        {(!isDragActive && !error && selectedFile.length <= 0) && (
-        <p>
-          Clique ou arraste o(s)
-          <br />
-          arquivos aqui
-        </p>
+        {isDragActive && <p>Solte o arquivo aqui ...</p>}
+        {!isDragActive && !error && selectedFile.length <= 0 && (
+          <p>
+            Clique ou arraste o(s)
+            <br />
+            arquivos aqui
+          </p>
         )}
       </div>
     </div>

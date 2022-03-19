@@ -4,6 +4,7 @@
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
@@ -46,7 +47,7 @@
 
       transition: color 0.2s, border-color 0.2s;
 
-      > svg {
+      >svg {
         width: 1.5rem;
         height: 1.5rem;
         color: var(--grafite);
@@ -60,7 +61,7 @@
         border-color: var(--yellow-300);
         color: var(--yellow-300);
 
-        > svg {
+        >svg {
           color: var(--yellow-300);
         }
       }
@@ -132,7 +133,7 @@
 
       overflow-y: auto;
 
-      > div + div {
+      >div+div {
         margin-left: 1rem;
       }
     }
@@ -159,7 +160,7 @@
       }
     }
 
-    .doubleInputContainer + .doubleInputContainer {
+    .doubleInputContainer+.doubleInputContainer {
       margin-top: 1rem;
     }
 
@@ -181,7 +182,7 @@
       }
     }
 
-    .multipleInputContainer + .multipleInputContainer {
+    .multipleInputContainer+.multipleInputContainer {
       margin-top: 1rem;
     }
 
@@ -222,7 +223,7 @@
           margin-left: 0.7rem;
           padding-bottom: 1rem;
 
-          > h3 {
+          >h3 {
             color: var(--grafite);
             font-size: 1.2rem;
             font-weight: bold;
@@ -230,7 +231,7 @@
             margin-bottom: 1rem;
           }
 
-          > span {
+          >span {
             font-size: 0.9rem;
             color: var(--grafite);
           }
@@ -276,7 +277,7 @@
 
   background-color: var(--yellow-50);
 
-  box-shadow: 0 0 20px rgba(0,0,0,0.10), 0 -3px 6px rgba(0,0,0,0.11);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.10), 0 -3px 6px rgba(0, 0, 0, 0.11);
 
   span {
     font-weight: bold;
@@ -339,7 +340,7 @@
     color: var(--grafite);
   }
 
-  > svg {
+  >svg {
     width: 5rem;
     height: 5rem;
 

@@ -9,9 +9,10 @@ import api from '../services/api';
  *
  * @param ms - milliseconds
  */
-export const sleep = (ms = 1) => new Promise((resolve) => {
-  setTimeout(resolve, ms);
-});
+export const sleep = (ms = 1) =>
+  new Promise(resolve => {
+    setTimeout(resolve, ms);
+  });
 
 /**
  * Returns the callee name
@@ -22,7 +23,13 @@ export const getFunctionName = (depth = 1) => {
   const error = new Error();
   if (error.stack) {
     // tslint:disable-next-line:max-line-length
-    return ((((error.stack.split('at ') || [])[1 + depth] || '').match(/(^|\.| <| )(.*[^(<])( \()/) || [])[2] || '').split('.').pop();
+    return (
+      (((error.stack.split('at ') || [])[1 + depth] || '').match(
+        /(^|\.| <| )(.*[^(<])( \()/,
+      ) || [])[2] || ''
+    )
+      .split('.')
+      .pop();
   }
   return 'NULL';
 };
@@ -35,7 +42,8 @@ export const getFunctionName = (depth = 1) => {
 export const formatDateFromTimestamp = (timestamp: number): string => {
   const date = new Date(timestamp * 1000);
   const year = date.getFullYear();
-  const month = date.getMonth() < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
+  const month =
+    date.getMonth() < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
   const day = date.getDay() < 10 ? `0${date.getDay()}` : date.getDay();
   return `${year}-${month}-${day}`;
 };
@@ -45,26 +53,24 @@ export const formatDateFromTimestamp = (timestamp: number): string => {
  * @param isoDate isoDate
  * @returns DD/MM/YYYY format from a ISO string date
  */
-export const formatDateFromIsoFormat = (isoDate: string): string => isoDate
-  .slice(0, 10)
-  .split('-')
-  .reverse()
-  .join('/');
+export const formatDateFromIsoFormat = (isoDate: string): string =>
+  isoDate.slice(0, 10).split('-').reverse().join('/');
 
 /**
  *
  * @param isoDate
  * @returns an integer that represents time from an ISO format string date
  */
-export const getIntFromDate = (isoDate: string) => parseInt(
-  isoDate
-    .replace('T', '')
-    .replace('Z', '')
-    .replace('.', '')
-    .replace(/:/g, '')
-    .replace(/-/g, ''),
-  10,
-);
+export const getIntFromDate = (isoDate: string) =>
+  parseInt(
+    isoDate
+      .replace('T', '')
+      .replace('Z', '')
+      .replace('.', '')
+      .replace(/:/g, '')
+      .replace(/-/g, ''),
+    10,
+  );
 
 export const throttle = (func: (...args: any) => any, delay: number) => {
   let inProgress = false;
@@ -86,18 +92,18 @@ export const throttle = (func: (...args: any) => any, delay: number) => {
  * @param value that need to be proved
  * @returns true | false whether is a number or not
  */
-export const isNumber = (value: string | number): boolean => ((value != null)
-    && (value !== '')
-    && !Number.isNaN(Number(value.toString())));
+export const isNumber = (value: string | number): boolean =>
+  value != null && value !== '' && !Number.isNaN(Number(value.toString()));
 
 /**
-  * Verifies whether the email is valid or not
-  *
-  * @param email
-  * @returns true or false
-*/
+ * Verifies whether the email is valid or not
+ *
+ * @param email
+ * @returns true or false
+ */
 export const isEmailValid = (email: string) => {
-  const validEmailRegex = /^[a-zA-Z0-9.!#$%&'+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$/;
+  const validEmailRegex =
+    /^[a-zA-Z0-9.!#$%&'+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$/;
 
   return validEmailRegex.test(email);
 };
@@ -109,27 +115,33 @@ export const isEmailValid = (email: string) => {
  * @returns true or false
  */
 export const isPasswordSecure = (password: string): boolean => {
-  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/;
+  const strongPasswordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/;
 
   return strongPasswordRegex.test(password);
 };
 
 export const nowInSeconds = () => Math.floor(Date.now() / 1000);
 
-export const isTokenValid = async (token: string | undefined): Promise<Boolean> => {
+export const isTokenValid = async (
+  token: string | undefined,
+): Promise<boolean> => {
   if (!token) return false;
 
   let decoded: any;
 
   // decoded = jwt.verify(token, 'lI@D2zeg$e6mKY!5', {})
 
-  await api.get('/account/decode').then((response) => {
-    decoded = { ...response.data };
-  }).catch((err) => {
-    console.log(err);
+  await api
+    .get('/account/decode')
+    .then(response => {
+      decoded = { ...response.data };
+    })
+    .catch(err => {
+      console.log(err);
 
-    decoded = undefined;
-  });
+      decoded = undefined;
+    });
 
   if (!decoded) return false;
 
@@ -149,19 +161,25 @@ export function getFilename(url: string) {
 }
 
 export function matchingWords(source: string, comparTo: string) {
-  if (!source || source.length === 0) { return false; }
+  if (!source || source.length === 0) {
+    return false;
+  }
 
-  if (!comparTo || comparTo.length === 0) { return false; }
+  if (!comparTo || comparTo.length === 0) {
+    return false;
+  }
 
   const sourceWords = source.split(' ');
 
   const compareToWords = comparTo.split(' ');
 
-  const matchWords = compareToWords.map((comparingWord) => {
+  const matchWords = compareToWords.map(comparingWord => {
     let match = false;
 
-    sourceWords.forEach((sourceWord) => {
-      if (match) { return; }
+    sourceWords.forEach(sourceWord => {
+      if (match) {
+        return;
+      }
 
       match = sourceWord.toLowerCase() === comparingWord.toLowerCase();
     });
@@ -195,7 +213,7 @@ export function matchingWords(source: string, comparTo: string) {
 //    const map = new Map<K, Array<V>>();
 export function groupBy(list: Array<any>, keyGetter: any) {
   const map = new Map();
-  list.forEach((item) => {
+  list.forEach(item => {
     const key = keyGetter(item);
     const collection = map.get(key);
     if (!collection) {

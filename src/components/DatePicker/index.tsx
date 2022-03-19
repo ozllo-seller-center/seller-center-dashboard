@@ -31,9 +31,7 @@ const DatePickerInput: React.FC<InputProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
-  const {
-    fieldName, defaultValue, error, registerField,
-  } = useField(name);
+  const { fieldName, defaultValue, error, registerField } = useField(name);
 
   const [inputDate, setInputDate] = useState(new Date() as any);
   const dateRef = useRef<ReactDatePicker>(null);
@@ -60,22 +58,28 @@ const DatePickerInput: React.FC<InputProps> = ({
   }, [fieldName, registerField]);
 
   const containerStyle = useMemo(() => {
-    if (disabled) { return styles.containerDisabled; }
+    if (disabled) {
+      return styles.containerDisabled;
+    }
 
-    if (error) { return styles.containerError; }
+    if (error) {
+      return styles.containerError;
+    }
 
-    if (isFocused) { return styles.containerFocused; }
+    if (isFocused) {
+      return styles.containerFocused;
+    }
 
-    if (isFilled) { return styles.containerFilled; }
+    if (isFilled) {
+      return styles.containerFilled;
+    }
 
     return styles.container;
   }, [disabled, error, isFilled, isFocused]);
 
   return (
     <div className={styles.parent}>
-      <div
-        className={containerStyle}
-      >
+      <div className={containerStyle}>
         <span className={styles.inputLabel}>{label}</span>
         <div>
           <DatePicker
@@ -87,7 +91,10 @@ const DatePickerInput: React.FC<InputProps> = ({
             ref={dateRef}
             locale={pt}
             dateFormatCalendar="MMMM yyyy"
-            formatWeekDay={(formattedDate: string) => formattedDate[0].toUpperCase() + formattedDate.substr(1, 2).toLowerCase()}
+            formatWeekDay={(formattedDate: string) =>
+              formattedDate[0].toUpperCase() +
+              formattedDate.substr(1, 2).toLowerCase()
+            }
             dateFormat="dd/MM/yyyy"
             todayButton="Hoje"
             className={styles.datePicker}
@@ -98,11 +105,7 @@ const DatePickerInput: React.FC<InputProps> = ({
           <FiCalendar />
         </div>
       </div>
-      {error && (
-        <p className={styles.error}>
-          {error}
-        </p>
-      )}
+      {error && <p className={styles.error}>{error}</p>}
     </div>
   );
 };

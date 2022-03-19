@@ -7,7 +7,11 @@ interface CollapsibleProps {
   toggleRef: undefined | RefObject<HTMLDivElement>;
 }
 
-const Collapsible: React.FC<CollapsibleProps> = ({ totalItems, toggleRef, children }) => {
+const Collapsible: React.FC<CollapsibleProps> = ({
+  totalItems,
+  toggleRef,
+  children,
+}) => {
   const [isChecked, setIsChecked] = useState(false);
 
   const checkHandle = useCallback((state: boolean) => {
@@ -22,21 +26,27 @@ const Collapsible: React.FC<CollapsibleProps> = ({ totalItems, toggleRef, childr
         <input id='show_more' className={styles.toggle} type="checkbox" checked={isChecked} onChange={checkHandle} />
       } */}
 
-      <div className={!isChecked ? styles.collapsibleContent : styles.collapsibleContentShow}>
+      <div
+        className={
+          !isChecked ? styles.collapsibleContent : styles.collapsibleContentShow
+        }
+      >
         {children}
       </div>
       <div className={styles.lblToggleContainer}>
-        {isChecked
-          ? <span className={styles.lblToggle} onClick={() => checkHandle(false)}>Recolher...</span>
-          : <span className={styles.lblToggle} onClick={() => checkHandle(true)}>Ver todos</span>}
+        {isChecked ? (
+          <span className={styles.lblToggle} onClick={() => checkHandle(false)}>
+            Recolher...
+          </span>
+        ) : (
+          <span className={styles.lblToggle} onClick={() => checkHandle(true)}>
+            Ver todos
+          </span>
+        )}
         {!!totalItems && !isChecked && (
-        <span className={styles.overflowItems}>
-          (mais
-          {' '}
-          {totalItems - 2}
-          {' '}
-          itens)
-        </span>
+          <span className={styles.overflowItems}>
+            (mais {totalItems - 2} itens)
+          </span>
         )}
       </div>
     </div>

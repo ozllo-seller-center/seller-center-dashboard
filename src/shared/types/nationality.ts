@@ -1,4 +1,4 @@
 export type Nationality = {
-  id: any,
-  name: string
-}
+  id: any;
+  name: string;
+};

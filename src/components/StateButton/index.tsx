@@ -15,27 +15,36 @@ interface StateButton extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const StateButton: React.FC<StateButton> = ({
-  isActive, pointer, borders, customStyle, children, ...rest
+  isActive,
+  pointer,
+  borders,
+  customStyle,
+  children,
+  ...rest
 }) => {
   const buttonStyle = useMemo(() => {
-    if (isActive) { return styles.buttonActive; }
+    if (isActive) {
+      return styles.buttonActive;
+    }
 
-    if (borders) { return styles.buttonBordered; }
+    if (borders) {
+      return styles.buttonBordered;
+    }
 
     return styles.button;
   }, [borders, isActive]);
 
-  return (customStyle ? (
-    <button className={isActive ? customStyle.activeClassName : customStyle.className}>
+  return customStyle ? (
+    <button
+      className={isActive ? customStyle.activeClassName : customStyle.className}
+    >
       {children}
     </button>
-  )
-    : (
-      <button className={buttonStyle} {...rest}>
-        {children}
-        {pointer && (<FaPlay />)}
-      </button>
-    )
+  ) : (
+    <button className={buttonStyle} {...rest}>
+      {children}
+      {pointer && <FaPlay />}
+    </button>
   );
 };
 

@@ -1,78 +1,78 @@
 {
-    "env": {
-        "browser": true,
-        "es2021": true
-    },
-    "extends": [
-        "plugin:react/recommended",
-        "airbnb",
-        "plugin:@typescript-eslint/recommended"
-    ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaFeatures": {
-            "jsx": true
-        },
-        "ecmaVersion": 12,
-        "sourceType": "module"
-    },
-    "plugins": [
-        "react",
-        "@typescript-eslint",
-        "react-hooks"
-    ],
-    "rules": {
-      "react-hooks/exhaustive-deps": "warn",
-      "react/jsx-filename-extension": [
-        1,
-        {
-        "extensions": [
-          ".tsx"
-        ]
-        }
-      ],
-      "no-use-before-define": "off",
-      "@typescript-eslint/no-use-before-define": [
-        "error"
-      ],
-      "react/react-in-jsx-scope": "off",
-      "react/function-component-definition": "off",
-      "import/extensions": [
-        "error",
-        "ignorePackages",
-        {
-          "ts": "never",
-          "tsx": "never"
-        }
-     ],
-     "no-underscore-dangle": "off",
-     "no-shadow": "off",
-      "@typescript-eslint/no-shadow": "error",
-      "max-len": "off",
-      "no-param-reassign": "off",
-      "@typescript-eslint/ban-types": "off",
-      "camelcase": "off",
-      "consistent-return": "off",
-      "array-callback-return": "off",
-      "react/require-default-props": "off",
-      "react/jsx-props-no-spreading": "off",
-      "jsx-a11y/no-noninteractive-element-interactions": "off",
-      "jsx-a11y/anchor-is-valid": "off",
-      "jsx-a11y/click-events-have-key-events": "off",
-      "jsx-a11y/no-static-element-interactions": "off",
-      "import/no-duplicates": "off",
-      "react/button-has-type": "off",
-      "jsx-a11y/no-noninteractive-element-to-interactive-role": "off",
-      "prefer-destructuring": "off",
-      "jsx-a11y/control-has-associated-label": "off",
-      "jsx-a11y/label-has-associated-control": "off",
-      "react/jsx-no-constructed-context-values": "off",
-      "no-case-declarations": "off",
-      "linebreak-style": "off"
-    },
-    "settings": {
-      "import/resolver": {
-        "typescript": {}
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "react",
+    "react-hooks",
+    "@typescript-eslint",
+    "prettier"
+    // "eslint-plugin-import-helpers",
+    // "import"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    // Uncomment the following lines to enable eslint-config-prettier
+    // Is not enabled right now to avoid issues with the Next.js repo
+    "prettier",
+    "plugin:prettier/recommended"
+  ],
+  "env": {
+    "es6": true,
+    "browser": true,
+    "jest": false,
+    "node": true
+  },
+  "rules": {
+    "comma-dangle": ["error", "always-multiline"],
+    "semi": "error",
+    "prettier/prettier": "error",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "react/react-in-jsx-scope": 0,
+    "react/display-name": 0,
+    "react/prop-types": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/explicit-member-accessibility": 0,
+    "@typescript-eslint/indent": 0,
+    "@typescript-eslint/member-delimiter-style": 0,
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/no-var-requires": 0,
+    "@typescript-eslint/no-use-before-define": 0,
+    "no-case-declarations": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_"
       }
+    ],
+    "no-console": [
+      "warn",
+      {
+        "allow": ["warn", "error"]
+      }
+    ]
+    // "import/no-duplicates": ["error", { "considerQueryString": true }],
+    // "import-helpers/order-imports": [
+    //   "warn",
+    //   {
+    //     "newlinesBetween": "always",
+    //     "groups": [
+    //       ["/^react/"],
+    //       ["module"],
+    //       ["/^~//"],
+    //       ["parent", "sibling", "index"]
+    //     ],
+    //     "alphabetize": { "order": "asc", "ignoreCase": true }
+    //   }
+    // ]
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
     }
+  }
 }

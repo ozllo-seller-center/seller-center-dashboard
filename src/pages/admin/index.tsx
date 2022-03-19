@@ -1,9 +1,7 @@
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { useRouter } from 'next/router';
-import React, {
-  useCallback, useEffect, useRef, useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FiSearch } from 'react-icons/fi';
 import FilterInput from 'src/components/FilterInput';
 import Loader from 'src/components/Loader';
@@ -29,7 +27,11 @@ export function Admin({ userFromApi }: ProductsProps) {
   const [search, setSeacrh] = useState('');
 
   const { isLoading, setLoading } = useLoading();
-  const { showModalMessage: showMessage, modalMessage, handleModalMessage } = useModalMessage();
+  const {
+    showModalMessage: showMessage,
+    modalMessage,
+    handleModalMessage,
+  } = useModalMessage();
 
   const { token, user, updateUser } = useAuth();
 
@@ -46,32 +48,48 @@ export function Admin({ userFromApi }: ProductsProps) {
 
   useEffect(() => {
     setLoading(true);
-    api.get('/account/decode').then((response) => {
-      if (response.data.role !== 'admin') router.push('/');
-    }).catch((err) => {
-      console.log(err);
-      setLoading(false);
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    api
+      .get('/account/decode')
+      .then(response => {
+        if (response.data.role !== 'admin') router.push('/');
+      })
+      .catch(err => {
+        console.log(err);
+        setLoading(false);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     setLoading(true);
-    api.get('/account/detail').then((response) => {
-      updateUser({ ...user, shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id } });
-      setLoading(false);
-      // return response.data as User;
-    }).catch((err) => {
-      console.log(err);
-      setLoading(false);
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    api
+      .get('/account/detail')
+      .then(response => {
+        updateUser({
+          ...user,
+          shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id },
+        });
+        setLoading(false);
+        // return response.data as User;
+      })
+      .catch(err => {
+        console.log(err);
+        setLoading(false);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     setLoading(true);
 
-    setItems(users.filter((usr) => (!!usr.email && (search === '' || usr.email.toLowerCase().includes(search.toLowerCase())))));
+    setItems(
+      users.filter(
+        usr =>
+          !!usr.email &&
+          (search === '' ||
+            usr.email.toLowerCase().includes(search.toLowerCase())),
+      ),
+    );
 
     setLoading(false);
   }, [search, setLoading, users]);
@@ -80,18 +98,21 @@ export function Admin({ userFromApi }: ProductsProps) {
     if (user) {
       setLoading(true);
 
-      api.get('/admin/users').then((response) => {
-        const summary = response.data as UserSummary[];
+      api
+        .get('/admin/users')
+        .then(response => {
+          const summary = response.data as UserSummary[];
 
-        setUsers(summary);
-        setItems(summary);
+          setUsers(summary);
+          setItems(summary);
 
-        setLoading(false);
-      }).catch((err) => {
-        console.log(err);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.log(err);
 
-        setLoading(false);
-      });
+          setLoading(false);
+        });
     }
   }, [setLoading, user]);
 
@@ -145,7 +166,7 @@ export function Admin({ userFromApi }: ProductsProps) {
                 </tr>
               </thead>
               <tbody className={styles.tableBody}>
-                {items.map((item) => (
+                {items.map(item => (
                   <UserTableItem
                     key={item._id}
                     item={item}
@@ -156,26 +177,25 @@ export function Admin({ userFromApi }: ProductsProps) {
                 ))}
               </tbody>
             </table>
-          )
-            : (
-              <span className={styles.emptyList}> Nenhum item foi encontrado </span>
-            )}
+          ) : (
+            <span className={styles.emptyList}>
+              {' '}
+              Nenhum item foi encontrado{' '}
+            </span>
+          )}
         </div>
       </div>
-      {
-        isLoading && (
-          <div className={styles.loadingContainer}>
-            <Loader />
-          </div>
-        )
-      }
+      {isLoading && (
+        <div className={styles.loadingContainer}>
+          <Loader />
+        </div>
+      )}
     </div>
   );
 }
 
 export const getInitialProps = async () => ({
-  props: {
-  },
+  props: {},
   revalidate: 10,
 });
 

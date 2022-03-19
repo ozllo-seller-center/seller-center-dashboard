@@ -1,5 +1,9 @@
 import React, {
-  useCallback, useEffect, useMemo, useRef, useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from 'react';
 import { IconBaseProps } from 'react-icons';
 
@@ -10,9 +14,9 @@ import ReactTooltip from 'react-tooltip';
 import styles from './styles.module.scss';
 
 export type Rule = {
-  state?: boolean,
-  descr: string,
-}
+  state?: boolean;
+  descr: string;
+};
 
 interface RuledHintboxProps {
   title?: string;
@@ -22,24 +26,33 @@ interface RuledHintboxProps {
 }
 
 const RuledHintbox: React.FC<RuledHintboxProps> = ({
-  title, example, icon: Icon, rules,
+  title,
+  example,
+  icon: Icon,
+  rules,
 }) => {
   const [ruleCheck, setRuleCheck] = useState(false);
 
   useEffect(() => {
     let check = true;
 
-    rules.map((rule) => {
-      if (check && rule.state !== undefined) { check = rule.state; }
+    rules.map(rule => {
+      if (check && rule.state !== undefined) {
+        check = rule.state;
+      }
     });
 
     setRuleCheck(check);
   }, [rules]);
 
   const spanStyles = useCallback((rule: Rule) => {
-    if (rule.state) { return ''; }
+    if (rule.state) {
+      return '';
+    }
 
-    if (rule.state) { return styles.green; }
+    if (rule.state) {
+      return styles.green;
+    }
 
     return styles.red;
   }, []);
@@ -63,19 +76,19 @@ const RuledHintbox: React.FC<RuledHintboxProps> = ({
           </div>
         )}
         <div>
-          {
-            rules.map((rule) => (
-              <div key={rule.descr} className={styles.rulesContainer}>
-                {!!rule.state && <BsDot /> }
-                {rule.state ? <FiCheck className={styles.green} /> : <FiX className={styles.red} />}
-                <span className={spanStyles(rule)}>{rule.descr}</span>
-              </div>
-            ))
-          }
+          {rules.map(rule => (
+            <div key={rule.descr} className={styles.rulesContainer}>
+              {!!rule.state && <BsDot />}
+              {rule.state ? (
+                <FiCheck className={styles.green} />
+              ) : (
+                <FiX className={styles.red} />
+              )}
+              <span className={spanStyles(rule)}>{rule.descr}</span>
+            </div>
+          ))}
         </div>
-        {!!example && (
-          <span className={styles.example}>{example}</span>
-        )}
+        {!!example && <span className={styles.example}>{example}</span>}
       </ReactTooltip>
     </>
   );

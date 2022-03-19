@@ -6,20 +6,30 @@ import styles from './styles.module.scss';
 import AddButton from '../AddButton';
 
 interface VariationsControllerProps extends HTMLAttributes<HTMLDivElement> {
-  handleAddVariation: Function;
+  handleAddVariation: () => void;
   disableAdd?: boolean;
 }
 
-const VariationsController: React.FC<VariationsControllerProps> = ({ handleAddVariation, disableAdd, children }: VariationsControllerProps) => (
+const VariationsController: React.FC<VariationsControllerProps> = ({
+  handleAddVariation,
+  disableAdd,
+  children,
+}: VariationsControllerProps) => (
   <div className={styles.controllerContainer}>
     {children}
-    {
-        !disableAdd && (
-          <div className={styles.addButtonContainer}>
-            <AddButton icon={FaPlus} onClick={() => { handleAddVariation(); }} type="button"><span>Adicionar variação</span></AddButton>
-          </div>
-        )
-      }
+    {!disableAdd && (
+      <div className={styles.addButtonContainer}>
+        <AddButton
+          icon={FaPlus}
+          onClick={() => {
+            handleAddVariation();
+          }}
+          type="button"
+        >
+          <span>Adicionar variação</span>
+        </AddButton>
+      </div>
+    )}
   </div>
 );
 

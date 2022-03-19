@@ -6,10 +6,10 @@ import MarketplaceButton from 'src/components/MarketplaceButton';
 import styles from './styles.module.scss';
 
 type MarketplaceData = {
-  name: string,
-  url: string,
-  image: string,
-}
+  name: string;
+  url: string;
+  image: string;
+};
 
 const SignUp: React.FC = () => {
   const { isLoading, setLoading } = useLoading();
@@ -103,22 +103,19 @@ const SignUp: React.FC = () => {
 
   return (
     <div className={styles.marketplacesContainer}>
-      {
-        marketplaces.map((marketplace) => (
-          <MarketplaceButton
-            name={marketplace.name}
-            image={marketplace.image}
-            url={marketplace.url}
-          />
-        ))
-      }
-      {
-        isLoading && (
-          <div className={styles.loadingContainer}>
-            <Loader />
-          </div>
-        )
-      }
+      {marketplaces.map(marketplace => (
+        <MarketplaceButton
+          key={marketplace.name}
+          name={marketplace.name}
+          image={marketplace.image}
+          url={marketplace.url}
+        />
+      ))}
+      {isLoading && (
+        <div className={styles.loadingContainer}>
+          <Loader />
+        </div>
+      )}
     </div>
   );
 };

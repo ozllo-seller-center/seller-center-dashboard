@@ -14,13 +14,13 @@ import Autocomplete from '../../Autocomplete';
 
 interface DefaultVariationDTO {
   _id?: string;
-  size?: number | string,
-  stock?: number,
-  color?: string,
+  size?: number | string;
+  stock?: number;
+  color?: string;
   flavor?: string;
-  gluten_free?: boolean,
-  lactose_free?: boolean,
-  voltage?: string,
+  gluten_free?: boolean;
+  lactose_free?: boolean;
+  voltage?: string;
 }
 interface VariationAttributes {
   name: string;
@@ -33,17 +33,27 @@ interface VariationProps {
   variation: any;
   index: number;
   attributes: any;
-  handleDeleteVariation: Function;
+  handleDeleteVariation: (param: any) => void;
   allowDelete?: boolean;
 }
 
 const VariationField: React.FC<VariationProps> = ({
-  variation, index, attributes, allowDelete, handleDeleteVariation,
+  variation,
+  index,
+  attributes,
+  allowDelete,
+  handleDeleteVariation,
 }) => {
   const idRef = useRef(null);
-  const { registerField, fieldName, defaultValue = variation._id } = useField('_id');
+  const {
+    registerField,
+    fieldName,
+    defaultValue = variation._id,
+  } = useField('_id');
 
-  const [variationAttributes, setVariationAttributes] = useState<VariationAttributes[]>([]);
+  const [variationAttributes, setVariationAttributes] = useState<
+    VariationAttributes[]
+  >([]);
 
   const { width } = useMemo(() => {
     if (typeof window !== 'undefined') {
@@ -66,50 +76,52 @@ const VariationField: React.FC<VariationProps> = ({
 
   useEffect(() => {
     if (attributes) {
-      const attributeDefs: VariationAttributes[] = attributes.map((attribute: Attribute) => {
-        // let valueAt;
-        let label;
-        let placeholder;
+      const attributeDefs: VariationAttributes[] = attributes.map(
+        (attribute: Attribute) => {
+          // let valueAt;
+          let label;
+          let placeholder;
 
-        switch (attribute.name) {
-          case 'color':
-            label = 'Cor';
-            placeholder = 'Escolha a cor';
-            break;
-          case 'size':
-            label = 'Tamanho/medida';
-            placeholder = 'Tamanho/medida';
-            break;
-          case 'flavor':
-            label = 'Sabor';
-            placeholder = 'Escolha o sabor';
-            break;
-          case 'voltage':
-            label = 'Voltagens';
-            placeholder = 'Escolha o voltagem';
-            break;
-          case 'gluten_free':
-            label = 'Sem glútem?';
-            placeholder = '';
-            break;
-          case 'lactose_free':
-            label = 'Sem lactose?';
-            placeholder = '';
-            break;
-          default:
-            label = '';
-            placeholder = '';
-            break;
-        }
+          switch (attribute.name) {
+            case 'color':
+              label = 'Cor';
+              placeholder = 'Escolha a cor';
+              break;
+            case 'size':
+              label = 'Tamanho/medida';
+              placeholder = 'Tamanho/medida';
+              break;
+            case 'flavor':
+              label = 'Sabor';
+              placeholder = 'Escolha o sabor';
+              break;
+            case 'voltage':
+              label = 'Voltagens';
+              placeholder = 'Escolha o voltagem';
+              break;
+            case 'gluten_free':
+              label = 'Sem glútem?';
+              placeholder = '';
+              break;
+            case 'lactose_free':
+              label = 'Sem lactose?';
+              placeholder = '';
+              break;
+            default:
+              label = '';
+              placeholder = '';
+              break;
+          }
 
-        return {
-          name: attribute.name,
-          type: attribute.type,
-          // valueAt,
-          label,
-          placeholder,
-        };
-      });
+          return {
+            name: attribute.name,
+            type: attribute.type,
+            // valueAt,
+            label,
+            placeholder,
+          };
+        },
+      );
 
       setVariationAttributes(attributeDefs);
     }
@@ -160,50 +172,53 @@ const VariationField: React.FC<VariationProps> = ({
         {index + 1}
       </span>
 
-      <input name="_id" style={{ display: 'none' }} ref={idRef} defaultValue={variation._id} />
+      <input
+        name="_id"
+        style={{ display: 'none' }}
+        ref={idRef}
+        defaultValue={variation._id}
+      />
 
-      {(!!width && width < 768) ? (
+      {!!width && width < 768 ? (
         <div className={styles.mobileDivisor}>
           <div className={mobileContainerStyle}>
-            {
-                variationAttributes.map((variationAttribute, i) => {
-                  switch (variationAttribute.type) {
-                    case 'boolean':
-                      return (
-                        <Checkbox
-                          key={variationAttribute.name}
-                          name={variationAttribute.name}
-                          label={variationAttribute.label}
-                          defaultValue={variation[variationAttribute.name]}
-                          defaultChecked={variation[variationAttribute.name]}
-                        />
-                      );
-                    case 'number':
-                      return (
-                        <Input
-                          key={variationAttribute.name}
-                          name={variationAttribute.name}
-                          label={variationAttribute.label}
-                          placeholder={variationAttribute.placeholder}
-                          autoComplete="off"
-                          defaultValue={variation[variationAttribute.name]}
-                        />
-                      );
-                    default:
-                      return (
-                        <Autocomplete
-                          key={variationAttribute.name}
-                          name={variationAttribute.name}
-                          items={attributes[i].values}
-                          label={variationAttribute.label}
-                          placeholder={variationAttribute.placeholder}
-                          autoComplete="off"
-                          defaultValue={variation[variationAttribute.name]}
-                        />
-                      );
-                  }
-                })
+            {variationAttributes.map((variationAttribute, i) => {
+              switch (variationAttribute.type) {
+                case 'boolean':
+                  return (
+                    <Checkbox
+                      key={variationAttribute.name}
+                      name={variationAttribute.name}
+                      label={variationAttribute.label}
+                      defaultValue={variation[variationAttribute.name]}
+                      defaultChecked={variation[variationAttribute.name]}
+                    />
+                  );
+                case 'number':
+                  return (
+                    <Input
+                      key={variationAttribute.name}
+                      name={variationAttribute.name}
+                      label={variationAttribute.label}
+                      placeholder={variationAttribute.placeholder}
+                      autoComplete="off"
+                      defaultValue={variation[variationAttribute.name]}
+                    />
+                  );
+                default:
+                  return (
+                    <Autocomplete
+                      key={variationAttribute.name}
+                      name={variationAttribute.name}
+                      items={attributes[i].values}
+                      label={variationAttribute.label}
+                      placeholder={variationAttribute.placeholder}
+                      autoComplete="off"
+                      defaultValue={variation[variationAttribute.name]}
+                    />
+                  );
               }
+            })}
 
             <Input
               name="stock"
@@ -213,62 +228,57 @@ const VariationField: React.FC<VariationProps> = ({
               defaultValue={variation.stock}
               type="number"
             />
-
           </div>
-          {
-              allowDelete && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleDeleteVariation(index);
-                  }}
-                >
-                  <FiXCircle />
-                </button>
-              )
-            }
+          {allowDelete && (
+            <button
+              type="button"
+              onClick={() => {
+                handleDeleteVariation(index);
+              }}
+            >
+              <FiXCircle />
+            </button>
+          )}
         </div>
       ) : (
         <>
-          {
-              variationAttributes.map((variationAttribute, i) => {
-                switch (variationAttribute.type) {
-                  case 'boolean':
-                    return (
-                      <Checkbox
-                        key={variationAttribute.name}
-                        name={variationAttribute.name}
-                        label={variationAttribute.label}
-                        placeholder={variationAttribute.placeholder}
-                        defaultChecked={variation[variationAttribute.name]}
-                      />
-                    );
-                  case 'number':
-                    return (
-                      <Input
-                        key={variationAttribute.name}
-                        name={variationAttribute.name}
-                        label={variationAttribute.label}
-                        placeholder={variationAttribute.placeholder}
-                        autoComplete="off"
-                        defaultValue={variation[variationAttribute.name]}
-                      />
-                    );
-                  default:
-                    return (
-                      <Autocomplete
-                        key={variationAttribute.name}
-                        name={variationAttribute.name}
-                        items={attributes[i].values}
-                        label={variationAttribute.label}
-                        placeholder={variationAttribute.placeholder}
-                        autoComplete="off"
-                        defaultValue={variation[variationAttribute.name]}
-                      />
-                    );
-                }
-              })
+          {variationAttributes.map((variationAttribute, i) => {
+            switch (variationAttribute.type) {
+              case 'boolean':
+                return (
+                  <Checkbox
+                    key={variationAttribute.name}
+                    name={variationAttribute.name}
+                    label={variationAttribute.label}
+                    placeholder={variationAttribute.placeholder}
+                    defaultChecked={variation[variationAttribute.name]}
+                  />
+                );
+              case 'number':
+                return (
+                  <Input
+                    key={variationAttribute.name}
+                    name={variationAttribute.name}
+                    label={variationAttribute.label}
+                    placeholder={variationAttribute.placeholder}
+                    autoComplete="off"
+                    defaultValue={variation[variationAttribute.name]}
+                  />
+                );
+              default:
+                return (
+                  <Autocomplete
+                    key={variationAttribute.name}
+                    name={variationAttribute.name}
+                    items={attributes[i].values}
+                    label={variationAttribute.label}
+                    placeholder={variationAttribute.placeholder}
+                    autoComplete="off"
+                    defaultValue={variation[variationAttribute.name]}
+                  />
+                );
             }
+          })}
 
           <Input
             name="stock"
@@ -279,18 +289,16 @@ const VariationField: React.FC<VariationProps> = ({
             type="number"
           />
 
-          {
-              allowDelete && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleDeleteVariation(index);
-                  }}
-                >
-                  <FiXCircle />
-                </button>
-              )
-            }
+          {allowDelete && (
+            <button
+              type="button"
+              onClick={() => {
+                handleDeleteVariation(index);
+              }}
+            >
+              <FiXCircle />
+            </button>
+          )}
         </>
       )}
     </div>

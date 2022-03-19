@@ -1,6 +1,5 @@
 @import '../../../public/styles/__dimensions.scss';
 
-
 .container {
   // min-height: 100%;
   display: flex;
@@ -14,25 +13,14 @@
   .header {
     display: flex;
 
-    align-items: center;
-    justify-content: center;
+    button+button {
+      margin-left: 1rem;
 
-    h1 {
-      font-weight: bold;
+      @media screen and (min-width: $desktop-size) {
+        margin-left: 1.5rem;
+      }
     }
   }
 
-  .cardContainer {
-    flex: 1;
-
-    display: flex;
-    flex-wrap: wrap;
-
-    row-gap: 1rem;
-    column-gap: 3rem;
-
-    justify-content: center;
-
-    margin-top: 1rem;
-  }
+  .content {}
 }

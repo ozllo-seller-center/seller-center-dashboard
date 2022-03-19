@@ -11,7 +11,11 @@ interface TooltipProps {
 }
 
 const Tooltip: React.FC<TooltipProps> = ({
-  title, offsetY, closeTooltip, className, children,
+  title,
+  offsetY,
+  closeTooltip,
+  className,
+  children,
 }) => (
   <>
     <div onClick={closeTooltip} className={styles.outside} />
@@ -33,9 +37,16 @@ interface HoverTooltipProps {
 }
 
 export const HoverTooltip: React.FC<HoverTooltipProps> = ({
-  offsetY, offsetX, closeTooltip, className, children,
+  offsetY,
+  offsetX,
+  closeTooltip,
+  className,
+  children,
 }) => (
-  <div className={styles.hoverContainer} style={{ top: offsetY, left: offsetX || undefined }}>
+  <div
+    className={styles.hoverContainer}
+    style={{ top: offsetY, left: offsetX || undefined }}
+  >
     {children}
   </div>
 );

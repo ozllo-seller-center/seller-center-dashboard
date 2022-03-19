@@ -9,7 +9,13 @@ export default class PersonInfo {
 
   birthday?: string;
 
-  constructor(isPF: boolean, firstName: string, lastName: string, cpf: string, birthday?: string) {
+  constructor(
+    isPF: boolean,
+    firstName: string,
+    lastName: string,
+    cpf: string,
+    birthday?: string,
+  ) {
     this.isPF = isPF;
     this.firstName = firstName;
     this.lastName = lastName;

@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
 
-  > div {
+  >div {
     flex: 1;
 
     display: flex;
@@ -46,7 +46,7 @@
 }
 
 .container {
-  box-shadow: 0 0 24px rgba(0,0,0,0.05), 0 0 6px rgba(0,0,0,0.1);
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.05), 0 0 6px rgba(0, 0, 0, 0.1);
 
   .inputLabel {
     color: var(--gray-250);
@@ -54,7 +54,7 @@
 }
 
 .containerDisabled {
-  box-shadow: 0 0 24px rgba(0,0,0,0.05), 0 0 6px rgba(0,0,0,0.1);
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.05), 0 0 6px rgba(0, 0, 0, 0.1);
 
   opacity: 0.9;
 

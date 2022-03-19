@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useRef, useState,
-} from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 
 import Link from 'next/link';
 
@@ -27,8 +25,8 @@ import Button from '../../components/PrimaryButton';
 import MessageModal from '../../components/MessageModal';
 
 type SignUpFormData = {
-  email: string,
-}
+  email: string;
+};
 
 const ForgotPassword: React.FC = () => {
   const { isLoading, setLoading } = useLoading();
@@ -45,63 +43,66 @@ const ForgotPassword: React.FC = () => {
 
   const router = useRouter();
 
-  const handleSubmit = useCallback(async (data: SignUpFormData) => {
-    setLoading(true);
-    try {
-      formRef.current?.setErrors({});
+  const handleSubmit = useCallback(
+    async (data: SignUpFormData) => {
+      setLoading(true);
+      try {
+        formRef.current?.setErrors({});
 
-      const schema = Yup.object().shape({
-        email: Yup.string()
-          .required('E-mail obrigatório')
-          .email('Digite um e-mail válido')
-          .test(
-            'email-validation',
-            'Informe um e-mail válido',
-            (value) => (
-              !!value && isEmailValid(value)
+        const schema = Yup.object().shape({
+          email: Yup.string()
+            .required('E-mail obrigatório')
+            .email('Digite um e-mail válido')
+            .test(
+              'email-validation',
+              'Informe um e-mail válido',
+              value => !!value && isEmailValid(value),
             ),
-          ),
-      });
-      await schema.validate(data, { abortEarly: false });
+        });
+        await schema.validate(data, { abortEarly: false });
 
-      const {
-        email,
-      } = data;
+        const { email } = data;
 
-      await api.get(`/auth/forgotPassword/${email}`);
+        await api.get(`/auth/forgotPassword/${email}`);
 
-      setModalVisibility(true);
-      setSuccessfull(true);
-      setLoading(false);
-      setTitle('Requisição de senha enviada!');
-      setMessage('Cheque seu e-mail para recuperar sua senha.');
-    } catch (err) {
-      setLoading(false);
+        setModalVisibility(true);
+        setSuccessfull(true);
+        setLoading(false);
+        setTitle('Requisição de senha enviada!');
+        setMessage('Cheque seu e-mail para recuperar sua senha.');
+      } catch (err) {
+        setLoading(false);
 
-      if (err instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(err);
-        formRef.current?.setErrors(errors);
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
+          formRef.current?.setErrors(errors);
 
-        return;
+          return;
+        }
+
+        setModalVisibility(true);
+        setSuccessfull(false);
+        setTitle('Oops...');
+        setMessage(
+          'Ocorreu um erro durante a requisição, tente novamente em alguns instantes.',
+        );
+        // addToast({
+        //   type: 'error',
+        //   title: 'Erro na atualização',
+        //   description:
+        //     'Ocorreu um erro ao atualizar seu perfil, tente novamente.',
+        // });
       }
-
-      setModalVisibility(true);
-      setSuccessfull(false);
-      setTitle('Oops...');
-      setMessage('Ocorreu um erro durante a requisição, tente novamente em alguns instantes.');
-      // addToast({
-      //   type: 'error',
-      //   title: 'Erro na atualização',
-      //   description:
-      //     'Ocorreu um erro ao atualizar seu perfil, tente novamente.',
-      // });
-    }
-  }, [setLoading]);
+    },
+    [setLoading],
+  );
 
   const handleModalVisibility = useCallback(() => {
     setModalVisibility(false);
 
-    if (successfull) { router.push('/'); }
+    if (successfull) {
+      router.push('/');
+    }
   }, [router, successfull]);
 
   return (
@@ -136,37 +137,36 @@ const ForgotPassword: React.FC = () => {
             <div className={styles.personal}>
               <h3>Recuperação de senha</h3>
 
-              <Input
-                name="email"
-                placeholder="E-mail"
-                autoComplete="off"
-              />
-
+              <Input name="email" placeholder="E-mail" autoComplete="off" />
             </div>
           </div>
 
-          <Button type="submit" customStyle={{ className: styles.saveButton }}>Confirmar</Button>
-
+          <Button type="submit" customStyle={{ className: styles.saveButton }}>
+            Confirmar
+          </Button>
         </Form>
       </div>
-      {
-        isLoading && (
-          <div className={styles.loadingContainer}>
-            <Loader />
+      {isLoading && (
+        <div className={styles.loadingContainer}>
+          <Loader />
+        </div>
+      )}
+      {isModalVisible && (
+        <MessageModal
+          handleVisibility={handleModalVisibility}
+          alterStyle={successfull}
+        >
+          <div className={styles.modalContent}>
+            {successfull ? (
+              <FiCheck style={{ color: 'var(--green-100)' }} />
+            ) : (
+              <FiX style={{ color: 'var(--red-100)' }} />
+            )}
+            <p>{title}</p>
+            <p>{message}</p>
           </div>
-        )
-      }
-      {
-        isModalVisible && (
-          <MessageModal handleVisibility={handleModalVisibility} alterStyle={successfull}>
-            <div className={styles.modalContent}>
-              {successfull ? <FiCheck style={{ color: 'var(--green-100)' }} /> : <FiX style={{ color: 'var(--red-100)' }} />}
-              <p>{title}</p>
-              <p>{message}</p>
-            </div>
-          </MessageModal>
-        )
-      }
+        </MessageModal>
+      )}
     </div>
   );
 };

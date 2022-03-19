@@ -18,7 +18,7 @@
     min-width: 800px;
   }
 
-  > strong {
+  >strong {
     font-weight: bold;
 
     margin-bottom: 1rem;
@@ -45,7 +45,7 @@
     min-width: 800px;
   }
 
-  > strong {
+  >strong {
     font-weight: bold;
 
     margin-bottom: 1rem;
@@ -101,7 +101,7 @@
     span {
       font-weight: lighter;
 
-      & + strong {
+      &+strong {
         margin-top: 1rem;
       }
     }
@@ -160,7 +160,7 @@
     span {
       font-weight: lighter;
 
-      & + div {
+      &+div {
         margin-top: 0.5rem;
       }
     }
@@ -185,18 +185,18 @@
           column-gap: 5rem;
         }
 
-        > div {
+        >div {
           display: flex;
           flex-direction: column;
         }
       }
 
-      & + .product {
+      &+.product {
         margin-top: 0.5rem;
       }
     }
 
-   }
+  }
 }
 
 .green {

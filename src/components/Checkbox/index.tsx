@@ -42,17 +42,20 @@ const CheckboxInput: React.FC<CheckBoxProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
 
-  const {
-    fieldName, defaultValue, error, registerField,
-  } = useField(name);
+  const { fieldName, defaultValue, error, registerField } = useField(name);
 
   const [isChecked, setChecked] = useState(rest.defaultChecked);
 
-  const handleChecked = useCallback((e) => {
-    if (inputRef.current) { inputRef.current.checked = !isChecked; }
+  const handleChecked = useCallback(
+    e => {
+      if (inputRef.current) {
+        inputRef.current.checked = !isChecked;
+      }
 
-    setChecked(!isChecked);
-  }, [inputRef, isChecked]);
+      setChecked(!isChecked);
+    },
+    [inputRef, isChecked],
+  );
 
   useEffect(() => {
     registerField({
@@ -63,13 +66,21 @@ const CheckboxInput: React.FC<CheckBoxProps> = ({
   }, [fieldName, registerField]);
 
   const containerStyle = useMemo(() => {
-    if (disabled) { return styles.containerDisabled; }
+    if (disabled) {
+      return styles.containerDisabled;
+    }
 
-    if (error) { return styles.containerError; }
+    if (error) {
+      return styles.containerError;
+    }
 
-    if (isFocused) { return styles.containerFocused; }
+    if (isFocused) {
+      return styles.containerFocused;
+    }
 
-    if (isFilled) { return styles.containerFilled; }
+    if (isFilled) {
+      return styles.containerFilled;
+    }
 
     return styles.container;
   }, [disabled, error, isFilled, isFocused]);
@@ -88,7 +99,7 @@ const CheckboxInput: React.FC<CheckBoxProps> = ({
           type="checkbox"
           ref={inputRef}
           checked={isChecked}
-          onChange={(e) => {
+          onChange={e => {
             e.currentTarget.checked = !isChecked;
           }}
         />
@@ -100,11 +111,7 @@ const CheckboxInput: React.FC<CheckBoxProps> = ({
           <FaCheck />
         </button>
       </div>
-      {error && (
-        <p className={styles.error}>
-          {error}
-        </p>
-      )}
+      {error && <p className={styles.error}>{error}</p>}
     </div>
   );
 };

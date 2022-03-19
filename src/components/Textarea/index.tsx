@@ -27,9 +27,7 @@ const TextArea: React.FC<TextAreaProps> = ({
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
-  const {
-    fieldName, defaultValue, error, registerField,
-  } = useField(name);
+  const { fieldName, defaultValue, error, registerField } = useField(name);
 
   const handleInputFocused = useCallback(() => {
     setIsFocused(true);
@@ -50,19 +48,25 @@ const TextArea: React.FC<TextAreaProps> = ({
   }, [fieldName, registerField]);
 
   const containerStyle = useMemo(() => {
-    if (disabled) { return styles.containerDisabled; }
-    if (error) { return styles.containerError; }
-    if (isFocused) { return styles.containerFocused; }
-    if (isFilled) { return styles.containerFilled; }
+    if (disabled) {
+      return styles.containerDisabled;
+    }
+    if (error) {
+      return styles.containerError;
+    }
+    if (isFocused) {
+      return styles.containerFocused;
+    }
+    if (isFilled) {
+      return styles.containerFilled;
+    }
 
     return styles.container;
   }, [disabled, error, isFilled, isFocused]);
 
   return (
     <div className={styles.parent}>
-      <div
-        className={containerStyle}
-      >
+      <div className={containerStyle}>
         <label className={styles.inputLabel}>{label}</label>
         <textarea
           name={name}
@@ -74,11 +78,7 @@ const TextArea: React.FC<TextAreaProps> = ({
           {...rest}
         />
       </div>
-      {error && (
-        <p className={styles.error}>
-          {error}
-        </p>
-      )}
+      {error && <p className={styles.error}>{error}</p>}
     </div>
   );
 };

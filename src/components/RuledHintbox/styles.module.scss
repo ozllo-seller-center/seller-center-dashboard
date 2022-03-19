@@ -1,6 +1,6 @@
 .icon {
-    width: 1rem;
-    color: var(--yellow-300);
+  width: 1rem;
+  color: var(--yellow-300);
 }
 
 .iconError {
@@ -9,7 +9,7 @@
 }
 
 .container {
-  box-shadow: 0 0 24px rgba(0,0,0,0.1), 0 0 6px rgba(0,0,0,0.2) !important;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.1), 0 0 6px rgba(0, 0, 0, 0.2) !important;
 
   display: flex !important;
   flex-direction: column !important;
@@ -22,7 +22,7 @@
 
   margin-bottom: 0.5rem;
 
-  > span {
+  >span {
     font-size: 1rem;
     font-weight: bold;
   }
@@ -44,7 +44,7 @@
 
   color: var(--grafite);
 
-  & + .rulesContainer {
+  &+.rulesContainer {
     margin-top: 0.25rem;
   }
 

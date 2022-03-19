@@ -10,7 +10,7 @@
 
   transition: color 0.5s, background-color 0.5s, font-weight 0.5s;
 
-  > svg {
+  >svg {
     color: var(--white);
     width: 1.25rem;
     height: 1.25rem;
@@ -21,7 +21,7 @@
     color: var(--grafite);
     background-color: var(--yellow-300);
 
-    > svg {
+    >svg {
       color: var(--grafite);
     }
   }
@@ -39,7 +39,7 @@
 
   transition: color 0.5s, background-color 0.5s, font-weight 0.5s;
 
-  > svg {
+  >svg {
     color: var(--grafite);
     width: 1.25rem;
     height: 1.25rem;

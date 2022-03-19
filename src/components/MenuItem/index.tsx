@@ -9,13 +9,17 @@ import { IconProps } from '../../icons/props/iconInterface';
 interface MenuItemProps {
   to: string;
   name: string;
-  setSelected: Function;
+  setSelected: React.Dispatch<any>;
   iconLib?: React.ComponentType<IconBaseProps>;
   iconAuth?: React.ComponentType<IconProps>;
 }
 
 const MenuButton: React.FC<MenuItemProps> = ({
-  to, name, iconLib: IconLib, iconAuth: IconAuth, setSelected,
+  to,
+  name,
+  iconLib: IconLib,
+  iconAuth: IconAuth,
+  setSelected,
 }: MenuItemProps) => {
   const { isRegisterCompleted } = useAuth();
 
@@ -30,7 +34,11 @@ const MenuButton: React.FC<MenuItemProps> = ({
 
   return (
     <div
-      className={router.pathname.includes(to) ? styles.menuItemContainerSelected : styles.menuItemContainer}
+      className={
+        router.pathname.includes(to)
+          ? styles.menuItemContainerSelected
+          : styles.menuItemContainer
+      }
       onClick={select}
     >
       <div className={styles.menuItemContent}>

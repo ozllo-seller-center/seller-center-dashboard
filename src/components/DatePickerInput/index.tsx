@@ -1,8 +1,4 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import DatePicker from 'react-datepicker';
 import pt from 'date-fns/locale/pt-BR';
@@ -32,9 +28,7 @@ const Input: React.FC<DatePickerInputProps> = ({
   const [inputDate, setInputDate] = useState(new Date() as any);
   const dateRef = useRef<ReactDatePicker>(null);
 
-  const {
-    fieldName, defaultValue, error, registerField,
-  } = useField(name);
+  const { fieldName, defaultValue, error, registerField } = useField(name);
 
   useEffect(() => {
     registerField({
@@ -48,15 +42,9 @@ const Input: React.FC<DatePickerInputProps> = ({
   }, [fieldName, registerField]);
 
   return (
-    <div
-      className={styles.container}
-    >
-      {isStart && (
-      <span>de</span>
-      )}
-      {isEnd && (
-      <span>até</span>
-      )}
+    <div className={styles.container}>
+      {isStart && <span>de</span>}
+      {isEnd && <span>até</span>}
       <DatePicker
         name={name}
         selected={inputDate}
@@ -64,7 +52,10 @@ const Input: React.FC<DatePickerInputProps> = ({
         ref={dateRef}
         locale={pt}
         dateFormatCalendar="MMMM yyyy"
-        formatWeekDay={(formattedDate) => formattedDate[0].toUpperCase() + formattedDate.substr(1, 2).toLowerCase()}
+        formatWeekDay={formattedDate =>
+          formattedDate[0].toUpperCase() +
+          formattedDate.substr(1, 2).toLowerCase()
+        }
         dateFormat="dd/MM/yyyy"
         todayButton="Hoje"
         selectsRange={isRanged}
