@@ -48,6 +48,7 @@ const HeaderDropdown: React.FC<HeaderDropdownProps> = ({
             if (item.value !== selectedItem) {
               return (
                 <li
+                  key={item.value}
                   onClick={() => {
                     setSelectedItem(item.value);
                     setActiveItem(item.value);
