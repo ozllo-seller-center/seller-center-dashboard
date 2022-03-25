@@ -79,12 +79,12 @@ const Menu: React.FC<MenuProps> = ({ open, setOpen, visible }) => {
           setSelected={setSelected}
           iconLib={RiStore2Line}
         />
-        {/* <MenuItem
+        <MenuItem
           to="/integrations"
           name="Integrações"
           setSelected={setSelected}
           iconLib={MdOutlineIntegrationInstructions}
-        /> */}
+        />
       </div>
       {!!width && width < 768 && open && (
         <div className={styles.outside} onClick={() => setOpen(!open)} />

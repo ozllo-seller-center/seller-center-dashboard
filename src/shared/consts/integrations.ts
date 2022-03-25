@@ -1,74 +1,74 @@
 export const platformItems = [
   {
     text: 'Bling',
-    value: 'Bling',
+    value: 'bling',
   },
   {
     text: 'BSeller',
-    value: 'BSeller',
+    value: 'bseller',
   },
   {
     text: 'Eccoys',
-    value: 'Eccoys',
+    value: 'eccoys',
   },
   {
     text: 'IdealaWare',
-    value: 'IdealaWare',
+    value: 'idealaware',
   },
   {
     text: 'IHub',
-    value: 'IHub',
+    value: 'iHub',
   },
   {
     text: 'Infra.commerce',
-    value: 'Infra.commerce',
+    value: 'infracommerce',
   },
   {
     text: 'Linx Commerce',
-    value: 'Linx Commerce',
+    value: 'linxc',
   },
   {
     text: 'Linx eMillenium',
-    value: 'Linx eMillenium',
+    value: 'linxe',
   },
   {
     text: 'Linx OMS',
-    value: 'Linx OMS',
+    value: 'linxo',
   },
   {
     text: 'Linx Integrada',
-    value: 'Linx Integrada',
+    value: 'lojaintegrada',
+  },
+  {
+    text: 'Magento',
+    value: 'magento',
   },
   {
     text: 'Magento2',
-    value: 'Magento2',
+    value: 'magento2',
   },
   {
     text: 'Opencart',
-    value: 'Opencart',
+    value: 'opencart',
   },
   {
     text: 'Softvar',
-    value: 'Softvar',
+    value: 'softvar',
   },
   {
     text: 'Tiny',
-    value: 'Tiny',
+    value: 'tiny',
   },
   {
     text: 'Tray.io',
-    value: 'Tray.io',
+    value: 'trayio',
   },
   {
     text: 'Vtex',
-    value: 'Vtex',
+    value: 'vtex',
   },
   {
     text: 'WooCommerce',
-    value: 'WooCommerce',
-  },
-  {
-    text: 'WooCommerce',
-    value: 'WooCommerce',
+    value: 'woo',
   },
 ];
