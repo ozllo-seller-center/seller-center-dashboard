@@ -14,7 +14,7 @@ interface MenuItemProps {
   iconAuth?: React.ComponentType<IconProps>;
 }
 
-const MenuButton: React.FC<MenuItemProps> = ({
+const MenuItem: React.FC<MenuItemProps> = ({
   to,
   name,
   iconLib: IconLib,
@@ -50,4 +50,4 @@ const MenuButton: React.FC<MenuItemProps> = ({
   );
 };
 
-export default MenuButton;
+export default MenuItem;

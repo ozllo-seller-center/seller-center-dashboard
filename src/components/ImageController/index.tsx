@@ -90,7 +90,7 @@ const ImageController: React.FC<ImageControllerProps> = ({
       {files.map((f, i) => {
         if (f.url) {
           return (
-            <div key={f.url} style={{ display: 'flex' }}>
+            <div key={i} style={{ display: 'flex' }}>
               {dropPos === i && !dropIntent && (
                 <hr
                   key="previous"

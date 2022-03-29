@@ -1,12 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import {
-  FiChevronLeft,
-  FiHome,
-  FiPackage,
-  FiUser,
-  FiShoppingCart,
-} from 'react-icons/fi';
+import { FiChevronLeft, FiHome, FiPackage } from 'react-icons/fi';
 import { FaRegMoneyBillAlt } from 'react-icons/fa';
 import { RiStore2Line } from 'react-icons/ri';
 import { MdOutlineIntegrationInstructions } from 'react-icons/md';
