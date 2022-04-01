@@ -12,6 +12,7 @@ interface MenuItemProps {
   setSelected: React.Dispatch<any>;
   iconLib?: React.ComponentType<IconBaseProps>;
   iconAuth?: React.ComponentType<IconProps>;
+  isExternal?: boolean;
 }
 
 const MenuItem: React.FC<MenuItemProps> = ({
@@ -20,6 +21,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   iconLib: IconLib,
   iconAuth: IconAuth,
   setSelected,
+  isExternal,
 }: MenuItemProps) => {
   const { isRegisterCompleted } = useAuth();
 
@@ -28,9 +30,15 @@ const MenuItem: React.FC<MenuItemProps> = ({
   const select = useCallback(() => {
     if (isRegisterCompleted) {
       setSelected(to);
+
+      if (isExternal) {
+        location.assign(to);
+        return;
+      }
+
       router.push(to);
     }
-  }, [isRegisterCompleted, router, setSelected, to]);
+  }, [isExternal, isRegisterCompleted, router, setSelected, to]);
 
   return (
     <div

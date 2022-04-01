@@ -77,10 +77,11 @@ const Header: React.FC<HeaderProps> = ({ open, setOpen }) => {
     }
 
     if (router.pathname.includes('integrations')) {
-      setTitle('Integrações');
+      setTitle('Integração');
       setDescription(
         <span>Integre suas informações a partir do seu ERP ou E-commerce</span>,
       );
+      return;
     }
 
     setTitle('Produtos');

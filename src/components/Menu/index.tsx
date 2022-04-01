@@ -79,6 +79,13 @@ const Menu: React.FC<MenuProps> = ({ open, setOpen, visible }) => {
           setSelected={setSelected}
           iconLib={MdOutlineIntegrationInstructions}
         />
+        <MenuItem
+          to="https://airtable.com/shrRuIRdHXKXtKcYB"
+          name="Integrações"
+          setSelected={setSelected}
+          iconLib={MdOutlineIntegrationInstructions}
+          isExternal
+        />
       </div>
       {!!width && width < 768 && open && (
         <div className={styles.outside} onClick={() => setOpen(!open)} />
