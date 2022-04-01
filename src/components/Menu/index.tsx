@@ -4,6 +4,7 @@ import { FiChevronLeft, FiHome, FiPackage } from 'react-icons/fi';
 import { FaRegMoneyBillAlt } from 'react-icons/fa';
 import { RiStore2Line } from 'react-icons/ri';
 import { MdOutlineIntegrationInstructions } from 'react-icons/md';
+import { HiOutlineSpeakerphone } from 'react-icons/hi';
 import MenuItem from '../MenuItem';
 
 import styles from './styles.module.scss';
@@ -81,9 +82,9 @@ const Menu: React.FC<MenuProps> = ({ open, setOpen, visible }) => {
         />
         <MenuItem
           to="https://airtable.com/shrRuIRdHXKXtKcYB"
-          name="Integrações"
+          name="Campanhas"
           setSelected={setSelected}
-          iconLib={MdOutlineIntegrationInstructions}
+          iconLib={HiOutlineSpeakerphone}
           isExternal
         />
       </div>

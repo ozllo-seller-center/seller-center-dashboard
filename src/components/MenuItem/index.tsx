@@ -32,7 +32,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
       setSelected(to);
 
       if (isExternal) {
-        location.assign(to);
+        window.open(to, '_blank');
         return;
       }
 
