@@ -428,7 +428,7 @@ const Integrations: React.FC = () => {
             type: 'text',
           },
           {
-            name: 'sellerdId',
+            name: 'sellerId',
             type: 'text',
           },
           {
@@ -510,6 +510,10 @@ const Integrations: React.FC = () => {
           return `URL da API ${integration}`;
         case 'url':
           return `URL da loja ${integration}`;
+        case 'shopId':
+          return `Id da loja ${integration}`;
+        case 'stockId':
+          return `Id do estoque (stockId) ${integration}`;
         case 'ecommerceUrl':
           return `URL do E-Commerce ${integration}`;
         case 'eMillenium':
@@ -520,6 +524,12 @@ const Integrations: React.FC = () => {
           return `Consumer Key WooCommerce`;
         case 'wooCommercePasswordConsumer':
           return `Senha do Consumer WooCommerce`;
+        case 'vtexKey':
+          return 'APP Key da Vtex';
+        case 'vtexToken':
+          return 'APP Token da Vtex';
+        case 'vtexPoliticId':
+          return 'ID da política da Vtex';
       }
 
       return '';
@@ -538,14 +548,16 @@ const Integrations: React.FC = () => {
           return `Token ${integration}`;
         case 'jwt':
           return `Token JWT (Token) para API do(a) ${integration}`;
+        case 'userId':
+          return `Insira o UserId ${integration}`;
         case 'sellerId':
-          return `Seller Id no ${integration}`;
+          return `Insira o Seller Id no ${integration}`;
         case 'clientId':
           return `Insira o clientId do(a)) ${integration}`;
         case 'channelId':
           return `Insira o channelId do(a) ${integration}`;
         case 'ecommerceId':
-          return `EcommerceId ${integration}`;
+          return `Insira o EcommerceId ${integration}`;
         case 'websiteId':
           return `Insira o identificador do site (websiteId) ${integration}`;
         case 'storeView':
@@ -562,6 +574,10 @@ const Integrations: React.FC = () => {
           return `URL da API ${integration}`;
         case 'url':
           return `Insira a URL da loja ${integration}`;
+        case 'shopId':
+          return `Insira o Id da loja (shopId) ${integration}`;
+        case 'stockId':
+          return `Insira o Id do estoque (stockId) ${integration}`;
         case 'ecommerceUrl':
           return `Insira a URL/Dominio do seu ecommerce ${integration}`;
         case 'eMillenium':
@@ -572,6 +588,12 @@ const Integrations: React.FC = () => {
           return `Consumer Key WooCommerce`;
         case 'wooCommercePasswordConsumer':
           return `Senha do Consumer WooCommerce`;
+        case 'vtexKey':
+          return 'Insira o APP Key da Vtex';
+        case 'vtexToken':
+          return 'Insira o APP Token da Vtex';
+        case 'vtexPoliticId':
+          return 'Insira o ID da política da Vtex';
       }
 
       return '';
@@ -742,7 +764,7 @@ const Integrations: React.FC = () => {
         ...validationSchema,
         vtexKey: Yup.string().required('Campo obrigatório'),
         vtexToken: Yup.string().required('Campo obrigatório'),
-        sellerdId: Yup.string().required('Campo obrigatório'),
+        sellerId: Yup.string().required('Campo obrigatório'),
         vtexPoliticId: Yup.string().required('Campo obrigatório'),
       };
     }
@@ -897,6 +919,7 @@ const Integrations: React.FC = () => {
                       key={i}
                       name={attribute.name}
                       label={label}
+                      autoComplete="off"
                       placeholder={integrationFieldPlaceholder(
                         title,
                         attribute.name,
@@ -910,6 +933,7 @@ const Integrations: React.FC = () => {
                       key={i}
                       name={attribute.name}
                       label={label}
+                      autoComplete="off"
                       placeholder={integrationFieldPlaceholder(
                         title,
                         attribute.name,
@@ -923,6 +947,7 @@ const Integrations: React.FC = () => {
                       key={i}
                       name={attribute.name}
                       label={label}
+                      autoComplete="off"
                       type="password"
                       placeholder={integrationFieldPlaceholder(
                         title,
@@ -936,6 +961,7 @@ const Integrations: React.FC = () => {
                     key={i}
                     name={attribute.name}
                     label={label}
+                    autoComplete="off"
                     placeholder={integrationFieldPlaceholder(
                       title,
                       attribute.name,

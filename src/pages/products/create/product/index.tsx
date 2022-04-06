@@ -144,7 +144,7 @@ export function ProductForm() {
         if (variation.size) {
           filled += 1;
         }
-        if (variation.stock) {
+        if (variation.stock || variation.stock === 0) {
           filled += 1;
         }
         if (variation.color) {
