@@ -225,7 +225,7 @@ const VariationField: React.FC<VariationProps> = ({
               label="Estoque"
               placeholder="Quantidade em estoque"
               autoComplete="off"
-              defaultValue={variation.stock}
+              defaultValue={variation.stock ? variation.stock : 0}
               type="number"
             />
           </div>
