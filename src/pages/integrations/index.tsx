@@ -31,6 +31,7 @@ interface PlatformAttribute {
 }
 
 type SavedIntegration = any & {
+  name: string;
   active?: boolean;
 };
 
@@ -49,7 +50,7 @@ const Integrations: React.FC = () => {
 
   const [title, setTitle] = useState('');
   const [attributes, setAttributes] = useState<PlatformAttribute[]>([]);
-  const [connectButton, setConnectButton] = useState(false);
+  // const [connectButton, setConnectButton] = useState(false);
 
   const formRef = useRef<FormHandles>(null);
 
@@ -71,9 +72,13 @@ const Integrations: React.FC = () => {
         })
         .then(response => {
           setPlatform(response.data.name);
-          setSavedInfo(response.data.data);
+          setSavedInfo({ ...response.data.data, name: response.data.name });
 
           formRef.current?.setData(response.data.data);
+
+          if (response.data.data) {
+            setConnectionStatus(IntegrationStatus.CONNECTED);
+          }
 
           setLoading(false);
         })
@@ -90,18 +95,20 @@ const Integrations: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!savedInfo) {
+    if (!savedInfo || platform !== savedInfo.name) {
       setConnectionStatus(IntegrationStatus.UNSET);
       return;
     }
 
     if (!savedInfo.active) {
-      setConnectionStatus(IntegrationStatus.DISCONNECTED);
+      // FIXME: ajustar depois que o Daniel ajustar o backend
+      // setConnectionStatus(IntegrationStatus.DISCONNECTED);
+      setConnectionStatus(IntegrationStatus.CONNECTED);
       return;
     }
 
     setConnectionStatus(IntegrationStatus.CONNECTED);
-  }, [savedInfo]);
+  }, [savedInfo, platform]);
 
   useEffect(() => {
     let attrs: PlatformAttribute[] = [];
@@ -464,14 +471,18 @@ const Integrations: React.FC = () => {
     }
 
     setAttributes(attrs);
-    setConnectButton(connection);
-  }, [platform]);
+    // setConnectButton(connection);
+  }, [platform, savedInfo]);
 
   useEffect(() => {
-    formRef.current?.setData(savedInfo);
+    if (!savedInfo || platform !== savedInfo.name) {
+      formRef.current?.reset();
+      return;
+    }
 
+    formRef.current?.setData(savedInfo);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attributes]);
+  }, [attributes, platform]);
 
   const integrationFieldLabel = useCallback(
     (integration: string, field: string) => {
@@ -840,30 +851,51 @@ const Integrations: React.FC = () => {
                   return;
                 }
 
-                setConnectionStatus(IntegrationStatus.DISCONNECTED);
+                // FIXME: assim que o Daniel ajustar o back retornar o comportamento de sem conexão
+                // setConnectionStatus(IntegrationStatus.DISCONNECTED);
+                // setLoading(false);
+                // handleModalMessage(true, {
+                //   title: 'Sem conexão!',
+                //   message: [
+                //     'A integração foi cadastrada com sucesso.\nPorém a conexão com a plataforma não pode ser estabelecida.',
+                //   ],
+                //   type: 'other',
+                // });
 
+                setConnectionStatus(IntegrationStatus.CONNECTED);
                 setLoading(false);
                 handleModalMessage(true, {
-                  title: 'Sem conexão!',
+                  title: 'Sucesso',
                   message: [
-                    'A integração foi cadastrada com sucesso.\nPorém a conexão com a plataforma não pode ser estabelecida.',
+                    'Estamos iniciando sua integração.',
+                    'Assim que finalizada seus produtos se encontrarão na aba de Produtos',
                   ],
-                  type: 'other',
+                  type: 'success',
                 });
               })
               .catch(err => {
-                console.log(err);
+                // FIXME: assim que o Daniel ajustar o back retornar o comportamento de erro na ativação
+                // console.log(err);
+                // setLoading(false);
+                // handleModalMessage(true, {
+                //   title: 'Erro',
+                //   message: [
+                //     'Erro ao conectar a integração, por favor cheque as informações e tente novamente',
+                //   ],
+                //   type: 'error',
+                // });
+                // setConnectionStatus(IntegrationStatus.UNSET);
 
+                setConnectionStatus(IntegrationStatus.CONNECTED);
                 setLoading(false);
                 handleModalMessage(true, {
-                  title: 'Erro',
+                  title: 'Sucesso',
                   message: [
-                    'Erro ao conectar a integração, por favor cheque as informações e tente novamente',
+                    'Estamos iniciando sua integração.',
+                    'Assim que finalizada seus produtos se encontrarão na aba de Produtos',
                   ],
-                  type: 'error',
+                  type: 'success',
                 });
-
-                setConnectionStatus(IntegrationStatus.UNSET);
               });
         })
         .catch(err => {
