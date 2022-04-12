@@ -6,6 +6,7 @@ export enum SellStatus {
   Faturando = 'Aprovado',
   Despachado = 'Despachado',
   Despachando = 'Despachando',
+  Atrasado = 'Atrasado',
   Todos = '?',
 }
 

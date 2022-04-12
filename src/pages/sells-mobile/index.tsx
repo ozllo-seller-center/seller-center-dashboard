@@ -6,6 +6,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  FiAlertCircle,
   FiAlertTriangle,
   FiCalendar,
   FiCheck,
@@ -40,6 +41,7 @@ import { BiPackage } from 'react-icons/bi';
 import OrderDetailsModal from 'src/components/OrderDetailsModal';
 import TrackingModalContent from 'src/components/TrackingModalContent';
 import {
+  getDaysToShip,
   InOrderStatus,
   OrderContainsProduct,
 } from 'src/shared/functions/sells';
@@ -55,6 +57,8 @@ import StatusPanel from '../../components/OrderStatusPanel';
 import FilterInput from '../../components/FilterInput';
 import FilterButton from '../../components/FilterButton';
 import Button from '../../components/PrimaryButton';
+import InfoPanel from 'src/components/InfoPanel';
+import InfoPanelMobile from 'src/components/InfoPanelMobile';
 
 interface SearchFormData {
   search: string;
@@ -64,6 +68,7 @@ interface Totals {
   totalApproved: number;
   totalProcessing: number;
   totalCanceled: number;
+  totalDelayed: number;
   total: number;
 }
 
@@ -78,7 +83,10 @@ export const SellsMobile: React.FC = () => {
   const [fromDateFilter, setFromDateFilter] = useState(new Date());
   const [toDateFilter, setToDateFilter] = useState(new Date());
   const [filter, setFilter] = useState(Filter.Mes);
-  const [search, setSeacrh] = useState('');
+  // const [search, setSeacrh] = useState('');
+
+  const [totalDelayed, setTotalDelayed] = useState(0);
+  const [daysUntilDelivery, setDaysUntilDelivery] = useState(0);
 
   const collapsibleRefs = useMemo(
     () =>
@@ -112,6 +120,84 @@ export const SellsMobile: React.FC = () => {
   const [isOrderModalOpen, setOrderModalOpen] = useState(false);
 
   const router = useRouter();
+
+  useEffect(() => {
+    // setOrders(ordersFromApi)
+    setLoading(true);
+
+    api
+      .get('/account/detail')
+      .then(response => {
+        updateUser({
+          ...user,
+          shopInfo: {
+            ...user.shopInfo,
+            _id: response.data.shopInfo._id,
+            userId: response.data.shopInfo.userId,
+          },
+        });
+
+        loadOrders();
+      })
+      .catch(err => {
+        setLoading(false);
+
+        console.log(err);
+        router.push('/');
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    api
+      .get('/order/insigths', {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        },
+      })
+      .then(response => {
+        if (filter === Filter.Mes) {
+          setDaysUntilDelivery(
+            response.data[0].average_shipping_time.last_month,
+          );
+          return;
+        }
+
+        setDaysUntilDelivery(response.data[0].average_shipping_time.last_week);
+      })
+      .catch(err => {
+        console.log(err);
+        setDaysUntilDelivery(0);
+
+        setLoading(false);
+      });
+  }, [orders, filter, setLoading, token, user.shopInfo._id]);
+
+  const loadOrders = useCallback(() => {
+    setLoading(true);
+
+    api
+      .get('/order/all', {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        },
+      })
+      .then(response => {
+        const ords: OrderParent[] = response.data;
+
+        setOrders(ords);
+
+        // setOrders(response.data as OrderParent[]);
+
+        setLoading(false);
+      })
+      .catch(err => {
+        console.log(err);
+        setLoading(false);
+      });
+  }, [user, token, setLoading]);
 
   const inInterval = useCallback(
     (order: Order) => {
@@ -149,55 +235,11 @@ export const SellsMobile: React.FC = () => {
     [fromDateFilter, toDateFilter, filter],
   );
 
-  const loadOrders = useCallback(() => {
-    setLoading(true);
-
-    api
-      .get('/account/detail')
-      .then(response => {
-        updateUser({
-          ...user,
-          shopInfo: {
-            ...user.shopInfo,
-            _id: response.data.shopInfo._id,
-            userId: response.data.shopInfo.userId,
-          },
-        });
-
-        api
-          .get('/order/all', {
-            headers: {
-              authorization: token,
-              shop_id: response.data.shopInfo._id,
-            },
-          })
-          .then(resp => {
-            setOrders(resp.data as OrderParent[]);
-
-            setLoading(false);
-          })
-          .catch(err => {
-            console.log(err);
-            setLoading(false);
-          });
-      })
-      .catch(err => {
-        setLoading(false);
-
-        console.log(err);
-        router.push('/');
-      });
-  }, [user, token, updateUser, setLoading, router]);
-
-  useEffect(() => {
-    // setOrders(ordersFromApi)
-    loadOrders();
-  }, []);
-
   useEffect(() => {
     const totals = orders.reduce(
       (accumulator: Totals, orderParent: OrderParent) => {
         const { order } = orderParent;
+
         if (inInterval(order)) {
           switch (order.status.status) {
             case 'Completed':
@@ -217,10 +259,21 @@ export const SellsMobile: React.FC = () => {
             case 'Canceled':
               accumulator.totalCanceled +=
                 order.payment.totalAmountPlusShipping;
-              accumulator.total -= order.payment.totalAmountPlusShipping;
+              accumulator.total += order.payment.totalAmountPlusShipping;
               break;
             default:
               break;
+          }
+
+          if (
+            order.status.status !== 'Shipped' &&
+            order.status.status !== 'Delivered' &&
+            order.status.status !== 'Completed' &&
+            order.status.status !== 'Canceled' &&
+            !!order.payment.paymentDate &&
+            getDaysToShip(order.payment.paymentDate) < 0
+          ) {
+            accumulator.totalDelayed += 1;
           }
         }
 
@@ -230,9 +283,12 @@ export const SellsMobile: React.FC = () => {
         totalApproved: 0,
         totalCanceled: 0,
         totalProcessing: 0,
+        totalDelayed: 0,
         total: 0,
       },
     );
+
+    setTotalDelayed(totals.totalDelayed);
 
     setTotalApproved(
       new Intl.NumberFormat('pt-BR', {
@@ -263,58 +319,30 @@ export const SellsMobile: React.FC = () => {
     );
   }, [orders, orderStatus, fromDateFilter, toDateFilter, filter, inInterval]);
 
-  const formRef = useRef<FormHandles>(null);
-  const [error, setError] = useState('');
-
   useEffect(() => {
     const newItems = orders.filter(orderParent => {
       const { order } = orderParent;
 
       switch (status) {
         case SellStatus.Processando:
-          return (
-            inInterval(order) &&
-            order.status.status === 'Pending' &&
-            (search === '' || OrderContainsProduct(order, search))
-          );
+          return inInterval(order) && order.status.status === 'Pending';
         case SellStatus.Faturando:
-          return (
-            inInterval(order) &&
-            order.status.status === 'Approved' &&
-            (search === '' || OrderContainsProduct(order, search))
-          );
+          return inInterval(order) && order.status.status === 'Approved';
         case SellStatus.Despachando:
-          return (
-            inInterval(order) &&
-            order.status.status === 'Invoiced' &&
-            (search === '' || OrderContainsProduct(order, search))
-          );
+          return inInterval(order) && order.status.status === 'Invoiced';
         case SellStatus.Despachado:
-          return (
-            inInterval(order) &&
-            order.status.status === 'Shipped' &&
-            (search === '' || OrderContainsProduct(order, search))
-          );
+          return inInterval(order) && order.status.status === 'Shipped';
         case SellStatus.Cancelado:
-          return (
-            inInterval(order) &&
-            order.status.status === 'Canceled' &&
-            (search === '' || OrderContainsProduct(order, search))
-          );
+          return inInterval(order) && order.status.status === 'Canceled';
         case SellStatus.Entregue:
           return (
             inInterval(order) &&
             (order.status.status === 'Delivered' ||
-              order.status.status === 'Completed') &&
-            (search === '' || OrderContainsProduct(order, search))
+              order.status.status === 'Completed')
           );
 
         default:
-          return (
-            inInterval(order) &&
-            InOrderStatus(order, orderStatus) &&
-            (search === '' || OrderContainsProduct(order, search))
-          );
+          return inInterval(order) && InOrderStatus(order, orderStatus);
       }
     });
 
@@ -325,25 +353,12 @@ export const SellsMobile: React.FC = () => {
     orderStatus,
     fromDateFilter,
     toDateFilter,
-    search,
     filter,
     inInterval,
   ]);
 
-  const handleSubmit = useCallback(
-    async (data: SearchFormData) => {
-      try {
-        formRef.current?.setErrors({});
-
-        if (data.search !== search) {
-          setSeacrh(data.search);
-        }
-      } catch (err) {
-        setError('Ocorreu um erro ao fazer login, cheque as credenciais.');
-      }
-    },
-    [search],
-  );
+  const datePickerRef = useRef<FormHandles>(null);
+  const [datePickerVisibility, setDatePickerVisibility] = useState(false);
 
   const handleModalVisibility = useCallback(() => {
     handleModalMessage(false);
@@ -352,9 +367,6 @@ export const SellsMobile: React.FC = () => {
   const handleOrderModalVisibility = useCallback(() => {
     setOrderModalOpen(false);
   }, []);
-
-  const datePickerRef = useRef<FormHandles>(null);
-  const [datePickerVisibility, setDatePickerVisibility] = useState(false);
 
   const getOrderStatus = useCallback((os: OrderStatusType): SellStatus => {
     switch (os) {
@@ -373,16 +385,7 @@ export const SellsMobile: React.FC = () => {
         return SellStatus.Entregue;
       default:
         return SellStatus.Processando;
-        break;
     }
-  }, []);
-
-  const getDaysToShip = useCallback((orderUpdateDate: string) => {
-    let orderDate = new Date(orderUpdateDate);
-    const today = new Date();
-    orderDate = addDays(orderDate, 2);
-
-    return differenceInBusinessDays(orderDate, today);
   }, []);
 
   return (
@@ -457,7 +460,7 @@ export const SellsMobile: React.FC = () => {
                   />
                 )}
               </div>
-              <Form
+              {/* <Form
                 ref={formRef}
                 onSubmit={handleSubmit}
                 className={styles.searchContainer}
@@ -468,8 +471,26 @@ export const SellsMobile: React.FC = () => {
                   placeholder="Pesquise um produto..."
                   autoComplete="off"
                 />
-              </Form>
+              </Form> */}
             </div>
+            <InfoPanelMobile
+              title="Tempo médio de envio"
+              icon={FiAlertCircle}
+              warning={daysUntilDelivery > 2}
+              warningMessage={
+                <span>
+                  Devido a média de entrega estar acima de 2 dias sua loja está
+                  sujeita a punições!
+                </span>
+              }
+            >
+              <span
+                style={daysUntilDelivery > 2 ? { color: 'var(--red-100)' } : {}}
+              >
+                {' '}
+                {daysUntilDelivery} dias{' '}
+              </span>
+            </InfoPanelMobile>
           </div>
           {items.length > 0 ? (
             <div>
@@ -693,6 +714,31 @@ export const SellsMobile: React.FC = () => {
                 isActive={orderStatus === OrderStatus.Cancelado}
               >
                 <span className={styles.redText}> {totalCanceled} </span>
+              </StatusPanel>
+              <StatusPanel
+                title="Atrasados"
+                altAlign
+                onClick={() => setOrderStatus(OrderStatus.Atrasado)}
+                isActive={orderStatus === OrderStatus.Atrasado}
+                style={
+                  totalDelayed > 0 && orderStatus !== OrderStatus.Atrasado
+                    ? {
+                        backgroundColor: 'var(--red-100-40)',
+                        color: 'var(--white)',
+                      }
+                    : {}
+                }
+              >
+                <span
+                  className={
+                    totalDelayed > 0 && orderStatus !== OrderStatus.Atrasado
+                      ? styles.whiteText
+                      : ''
+                  }
+                >
+                  {' '}
+                  {totalDelayed}{' '}
+                </span>
               </StatusPanel>
             </div>
           </div>

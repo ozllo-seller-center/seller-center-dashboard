@@ -6,6 +6,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  FiAlertCircle,
   FiAlertTriangle,
   FiCalendar,
   FiCheck,
@@ -14,14 +15,7 @@ import {
 } from 'react-icons/fi';
 
 import { FormHandles } from '@unform/core';
-import {
-  addDays,
-  differenceInBusinessDays,
-  format,
-  isSameWeek,
-  isToday,
-  subDays,
-} from 'date-fns';
+import { format, isSameWeek, isToday, subDays } from 'date-fns';
 
 import { useLoading } from 'src/hooks/loading';
 import { useAuth } from 'src/hooks/auth';
@@ -36,7 +30,7 @@ import OrderDetailsModal from 'src/components/OrderDetailsModal';
 import TrackingModalContent from 'src/components/TrackingModalContent';
 import router from 'next/router';
 import OrderStatus from 'src/shared/enums/order';
-import { InOrderStatus } from 'src/shared/functions/sells';
+import { getDaysToShip, InOrderStatus } from 'src/shared/functions/sells';
 import { HoverTooltip } from 'src/components/Tooltip';
 import Loader from 'src/components/Loader';
 import { Filter, SellStatus } from 'src/shared/enums/sells';
@@ -46,11 +40,13 @@ import styles from './styles.module.scss';
 import StatusPanel from '../../components/OrderStatusPanel';
 import BulletedButton from '../../components/BulletedButton';
 import Button from '../../components/FilterButton';
+import InfoPanel from 'src/components/InfoPanel';
 
 interface Totals {
   totalApproved: number;
   totalProcessing: number;
   totalCanceled: number;
+  totalDelayed: number;
   total: number;
 }
 
@@ -66,7 +62,9 @@ const Sells: React.FC = () => {
   const [toDateFilter, setToDateFilter] = useState(new Date());
 
   const [filter, setFilter] = useState(Filter.Mes);
-  const [search, setSeacrh] = useState('');
+  // const [search, setSeacrh] = useState('');
+
+  const [daysUntilDelivery, setDaysUntilDelivery] = useState(0);
 
   const itemsRef = useMemo(
     () =>
@@ -87,6 +85,7 @@ const Sells: React.FC = () => {
   const [totalApproved, setTotalApproved] = useState('Carregando...');
   const [totalProcessing, setTotalProcessing] = useState('Carregando...');
   const [totalCanceled, setTotalCanceled] = useState('Carregando...');
+  const [totalDelayed, setTotalDelayed] = useState(0);
   const [total, setTotal] = useState('Carregando...');
 
   const { user, token, updateUser } = useAuth();
@@ -109,31 +108,6 @@ const Sells: React.FC = () => {
   const [openTooltip, setOpenTooltip] = useState(false);
   const [toolTipYOffset, setToolTipYOffset] = useState(0);
   const [toolTipXOffset, setToolTipXOffset] = useState(0);
-
-  const loadOrders = useCallback(() => {
-    setLoading(true);
-
-    api
-      .get('/order/all', {
-        headers: {
-          authorization: token,
-          shop_id: user.shopInfo._id,
-        },
-      })
-      .then(response => {
-        const ords: OrderParent[] = response.data;
-
-        setOrders(ords);
-
-        // setOrders(response.data as OrderParent[]);
-
-        setLoading(false);
-      })
-      .catch(err => {
-        console.log(err);
-        setLoading(false);
-      });
-  }, [user, token, setLoading]);
 
   useEffect(() => {
     // setOrders(ordersFromApi)
@@ -159,7 +133,59 @@ const Sells: React.FC = () => {
         console.log(err);
         router.push('/');
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    api
+      .get('/order/insigths', {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        },
+      })
+      .then(response => {
+        if (filter === Filter.Mes) {
+          setDaysUntilDelivery(
+            response.data[0].average_shipping_time.last_month,
+          );
+          return;
+        }
+
+        setDaysUntilDelivery(response.data[0].average_shipping_time.last_week);
+      })
+      .catch(err => {
+        console.log(err);
+        setDaysUntilDelivery(0);
+
+        setLoading(false);
+      });
+  }, [orders, filter, setLoading, token, user.shopInfo._id]);
+
+  const loadOrders = useCallback(() => {
+    setLoading(true);
+
+    api
+      .get('/order/all', {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        },
+      })
+      .then(response => {
+        const ords: OrderParent[] = response.data;
+
+        setOrders(ords);
+
+        // setOrders(response.data as OrderParent[]);
+
+        setLoading(false);
+      })
+      .catch(err => {
+        console.log(err);
+        setLoading(false);
+      });
+  }, [user, token, setLoading]);
 
   const inInterval = useCallback(
     (order: Order) => {
@@ -201,6 +227,7 @@ const Sells: React.FC = () => {
     const totals = orders.reduce(
       (accumulator: Totals, orderParent: OrderParent) => {
         const { order } = orderParent;
+
         if (inInterval(order)) {
           switch (order.status.status) {
             case 'Completed':
@@ -225,6 +252,17 @@ const Sells: React.FC = () => {
             default:
               break;
           }
+
+          if (
+            order.status.status !== 'Shipped' &&
+            order.status.status !== 'Delivered' &&
+            order.status.status !== 'Completed' &&
+            order.status.status !== 'Canceled' &&
+            !!order.payment.paymentDate &&
+            getDaysToShip(order.payment.paymentDate) < 0
+          ) {
+            accumulator.totalDelayed += 1;
+          }
         }
 
         return accumulator;
@@ -233,9 +271,12 @@ const Sells: React.FC = () => {
         totalApproved: 0,
         totalCanceled: 0,
         totalProcessing: 0,
+        totalDelayed: 0,
         total: 0,
       },
     );
+
+    setTotalDelayed(totals.totalDelayed);
 
     setTotalApproved(
       new Intl.NumberFormat('pt-BR', {
@@ -333,14 +374,6 @@ const Sells: React.FC = () => {
       default:
         return SellStatus.Processando;
     }
-  }, []);
-
-  const getDaysToShip = useCallback((orderUpdateDate: string) => {
-    let orderDate = new Date(orderUpdateDate);
-    const today = new Date();
-    orderDate = addDays(orderDate, 2);
-
-    return differenceInBusinessDays(orderDate, today);
   }, []);
 
   return (
@@ -476,6 +509,50 @@ const Sells: React.FC = () => {
             >
               <span className={styles.redText}> {totalCanceled} </span>
             </StatusPanel>
+            <InfoPanel
+              style={{ marginLeft: 'auto' }}
+              title="Tempo médio de envio"
+              icon={FiAlertCircle}
+              warning={daysUntilDelivery > 2}
+              warningMessage={
+                <span>
+                  Devido a média de entrega estar acima de 2 dias
+                  <br /> sua loja está sujeita a punições!
+                </span>
+              }
+            >
+              <span
+                style={daysUntilDelivery > 2 ? { color: 'var(--red-100)' } : {}}
+              >
+                {' '}
+                {daysUntilDelivery} dias{' '}
+              </span>
+            </InfoPanel>
+            <StatusPanel
+              title="Atrasados"
+              altAlign
+              onClick={() => setOrderStatus(OrderStatus.Atrasado)}
+              isActive={orderStatus === OrderStatus.Atrasado}
+              style={
+                totalDelayed > 0 && orderStatus !== OrderStatus.Atrasado
+                  ? {
+                      backgroundColor: 'var(--red-100-40)',
+                      color: 'var(--white)',
+                    }
+                  : {}
+              }
+            >
+              <span
+                className={
+                  totalDelayed > 0 && orderStatus !== OrderStatus.Atrasado
+                    ? styles.whiteText
+                    : ''
+                }
+              >
+                {' '}
+                {totalDelayed}{' '}
+              </span>
+            </StatusPanel>
           </div>
         )}
         {items.length > 0 ? (
@@ -559,7 +636,7 @@ const Sells: React.FC = () => {
                             setToolTipYOffset(e.pageY);
                             setToolTipXOffset(e.pageX);
                           }}
-                          onMouseOut={e => {
+                          onMouseOut={() => {
                             setOpenTooltip(false);
                           }}
                         />

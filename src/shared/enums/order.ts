@@ -3,7 +3,8 @@ enum OrderStatus {
   Processando = 1,
   Cancelado = 2,
   Devolvido = 3,
-  Todos = 4,
+  Atrasado = 4,
+  Todos = 5,
 }
 
 export default OrderStatus;
