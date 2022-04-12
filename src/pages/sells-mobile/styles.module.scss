@@ -54,6 +54,11 @@ button+button {
   flex-direction: column;
 
   .sellsOptions {
+    display: flex;
+    flex-direction: column;
+
+    row-gap: 1rem;
+
     margin-bottom: 1.25rem;
 
     .contentFilters {
