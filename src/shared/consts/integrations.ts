@@ -61,7 +61,7 @@ export const platformItems = [
   },
   {
     text: 'Tray.io',
-    value: 'trayio',
+    value: 'tray',
   },
   {
     text: 'Vtex',
