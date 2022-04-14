@@ -406,7 +406,7 @@ const Integrations: React.FC = () => {
 
         break;
 
-      case 'trayio':
+      case 'tray':
         setTitle('Tray.io');
 
         attrs = [
@@ -638,7 +638,7 @@ const Integrations: React.FC = () => {
       platform === 'magento' ||
       platform === 'magento2' ||
       platform === 'opencart' ||
-      platform === 'trayio' ||
+      platform === 'tray' ||
       platform === 'vtex' ||
       platform === 'woo'
     ) {
