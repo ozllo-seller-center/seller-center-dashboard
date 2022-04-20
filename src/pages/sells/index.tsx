@@ -759,7 +759,11 @@ const Sells: React.FC = () => {
                                     },
                                   })
                                   .then(response => {
-                                    return response.data;
+                                    const url = URL.createObjectURL(
+                                      response.data,
+                                    );
+
+                                    window.open(url, '_blank');
                                   })
                                   .catch(err => console.log(err));
                               }}
