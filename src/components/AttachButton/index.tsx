@@ -1,4 +1,5 @@
 import React, { ButtonHTMLAttributes } from 'react';
+import { IconType } from 'react-icons';
 
 import { FiPaperclip } from 'react-icons/fi';
 
@@ -11,6 +12,7 @@ interface AttachButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   unattachedText: string;
   attachedText: string;
   placeholder: string;
+  alterIcon?: IconType;
 }
 
 const AttachButton: React.FC<AttachButtonProps> = ({
@@ -20,11 +22,12 @@ const AttachButton: React.FC<AttachButtonProps> = ({
   isAttached,
   unattachedText,
   attachedText,
+  alterIcon: Icon,
   ...rest
 }) => (
   <div className={styles.container}>
     <button type="button" {...rest}>
-      <FiPaperclip />
+      {Icon ? <Icon /> : <FiPaperclip />}
       {isAttached ? <span>{attachedText}</span> : <span>{unattachedText}</span>}
     </button>
   </div>
