@@ -476,7 +476,11 @@ export const SellsMobile: React.FC = () => {
             <InfoPanelMobile
               title="Tempo médio de envio"
               icon={FiAlertCircle}
-              warning={daysUntilDelivery > 2}
+              warning={
+                daysUntilDelivery > 2 &&
+                orders.length > 0 &&
+                filter !== Filter.Custom
+              }
               warningMessage={
                 <span>
                   Devido a média de entrega estar acima de 2 dias sua loja está
@@ -485,10 +489,17 @@ export const SellsMobile: React.FC = () => {
               }
             >
               <span
-                style={daysUntilDelivery > 2 ? { color: 'var(--red-100)' } : {}}
+                style={
+                  daysUntilDelivery > 2 && Filter.Custom && orders.length > 0
+                    ? { color: 'var(--red-100)' }
+                    : {}
+                }
               >
                 {' '}
-                {daysUntilDelivery} dias{' '}
+                {!Filter.Custom && orders.length > 0
+                  ? daysUntilDelivery
+                  : '--'}{' '}
+                dias{' '}
               </span>
             </InfoPanelMobile>
           </div>

@@ -10,6 +10,7 @@ import {
   FiAlertTriangle,
   FiCalendar,
   FiCheck,
+  FiDownload,
   FiPaperclip,
   FiX,
 } from 'react-icons/fi';
@@ -513,7 +514,11 @@ const Sells: React.FC = () => {
               style={{ marginLeft: 'auto' }}
               title="Tempo médio de envio"
               icon={FiAlertCircle}
-              warning={daysUntilDelivery > 2}
+              warning={
+                daysUntilDelivery > 2 &&
+                orders.length > 0 &&
+                filter !== Filter.Custom
+              }
               warningMessage={
                 <span>
                   Devido a média de entrega estar acima de 2 dias
@@ -522,10 +527,17 @@ const Sells: React.FC = () => {
               }
             >
               <span
-                style={daysUntilDelivery > 2 ? { color: 'var(--red-100)' } : {}}
+                style={
+                  daysUntilDelivery > 2 && Filter.Custom && orders.length > 0
+                    ? { color: 'var(--red-100)' }
+                    : {}
+                }
               >
                 {' '}
-                {daysUntilDelivery} dias{' '}
+                {!Filter.Custom && orders.length > 0
+                  ? daysUntilDelivery
+                  : '--'}{' '}
+                dias{' '}
               </span>
             </InfoPanel>
             <StatusPanel
@@ -726,17 +738,46 @@ const Sells: React.FC = () => {
                     )}
                     {status !== SellStatus.Faturando &&
                       status !== SellStatus.Despachando && (
-                        <button
-                          type="button"
-                          className={styles.action}
-                          onClick={() => {
-                            setOrderModalOpen(true);
-                            setModalOrder(item.order);
-                          }}
-                        >
-                          {' '}
-                          Ver detalhes{' '}
-                        </button>
+                        <>
+                          {status === SellStatus.Despachado && (
+                            <AttachButton
+                              style={{ marginBottom: '1rem' }}
+                              name={item._id}
+                              title="Etiqueta de envio"
+                              attachedText="Etiqueta de envio"
+                              unattachedText="Etiqueta de envio"
+                              isAttached={true}
+                              placeholder={''}
+                              type="button"
+                              alterIcon={FiDownload}
+                              onClick={async () => {
+                                return await api
+                                  .get(`order/${item._id}/tracking`, {
+                                    headers: {
+                                      authorization: token,
+                                      shop_id: user.shopInfo._id,
+                                    },
+                                  })
+                                  .then(response => {
+                                    return response.data;
+                                  })
+                                  .catch(err => console.log(err));
+                              }}
+                            ></AttachButton>
+                          )}
+
+                          <button
+                            type="button"
+                            className={styles.action}
+                            onClick={() => {
+                              setOrderModalOpen(true);
+                              setModalOrder(item.order);
+                            }}
+                          >
+                            {' '}
+                            Ver detalhes{' '}
+                          </button>
+                        </>
                       )}
                   </td>
                 </tr>
