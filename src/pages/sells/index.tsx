@@ -719,22 +719,50 @@ const Sells: React.FC = () => {
                       />
                     )}
                     {status === SellStatus.Despachando && (
-                      <AttachButton
-                        name={item._id}
-                        title="Código de envio"
-                        attachedText="Código de Envio"
-                        unattachedText="Informar código"
-                        placeholder="Informe o código de envio"
-                        // handleAttachment={handleAttachment}
-                        // isAttached={!!item.order.orderNotes} //!item.nfe_url
-                        isAttached={item.order.status.status === 'Shipped'}
-                        onClick={() => {
-                          if (item.order.status.status === 'Invoiced') {
-                            setTrackingModalOpen(true);
-                            setTrackingItem(item);
-                          }
-                        }}
-                      />
+                      <>
+                        <AttachButton
+                          name={item._id}
+                          title="Código de envio"
+                          attachedText="Código de Envio"
+                          unattachedText="Informar código"
+                          placeholder="Informe o código de envio"
+                          // handleAttachment={handleAttachment}
+                          // isAttached={!!item.order.orderNotes} //!item.nfe_url
+                          isAttached={item.order.status.status === 'Shipped'}
+                          onClick={() => {
+                            if (item.order.status.status === 'Invoiced') {
+                              setTrackingModalOpen(true);
+                              setTrackingItem(item);
+                            }
+                          }}
+                        />
+                        <AttachButton
+                          style={{ marginBottom: '1rem' }}
+                          name={item._id}
+                          title="Etiqueta de envio"
+                          attachedText="Etiqueta de envio"
+                          unattachedText="Etiqueta de envio"
+                          isAttached={true}
+                          placeholder={''}
+                          type="button"
+                          alterIcon={FiDownload}
+                          onClick={async () => {
+                            return await api
+                              .get(`order/${item._id}/tracking`, {
+                                headers: {
+                                  authorization: token,
+                                  shop_id: user.shopInfo._id,
+                                },
+                              })
+                              .then(response => {
+                                const url = URL.createObjectURL(response.data);
+
+                                window.open(url, '_blank');
+                              })
+                              .catch(err => console.log(err));
+                          }}
+                        ></AttachButton>
+                      </>
                     )}
                     {status !== SellStatus.Faturando &&
                       status !== SellStatus.Despachando && (
