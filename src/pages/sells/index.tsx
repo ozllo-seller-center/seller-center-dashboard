@@ -82,14 +82,6 @@ const Sells: React.FC = () => {
     [items],
   );
 
-  const hoversRef = useMemo(
-    () =>
-      Array(items.length)
-        .fill(0)
-        .map(i => React.createRef<HTMLDivElement>()),
-    [items],
-  );
-
   const collapsibleRefs = useMemo(
     () =>
       items.length > 2 &&
@@ -123,6 +115,7 @@ const Sells: React.FC = () => {
   const [isOrderModalOpen, setOrderModalOpen] = useState(false);
 
   const [openTooltip, setOpenTooltip] = useState(false);
+  const [tooltipItem, setTooltipItem] = useState<Order>();
   const [toolTipYOffset, setToolTipYOffset] = useState(0);
   const [toolTipXOffset, setToolTipXOffset] = useState(0);
 
@@ -669,6 +662,7 @@ const Sells: React.FC = () => {
                           }
                           onMouseOver={e => {
                             setOpenTooltip(true);
+                            setTooltipItem(item.order);
                             setToolTipYOffset(e.pageY);
                             setToolTipXOffset(e.pageX);
                           }}
@@ -688,34 +682,6 @@ const Sells: React.FC = () => {
                       </div>
                     ) : (
                       getOrderStatus(item.order.status.status)
-                    )}
-                    {openTooltip && (
-                      <HoverTooltip
-                        ref={hoversRef[i]}
-                        closeTooltip={() => setOpenTooltip(false)}
-                        offsetY={toolTipYOffset}
-                        offsetX={toolTipXOffset}
-                      >
-                        <div
-                          className={
-                            getDaysToShip(item.order.payment.paymentDate) >= 0
-                              ? styles.yellowText
-                              : styles.redText
-                          }
-                        >
-                          {getDaysToShip(item.order.payment.paymentDate) >=
-                            1 && (
-                            <span>
-                              {getDaysToShip(item.order.payment.paymentDate)}{' '}
-                              dias p/ despachar
-                            </span>
-                          )}
-                          {getDaysToShip(item.order.payment.paymentDate) ===
-                            0 && <span>Último dia p/ despachar</span>}
-                          {getDaysToShip(item.order.payment.paymentDate) <
-                            0 && <span>Despache atrasado!</span>}
-                        </div>
-                      </HoverTooltip>
                     )}
                   </td>
                   <td
@@ -851,6 +817,34 @@ const Sells: React.FC = () => {
           <span className={styles.emptyList}> Nenhum item foi encontrado </span>
         )}
       </div>
+      {openTooltip && tooltipItem && (
+        <HoverTooltip
+          closeTooltip={() => setOpenTooltip(false)}
+          offsetY={toolTipYOffset}
+          offsetX={toolTipXOffset}
+        >
+          <div
+            className={
+              getDaysToShip(tooltipItem.payment.paymentDate) >= 0
+                ? styles.yellowText
+                : styles.redText
+            }
+          >
+            {getDaysToShip(tooltipItem.payment.paymentDate) >= 1 && (
+              <span>
+                {getDaysToShip(tooltipItem.payment.paymentDate)} dias p/
+                despachar
+              </span>
+            )}
+            {getDaysToShip(tooltipItem.payment.paymentDate) === 0 && (
+              <span>Último dia p/ despachar</span>
+            )}
+            {getDaysToShip(tooltipItem.payment.paymentDate) < 0 && (
+              <span>Despache atrasado!</span>
+            )}
+          </div>
+        </HoverTooltip>
+      )}
       {isNfeModalOpen && nfeItem && (
         <Modal
           handleVisibility={() => {

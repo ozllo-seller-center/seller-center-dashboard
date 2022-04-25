@@ -29,7 +29,7 @@ const Tooltip: React.FC<TooltipProps> = ({
   </>
 );
 
-interface HoverTooltipProps extends React.HTMLProps<HTMLDivElement> {
+interface HoverTooltipProps {
   offsetX?: number;
   offsetY?: number;
   className?: string;
