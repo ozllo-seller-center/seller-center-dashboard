@@ -748,12 +748,15 @@ const Sells: React.FC = () => {
                           alterIcon={FiDownload}
                           onClick={async () => {
                             return await api
-                              .get(`order/${item._id}/tracking`, {
-                                headers: {
-                                  authorization: token,
-                                  shop_id: user.shopInfo._id,
+                              .get(
+                                `order/${item.order.reference.id}/tracking`,
+                                {
+                                  headers: {
+                                    authorization: token,
+                                    shop_id: user.shopInfo._id,
+                                  },
                                 },
-                              })
+                              )
                               .then(response => {
                                 const url = URL.createObjectURL(response.data);
 
@@ -780,12 +783,15 @@ const Sells: React.FC = () => {
                               alterIcon={FiDownload}
                               onClick={async () => {
                                 return await api
-                                  .get(`order/${item._id}/tracking`, {
-                                    headers: {
-                                      authorization: token,
-                                      shop_id: user.shopInfo._id,
+                                  .get(
+                                    `order/${item.order.reference.id}/tracking`,
+                                    {
+                                      headers: {
+                                        authorization: token,
+                                        shop_id: user.shopInfo._id,
+                                      },
                                     },
-                                  })
+                                  )
                                   .then(response => {
                                     const url = URL.createObjectURL(
                                       response.data,
