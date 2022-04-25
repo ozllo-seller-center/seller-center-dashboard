@@ -16,7 +16,14 @@ import {
 } from 'react-icons/fi';
 
 import { FormHandles } from '@unform/core';
-import { format, isSameWeek, isToday, subDays } from 'date-fns';
+import {
+  addDays,
+  differenceInBusinessDays,
+  format,
+  isSameWeek,
+  isToday,
+  subDays,
+} from 'date-fns';
 
 import { useLoading } from 'src/hooks/loading';
 import { useAuth } from 'src/hooks/auth';
@@ -31,7 +38,7 @@ import OrderDetailsModal from 'src/components/OrderDetailsModal';
 import TrackingModalContent from 'src/components/TrackingModalContent';
 import router from 'next/router';
 import OrderStatus from 'src/shared/enums/order';
-import { getDaysToShip, InOrderStatus } from 'src/shared/functions/sells';
+import { InOrderStatus } from 'src/shared/functions/sells';
 import { HoverTooltip } from 'src/components/Tooltip';
 import Loader from 'src/components/Loader';
 import { Filter, SellStatus } from 'src/shared/enums/sells';
@@ -375,6 +382,14 @@ const Sells: React.FC = () => {
       default:
         return SellStatus.Processando;
     }
+  }, []);
+
+  const getDaysToShip = useCallback((orderUpdateDate: string) => {
+    let orderDate = new Date(orderUpdateDate);
+    const today = new Date();
+    orderDate = addDays(orderDate, 2);
+
+    return differenceInBusinessDays(orderDate, today);
   }, []);
 
   return (
