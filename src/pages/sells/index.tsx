@@ -81,6 +81,15 @@ const Sells: React.FC = () => {
         .map(i => React.createRef<HTMLTableRowElement>()),
     [items],
   );
+
+  const hoversRef = useMemo(
+    () =>
+      Array(items.length)
+        .fill(0)
+        .map(i => React.createRef<HTMLDivElement>()),
+    [items],
+  );
+
   const collapsibleRefs = useMemo(
     () =>
       items.length > 2 &&
@@ -682,6 +691,7 @@ const Sells: React.FC = () => {
                     )}
                     {openTooltip && (
                       <HoverTooltip
+                        ref={hoversRef[i]}
                         closeTooltip={() => setOpenTooltip(false)}
                         offsetY={toolTipYOffset}
                         offsetX={toolTipXOffset}
