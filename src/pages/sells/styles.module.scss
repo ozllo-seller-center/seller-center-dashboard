@@ -210,6 +210,10 @@
 
           #attachmentCell {
             width: 12rem;
+
+            > div + div {
+              margin-top: 0.25rem;
+            }
           }
         }
       }
