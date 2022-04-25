@@ -737,7 +737,7 @@ const Sells: React.FC = () => {
                           }}
                         />
                         <AttachButton
-                          style={{ marginBottom: '1rem' }}
+                          style={{ marginTop: '1rem' }}
                           name={item._id}
                           title="Etiqueta de envio"
                           attachedText="Etiqueta de envio"
