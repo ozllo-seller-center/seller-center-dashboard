@@ -735,7 +735,7 @@ const Sells: React.FC = () => {
                         {(item.order.reference.system.source === shoppeeStore ||
                           item.order.reference.system.source ===
                             mercadoLivreStore ||
-                          item.order.reference.source === b2wStore) && (
+                          item.order.reference.system.source === b2wStore) && (
                           <AttachButton
                             style={{ marginTop: '1rem' }}
                             name={item._id}
@@ -778,7 +778,8 @@ const Sells: React.FC = () => {
                               shoppeeStore ||
                               item.order.reference.system.source ===
                                 mercadoLivreStore ||
-                              item.order.reference.source === b2wStore) && (
+                              item.order.reference.system.source ===
+                                b2wStore) && (
                               <AttachButton
                                 style={{ marginBottom: '1rem' }}
                                 name={item._id}
