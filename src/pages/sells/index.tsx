@@ -49,6 +49,11 @@ import StatusPanel from '../../components/OrderStatusPanel';
 import BulletedButton from '../../components/BulletedButton';
 import Button from '../../components/FilterButton';
 import InfoPanel from 'src/components/InfoPanel';
+import {
+  b2wStore,
+  mercadoLivreStore,
+  shoppeeStore,
+} from 'src/shared/consts/sells';
 
 interface Totals {
   totalApproved: number;
@@ -727,73 +732,85 @@ const Sells: React.FC = () => {
                             }
                           }}
                         />
-                        <AttachButton
-                          style={{ marginTop: '1rem' }}
-                          name={item._id}
-                          title="Etiqueta de envio"
-                          attachedText="Etiqueta de envio"
-                          unattachedText="Etiqueta de envio"
-                          isAttached={true}
-                          placeholder={''}
-                          type="button"
-                          alterIcon={FiDownload}
-                          onClick={async () => {
-                            return await api
-                              .get(
-                                `order/${item.order.reference.id}/tracking`,
-                                {
-                                  headers: {
-                                    authorization: token,
-                                    shop_id: user.shopInfo._id,
+                        {(item.order.reference.system.source === shoppeeStore ||
+                          item.order.reference.system.source ===
+                            mercadoLivreStore ||
+                          item.order.reference.source === b2wStore) && (
+                          <AttachButton
+                            style={{ marginTop: '1rem' }}
+                            name={item._id}
+                            title="Etiqueta de envio"
+                            attachedText="Etiqueta de envio"
+                            unattachedText="Etiqueta de envio"
+                            isAttached={true}
+                            placeholder={''}
+                            type="button"
+                            alterIcon={FiDownload}
+                            onClick={async () => {
+                              return await api
+                                .get(
+                                  `order/${item.order.reference.id}/tracking`,
+                                  {
+                                    headers: {
+                                      authorization: token,
+                                      shop_id: user.shopInfo._id,
+                                    },
                                   },
-                                },
-                              )
-                              .then(response => {
-                                const url = URL.createObjectURL(response.data);
+                                )
+                                .then(response => {
+                                  const url = URL.createObjectURL(
+                                    response.data,
+                                  );
 
-                                window.open(url, '_blank');
-                              })
-                              .catch(err => console.log(err));
-                          }}
-                        ></AttachButton>
+                                  window.open(url, '_blank');
+                                })
+                                .catch(err => console.log(err));
+                            }}
+                          ></AttachButton>
+                        )}
                       </>
                     )}
                     {status !== SellStatus.Faturando &&
                       status !== SellStatus.Despachando && (
                         <>
-                          {status === SellStatus.Despachado && (
-                            <AttachButton
-                              style={{ marginBottom: '1rem' }}
-                              name={item._id}
-                              title="Etiqueta de envio"
-                              attachedText="Etiqueta de envio"
-                              unattachedText="Etiqueta de envio"
-                              isAttached={true}
-                              placeholder={''}
-                              type="button"
-                              alterIcon={FiDownload}
-                              onClick={async () => {
-                                return await api
-                                  .get(
-                                    `order/${item.order.reference.id}/tracking`,
-                                    {
-                                      headers: {
-                                        authorization: token,
-                                        shop_id: user.shopInfo._id,
+                          {status === SellStatus.Despachado &&
+                            (item.order.reference.system.source ===
+                              shoppeeStore ||
+                              item.order.reference.system.source ===
+                                mercadoLivreStore ||
+                              item.order.reference.source === b2wStore) && (
+                              <AttachButton
+                                style={{ marginBottom: '1rem' }}
+                                name={item._id}
+                                title="Etiqueta de envio"
+                                attachedText="Etiqueta de envio"
+                                unattachedText="Etiqueta de envio"
+                                isAttached={true}
+                                placeholder={''}
+                                type="button"
+                                alterIcon={FiDownload}
+                                onClick={async () => {
+                                  return await api
+                                    .get(
+                                      `order/${item.order.reference.id}/tracking`,
+                                      {
+                                        headers: {
+                                          authorization: token,
+                                          shop_id: user.shopInfo._id,
+                                        },
                                       },
-                                    },
-                                  )
-                                  .then(response => {
-                                    const url = URL.createObjectURL(
-                                      response.data,
-                                    );
+                                    )
+                                    .then(response => {
+                                      const url = URL.createObjectURL(
+                                        response.data,
+                                      );
 
-                                    window.open(url, '_blank');
-                                  })
-                                  .catch(err => console.log(err));
-                              }}
-                            ></AttachButton>
-                          )}
+                                      window.open(url, '_blank');
+                                    })
+                                    .catch(err => console.log(err));
+                                }}
+                              ></AttachButton>
+                            )}
 
                           <button
                             type="button"
