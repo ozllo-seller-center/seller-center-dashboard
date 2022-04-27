@@ -251,7 +251,12 @@ const AuthProvider: React.FC = ({ children }) => {
   }, [data]);
 
   const isAdmin = async () =>
-    api.get('/account/decode').then(response => response.data.role === 'admin');
+    api
+      .get('/account/decode')
+      .then(response => response.data.role === 'admin')
+      .catch(() => {
+        return false;
+      });
 
   return (
     <AuthContext.Provider
