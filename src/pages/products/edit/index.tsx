@@ -854,6 +854,12 @@ export function EditProductForm() {
               handleOnFileUpload={handleOnFileUpload}
               handleDeleteFile={handleDeleteFile}
             />
+            <p>
+              {' '}
+              *Padrão: 1 foto de capa fundo branco/neutro + 3 imagens ângulos
+              diferentes +1 foto próximo ao corpo + 1 tabela de medidas
+            </p>
+
             <div className={styles.doubleInputContainer}>
               {/* <HintedInput
                 name="name"
@@ -889,6 +895,9 @@ export function EditProductForm() {
                 autoComplete="off"
               />
             </div>
+            <p>
+              *Padrão: Nome do produto + Principais Características + Cor/Sabor
+            </p>
 
             <div className={styles.singleInputContainer}>
               <TextArea
@@ -898,6 +907,11 @@ export function EditProductForm() {
                 autoComplete="off"
                 maxLength={1800}
               />
+              <p>
+                {' '}
+                *Padrão: detalhes do produto + Nome da marca + Funcionalidades e
+                como usar o produto + Composição + Medidas + Validade
+              </p>
             </div>
 
             <div className={styles.titledContainer}>
