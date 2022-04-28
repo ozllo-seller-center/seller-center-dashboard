@@ -20,6 +20,7 @@ import { FormHandles } from '@unform/core';
 import {
   addDays,
   differenceInBusinessDays,
+  differenceInDays,
   format,
   isSameWeek,
   isToday,
@@ -153,6 +154,10 @@ const Sells: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (!user) {
+      return;
+    }
+
     api
       .get('/order/insigths', {
         headers: {
@@ -161,7 +166,11 @@ const Sells: React.FC = () => {
         },
       })
       .then(response => {
-        if (filter === Filter.Mes) {
+        if (
+          filter === Filter.Mes ||
+          (filter === Filter.Custom &&
+            differenceInDays(toDateFilter, fromDateFilter) > 10)
+        ) {
           setDaysUntilDelivery(
             response.data[0].average_shipping_time.last_month,
           );
@@ -537,11 +546,7 @@ const Sells: React.FC = () => {
               style={{ marginLeft: 'auto' }}
               title="Tempo médio de envio"
               icon={FiAlertCircle}
-              warning={
-                daysUntilDelivery > 2 &&
-                orders.length > 0 &&
-                filter !== Filter.Custom
-              }
+              warning={daysUntilDelivery > 2 && orders.length > 0}
               warningMessage={
                 <span>
                   Devido a média de entrega estar acima de 2 dias
@@ -551,16 +556,13 @@ const Sells: React.FC = () => {
             >
               <span
                 style={
-                  daysUntilDelivery > 2 && Filter.Custom && orders.length > 0
+                  daysUntilDelivery > 2 && orders.length > 0
                     ? { color: 'var(--red-100)' }
                     : {}
                 }
               >
                 {' '}
-                {!Filter.Custom && orders.length > 0
-                  ? daysUntilDelivery
-                  : '--'}{' '}
-                dias{' '}
+                {orders.length > 0 ? daysUntilDelivery : '--'} dias{' '}
               </span>
             </InfoPanel>
             <StatusPanel
@@ -780,6 +782,16 @@ const Sells: React.FC = () => {
                                 .catch(err => {
                                   setLoading(false);
 
+                                  handleModalMessage(true, {
+                                    message: [
+                                      'Etiqueta não encontrada na hub2b',
+                                    ],
+                                    title: 'Etiqueta não encontrada',
+                                    type: 'error',
+                                  });
+
+                                  return;
+
                                   console.log(err);
                                 });
                             }}
@@ -839,6 +851,14 @@ const Sells: React.FC = () => {
                                     })
                                     .catch(err => {
                                       setLoading(false);
+
+                                      handleModalMessage(true, {
+                                        message: [
+                                          'Etiqueta não encontrada na hub2b',
+                                        ],
+                                        title: 'Etiqueta não encontrada',
+                                        type: 'error',
+                                      });
 
                                       console.log(err);
                                     });
