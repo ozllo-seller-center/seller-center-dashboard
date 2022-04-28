@@ -11,6 +11,7 @@ import {
   FiCalendar,
   FiCheck,
   FiDownload,
+  FiInfo,
   FiPaperclip,
   FiX,
 } from 'react-icons/fi';
@@ -19,6 +20,7 @@ import { FormHandles } from '@unform/core';
 import {
   addDays,
   differenceInBusinessDays,
+  differenceInDays,
   format,
   isSameWeek,
   isToday,
@@ -152,6 +154,10 @@ const Sells: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (!user) {
+      return;
+    }
+
     api
       .get('/order/insigths', {
         headers: {
@@ -160,7 +166,11 @@ const Sells: React.FC = () => {
         },
       })
       .then(response => {
-        if (filter === Filter.Mes) {
+        if (
+          filter === Filter.Mes ||
+          (filter === Filter.Custom &&
+            differenceInDays(toDateFilter, fromDateFilter) > 10)
+        ) {
           setDaysUntilDelivery(
             response.data[0].average_shipping_time.last_month,
           );
@@ -175,7 +185,7 @@ const Sells: React.FC = () => {
 
         setLoading(false);
       });
-  }, [orders, filter, setLoading, token, user.shopInfo._id]);
+  }, [orders, filter, setLoading, token, user]);
 
   const loadOrders = useCallback(() => {
     setLoading(true);
@@ -536,11 +546,7 @@ const Sells: React.FC = () => {
               style={{ marginLeft: 'auto' }}
               title="Tempo médio de envio"
               icon={FiAlertCircle}
-              warning={
-                daysUntilDelivery > 2 &&
-                orders.length > 0 &&
-                filter !== Filter.Custom
-              }
+              warning={daysUntilDelivery > 2 && orders.length > 0}
               warningMessage={
                 <span>
                   Devido a média de entrega estar acima de 2 dias
@@ -550,16 +556,13 @@ const Sells: React.FC = () => {
             >
               <span
                 style={
-                  daysUntilDelivery > 2 && Filter.Custom && orders.length > 0
+                  daysUntilDelivery > 2 && orders.length > 0
                     ? { color: 'var(--red-100)' }
                     : {}
                 }
               >
                 {' '}
-                {!Filter.Custom && orders.length > 0
-                  ? daysUntilDelivery
-                  : '--'}{' '}
-                dias{' '}
+                {orders.length > 0 ? daysUntilDelivery : '--'} dias{' '}
               </span>
             </InfoPanel>
             <StatusPanel
@@ -762,10 +765,32 @@ const Sells: React.FC = () => {
                                 .then(response => {
                                   setLoading(false);
 
+                                  if (!response.data.url) {
+                                    handleModalMessage(true, {
+                                      message: [
+                                        'Etiqueta não encontrada na hub2b',
+                                      ],
+                                      title: 'Etiqueta não encontrada',
+                                      type: 'other',
+                                    });
+
+                                    return;
+                                  }
+
                                   window.open(response.data.url, '_blank');
                                 })
                                 .catch(err => {
                                   setLoading(false);
+
+                                  handleModalMessage(true, {
+                                    message: [
+                                      'Etiqueta não encontrada na hub2b',
+                                    ],
+                                    title: 'Etiqueta não encontrada',
+                                    type: 'error',
+                                  });
+
+                                  return;
 
                                   console.log(err);
                                 });
@@ -809,10 +834,31 @@ const Sells: React.FC = () => {
                                     )
                                     .then(response => {
                                       setLoading(false);
+
+                                      if (!response.data.url) {
+                                        handleModalMessage(true, {
+                                          message: [
+                                            'Etiqueta não encontrada na hub2b',
+                                          ],
+                                          title: 'Etiqueta não encontrada',
+                                          type: 'other',
+                                        });
+
+                                        return;
+                                      }
+
                                       window.open(response.data.url, '_blank');
                                     })
                                     .catch(err => {
                                       setLoading(false);
+
+                                      handleModalMessage(true, {
+                                        message: [
+                                          'Etiqueta não encontrada na hub2b',
+                                        ],
+                                        title: 'Etiqueta não encontrada',
+                                        type: 'error',
+                                      });
 
                                       console.log(err);
                                     });
@@ -903,10 +949,14 @@ const Sells: React.FC = () => {
       {showMessage && (
         <MessageModal handleVisibility={handleModalVisibility}>
           <div className={styles.modalContent}>
-            {modalMessage.type === 'success' ? (
+            {modalMessage.type === 'success' && (
               <FiCheck style={{ color: 'var(--green-100)' }} />
-            ) : (
+            )}
+            {modalMessage.type === 'error' && (
               <FiX style={{ color: 'var(--red-100)' }} />
+            )}
+            {modalMessage.type === 'other' && (
+              <FiInfo style={{ color: 'var(--gray-300)' }} />
             )}
             <p className={styles.title}>{modalMessage.title}</p>
             {modalMessage.message.map(message => (
