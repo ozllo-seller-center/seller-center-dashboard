@@ -747,6 +747,8 @@ const Sells: React.FC = () => {
                             type="button"
                             alterIcon={FiDownload}
                             onClick={async () => {
+                              setLoading(true);
+
                               return await api
                                 .get(
                                   `order/${item.order.reference.id}/shippingLabel`,
@@ -758,9 +760,15 @@ const Sells: React.FC = () => {
                                   },
                                 )
                                 .then(response => {
+                                  setLoading(false);
+
                                   window.open(response.data.url, '_blank');
                                 })
-                                .catch(err => console.log(err));
+                                .catch(err => {
+                                  setLoading(false);
+
+                                  console.log(err);
+                                });
                             }}
                           ></AttachButton>
                         )}
@@ -787,6 +795,8 @@ const Sells: React.FC = () => {
                                 type="button"
                                 alterIcon={FiDownload}
                                 onClick={async () => {
+                                  setLoading(true);
+
                                   return await api
                                     .get(
                                       `order/${item.order.reference.id}/shippingLabel`,
@@ -798,9 +808,14 @@ const Sells: React.FC = () => {
                                       },
                                     )
                                     .then(response => {
+                                      setLoading(false);
                                       window.open(response.data.url, '_blank');
                                     })
-                                    .catch(err => console.log(err));
+                                    .catch(err => {
+                                      setLoading(false);
+
+                                      console.log(err);
+                                    });
                                 }}
                               ></AttachButton>
                             )}
