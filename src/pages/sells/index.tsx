@@ -749,7 +749,7 @@ const Sells: React.FC = () => {
                             onClick={async () => {
                               return await api
                                 .get(
-                                  `order/${item.order.reference.id}/tracking`,
+                                  `order/${item.order.reference.id}/shippingLabel`,
                                   {
                                     headers: {
                                       authorization: token,
@@ -758,11 +758,7 @@ const Sells: React.FC = () => {
                                   },
                                 )
                                 .then(response => {
-                                  const url = URL.createObjectURL(
-                                    response.data,
-                                  );
-
-                                  window.open(url, '_blank');
+                                  window.open(response.data.url, '_blank');
                                 })
                                 .catch(err => console.log(err));
                             }}
@@ -793,7 +789,7 @@ const Sells: React.FC = () => {
                                 onClick={async () => {
                                   return await api
                                     .get(
-                                      `order/${item.order.reference.id}/tracking`,
+                                      `order/${item.order.reference.id}/shippingLabel`,
                                       {
                                         headers: {
                                           authorization: token,
@@ -802,11 +798,7 @@ const Sells: React.FC = () => {
                                       },
                                     )
                                     .then(response => {
-                                      const url = URL.createObjectURL(
-                                        response.data,
-                                      );
-
-                                      window.open(url, '_blank');
+                                      window.open(response.data.url, '_blank');
                                     })
                                     .catch(err => console.log(err));
                                 }}
