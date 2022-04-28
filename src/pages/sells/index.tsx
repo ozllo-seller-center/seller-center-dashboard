@@ -11,6 +11,7 @@ import {
   FiCalendar,
   FiCheck,
   FiDownload,
+  FiInfo,
   FiPaperclip,
   FiX,
 } from 'react-icons/fi';
@@ -175,7 +176,7 @@ const Sells: React.FC = () => {
 
         setLoading(false);
       });
-  }, [orders, filter, setLoading, token, user.shopInfo._id]);
+  }, [orders, filter, setLoading, token, user]);
 
   const loadOrders = useCallback(() => {
     setLoading(true);
@@ -762,6 +763,18 @@ const Sells: React.FC = () => {
                                 .then(response => {
                                   setLoading(false);
 
+                                  if (!response.data.url) {
+                                    handleModalMessage(true, {
+                                      message: [
+                                        'Etiqueta não encontrada na hub2b',
+                                      ],
+                                      title: 'Etiqueta não encontrada',
+                                      type: 'other',
+                                    });
+
+                                    return;
+                                  }
+
                                   window.open(response.data.url, '_blank');
                                 })
                                 .catch(err => {
@@ -809,6 +822,19 @@ const Sells: React.FC = () => {
                                     )
                                     .then(response => {
                                       setLoading(false);
+
+                                      if (!response.data.url) {
+                                        handleModalMessage(true, {
+                                          message: [
+                                            'Etiqueta não encontrada na hub2b',
+                                          ],
+                                          title: 'Etiqueta não encontrada',
+                                          type: 'other',
+                                        });
+
+                                        return;
+                                      }
+
                                       window.open(response.data.url, '_blank');
                                     })
                                     .catch(err => {
@@ -903,10 +929,14 @@ const Sells: React.FC = () => {
       {showMessage && (
         <MessageModal handleVisibility={handleModalVisibility}>
           <div className={styles.modalContent}>
-            {modalMessage.type === 'success' ? (
+            {modalMessage.type === 'success' && (
               <FiCheck style={{ color: 'var(--green-100)' }} />
-            ) : (
+            )}
+            {modalMessage.type === 'error' && (
               <FiX style={{ color: 'var(--red-100)' }} />
+            )}
+            {modalMessage.type === 'other' && (
+              <FiInfo style={{ color: 'var(--gray-300)' }} />
             )}
             <p className={styles.title}>{modalMessage.title}</p>
             {modalMessage.message.map(message => (
