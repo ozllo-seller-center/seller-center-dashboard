@@ -768,7 +768,8 @@ const Sells: React.FC = () => {
                                   if (!response.data.url) {
                                     handleModalMessage(true, {
                                       message: [
-                                        'Etiqueta não encontrada na hub2b',
+                                        'Etiqueta não pode ser encontrada.',
+                                        'Por favor, tente novamente mais tarde.',
                                       ],
                                       title: 'Etiqueta não encontrada',
                                       type: 'other',
@@ -780,19 +781,20 @@ const Sells: React.FC = () => {
                                   window.open(response.data.url, '_blank');
                                 })
                                 .catch(err => {
+                                  console.log(err);
+
                                   setLoading(false);
 
                                   handleModalMessage(true, {
                                     message: [
-                                      'Etiqueta não encontrada na hub2b',
+                                      'Etiqueta não pode ser encontrada.',
+                                      'Por favor, tente novamente mais tarde.',
                                     ],
                                     title: 'Etiqueta não encontrada',
                                     type: 'error',
                                   });
 
                                   return;
-
-                                  console.log(err);
                                 });
                             }}
                           ></AttachButton>
@@ -838,7 +840,8 @@ const Sells: React.FC = () => {
                                       if (!response.data.url) {
                                         handleModalMessage(true, {
                                           message: [
-                                            'Etiqueta não encontrada na hub2b',
+                                            'Etiqueta não pode ser encontrada.',
+                                            'Por favor, tente novamente mais tarde.',
                                           ],
                                           title: 'Etiqueta não encontrada',
                                           type: 'other',
@@ -854,7 +857,8 @@ const Sells: React.FC = () => {
 
                                       handleModalMessage(true, {
                                         message: [
-                                          'Etiqueta não encontrada na hub2b',
+                                          'Etiqueta não pode ser encontrada.',
+                                          'Por favor, tente novamente mais tarde.',
                                         ],
                                         title: 'Etiqueta não encontrada',
                                         type: 'error',
