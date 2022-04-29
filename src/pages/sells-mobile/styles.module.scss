@@ -249,6 +249,17 @@ button+button {
         margin-left: auto;
       }
 
+      >button {
+        align-self: center;
+      }
+
+      .multipleButtons {
+        display: flex;
+        flex-direction: column;
+
+        row-gap: 0.25rem;
+      }
+
       .detailsButton {
         padding: 0.8rem;
 
@@ -393,4 +404,66 @@ button+button {
     height: 1.25rem;
   }
 
+}
+
+.modalContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  .loader {
+    align-self: center;
+    border: 1rem solid var(--gray-100);
+    border-top: 1rem solid var(--grafite);
+    border-radius: 50%;
+    width: 6.5rem;
+    height: 6.5rem;
+    animation: spin 2s linear infinite;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--grafite);
+
+    margin-bottom: 0.5rem;
+  }
+
+  .messages {
+    font-size: 1.25rem;
+    color: var(--grafite);
+  }
+
+  >svg {
+    width: 5rem;
+    height: 5rem;
+
+    margin-bottom: 1rem;
+  }
+}
+
+.loadingContainer {
+  width: 100%;
+  height: 100%;
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  background: var(--gray-100);
+  opacity: 0.75;
+
+  z-index: 10;
+}
+
+.redText {
+  color: var(--red-100);
+}
+
+.yellowText {
+  color: var(--yellow-300);
 }

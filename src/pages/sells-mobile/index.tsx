@@ -11,6 +11,7 @@ import {
   FiCalendar,
   FiCheck,
   FiClipboard,
+  FiDownload,
   FiMoreHorizontal,
   FiPaperclip,
   FiSearch,
@@ -20,6 +21,7 @@ import { FormHandles } from '@unform/core';
 import {
   addDays,
   differenceInBusinessDays,
+  differenceInDays,
   format,
   isSameWeek,
   isToday,
@@ -59,6 +61,11 @@ import FilterButton from '../../components/FilterButton';
 import Button from '../../components/PrimaryButton';
 import InfoPanel from 'src/components/InfoPanel';
 import InfoPanelMobile from 'src/components/InfoPanelMobile';
+import {
+  b2wStore,
+  mercadoLivreStore,
+  shoppeeStore,
+} from 'src/shared/consts/sells';
 
 interface SearchFormData {
   search: string;
@@ -149,6 +156,10 @@ export const SellsMobile: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (!user) {
+      return;
+    }
+
     api
       .get('/order/insigths', {
         headers: {
@@ -157,7 +168,11 @@ export const SellsMobile: React.FC = () => {
         },
       })
       .then(response => {
-        if (filter === Filter.Mes) {
+        if (
+          filter === Filter.Mes ||
+          (filter === Filter.Custom &&
+            differenceInDays(toDateFilter, fromDateFilter) > 10)
+        ) {
           setDaysUntilDelivery(
             response.data[0].average_shipping_time.last_month,
           );
@@ -172,7 +187,7 @@ export const SellsMobile: React.FC = () => {
 
         setLoading(false);
       });
-  }, [orders, filter, setLoading, token, user.shopInfo._id]);
+  }, [orders, filter, setLoading, token, user, toDateFilter, fromDateFilter]);
 
   const loadOrders = useCallback(() => {
     setLoading(true);
@@ -654,35 +669,166 @@ export const SellsMobile: React.FC = () => {
                       />
                     )}
                     {status === SellStatus.Despachando && (
-                      <AttachButton
-                        name={item._id}
-                        title="Código de envio"
-                        attachedText="Código de Envio"
-                        unattachedText="Informar código"
-                        placeholder="Informe o código de envio"
-                        // handleAttachment={handleAttachment}
-                        // isAttached={!!item.order.orderNotes} //!item.nfe_url
-                        isAttached={item.order.status.status === 'Shipped'}
-                        onClick={() => {
-                          if (item.order.status.status === 'Invoiced') {
-                            setTrackingModalOpen(true);
-                            setTrackingItem(item);
-                          }
-                        }}
-                      />
+                      <div className={styles.multipleButtons}>
+                        <AttachButton
+                          name={item._id}
+                          title="Código de envio"
+                          attachedText="Código de Envio"
+                          unattachedText="Informar código"
+                          placeholder="Informe o código de envio"
+                          // handleAttachment={handleAttachment}
+                          // isAttached={!!item.order.orderNotes} //!item.nfe_url
+                          isAttached={item.order.status.status === 'Shipped'}
+                          onClick={() => {
+                            if (item.order.status.status === 'Invoiced') {
+                              setTrackingModalOpen(true);
+                              setTrackingItem(item);
+                            }
+                          }}
+                        />
+                        {(item.order.reference.system.source === shoppeeStore ||
+                          item.order.reference.system.source ===
+                            mercadoLivreStore ||
+                          item.order.reference.system.source === b2wStore) && (
+                          <AttachButton
+                            name={item._id}
+                            title="Etiqueta de envio"
+                            attachedText="Etiqueta de envio"
+                            unattachedText="Etiqueta de envio"
+                            isAttached={true}
+                            placeholder={''}
+                            type="button"
+                            alterIcon={FiDownload}
+                            onClick={async () => {
+                              setLoading(true);
+
+                              return await api
+                                .get(
+                                  `order/${item.order.reference.id}/shippingLabel`,
+                                  {
+                                    headers: {
+                                      authorization: token,
+                                      shop_id: user.shopInfo._id,
+                                    },
+                                  },
+                                )
+                                .then(response => {
+                                  setLoading(false);
+
+                                  if (!response.data.url) {
+                                    handleModalMessage(true, {
+                                      message: [
+                                        'Etiqueta não pode ser encontrada.',
+                                        'Por favor, tente novamente mais tarde.',
+                                      ],
+                                      title: 'Etiqueta não encontrada',
+                                      type: 'other',
+                                    });
+
+                                    return;
+                                  }
+
+                                  window.open(response.data.url, '_blank');
+                                })
+                                .catch(err => {
+                                  console.log(err);
+
+                                  setLoading(false);
+
+                                  handleModalMessage(true, {
+                                    message: [
+                                      'Etiqueta não pode ser encontrada.',
+                                      'Por favor, tente novamente mais tarde.',
+                                    ],
+                                    title: 'Etiqueta não encontrada',
+                                    type: 'error',
+                                  });
+
+                                  return;
+                                });
+                            }}
+                          ></AttachButton>
+                        )}
+                      </div>
                     )}
                     {status !== SellStatus.Faturando &&
                       status !== SellStatus.Despachando && (
-                        <Button
-                          className={styles.detailsButton}
-                          onClick={() => {
-                            setOrderModalOpen(true);
-                            setModalOrder(item.order);
-                          }}
-                        >
-                          {' '}
-                          Ver detalhes{' '}
-                        </Button>
+                        <>
+                          {status === SellStatus.Despachado &&
+                            (item.order.reference.system.source ===
+                              shoppeeStore ||
+                              item.order.reference.system.source ===
+                                mercadoLivreStore ||
+                              item.order.reference.system.source ===
+                                b2wStore) && (
+                              <AttachButton
+                                name={item._id}
+                                title="Etiqueta de envio"
+                                attachedText="Etiqueta de envio"
+                                unattachedText="Etiqueta de envio"
+                                isAttached={true}
+                                placeholder={''}
+                                type="button"
+                                alterIcon={FiDownload}
+                                onClick={async () => {
+                                  setLoading(true);
+
+                                  return await api
+                                    .get(
+                                      `order/${item.order.reference.id}/shippingLabel`,
+                                      {
+                                        headers: {
+                                          authorization: token,
+                                          shop_id: user.shopInfo._id,
+                                        },
+                                      },
+                                    )
+                                    .then(response => {
+                                      setLoading(false);
+
+                                      if (!response.data.url) {
+                                        handleModalMessage(true, {
+                                          message: [
+                                            'Etiqueta não pode ser encontrada.',
+                                            'Por favor, tente novamente mais tarde.',
+                                          ],
+                                          title: 'Etiqueta não encontrada',
+                                          type: 'other',
+                                        });
+
+                                        return;
+                                      }
+
+                                      window.open(response.data.url, '_blank');
+                                    })
+                                    .catch(err => {
+                                      setLoading(false);
+
+                                      handleModalMessage(true, {
+                                        message: [
+                                          'Etiqueta não pode ser encontrada.',
+                                          'Por favor, tente novamente mais tarde.',
+                                        ],
+                                        title: 'Etiqueta não encontrada',
+                                        type: 'error',
+                                      });
+
+                                      console.log(err);
+                                    });
+                                }}
+                              ></AttachButton>
+                            )}
+                          <Button
+                            className={styles.detailsButton}
+                            onClick={() => {
+                              setOrderModalOpen(true);
+                              setModalOrder(item.order);
+                            }}
+                          >
+                            {' '}
+                            Ver detalhes{' '}
+                          </Button>
+                        </>
                       )}
                   </div>
                 </div>
