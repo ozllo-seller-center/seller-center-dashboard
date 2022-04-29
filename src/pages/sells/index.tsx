@@ -185,7 +185,7 @@ const Sells: React.FC = () => {
 
         setLoading(false);
       });
-  }, [orders, filter, setLoading, token, user]);
+  }, [orders, filter, setLoading, token, user, toDateFilter, fromDateFilter]);
 
   const loadOrders = useCallback(() => {
     setLoading(true);
