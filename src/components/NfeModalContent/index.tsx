@@ -71,6 +71,8 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({
 
       // dataContainer.append("xml", blob, nfeFile.name)
 
+      const xml = await nfeFile?.text().then(data => data)
+
       const schema = Yup.object().shape({
         key: Yup.string()
           .required('Campo obrigatório')
@@ -92,6 +94,7 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({
           issuedDate: !nfeData
             ? isoDateHub2b(new Date().toISOString())
             : nfeData.issueDate,
+          ...(xml ? {xml} : {}),
         };
 
         api
