@@ -56,12 +56,14 @@ const Layout: React.FC = ({ children }) => {
   }, [showModalMessage]);
 
   useEffect(() => {
-    if (!user) {
+    if (!user || !token) {
       router.push('/');
     }
 
     // isTokenValid(token).then(valid => {
     // if (valid) /${token}`)
+    api
+      .get(`auth/token/${token}`)
       .then(response => {
         const { isValid } = response.data;
 
