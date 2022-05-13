@@ -52,7 +52,7 @@
   .content {
     flex: 1;
 
-    > div + div {
+    >div+div {
       margin-top: 1rem;
     }
   }
@@ -103,7 +103,7 @@
     }
   }
 
-  button + button {
+  button+button {
     margin-left: 1rem;
   }
 }

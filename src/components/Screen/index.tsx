@@ -61,9 +61,7 @@ const Layout: React.FC = ({ children }) => {
     }
 
     // isTokenValid(token).then(valid => {
-    // if (valid) {
-    api
-      .get(`auth/token/${token}`)
+    // if (valid) /${token}`)
       .then(response => {
         const { isValid } = response.data;
 
