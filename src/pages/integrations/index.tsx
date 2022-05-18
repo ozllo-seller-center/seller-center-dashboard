@@ -23,6 +23,7 @@ import IntegrationList from 'src/components/IntegrationList';
 import { useModalMessage } from 'src/hooks/message';
 import MessageModal from 'src/components/MessageModal';
 import { FiCheck, FiWifiOff, FiX } from 'react-icons/fi';
+import { BiHelpCircle } from 'react-icons/bi';
 
 interface PlatformAttribute {
   name: string;
@@ -50,6 +51,7 @@ const Integrations: React.FC = () => {
 
   const [title, setTitle] = useState('');
   const [attributes, setAttributes] = useState<PlatformAttribute[]>([]);
+  const [tutorialLink, setTutorialLink] = useState('');
   // const [connectButton, setConnectButton] = useState(false);
 
   const formRef = useRef<FormHandles>(null);
@@ -109,6 +111,33 @@ const Integrations: React.FC = () => {
 
     setConnectionStatus(IntegrationStatus.CONNECTED);
   }, [savedInfo, platform]);
+
+  useEffect(() => {
+    switch (platform) {
+      case 'bling':
+        setTutorialLink(
+          'https://brandz.ozllo.com.br/como-integrar-a-ozllo360-ao-erp-bling/',
+        );
+        break;
+      case 'lojaintegrada':
+        setTutorialLink(
+          'https://brandz.ozllo.com.br/como-integrar-sua-loja-integrada-com-a-ozllo360/',
+        );
+        break;
+      case 'vtex':
+        setTutorialLink(
+          'https://brandz.ozllo.com.br/como-integrar-sua-loja-vtex-com-a-ozllo360-2/',
+        );
+        break;
+      case 'tray':
+        setTutorialLink(
+          'https://brandz.ozllo.com.br/como-integrar-sua-loja-da-plataforma-tray-com-a-ozllo360/',
+        );
+        break;
+      default:
+        setTutorialLink('');
+    }
+  }, [platform]);
 
   useEffect(() => {
     let attrs: PlatformAttribute[] = [];
@@ -291,7 +320,7 @@ const Integrations: React.FC = () => {
         break;
 
       case 'lojaintegrada':
-        setTitle('Linx Integrada');
+        setTitle('Loja Integrada');
 
         attrs = [
           {
@@ -940,6 +969,19 @@ const Integrations: React.FC = () => {
         <IntegrationList items={platformItems} setActiveItem={setPlatform} />
         <div className={styles.divider} />
         <div className={styles.content}>
+          {tutorialLink && (
+            <div
+              className={styles.tutorialContainer}
+              onClick={() => {
+                window.open(tutorialLink, '_blank');
+              }}
+            >
+              <BiHelpCircle />
+              <span>
+                Dúvidas? Clique aqui para ver como preencher o formulário
+              </span>
+            </div>
+          )}
           <Form ref={formRef} onSubmit={handleSubmit}>
             {attributes.map((attribute, i) => {
               if (attribute) {

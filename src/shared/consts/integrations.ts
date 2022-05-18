@@ -36,7 +36,7 @@ export const platformItems = [
     value: 'linxo',
   },
   {
-    text: 'Linx Integrada',
+    text: 'Loja Integrada',
     value: 'lojaintegrada',
   },
   {

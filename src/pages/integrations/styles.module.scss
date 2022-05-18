@@ -52,6 +52,55 @@
   .content {
     flex: 1;
 
+    display: flex;
+    flex-direction: column;
+
+    .tutorialContainer {
+      display: flex;
+
+      align-items: center;
+
+      margin-left: auto;
+      margin-bottom: 0.5rem;
+
+      cursor: pointer;
+
+      svg {
+        width: 1.5rem;
+        height: 1.5rem;
+
+        color: var(--blue-100);
+
+        margin-right: 0.25rem;
+
+        filter: brightness(0.9);
+
+        transition: filter 0.5s;
+      }
+
+      span {
+        font-weight: bold;
+        color: var(--blue-100);
+
+        text-align: end;
+        text-decoration: underline;
+
+        filter: brightness(0.9);
+
+        transition: filter 0.5s;
+      }
+
+      &:hover {
+        svg {
+          filter: brightness(0.7);
+        }
+
+        span {
+          filter: brightness(0.7);
+        }
+      }
+    }
+
     >div+div {
       margin-top: 1rem;
     }
