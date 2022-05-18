@@ -715,7 +715,7 @@ export const SellsMobile: React.FC = () => {
                                 .then(response => {
                                   setLoading(false);
 
-                                  if (!response.data.url) {
+                                  if (!response.data.data.url) {
                                     handleModalMessage(true, {
                                       message: [
                                         'Etiqueta não pode ser encontrada.',
@@ -728,7 +728,7 @@ export const SellsMobile: React.FC = () => {
                                     return;
                                   }
 
-                                  window.open(response.data.url, '_blank');
+                                  window.open(response.data.data.url, '_blank');
                                 })
                                 .catch(err => {
                                   console.log(err);
@@ -786,7 +786,7 @@ export const SellsMobile: React.FC = () => {
                                     .then(response => {
                                       setLoading(false);
 
-                                      if (!response.data.url) {
+                                      if (!response.data.data.url) {
                                         handleModalMessage(true, {
                                           message: [
                                             'Etiqueta não pode ser encontrada.',
@@ -799,7 +799,10 @@ export const SellsMobile: React.FC = () => {
                                         return;
                                       }
 
-                                      window.open(response.data.url, '_blank');
+                                      window.open(
+                                        response.data.data.url,
+                                        '_blank',
+                                      );
                                     })
                                     .catch(err => {
                                       setLoading(false);
