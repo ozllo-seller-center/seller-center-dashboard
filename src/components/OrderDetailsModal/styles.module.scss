@@ -1,11 +1,11 @@
 @import '../../../public/styles/__dimensions.scss';
 
 .container {
-  overflow: scroll;
+  overflow: auto;
 }
 
 .normal {
-  min-width: 700px;
+  max-width: 700px;
 
   display: flex;
   flex-direction: column;
@@ -13,6 +13,10 @@
   padding: 1rem;
 
   column-gap: 1.5rem;
+
+  @media screen and (min-width: $tablet_vertical) {
+    min-width: 600px;
+  }
 
   @media screen and (min-width: $desktop-size) {
     min-width: 800px;
@@ -30,7 +34,7 @@
 }
 
 .alt {
-  min-width: 700px;
+  max-width: 700px;
 
   display: flex;
   flex-direction: column;
@@ -40,6 +44,10 @@
   column-gap: 1.5rem;
 
   background-color: var(--gray-100);
+
+  @media screen and (min-width: $tablet_vertical) {
+    min-width: 600px;
+  }
 
   @media screen and (min-width: $desktop-size) {
     min-width: 800px;
