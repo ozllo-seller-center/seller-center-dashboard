@@ -236,7 +236,7 @@ const Import: React.FC = () => {
           // });
           const isVariation = false;
 
-          const imagesUrls = product.images.map(img => img.url);
+          const imagesUrls = product?.images?.map(img => img.url);
 
           const nationalityIndex = nationalities.findIndex(
             nat => nat.name === product.nationality,
@@ -305,7 +305,8 @@ const Import: React.FC = () => {
           };
 
           if (product._id) {
-            const newImages: string[] = product.images.map(img => img.url);
+            const newImages: string[] =
+              product?.images?.map(img => img.url) || [];
             handleSubmit(product, newImages, products);
           } else {
             await api

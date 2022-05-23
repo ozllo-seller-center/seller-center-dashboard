@@ -38,10 +38,10 @@ function importToProduct(importProducts: ProductImport[]): Product[] {
     product.images = [];
 
     group[0].image.value.forEach((img: string, i: number) => {
-      product.images.push({
+      product?.images?.push({
         id: '',
         name: `${product.name}-${i}`,
-        alt_text: product.name,
+        alt_text: product.name || '',
         url: img,
       });
     });
