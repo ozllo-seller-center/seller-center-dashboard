@@ -189,22 +189,24 @@ export function EditProductForm() {
           formRef.current?.setData(response.data);
           // setFormData(response.data)
 
-          setValidationErrors(
-            response.data.validation.errors.map((error: any) => {
-              if ('category' === error.field) error.message = 'Categoria';
-              if ('name' === error.field) error.message = 'Nome';
-              if ('description' === error.field) error.message = 'Descrição';
-              if ('brand' === error.field) error.message = 'Marca';
-              if ('sku' === error.field) error.message = 'SKU';
-              if ('height' === error.field) error.message = 'Altura';
-              if ('width' === error.field) error.message = 'Largura';
-              if ('length' === error.field) error.message = 'Comprimento';
-              if ('weight' === error.field) error.message = 'Peso';
-              console.log({ badah: attributes });
-              if (!error.message) error.message = error.field;
-              return error;
-            }),
-          );
+          if (response.data?.validation?.errors.length) {
+            setValidationErrors(
+              response.data.validation.errors.map((error: any) => {
+                if ('category' === error.field) error.message = 'Categoria';
+                if ('name' === error.field) error.message = 'Nome';
+                if ('description' === error.field) error.message = 'Descrição';
+                if ('brand' === error.field) error.message = 'Marca';
+                if ('sku' === error.field) error.message = 'SKU';
+                if ('height' === error.field) error.message = 'Altura';
+                if ('width' === error.field) error.message = 'Largura';
+                if ('length' === error.field) error.message = 'Comprimento';
+                if ('weight' === error.field) error.message = 'Peso';
+                console.log({ badah: attributes });
+                if (!error.message) error.message = error.field;
+                return error;
+              }),
+            );
+          }
 
           setChanging(true);
 
