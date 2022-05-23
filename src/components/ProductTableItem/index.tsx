@@ -3,7 +3,11 @@ import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FiCameraOff, FiEdit } from 'react-icons/fi';
 import api from 'src/services/api';
-import { Product, ProductSummary } from 'src/shared/types/product';
+import {
+  Product,
+  ProductSummary,
+  Validation_Errors,
+} from 'src/shared/types/product';
 import styles from './styles.module.scss';
 import switchStyles from './switch-styles.module.scss';
 
@@ -47,6 +51,10 @@ const ProductTableItem: React.FC<ProductItemProps> = ({
   const [count, setCount] = useState(0);
 
   const router = useRouter();
+
+  const [validationErrors, setValidationErrors] = useState<Validation_Errors[]>(
+    [],
+  );
 
   useEffect(() => {
     const index = products.findIndex(product => product._id === item._id);
@@ -168,45 +176,58 @@ const ProductTableItem: React.FC<ProductItemProps> = ({
         {new Intl.NumberFormat('pt-BR').format(item.stock)}
       </td>
       <td id={styles.switchCell}>
-        <MuiThemeProvider theme={theme}>
-          <Switch
-            inputRef={itemRef}
-            checked={item.is_active}
-            onClick={() => {
-              handleAvailability(item._id);
+        {item?.validation?.errors?.length !== 0 && (
+          <>
+            <span className={styles.switchSubtitle}>Faltam</span>
+            <div className={styles.validationCount}>
+              {item?.validation?.errors?.length ?? '?'}
+            </div>
+            <span className={styles.switchSubtitle}>Campos</span>
+          </>
+        )}
+        {item?.validation?.errors.length === 0 && (
+          <>
+            <MuiThemeProvider theme={theme}>
+              <Switch
+                inputRef={itemRef}
+                checked={item.is_active}
+                onClick={() => {
+                  handleAvailability(item._id);
 
-              if (!disabledActions && !!setDisabledActions) {
-                setDisabledActions(true);
+                  if (!disabledActions && !!setDisabledActions) {
+                    setDisabledActions(true);
 
-                setTimeout(() => {
-                  setDisabledActions(false);
-                }, 1500);
-              }
-            }}
-            classes={
-              disabledActions
-                ? {
-                    root: switchStyles.root,
-                    thumb: switchStyles.thumbDisabled,
-                    track: switchStyles.trackDisabled,
-                    checked: switchStyles.checked,
+                    setTimeout(() => {
+                      setDisabledActions(false);
+                    }, 1500);
                   }
-                : {
-                    root: switchStyles.root,
-                    thumb: isAvailable
-                      ? switchStyles.thumb
-                      : switchStyles.thumbUnchecked,
-                    track: isAvailable
-                      ? switchStyles.track
-                      : switchStyles.trackUnchecked,
-                    checked: switchStyles.checked,
-                  }
-            }
-          />
-        </MuiThemeProvider>
-        <span className={styles.switchSubtitle}>
-          {isAvailable ? 'Ativado' : 'Desativado'}
-        </span>
+                }}
+                classes={
+                  disabledActions
+                    ? {
+                        root: switchStyles.root,
+                        thumb: switchStyles.thumbDisabled,
+                        track: switchStyles.trackDisabled,
+                        checked: switchStyles.checked,
+                      }
+                    : {
+                        root: switchStyles.root,
+                        thumb: isAvailable
+                          ? switchStyles.thumb
+                          : switchStyles.thumbUnchecked,
+                        track: isAvailable
+                          ? switchStyles.track
+                          : switchStyles.trackUnchecked,
+                        checked: switchStyles.checked,
+                      }
+                }
+              />
+            </MuiThemeProvider>
+            <span className={styles.switchSubtitle}>
+              {isAvailable ? 'Ativado' : 'Desativado'}
+            </span>
+          </>
+        )}
       </td>
       <td id={styles.editCell}>
         <div

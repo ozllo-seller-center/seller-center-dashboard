@@ -74,9 +74,9 @@ const Products: React.FC = () => {
     setItems(
       products.filter(
         product =>
-          !!product.name &&
-          (search === '' ||
-            product.name.toLowerCase().includes(search.toLowerCase())),
+          // !!product.name &&
+          search === '' ||
+          product.name.toLowerCase().includes(search.toLowerCase()),
       ),
     );
 

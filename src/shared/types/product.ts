@@ -15,19 +15,19 @@ export type Variation = {
 };
 
 export type Product = {
-  images: {
+  images?: {
     id: any;
     name: string;
     alt_text: string;
     url: string;
   }[];
-  name: string;
-  description: string;
-  brand: string;
+  name?: string;
+  description?: string;
+  brand?: string;
   ean?: string;
-  sku: string;
+  sku?: string;
   gender: string;
-  price: number;
+  price?: number;
   price_discounted?: number;
   height?: number;
   width?: number;
@@ -41,7 +41,16 @@ export type Product = {
   subcategory: string;
   _id: string;
   grouperId: string;
+  validation?: {
+    errors: Validation_Errors[];
+  };
 };
+
+export interface Validation_Errors {
+  field: string;
+  conditions: string[];
+  message: string;
+}
 
 export type ProductSummary = {
   _id: string;
@@ -54,4 +63,7 @@ export type ProductSummary = {
   images?: string[];
   variations: Variation[];
   checked: boolean;
+  validation?: {
+    errors: Validation_Errors[];
+  };
 };

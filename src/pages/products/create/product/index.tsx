@@ -136,7 +136,7 @@ export function ProductForm() {
       if (data.price) {
         filled += 1;
       }
-      if (data.images?.length > 0) {
+      if (Array.isArray(data.images) && data.images?.length > 0) {
         filled += 1;
       }
 
@@ -841,16 +841,14 @@ export function ProductForm() {
         <span>
           {filledFields}/{totalFields} Informações inseridas
         </span>
-        {filledFields >= totalFields && (
-          <Button
-            type="submit"
-            onClick={() => {
-              formRef.current?.submitForm();
-            }}
-          >
-            Cadastrar produto
-          </Button>
-        )}
+        <Button
+          type="submit"
+          onClick={() => {
+            formRef.current?.submitForm();
+          }}
+        >
+          Cadastrar produto
+        </Button>
       </div>
 
       {isLoading && (

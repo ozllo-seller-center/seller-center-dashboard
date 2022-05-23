@@ -15,7 +15,12 @@ import { FiCheck, FiChevronLeft, FiInfo, FiX } from 'react-icons/fi';
 
 import api from 'src/services/api';
 import { useAuth } from 'src/hooks/auth';
-import { Product, ProductImage, Variation } from 'src/shared/types/product';
+import {
+  Product,
+  ProductImage,
+  Validation_Errors,
+  Variation,
+} from 'src/shared/types/product';
 import TextArea from 'src/components/Textarea';
 import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
@@ -35,6 +40,8 @@ import VariationsController from '../../../components/VariationsController';
 import RadioButtonGroup from '../../../components/RadioButtonGroup';
 import Input from '../../../components/Input';
 import Button from '../../../components/PrimaryButton';
+import Products from '..';
+import { da } from 'date-fns/locale';
 
 type VariationDTO = {
   _id?: string;
@@ -79,6 +86,10 @@ export function EditProductForm() {
   } = useModalMessage();
 
   const [attributes, setAttributes] = useState<Attribute[]>([]);
+
+  const [validationErrors, setValidationErrors] = useState<Validation_Errors[]>(
+    [],
+  );
 
   const hintRules = useMemo(() => {
     if (isHintDisabled) {
@@ -177,6 +188,23 @@ export function EditProductForm() {
 
           formRef.current?.setData(response.data);
           // setFormData(response.data)
+
+          setValidationErrors(
+            response.data.validation.errors.map((error: any) => {
+              if ('category' === error.field) error.message = 'Categoria';
+              if ('name' === error.field) error.message = 'Nome';
+              if ('description' === error.field) error.message = 'Descrição';
+              if ('brand' === error.field) error.message = 'Marca';
+              if ('sku' === error.field) error.message = 'SKU';
+              if ('height' === error.field) error.message = 'Altura';
+              if ('width' === error.field) error.message = 'Largura';
+              if ('length' === error.field) error.message = 'Comprimento';
+              if ('weight' === error.field) error.message = 'Peso';
+              console.log({ badah: attributes });
+              if (!error.message) error.message = error.field;
+              return error;
+            }),
+          );
 
           setChanging(true);
 
@@ -496,11 +524,10 @@ export function EditProductForm() {
               .required()
               .of(
                 Yup.object().shape({
-                  size: Yup.string().required('Campo obrigatório'),
-                  flavor: Yup.string().required('Campo obrigatório'),
+                  size: Yup.string(),
+                  flavor: Yup.string(),
                   stock: Yup.number()
                     .typeError('Campo obrigatório')
-                    .required('Campo obrigatório')
                     .min(0, 'Valor mínimo 0'),
                 }),
               ),
@@ -510,11 +537,10 @@ export function EditProductForm() {
               .required()
               .of(
                 Yup.object().shape({
-                  size: Yup.string().required('Campo obrigatório'),
-                  color: Yup.string().required('Campo obrigatório'),
+                  size: Yup.string(),
+                  color: Yup.string(),
                   stock: Yup.number()
                     .typeError('Campo obrigatório')
-                    .required('Campo obrigatório')
                     .min(0, 'Valor mínimo 0'),
                 }),
               ),
@@ -524,16 +550,16 @@ export function EditProductForm() {
 
   const handleSubmit = useCallback(
     async data => {
-      if (filledFields < totalFields) {
-        handleModalMessage(true, {
-          type: 'error',
-          title: 'Formulário incompleto',
-          message: [
-            'Preencha todas as informações obrigatórias antes de continuar.',
-          ],
-        });
-        return;
-      }
+      // if (filledFields < totalFields) {
+      //   handleModalMessage(true, {
+      //     type: 'error',
+      //     title: 'Formulário incompleto',
+      //     message: [
+      //       'Preencha todas as informações obrigatórias antes de continuar.',
+      //     ],
+      //   });
+      //   return;
+      // }
 
       if (colorInName || brandInName) {
         handleModalMessage(true, {
@@ -557,34 +583,78 @@ export function EditProductForm() {
         setLoading(true);
         formRef.current?.setErrors({});
 
-        const schema = Yup.object().shape({
-          images: Yup.array()
-            .min(2, 'Escolha pelo menos duas imagens')
-            .max(8, 'Pode atribuir no máximo 8 imagens'),
-          name: Yup.string()
-            .required('Campo obrigatório')
-            .min(2, 'Deve conter pelo menos 2 caracteres'),
-          description: Yup.string()
-            .required('Campo obrigatório')
-            .min(2, 'Deve conter pelo menos 2 caracteres')
-            .max(1800, 'Deve conter no máximo 1800 caracteres'),
-          brand: Yup.string()
-            .required('Campo obrigatório')
-            .min(2, 'Deve conter pelo menos 2 caracteres'),
-          ean: Yup.string(),
-          sku: Yup.string().required('Campo obrigatório'),
-          height: Yup.number().min(10, 'Mínimo de 10cm'),
-          width: Yup.number().min(10, 'Mínimo de 10cm'),
-          length: Yup.number().min(10, 'Mínimo de 10cm'),
-          weight: Yup.number().required('Campo obrigatório'),
-          gender: Yup.string(),
-          price: Yup.number().required('Campo obrigatório'),
-          price_discounted: Yup.number()
-            .nullable()
-            .min(0, 'Valor mínimo de R$ 0')
-            .max(data.price, `Valor máximo de R$ ${data.price}`),
-          ...yupVariationSchema(),
-        });
+        // https://stackoverflow.com/questions/66795388/yup-validation-for-a-non-required-field
+        const schema = Yup.object().shape(
+          {
+            images: Yup.array()
+              .nullable()
+              .notRequired()
+              .when('images', {
+                is: (images: any[]) => images?.length > 0,
+                then: rule =>
+                  rule
+                    .min(2, 'Escolha pelo menos duas imagens')
+                    .max(8, 'Pode atribuir no máximo 8 imagens'),
+              }),
+            name: Yup.string()
+              .nullable()
+              .notRequired()
+              .when('name', {
+                is: (value: any) => value?.length,
+                then: rule =>
+                  rule.min(2, 'Deve conter pelo menos 2 caracteres'),
+              }),
+            description: Yup.string()
+              .nullable()
+              .notRequired()
+              .when('description', {
+                is: (value: any) => value?.length,
+                then: rule =>
+                  rule
+                    .min(2, 'Deve conter pelo menos 2 caracteres')
+                    .max(1800, 'Deve conter no máximo 1800 caracteres'),
+              }),
+            brand: Yup.string()
+              .nullable()
+              .notRequired()
+              .when('brand', {
+                is: (value: any) => value?.length,
+                then: rule =>
+                  rule.min(2, 'Deve conter pelo menos 2 caracteres'),
+              }),
+            ean: Yup.string(),
+            sku: Yup.string(),
+            height: Yup.number()
+              .min(10, 'Mínimo de 10cm')
+              .nullable(true)
+              .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
+            width: Yup.number()
+              .nullable(true)
+              .min(10, 'Mínimo de 10cm')
+              .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
+            length: Yup.number()
+              .nullable(true)
+              .min(10, 'Mínimo de 10cm')
+              .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
+            weight: Yup.number()
+              .nullable(true)
+              .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
+            gender: Yup.string(),
+            price: Yup.number().typeError('Campo obrigatório'),
+            price_discounted: Yup.number()
+              .nullable()
+              .min(0, 'Valor mínimo de R$ 0')
+              .max(data.price, `Valor máximo de R$ ${data.price}`),
+            ...yupVariationSchema(),
+          },
+          [
+            // Add Cyclic deps here because when require itself
+            ['name', 'name'],
+            ['images', 'images'],
+            ['description', 'description'],
+            ['brand', 'brand'],
+          ],
+        );
 
         await schema.validate(data, { abortEarly: false });
 
@@ -832,6 +902,26 @@ export function EditProductForm() {
           </div> */}
         </section>
         <div className={styles.divider} />
+        {validationErrors.length > 0 && (
+          <div className="container">
+            <div className={styles.alert}>
+              <h3 className={styles.title}>Status</h3>
+              <p>
+                Preencha corretamente{' '}
+                {validationErrors.length > 1
+                  ? 'os seguintes campos'
+                  : 'o seguinte campo'}{' '}
+                para conectar o produto nos canais de vendas:
+              </p>
+              <ul>
+                {validationErrors.map(item => (
+                  <li key={item.field}>{item.message}</li>
+                ))}
+              </ul>
+              <br />
+            </div>
+          </div>
+        )}
         <section className={styles.content}>
           <Form
             ref={formRef}
@@ -1027,16 +1117,14 @@ export function EditProductForm() {
         <span>
           {filledFields}/{totalFields} Informações inseridas
         </span>
-        {filledFields >= totalFields && (
-          <Button
-            type="submit"
-            onClick={() => {
-              formRef.current?.submitForm();
-            }}
-          >
-            Cadastrar produto
-          </Button>
-        )}
+        <Button
+          type="submit"
+          onClick={() => {
+            formRef.current?.submitForm();
+          }}
+        >
+          Salvar produto
+        </Button>
       </div>
 
       {isLoading && (
