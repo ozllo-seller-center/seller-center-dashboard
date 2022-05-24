@@ -193,15 +193,15 @@ export function EditProductForm() {
             setValidationErrors(
               response.data.validation.errors.map((error: any) => {
                 if ('category' === error.field) error.message = 'Categoria';
+                if ('images' === error.field) error.message = 'Fotos';
                 if ('name' === error.field) error.message = 'Nome';
-                if ('description' === error.field) error.message = 'Descrição';
                 if ('brand' === error.field) error.message = 'Marca';
+                if ('description' === error.field) error.message = 'Descrição';
                 if ('sku' === error.field) error.message = 'SKU';
                 if ('height' === error.field) error.message = 'Altura';
                 if ('width' === error.field) error.message = 'Largura';
                 if ('length' === error.field) error.message = 'Comprimento';
                 if ('weight' === error.field) error.message = 'Peso';
-                console.log({ badah: attributes });
                 if (!error.message) error.message = error.field;
                 return error;
               }),
@@ -644,8 +644,7 @@ export function EditProductForm() {
               .nullable(true)
               .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
             gender: Yup.string(),
-            price: Yup.number()
-              .typeError('Campo obrigatório'),
+            price: Yup.number().typeError('Campo obrigatório'),
             price_discounted: Yup.number()
               .nullable(true)
               .min(0, 'Valor mínimo de R$ 0')
