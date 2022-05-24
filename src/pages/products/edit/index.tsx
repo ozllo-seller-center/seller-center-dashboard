@@ -202,6 +202,25 @@ export function EditProductForm() {
                 if ('width' === error.field) error.message = 'Largura';
                 if ('length' === error.field) error.message = 'Comprimento';
                 if ('weight' === error.field) error.message = 'Peso';
+                if ('variations' === error.field) error.message = 'Variação 1';
+                if (error.field.endsWith('.size'))
+                  error.message = `Variação ${
+                    response.data.variations.findIndex(
+                      (v: any) => v._id === error.field.split('.')[1],
+                    ) + 1
+                  }: Tamanho`;
+                if (error.field.endsWith('.attr'))
+                  error.message = `Variação ${
+                    response.data.variations.findIndex(
+                      (v: any) => v._id === error.field.split('.')[1],
+                    ) + 1
+                  }: Cor ou Sabor`;
+                if (error.field.endsWith('.stock'))
+                  error.message = `Variação ${
+                    response.data.variations.findIndex(
+                      (v: any) => v._id === error.field.split('.')[1],
+                    ) + 1
+                  }: Estoque`;
                 if (!error.message) error.message = error.field;
                 return error;
               }),
