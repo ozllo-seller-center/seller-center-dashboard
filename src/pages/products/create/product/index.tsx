@@ -368,12 +368,12 @@ export function ProductForm() {
               .required()
               .of(
                 Yup.object().shape({
-                  size: Yup.string().required('Campo obrigatório'),
-                  flavor: Yup.string().required('Campo obrigatório'),
+                  size: Yup.string(),
+                  flavor: Yup.string(),
                   stock: Yup.number()
-                    .typeError('Campo obrigatório')
-                    .required('Campo obrigatório')
-                    .min(0, 'Valor mínimo 0'),
+                    .nullable(true)
+                    .min(0, 'Valor mínimo 0')
+                    .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
                 }),
               ),
           }
@@ -382,12 +382,12 @@ export function ProductForm() {
               .required()
               .of(
                 Yup.object().shape({
-                  size: Yup.string().required('Campo obrigatório'),
-                  color: Yup.string().required('Campo obrigatório'),
+                  size: Yup.string(),
+                  color: Yup.string(),
                   stock: Yup.number()
-                    .typeError('Campo obrigatório')
-                    .required('Campo obrigatório')
-                    .min(0, 'Valor mínimo 0'),
+                    .nullable(true)
+                    .min(0, 'Valor mínimo 0')
+                    .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
                 }),
               ),
           },
@@ -396,16 +396,16 @@ export function ProductForm() {
 
   const handleSubmit = useCallback(
     async data => {
-      if (filledFields < totalFields) {
-        handleModalMessage(true, {
-          type: 'error',
-          title: 'Formulário incompleto',
-          message: [
-            'Preencha todas as informações obrigatórias antes de continuar.',
-          ],
-        });
-        return;
-      }
+      // if (filledFields < totalFields) {
+      //   handleModalMessage(true, {
+      //     type: 'error',
+      //     title: 'Formulário incompleto',
+      //     message: [
+      //       'Preencha todas as informações obrigatórias antes de continuar.',
+      //     ],
+      //   });
+      //   return;
+      // }
 
       // if (colorInName || brandInName) {
       //   handleModalMessage(true, { type: 'error', title: 'Nome de produto inválido', message: [brandInName ? 'Remova a marca do nome do produto.' : 'Remova a cor do nome do produto.', 'Quando necessário o sistema adicionará essas informações ao nome do produto.'] });
@@ -420,36 +420,79 @@ export function ProductForm() {
         setLoading(true);
         formRef.current?.setErrors({});
 
-        const schema = Yup.object().shape({
-          images: Yup.array()
-            .min(2, 'Escolha pelo menos duas imagens')
-            .max(8, 'Pode atribuir no máximo 8 imagens'),
-          name: Yup.string()
-            .required('Campo obrigatório')
-            .min(2, 'Deve conter pelo menos 2 caracteres'),
-          description: Yup.string()
-            .required('Campo obrigatório')
-            .min(2, 'Deve conter pelo menos 2 caracteres')
-            .max(1800, 'Deve conter no máximo 1800 caracteres'),
-          brand: Yup.string()
-            .required('Campo obrigatório')
-            .min(2, 'Deve conter pelo menos 2 caracteres'),
-          ean: Yup.string(),
-          sku: Yup.string()
-            .required('Campo obrigatório')
-            .min(2, 'Deve conter pelo menos 2 caracteres'),
-          height: Yup.number().min(10, 'Mínimo de 10cm'),
-          width: Yup.number().min(10, 'Mínimo de 10cm'),
-          length: Yup.number().min(10, 'Mínimo de 10cm'),
-          weight: Yup.number().required('Campo obrigatório'),
-          gender: Yup.string(),
-          price: Yup.number().required('Campo obrigatório'),
-          price_discounted: Yup.number()
-            .nullable()
-            .min(0, 'Valor mínimo de R$ 0')
-            .max(data.price, `Valor máximo de R$ ${data.price}`),
-          ...yupVariationSchema(),
-        });
+        // https://stackoverflow.com/questions/66795388/yup-validation-for-a-non-required-field
+        const schema = Yup.object().shape(
+          {
+            images: Yup.array()
+              .nullable()
+              .notRequired()
+              .when('images', {
+                is: (images: any[]) => images?.length > 0,
+                then: rule =>
+                  rule
+                    .min(2, 'Escolha pelo menos duas imagens')
+                    .max(8, 'Pode atribuir no máximo 8 imagens'),
+              }),
+            name: Yup.string()
+              .nullable()
+              .notRequired()
+              .when('name', {
+                is: (value: any) => value?.length,
+                then: rule =>
+                  rule.min(2, 'Deve conter pelo menos 2 caracteres'),
+              }),
+            description: Yup.string()
+              .nullable()
+              .notRequired()
+              .when('description', {
+                is: (value: any) => value?.length,
+                then: rule =>
+                  rule
+                    .min(2, 'Deve conter pelo menos 2 caracteres')
+                    .max(1800, 'Deve conter no máximo 1800 caracteres'),
+              }),
+            brand: Yup.string()
+              .nullable()
+              .notRequired()
+              .when('brand', {
+                is: (value: any) => value?.length,
+                then: rule =>
+                  rule.min(2, 'Deve conter pelo menos 2 caracteres'),
+              }),
+            ean: Yup.string(),
+            sku: Yup.string(),
+            height: Yup.number()
+              .min(10, 'Mínimo de 10cm')
+              .nullable(true)
+              .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
+            width: Yup.number()
+              .nullable(true)
+              .min(10, 'Mínimo de 10cm')
+              .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
+            length: Yup.number()
+              .nullable(true)
+              .min(10, 'Mínimo de 10cm')
+              .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
+            weight: Yup.number()
+              .nullable(true)
+              .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
+            gender: Yup.string(),
+            price: Yup.number().typeError('Campo obrigatório'),
+            price_discounted: Yup.number()
+              .nullable(true)
+              .min(0, 'Valor mínimo de R$ 0')
+              .max(data.price, `Valor máximo de R$ ${data.price}`)
+              .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
+            ...yupVariationSchema(),
+          },
+          [
+            // Add Cyclic deps here because when require itself
+            ['name', 'name'],
+            ['images', 'images'],
+            ['description', 'description'],
+            ['brand', 'brand'],
+          ],
+        );
 
         await schema.validate(data, { abortEarly: false });
 

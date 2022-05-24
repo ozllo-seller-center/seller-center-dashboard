@@ -529,8 +529,9 @@ export function EditProductForm() {
                   size: Yup.string(),
                   flavor: Yup.string(),
                   stock: Yup.number()
-                    .typeError('Campo obrigatório')
-                    .min(0, 'Valor mínimo 0'),
+                    .nullable(true)
+                    .min(0, 'Valor mínimo 0')
+                    .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
                 }),
               ),
           }
@@ -542,8 +543,9 @@ export function EditProductForm() {
                   size: Yup.string(),
                   color: Yup.string(),
                   stock: Yup.number()
-                    .typeError('Campo obrigatório')
-                    .min(0, 'Valor mínimo 0'),
+                    .nullable(true)
+                    .min(0, 'Valor mínimo 0')
+                    .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
                 }),
               ),
           },
@@ -642,11 +644,13 @@ export function EditProductForm() {
               .nullable(true)
               .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
             gender: Yup.string(),
-            price: Yup.number().typeError('Campo obrigatório'),
+            price: Yup.number()
+              .typeError('Campo obrigatório'),
             price_discounted: Yup.number()
-              .nullable()
+              .nullable(true)
               .min(0, 'Valor mínimo de R$ 0')
-              .max(data.price, `Valor máximo de R$ ${data.price}`),
+              .max(data.price, `Valor máximo de R$ ${data.price}`)
+              .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
             ...yupVariationSchema(),
           },
           [
