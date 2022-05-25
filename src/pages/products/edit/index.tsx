@@ -418,20 +418,6 @@ export function EditProductForm() {
     [filesUrl, files],
   );
 
-  useEffect(() => {
-    if (filesUrl) {
-      console.log('Files Url:');
-      console.log([...filesUrl]);
-    }
-  }, [filesUrl]);
-
-  useEffect(() => {
-    if (files) {
-      console.log('Files:');
-      console.log([...files]);
-    }
-  }, [files]);
-
   const handleFileOrder = useCallback(
     (draggedFile: number, droppedAt: number) => {
       if (draggedFile === droppedAt) {
