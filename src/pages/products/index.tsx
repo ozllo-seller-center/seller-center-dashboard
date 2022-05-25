@@ -352,9 +352,7 @@ const Products: React.FC = () => {
                   onChange={setValorAcao}
                   className={styles.selectOption}
                 >
-                  <option selected value="0">
-                    Ação em massa
-                  </option>
+                  <option value="0">Ação em massa</option>
                   <option value="1">Exportar Produto(s)</option>
                   <option value="2">Excluir Produto(s)</option>
                 </select>
