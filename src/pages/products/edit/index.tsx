@@ -280,8 +280,8 @@ export function EditProductForm() {
         .get(`/category/${category}/subcategories`)
         .then(response => {
           const categoryName = response.data.find(
-            (c: SubCategory) => c.categoryCode === Number(category),
-          ).value;
+            (c: SubCategory) => Number(c.code) === Number(subCategory),
+          )?.value;
           setSubCategoryName(categoryName || '');
           setLoading(false);
         })
@@ -290,7 +290,7 @@ export function EditProductForm() {
           setLoading(false);
         });
     }
-  }, [category, setLoading]);
+  }, [subCategory, setLoading]);
 
   useEffect(() => {
     if (variations.length > 0) {
@@ -919,7 +919,7 @@ export function EditProductForm() {
                   ? 'Nacional'
                   : '2' === nationality
                   ? 'Internacional'
-                  : 'Sem origem'}
+                  : 'Nacional'}
               </span>
 
               <span className={styles.separator}>/</span>
