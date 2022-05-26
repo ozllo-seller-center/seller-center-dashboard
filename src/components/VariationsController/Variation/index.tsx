@@ -280,6 +280,29 @@ const VariationField: React.FC<VariationProps> = ({
             }
           })}
 
+          {!attributes.length && (
+            <>
+              <Input
+                name="size"
+                label="Tamanho/medida"
+                placeholder="Escolha uma categoria primeiro"
+                autoComplete="off"
+                defaultValue=""
+                type="string"
+                disabled={true}
+              />
+              <Input
+                name="color_flavor"
+                label="Cor ou Sabor"
+                placeholder="Escolha uma categoria primeiro"
+                autoComplete="off"
+                defaultValue=""
+                type="number"
+                disabled={true}
+              />
+            </>
+          )}
+
           <Input
             name="stock"
             label="Estoque"

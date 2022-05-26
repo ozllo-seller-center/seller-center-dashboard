@@ -27,7 +27,7 @@ import { useModalMessage } from 'src/hooks/message';
 import Loader from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
 import VariationField from 'src/components/VariationsController/Variation';
-import { Attribute } from 'src/shared/types/category';
+import { Attribute, SubCategory } from 'src/shared/types/category';
 import ImageController from 'src/components/ImageController';
 import RuledHintbox, { Rule } from 'src/components/RuledHintbox';
 import { matchingWords } from 'src/utils/util';
@@ -49,6 +49,7 @@ type VariationDTO = {
   stock?: number;
   color?: string;
   flavor?: string;
+  color_flavor?: string;
   gluten_free?: boolean;
   lactose_free?: boolean;
 };
@@ -68,7 +69,9 @@ export function EditProductForm() {
   const [variations, setVariations] = useState<VariationDTO[]>([{}]);
   const [nationality, setNationality] = useState('');
   const [category, setCategory] = useState('');
+  const [categoryName, setCategoryName] = useState('');
   const [subCategory, setSubCategory] = useState('');
+  const [subCategoryName, setSubCategoryName] = useState('');
   const [genderRadio, setGenderRadio] = useState('M');
 
   const [isChanging, setChanging] = useState(false);
@@ -189,7 +192,7 @@ export function EditProductForm() {
           formRef.current?.setData(response.data);
           // setFormData(response.data)
 
-          if (response.data?.validation?.errors.length) {
+          if (response.data?.validation?.errors?.length) {
             setValidationErrors(
               response.data.validation.errors.map((error: any) => {
                 if ('category' === error.field) error.message = 'Categoria';
@@ -252,6 +255,7 @@ export function EditProductForm() {
         .get(`/category/${category}/attributes`)
         .then(response => {
           setAttributes(response.data[0].attributes);
+          setCategoryName(response.data[0].value);
 
           response.data[0].attributes.map((attr: Attribute) => {
             if (attr.name === 'flavor') {
@@ -264,6 +268,25 @@ export function EditProductForm() {
         .catch(err => {
           console.log(err);
 
+          setLoading(false);
+        });
+    }
+  }, [category, setLoading]);
+
+  useEffect(() => {
+    if (category) {
+      setLoading(true);
+      api
+        .get(`/category/${category}/subcategories`)
+        .then(response => {
+          const categoryName = response.data.find(
+            (c: SubCategory) => c.categoryCode === Number(category),
+          ).value;
+          setSubCategoryName(categoryName || '');
+          setLoading(false);
+        })
+        .catch(err => {
+          console.log(err);
           setLoading(false);
         });
     }
@@ -756,6 +779,11 @@ export function EditProductForm() {
 
         await vars.forEach(async (variation: VariationDTO, i: number) => {
           if (!!variation._id && variation._id !== '') {
+            if (!category?.length) {
+              delete variation.size;
+              delete variation.color_flavor;
+            }
+
             const variationId = variation._id;
 
             if (oldStock[i] !== variation.stock) {
@@ -884,32 +912,31 @@ export function EditProductForm() {
           >
             Voltar
           </Button>
+          {categoryName && subCategoryName ? (
+            <div className={styles.breadCumbs}>
+              <span className={category ? styles.crumb : styles.activeCrumb}>
+                {'1' === nationality
+                  ? 'Nacional'
+                  : '2' === nationality
+                  ? 'Internacional'
+                  : 'Sem origem'}
+              </span>
 
-          {/* TODO: Definir api para recuperar os dados das categorias */}
+              <span className={styles.separator}>/</span>
 
-          {/* <div className={styles.breadCumbs}>
-            {
-              !!nationality && (
-                <span className={!!category ? styles.crumb : styles.activeCrumb}>{nationality}</span>
-              )
-            }
-            {
-              !!category && (
-                <>
-                  <span className={styles.separator}>/</span>
-                  <span className={!!subCategory ? styles.crumb : styles.activeCrumb}>{category}</span>
-                </>
-              )
-            }
-            {
-              !!subCategory && (
-                <>
-                  <span className={styles.separator}>/</span>
-                  <span className={styles.activeCrumb}>{subCategory}</span>
-                </>
-              )
-            }
-          </div> */}
+              <span className={subCategory ? styles.crumb : styles.activeCrumb}>
+                {categoryName}
+              </span>
+
+              <span className={styles.separator}>/</span>
+
+              <span className={styles.activeCrumb}>{subCategoryName}</span>
+            </div>
+          ) : (
+            <div className={styles.breadCumbs}>
+              <span className={styles.crumb}>Escolha uma categoria</span>
+            </div>
+          )}
         </section>
         <div className={styles.divider} />
         {validationErrors.length > 0 && (
