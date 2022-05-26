@@ -411,10 +411,10 @@ const Sells: React.FC = () => {
 
   return (
     <div className={styles.sellsContainer}>
-      <span className={styles.aviso}> Prazo de despacho 2 dias úteis </span>
+      <span className={styles.aviso}> Prazo de despacho: 2 dias úteis </span>
       <span className={styles.aviso}>
         Uso obrigatório da etiqueta de despacho da B2W, Mercado Livre e Shopee
-        que chegará em seu email
+        que estará disponível após o anexo da Nota Fiscal
       </span>
       <br />
       <div className={styles.sellsHeader}>

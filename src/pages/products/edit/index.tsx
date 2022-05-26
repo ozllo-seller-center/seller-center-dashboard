@@ -985,6 +985,9 @@ export function EditProductForm() {
               {' '}
               *Padrão: 1 foto de capa fundo branco/neutro + 3 imagens ângulos
               diferentes +1 foto próximo ao corpo + 1 tabela de medidas
+              <br />
+              **Observação: todas as fotos serão redimensionadas automaticamente
+              para 1000x1000px
             </p>
 
             <div className={styles.doubleInputContainer}>
@@ -1024,6 +1027,7 @@ export function EditProductForm() {
             </div>
             <p>
               *Padrão: Nome do produto + Principais Características + Cor/Sabor
+              + Marca
             </p>
 
             <div className={styles.singleInputContainer}>
