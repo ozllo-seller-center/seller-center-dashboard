@@ -157,7 +157,7 @@ const ProductTableItem: React.FC<ProductItemProps> = ({
         />
       </td>
       <td id={styles.imgCell}>
-        {item.images ? (
+        {item.images?.length ? (
           <img src={item.images[0]} alt={item.name} />
         ) : (
           <FiCameraOff />
