@@ -42,6 +42,7 @@ import Input from '../../../components/Input';
 import Button from '../../../components/PrimaryButton';
 import Products from '..';
 import { da } from 'date-fns/locale';
+import ProductCategories from 'src/components/ProductCategories';
 
 type VariationDTO = {
   _id?: string;
@@ -93,6 +94,9 @@ export function EditProductForm() {
   const [validationErrors, setValidationErrors] = useState<Validation_Errors[]>(
     [],
   );
+
+  const [isProductCategoriesOpened, setProductCategoriesOpened] =
+    useState(false);
 
   const hintRules = useMemo(() => {
     if (isHintDisabled) {
@@ -901,6 +905,11 @@ export function EditProductForm() {
     setVariations([...variations, {}]);
   }, [variations]);
 
+  const nationalities = [
+    { id: '1', name: 'Nacional' },
+    { id: '2', name: 'Internacional' },
+  ];
+
   return (
     <>
       <div className={styles.container}>
@@ -912,30 +921,50 @@ export function EditProductForm() {
           >
             Voltar
           </Button>
-          {categoryName && subCategoryName ? (
-            <div className={styles.breadCumbs}>
-              <span className={category ? styles.crumb : styles.activeCrumb}>
-                {'1' === nationality
-                  ? 'Nacional'
-                  : '2' === nationality
-                  ? 'Internacional'
-                  : 'Nacional'}
-              </span>
+          <div className={styles.breadCumbs}>
+            <div
+              className="container"
+              onClick={() =>
+                !isProductCategoriesOpened
+                  ? setProductCategoriesOpened(true)
+                  : setProductCategoriesOpened(false)
+              }
+            >
+              {categoryName && subCategoryName ? (
+                <>
+                  <span className={styles.crumb}>
+                    {'1' === nationality
+                      ? 'Nacional'
+                      : '2' === nationality
+                      ? 'Internacional'
+                      : 'Nacional'}
+                  </span>
 
-              <span className={styles.separator}>/</span>
+                  <span className={styles.separator}>/</span>
 
-              <span className={subCategory ? styles.crumb : styles.activeCrumb}>
-                {categoryName}
-              </span>
+                  <span className={styles.crumb}>{categoryName}</span>
 
-              <span className={styles.separator}>/</span>
+                  <span className={styles.separator}>/</span>
 
-              <span className={styles.activeCrumb}>{subCategoryName}</span>
+                  <span className={styles.activeCrumb}>{subCategoryName}</span>
+                </>
+              ) : (
+                <span className={styles.activeCrumb}>Escolha uma categoria</span>
+              )}
             </div>
-          ) : (
-            <div className={styles.breadCumbs}>
-              <span className={styles.crumb}>Escolha uma categoria</span>
-            </div>
+          </div>
+        </section>
+        <section className={styles.content}>
+          {isProductCategoriesOpened && (
+            <ProductCategories
+              nationalities={nationalities}
+              setNationality={setNationality}
+              setCategory={setCategory}
+              setSubCategory={setSubCategory}
+              setDisplay={setProductCategoriesOpened}
+              category={category}
+              subCategory={subCategory}
+            ></ProductCategories>
           )}
         </section>
         <div className={styles.divider} />
