@@ -949,7 +949,9 @@ export function EditProductForm() {
                   <span className={styles.activeCrumb}>{subCategoryName}</span>
                 </>
               ) : (
-                <span className={styles.activeCrumb}>Escolha uma categoria</span>
+                <span className={styles.activeCrumb}>
+                  Escolha uma categoria
+                </span>
               )}
             </div>
           </div>
@@ -964,6 +966,7 @@ export function EditProductForm() {
               setDisplay={setProductCategoriesOpened}
               category={category}
               subCategory={subCategory}
+              nationality={nationality}
             ></ProductCategories>
           )}
         </section>

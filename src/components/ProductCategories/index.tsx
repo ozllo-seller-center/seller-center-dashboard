@@ -17,6 +17,7 @@ interface CategoriesDTO {
   setCategory?: any;
   setSubCategory?: any;
   setDisplay?: any;
+  nationality?: any;
   category?: any;
   subCategory?: any;
 }
@@ -66,13 +67,11 @@ const ProductCategories: React.FC<CategoriesDTO> = props => {
   }, [setLoading]);
 
   useEffect(() => {
-    if (category) {
+    if (category || currentCategoryCode) {
       setLoading(true);
-      // setSubCategories(sub_categories.filter((sc: SubCategory) => sc.categoryCode === category.code))
-      // setLoading(false);
 
       api
-        .get(`/category/${category.code}/subcategories`)
+        .get(`/category/${category?.code || currentCategoryCode}/subcategories`)
         .then(response => {
           setSubCategories(response.data);
 
@@ -85,7 +84,7 @@ const ProductCategories: React.FC<CategoriesDTO> = props => {
     }
 
     setSubCategories([]);
-  }, [category, setLoading]);
+  }, [category, currentCategoryCode, setLoading]);
 
   const handleNationality = useCallback(
     (n: Nationality) => {
@@ -101,6 +100,7 @@ const ProductCategories: React.FC<CategoriesDTO> = props => {
 
   const handleCategory = useCallback(
     (c: Category) => {
+      setCategory(undefined);
       if (category?.code === c.code) {
         setCategory(undefined);
         return;
@@ -123,22 +123,36 @@ const ProductCategories: React.FC<CategoriesDTO> = props => {
     [subCategory],
   );
 
+  const handleActiveNationality = (n: Nationality) => {
+    console.log(nationality?.id, props.nationality);
+    if (nationality?.id > 0 && props.nationality > 0) {
+      return nationality?.id === n.id;
+    }
+
+    return nationality?.id === n.id || props.nationality === n.id;
+  };
+
+  const handleActiveCategory = (c: Category) => {
+    if (category?.code && category?.code > 0 && currentCategoryCode > 0) {
+      return category?.code === c.code;
+    }
+
+    return category?.code === c.code || currentCategoryCode === c.code;
+  };
+
   useEffect(() => {
-    props.setNationality(nationality?.id);
-    props.setCategory(category?.code);
-    props.setSubCategory(subCategory?.code);
+    if (nationality?.id) props.setNationality(nationality.id);
+    if (category?.code) props.setCategory(category.code);
+    if (subCategory?.code) props.setSubCategory(subCategory.code);
     return () => {
       props.setDisplay(false);
     };
   }, [subCategory]);
 
-  // useEffect(() => {
-  //   if (props.category) setCurrentCategoryCode(props.category);
-  // }, [props.category]);
-
-  // useEffect(() => {
-  //   if (props.subCategory) setCurrentSubCategoryCode(props.subCategory);
-  // }, [props.subCategory]);
+  useEffect(() => {
+    if (props.category) setCurrentCategoryCode(props.category);
+    if (props.subCategory) setCurrentSubCategoryCode(props.subCategory);
+  }, [props.subCategory]);
 
   return (
     <div className={styles.container}>
@@ -150,21 +164,21 @@ const ProductCategories: React.FC<CategoriesDTO> = props => {
               <StateButton
                 key={n.id}
                 onClick={() => handleNationality(n)}
-                isActive={nationality?.id === n.id}
+                isActive={handleActiveNationality(n)}
                 pointer={!!width && width >= 768}
               >
                 {n.name}
               </StateButton>
             ))}
           </div>
-          {!!nationality && (
+          {(!!nationality || !!currentCategoryCode) && (
             <div className={styles.categoriesContainer}>
               <div className={styles.categoryContainer}>
                 {categories.map((c: Category) => (
                   <StateButton
                     key={c.code}
                     onClick={() => handleCategory(c)}
-                    isActive={category?.code === c.code}
+                    isActive={handleActiveCategory(c)}
                     pointer={!!width && width >= 768}
                     borders
                   >
@@ -172,7 +186,7 @@ const ProductCategories: React.FC<CategoriesDTO> = props => {
                   </StateButton>
                 ))}
               </div>
-              {!!category && !isLoading && (
+              {(!!category || !!currentSubCategoryCode) && !isLoading && (
                 <div className={styles.subcategoryContainer}>
                   {!!subCategories && subCategories.length > 0 && (
                     <div className={styles.subCategories}>
@@ -180,7 +194,10 @@ const ProductCategories: React.FC<CategoriesDTO> = props => {
                         <Button
                           key={sc.code}
                           onClick={() => handleSubCategory(sc)}
-                          isActive={subCategory?.code === sc.code}
+                          isActive={
+                            subCategory?.code === sc.code ||
+                            currentSubCategoryCode === sc.code
+                          }
                           customStyle={{
                             className: styles.subCategoryButton,
                             activeClassName: styles.subCategoryActiveButton,
