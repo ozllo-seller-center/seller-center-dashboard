@@ -124,20 +124,19 @@ const ProductCategories: React.FC<CategoriesDTO> = props => {
   );
 
   const handleActiveNationality = (n: Nationality) => {
-    console.log(nationality?.id, props.nationality);
     if (nationality?.id > 0 && props.nationality > 0) {
-      return nationality?.id === n.id;
+      return nationality?.id == n.id;
     }
 
-    return nationality?.id === n.id || props.nationality === n.id;
+    return nationality?.id == n.id || props.nationality == n.id;
   };
 
   const handleActiveCategory = (c: Category) => {
     if (category?.code && category?.code > 0 && currentCategoryCode > 0) {
-      return category?.code === c.code;
+      return category?.code == c.code;
     }
 
-    return category?.code === c.code || currentCategoryCode === c.code;
+    return category?.code == c.code || currentCategoryCode == c.code;
   };
 
   useEffect(() => {
