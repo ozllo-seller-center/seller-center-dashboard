@@ -18,9 +18,9 @@ export const getGender = (produto: any) => {
 };
 
 export const getCategory = (produto: any) => {
-  const nacionalidade = Nationalities[produto.nationality]; // nacionalidade
-  const categoria = Categories[produto.category]; // categoria
-  const subCategoria = Subcategories[produto.subcategory]; // subcategoria
+  const nacionalidade = Nationalities[produto.nationality] || '';
+  const categoria = Categories[produto.category] || '';
+  const subCategoria = Subcategories[produto.subcategory] || '';
   return `${nacionalidade} > ${categoria} > ${subCategoria}`;
 };
 
@@ -47,6 +47,8 @@ export const getImagesHeader = () => {
 };
 
 export const getVariations = (produto: any) => {
+  console.log({ category: getCategory(produto) });
+
   const { variations } = produto;
   return variations.map((variacao: Variation, index: number) => ({
     Categoria: index === 0 ? getCategory(produto) : '',
