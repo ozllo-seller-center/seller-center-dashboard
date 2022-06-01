@@ -439,11 +439,11 @@ const Import: React.FC = () => {
                     const value = line[attrI].split('>');
 
                     productValidation[attribute].value.nationality =
-                      value[0].trim();
+                      value[0]?.trim();
                     productValidation[attribute].value.category =
-                      value[1].trim();
+                      value[1]?.trim();
                     productValidation[attribute].value.subCategory =
-                      value[2].trim();
+                      value[2]?.trim();
                     break;
                   case 16:
                     productValidation[attribute].value = line[attrI]
