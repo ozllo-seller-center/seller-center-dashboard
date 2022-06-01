@@ -783,7 +783,7 @@ export function EditProductForm() {
 
         await vars.forEach(async (variation: VariationDTO, i: number) => {
           if (!!variation._id && variation._id !== '') {
-            if (!category?.length) {
+            if (!category) {
               delete variation.size;
               delete variation.color_flavor;
             }
