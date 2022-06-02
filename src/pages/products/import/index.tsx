@@ -51,7 +51,6 @@ const Import: React.FC = () => {
   const [imports, setImports] = useState<ProductImport[]>([]);
   const [nationalities, setNationalities] = useState([] as Nationality[]);
   const [categories, setCategories] = useState([] as Category[]);
-  const [subCategories, setSubCategories] = useState([] as SubCategory[]);
 
   const {
     showModalMessage: showMessage,
@@ -291,10 +290,12 @@ const Import: React.FC = () => {
           };
 
           if (product._id) {
+            // Modify existing products.
             const newImages: string[] =
               product?.images?.map(img => img.url) || [];
             handleSubmit(product, newImages, products);
           } else {
+            // Create new products.
             await api
               .post('/product', p, {
                 headers: {
@@ -392,7 +393,7 @@ const Import: React.FC = () => {
             ? result.Planilha1
             : result.data;
 
-          console.log(sheet);
+          // console.log(sheet);
 
           sheet.forEach(async (line, i) => {
             // Ignorar o cabeçalho
@@ -421,17 +422,20 @@ const Import: React.FC = () => {
                 const validate = productValidation[attribute].validate;
 
                 switch (attrI) {
-                  case 0:
-                    const value = line[attrI].split('>');
+                  case 0: // Category
+                    const value = line[attrI]?.split('>');
 
-                    productValidation[attribute].value.nationality =
-                      value[0]?.trim();
-                    productValidation[attribute].value.category =
-                      value[1]?.trim();
-                    productValidation[attribute].value.subCategory =
-                      value[2]?.trim();
+                    if (value) {
+                      productValidation[attribute].value.nationality =
+                        value[0]?.trim();
+                      productValidation[attribute].value.category =
+                        value[1]?.trim();
+                      productValidation[attribute].value.subCategory =
+                        value[2]?.trim();
+                    }
+
                     break;
-                  case 16:
+                  case 16: // Gender
                     productValidation[attribute].value = line[attrI]
                       .charAt(0)
                       .toUpperCase();
