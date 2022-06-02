@@ -83,17 +83,6 @@ const Import: React.FC = () => {
   const handleSubmit = useCallback(
     async (product, newImages, products) => {
       try {
-        /* if (!isVariation) {
-        //imagens - verificar se e necessario
-        await api.patch(`/product/${product._id}/images`, { images: newImages }, {
-          headers: {
-            authorization: token,
-            shop_id: user.shopInfo._id,
-          }
-        }).then(response => {
-        })/
-      } */
-
         const { variations } = product;
         const price = product.price.toString();
         const price_discounted = product.price_discounted.toString();
@@ -264,9 +253,6 @@ const Import: React.FC = () => {
             subCategoryIndex > -1 ? subCats[subCategoryIndex] : subCats[0];
 
           const {
-            // category,
-            // subcategory,
-            // nationality,
             name,
             description,
             brand,
@@ -583,10 +569,6 @@ const Import: React.FC = () => {
 
         setLoading(false);
       });
-
-    // return
-    //   }
-    // })
 
     setNationalities([
       {
