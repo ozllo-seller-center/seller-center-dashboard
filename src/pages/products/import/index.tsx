@@ -495,24 +495,6 @@ const Import: React.FC = () => {
                 }
               }
 
-              if (productValidation.image.value.length < 2) {
-                const err = ErrorMessages.image;
-
-                handleModalMessage(true, {
-                  type: 'error',
-                  title: err.title,
-                  message: [
-                    err.message
-                      .replace('%s', line[3])
-                      .replace('%d', (i + 1).toString()),
-                  ],
-                });
-
-                setError(true);
-
-                return;
-              }
-
               if (stop) {
                 return;
               }
