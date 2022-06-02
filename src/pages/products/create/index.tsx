@@ -167,7 +167,6 @@ export function NewProduct({
       <div className={styles.content}>
         <div className={styles.contentHeader}>
           <h4>Suas categorias</h4>
-          <Button disabled>Nova categoria</Button>
         </div>
         <div className={styles.contentBody}>
           <div className={styles.nationalityContainer}>
