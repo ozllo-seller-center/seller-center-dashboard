@@ -194,8 +194,8 @@ const ProductCategories: React.FC<CategoriesDTO> = props => {
                           key={sc.code}
                           onClick={() => handleSubCategory(sc)}
                           isActive={
-                            subCategory?.code === sc.code ||
-                            currentSubCategoryCode === sc.code
+                            subCategory?.code == sc.code ||
+                            currentSubCategoryCode == sc.code
                           }
                           customStyle={{
                             className: styles.subCategoryButton,
