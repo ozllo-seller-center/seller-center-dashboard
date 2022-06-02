@@ -112,9 +112,15 @@
           }
 
           th:first-child {
-            // padding-left: 1rem;
+            text-align: center;
             align-items: center;
             justify-self: center;
+          }
+
+          label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
           }
         }
 
@@ -197,9 +203,10 @@
   }
 
   .checkbox {
-    width: 30px;
-    height: 19px;
-    text-align: center;
+    width: 1.15em;
+    height: 1.15em;
+    cursor: pointer;
+    vertical-align: middle;
   }
 }
 

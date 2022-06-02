@@ -52,10 +52,6 @@ const ProductTableItem: React.FC<ProductItemProps> = ({
 
   const router = useRouter();
 
-  const [validationErrors, setValidationErrors] = useState<Validation_Errors[]>(
-    [],
-  );
-
   useEffect(() => {
     const index = products.findIndex(product => product._id === item._id);
 
@@ -147,7 +143,7 @@ const ProductTableItem: React.FC<ProductItemProps> = ({
 
   return (
     <tr key={item._id} className={styles.tableItem}>
-      <td>
+      <td className={styles.selectItems}>
         <input
           className={styles.checkboxDados}
           type="checkbox"

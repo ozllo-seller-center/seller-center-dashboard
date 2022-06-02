@@ -17,7 +17,6 @@
 
   #imgCell {
     width: 10rem;
-    padding: 0 1rem;
 
     svg {
       width: 1.5rem;
@@ -79,8 +78,9 @@
     border-radius: 0.15em;
     transform: translateY(-0.075em);
 
-    display: grid;
+    display: inline-grid;
     place-content: center;
+    cursor: pointer;
 
     &::before {
       content: '';
@@ -105,6 +105,12 @@
       outline: max(2px, 0.15rem) solid var(--grafite);
       outline-offset: max(2px, 0.15rem);
     }
+  }
+}
+
+.selectItems {
+    label {
+    cursor: pointer;
   }
 }
 
