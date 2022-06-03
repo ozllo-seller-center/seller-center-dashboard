@@ -29,9 +29,8 @@ import MessageModal from 'src/components/MessageModal';
 import VariationField from 'src/components/VariationsController/Variation';
 import { Attribute, SubCategory } from 'src/shared/types/category';
 import ImageController from 'src/components/ImageController';
-import RuledHintbox, { Rule } from 'src/components/RuledHintbox';
+import { Rule } from 'src/components/RuledHintbox';
 import { matchingWords } from 'src/utils/util';
-import HintedInput from 'src/components/HintedInput';
 
 import Compressor from 'compressorjs';
 import styles from './styles.module.scss';
@@ -40,8 +39,7 @@ import VariationsController from '../../../components/VariationsController';
 import RadioButtonGroup from '../../../components/RadioButtonGroup';
 import Input from '../../../components/Input';
 import Button from '../../../components/PrimaryButton';
-import Products from '..';
-import { da } from 'date-fns/locale';
+
 import ProductCategories from 'src/components/ProductCategories';
 
 type VariationDTO = {
