@@ -1,4 +1,5 @@
 import React, {
+  ChangeEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -636,7 +637,9 @@ export function EditProductForm() {
               .when('name', {
                 is: (value: any) => value?.length,
                 then: rule =>
-                  rule.min(2, 'Deve conter pelo menos 2 caracteres'),
+                  rule
+                    .min(2, 'Deve conter pelo menos 2 caracteres')
+                    .max(100, 'Deve conter no máximo 100 caracteres'),
               }),
             description: Yup.string()
               .nullable()

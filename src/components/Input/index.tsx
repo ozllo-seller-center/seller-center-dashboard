@@ -5,6 +5,7 @@ import React, {
   useState,
   useCallback,
   useMemo,
+  ChangeEvent,
 } from 'react';
 
 import { useField } from '@unform/core';
@@ -34,6 +35,8 @@ const Input: React.FC<InputProps> = ({ name, label, disabled, ...rest }) => {
     setIsFilled(!!inputRef.current?.value || !!defaultValue);
   }, [defaultValue]);
 
+  const [count, setCount] = useState(0);
+
   useEffect(() => {
     registerField({
       name: fieldName,
@@ -59,20 +62,32 @@ const Input: React.FC<InputProps> = ({ name, label, disabled, ...rest }) => {
     return styles.container;
   }, [disabled, error, isFilled, isFocused]);
 
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!rest.maxLength) return;
+    setCount(e.target.value.length);
+  };
+
   return (
     <div className={styles.parent}>
       <div className={containerStyle}>
         <label htmlFor={inputRef.current?.id} className={styles.inputLabel}>
           {label}
+          {rest.maxLength && (
+            <span className={styles.counter}>
+              <span>{inputRef.current?.value.length || count}</span>
+              <span>/</span>
+              <span>{rest.maxLength}</span>
+            </span>
+          )}
         </label>
         <input
-          // type="text"
           name={name}
           onFocus={handleInputFocused}
           onBlur={handleInputBlur}
           defaultValue={defaultValue}
           ref={inputRef}
           disabled={disabled}
+          onChange={(e: any) => handleChange(e)}
           {...rest}
         />
       </div>
