@@ -993,7 +993,6 @@ export function EditProductForm() {
           <Form
             ref={formRef}
             onSubmit={handleSubmit}
-            // onChange={(e) => { calcFilledFields(formRef.current?.getData() as Product) }}
             onChange={() => {
               if (formRef.current) {
                 const vars = formRef.current.getData().variations;
@@ -1021,26 +1020,6 @@ export function EditProductForm() {
             </p>
 
             <div className={styles.doubleInputContainer}>
-              {/* <HintedInput
-                name="name"
-                label="Nome do produto"
-                placeholder="Insira o nome do produto"
-                autoComplete="off"
-                maxLength={100}
-                hint={
-                  !isHintDisabled && (
-                    <RuledHintbox
-                      title="Orientações para nomeação"
-                      rules={hintRules}
-                      example="Ex.: Sapato Cano Alto Fit"
-                      icon={FiInfo}
-                    />
-                  )
-                }
-                onChange={e => {
-                  setNameChecks(e.currentTarget.value);
-                }}
-              /> */}
               <Input
                 name="name"
                 label="Nome do produto"
