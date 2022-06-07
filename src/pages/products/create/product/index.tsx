@@ -710,8 +710,12 @@ export function ProductForm() {
             />
             <p>
               {' '}
-              *Padrão: 1 foto de capa fundo branco/neutro + 3 imagens ângulos
-              diferentes +1 foto próximo ao corpo + 1 tabela de medidas
+              *Obrigatório: 1 foto de capa fundo branco/neutro + 3 imagens
+              ângulos diferentes +1 foto próximo ao corpo + 1 tabela de medidas
+            </p>
+            <p>
+              *Observação: todas as fotos serão redimensionadas automaticamente
+              para <b>1000x1000px</b>
             </p>
 
             <div className={styles.doubleInputContainer}>
@@ -749,7 +753,11 @@ export function ProductForm() {
               />
             </div>
             <p>
-              *Padrão: Nome do produto + Principais Características + Cor/Sabor
+              *Obrigatório: Nome do produto + Principais Características +
+              Cor/Sabor + Marca
+            </p>
+            <p>
+              *Limite: <b>100</b> caracteres.
             </p>
 
             <div className={styles.singleInputContainer}>
@@ -762,8 +770,12 @@ export function ProductForm() {
               />
               <p>
                 {' '}
-                *Padrão: detalhes do produto + Nome da marca + Funcionalidades e
-                como usar o produto + Composição + Medidas + Validade
+                *Obrigatório: detalhes do produto + Nome da marca +
+                Funcionalidades e como usar o produto + Composição + Medidas +
+                Validade
+              </p>
+              <p>
+                *Limite: <b>1800</b> caracteres.
               </p>
             </div>
 

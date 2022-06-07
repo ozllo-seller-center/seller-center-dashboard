@@ -1015,7 +1015,7 @@ export function EditProductForm() {
             />
             <p>
               {' '}
-              *Padrão: 1 foto de capa fundo branco/neutro + 3 imagens ângulos
+              *Obrigatório: 1 foto de capa fundo branco/neutro + 3 imagens ângulos
               diferentes +1 foto próximo ao corpo + 1 tabela de medidas
             </p>
             <p>
@@ -1039,7 +1039,7 @@ export function EditProductForm() {
               />
             </div>
             <p>
-              *Padrão: Nome do produto + Principais Características + Cor/Sabor
+              *Obrigatório: Nome do produto + Principais Características + Cor/Sabor
               + Marca
             </p>
             <p>
@@ -1056,7 +1056,7 @@ export function EditProductForm() {
               />
               <p>
                 {' '}
-                *Padrão: detalhes do produto + Nome da marca + Funcionalidades e
+                *Obrigatório: detalhes do produto + Nome da marca + Funcionalidades e
                 como usar o produto + Composição + Medidas + Validade
               </p>
               <p>
