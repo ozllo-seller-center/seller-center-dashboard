@@ -563,11 +563,12 @@ const Sells: React.FC = () => {
                 }
               >
                 {' '}
-                {orders.length > 0 ? daysUntilDelivery : '--'} dias{' '}
+                {orders.length > 0 ? daysUntilDelivery : '--'}{' '}
+                {daysUntilDelivery > 1 ? 'dias' : 'dia'}{' '}
               </span>
             </InfoPanel>
             <StatusPanel
-              title="Atrasados"
+              title={daysUntilDelivery > 1 ? 'Atrados' : 'Atrasado'}
               altAlign
               onClick={() => setOrderStatus(OrderStatus.Atrasado)}
               isActive={orderStatus === OrderStatus.Atrasado}
