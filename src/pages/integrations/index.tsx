@@ -73,14 +73,22 @@ const Integrations: React.FC = () => {
           },
         })
         .then(response => {
+          if (!response.data) {
+            setLoading(false);
+            return;
+          }
           setPlatform(response.data.name);
-          setSavedInfo({ ...response.data.data, name: response.data.name });
+          setSavedInfo({
+            ...response.data.data,
+            name: response.data.name,
+            active: response.data.active,
+          });
 
           formRef.current?.setData(response.data.data);
 
-          if (response.data.data) {
-            setConnectionStatus(IntegrationStatus.CONNECTED);
-          }
+          response.data.active
+            ? setConnectionStatus(IntegrationStatus.CONNECTED)
+            : setConnectionStatus(IntegrationStatus.DISCONNECTED);
 
           setLoading(false);
         })
@@ -101,15 +109,10 @@ const Integrations: React.FC = () => {
       setConnectionStatus(IntegrationStatus.UNSET);
       return;
     }
-
-    if (!savedInfo.active) {
-      // FIXME: ajustar depois que o Daniel ajustar o backend
-      // setConnectionStatus(IntegrationStatus.DISCONNECTED);
-      setConnectionStatus(IntegrationStatus.CONNECTED);
-      return;
-    }
-
-    setConnectionStatus(IntegrationStatus.CONNECTED);
+    savedInfo?.active
+      ? setConnectionStatus(IntegrationStatus.CONNECTED)
+      : setConnectionStatus(IntegrationStatus.DISCONNECTED);
+    return;
   }, [savedInfo, platform]);
 
   useEffect(() => {
@@ -830,10 +833,7 @@ const Integrations: React.FC = () => {
 
       const payload = {
         name: platform,
-        data: {
-          ...data,
-          active: savedInfo && savedInfo.active ? savedInfo.active : false,
-        },
+        data,
       };
 
       api
@@ -844,88 +844,22 @@ const Integrations: React.FC = () => {
           },
         })
         .then(response => {
+          setPlatform(response.data.name);
           setSavedInfo({
             ...response.data.data,
-            active: response.data.data.active,
+            name: response.data.name,
+            active: response.data.active,
           });
 
-          if (!response.data.data.active)
-            api
-              .post(
-                `integration/system/${response.data._id}/activate`,
-                {},
-                {
-                  headers: {
-                    authorization: token,
-                    shop_id: user.shopInfo._id,
-                  },
-                },
-              )
-              .then(resp => {
-                setSavedInfo({
-                  ...response.data.data,
-                  active: resp.data.active,
-                });
-
-                if (resp.data.active) {
-                  setConnectionStatus(IntegrationStatus.CONNECTED);
-
-                  setLoading(false);
-                  handleModalMessage(true, {
-                    title: 'Sucesso',
-                    message: ['Integração realizada com sucesso!'],
-                    type: 'success',
-                  });
-
-                  return;
-                }
-
-                // FIXME: assim que o Daniel ajustar o back retornar o comportamento de sem conexão
-                // setConnectionStatus(IntegrationStatus.DISCONNECTED);
-                // setLoading(false);
-                // handleModalMessage(true, {
-                //   title: 'Sem conexão!',
-                //   message: [
-                //     'A integração foi cadastrada com sucesso.\nPorém a conexão com a plataforma não pode ser estabelecida.',
-                //   ],
-                //   type: 'other',
-                // });
-
-                setConnectionStatus(IntegrationStatus.CONNECTED);
-                setLoading(false);
-                handleModalMessage(true, {
-                  title: 'Sucesso',
-                  message: [
-                    'Estamos iniciando sua integração.',
-                    'Assim que finalizada seus produtos se encontrarão na aba de Produtos',
-                  ],
-                  type: 'success',
-                });
-              })
-              .catch(err => {
-                // FIXME: assim que o Daniel ajustar o back retornar o comportamento de erro na ativação
-                // console.log(err);
-                // setLoading(false);
-                // handleModalMessage(true, {
-                //   title: 'Erro',
-                //   message: [
-                //     'Erro ao conectar a integração, por favor cheque as informações e tente novamente',
-                //   ],
-                //   type: 'error',
-                // });
-                // setConnectionStatus(IntegrationStatus.UNSET);
-
-                setConnectionStatus(IntegrationStatus.CONNECTED);
-                setLoading(false);
-                handleModalMessage(true, {
-                  title: 'Sucesso',
-                  message: [
-                    'Estamos iniciando sua integração.',
-                    'Assim que finalizada seus produtos se encontrarão na aba de Produtos',
-                  ],
-                  type: 'success',
-                });
-              });
+          setLoading(false);
+          handleModalMessage(true, {
+            title: 'Sucesso',
+            message: [
+              'Estamos iniciando sua integração.',
+              'Assim que finalizada seus produtos se encontrarão na aba de Produtos',
+            ],
+            type: 'success',
+          });
         })
         .catch(err => {
           console.log(err);
