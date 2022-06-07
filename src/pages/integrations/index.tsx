@@ -153,7 +153,7 @@ const Integrations: React.FC = () => {
 
         attrs = [
           {
-            name: 'apiKey',
+            name: 'api_key',
             type: 'text',
           },
         ];
@@ -164,14 +164,14 @@ const Integrations: React.FC = () => {
 
         attrs = [
           {
-            name: 'apiKey',
+            name: 'api_key',
             type: 'text',
           },
         ];
         break;
 
       case 'eccosys':
-        setTitle('Eccoys');
+        setTitle('Eccosys');
 
         attrs = [
           {
@@ -179,34 +179,34 @@ const Integrations: React.FC = () => {
             type: 'url',
           },
           {
-            name: 'apiKey',
+            name: 'api_key',
             type: 'text',
           },
           {
-            name: 'secret',
+            name: 'secret_key',
             type: 'text',
           },
           {
-            name: 'ecommerceUrl',
+            name: 'store_url',
             type: 'url',
           },
         ];
         break;
 
-      case 'idealaware':
-        setTitle('IdealaWare');
+      case 'idealeware':
+        setTitle('IdealeWare');
 
         attrs = [
           {
-            name: 'url',
+            name: 'domain',
             type: 'url',
           },
           {
-            name: 'email',
+            name: 'user_email',
             type: 'email',
           },
           {
-            name: 'password',
+            name: 'user_password',
             type: 'text',
           },
         ];
@@ -217,7 +217,7 @@ const Integrations: React.FC = () => {
 
         attrs = [
           {
-            name: 'apiUrl',
+            name: 'host',
             type: 'url',
           },
           {
@@ -225,7 +225,7 @@ const Integrations: React.FC = () => {
             type: 'text',
           },
           {
-            name: 'sellerId',
+            name: 'seller_id',
             type: 'text',
           },
         ];
@@ -236,15 +236,15 @@ const Integrations: React.FC = () => {
 
         attrs = [
           {
-            name: 'shopName',
+            name: 'store_name',
             type: 'text',
           },
           {
-            name: 'url',
+            name: 'domain',
             type: 'url',
           },
           {
-            name: 'user',
+            name: 'user_email',
             type: 'text',
           },
           {
@@ -254,32 +254,32 @@ const Integrations: React.FC = () => {
         ];
         break;
 
-      case 'linxc':
+      case 'linx_commerce':
         setTitle('Linx Commerce');
 
         attrs = [
           {
-            name: 'user',
+            name: 'user_name',
             type: 'text',
           },
           {
-            name: 'password',
+            name: 'user_password',
             type: 'text',
           },
         ];
 
         break;
 
-      case 'linxe':
+      case 'linx_emillenium':
         setTitle('Linx eMillenium');
 
         attrs = [
           {
-            name: 'url',
+            name: 'store_url',
             type: 'url',
           },
           {
-            name: 'user',
+            name: 'user_name',
             type: 'text',
           },
           {
@@ -287,47 +287,47 @@ const Integrations: React.FC = () => {
             type: 'text',
           },
           {
-            name: 'eMillenium',
+            name: 'showcase',
             type: 'text',
           },
         ];
 
         break;
 
-      case 'linxo':
+      case 'linx_oms':
         setTitle('Linx OMS');
 
         attrs = [
           {
-            name: 'user',
+            name: 'user_name',
             type: 'text',
           },
           {
-            name: 'password',
+            name: 'user_password',
             type: 'text',
           },
           {
-            name: 'apiUrl',
+            name: 'domain',
             type: 'url',
           },
           {
-            name: 'clientId',
+            name: 'client_id',
             type: 'text',
           },
           {
-            name: 'channelId',
+            name: 'channel_id',
             type: 'text',
           },
         ];
 
         break;
 
-      case 'lojaintegrada':
+      case 'loja_integrada':
         setTitle('Loja Integrada');
 
         attrs = [
           {
-            name: 'apiKey',
+            name: 'api_key',
             type: 'text',
           },
         ];
@@ -339,30 +339,30 @@ const Integrations: React.FC = () => {
 
         attrs = [
           {
-            name: 'url',
+            name: 'url_v1',
             type: 'url',
           },
           {
-            name: 'apiKey',
+            name: 'api_key',
             type: 'text',
           },
           {
-            name: 'userId',
+            name: 'user_id',
             type: 'text',
           },
           {
-            name: 'websiteId',
+            name: 'website_id',
             type: 'text',
           },
           {
-            name: 'storeView',
+            name: 'store_view',
             type: 'text',
           },
         ];
 
         break;
 
-      case 'magento2':
+      case 'magento_2':
         setTitle('Magento2');
 
         attrs = [
@@ -371,7 +371,7 @@ const Integrations: React.FC = () => {
             type: 'text',
           },
           {
-            name: 'url',
+            name: 'domain',
             type: 'url',
           },
         ];
@@ -383,15 +383,11 @@ const Integrations: React.FC = () => {
 
         attrs = [
           {
-            name: 'apiKey',
-            type: 'text',
-          },
-          {
-            name: 'url',
+            name: 'store_domain',
             type: 'url',
           },
           {
-            name: 'adminIdOpenCart',
+            name: 'rest_admin',
             type: 'text',
           },
         ];
@@ -403,19 +399,19 @@ const Integrations: React.FC = () => {
 
         attrs = [
           {
-            name: 'apiKey',
+            name: 'api_key',
             type: 'text',
           },
           {
-            name: 'userId',
+            name: 'user_id',
             type: 'text',
           },
           {
-            name: 'shopId',
+            name: 'store_payload_id',
             type: 'text',
           },
           {
-            name: 'stockId',
+            name: 'store_stock_id',
             type: 'text',
           },
         ];
@@ -431,7 +427,7 @@ const Integrations: React.FC = () => {
             type: 'text',
           },
           {
-            name: 'ecommerceId',
+            name: 'ecommerce_id',
             type: 'text',
           },
         ];
@@ -459,39 +455,39 @@ const Integrations: React.FC = () => {
             type: 'url',
           },
           {
-            name: 'vtexKey',
+            name: 'admin_app_key',
             type: 'text',
           },
           {
-            name: 'vtexToken',
+            name: 'admin_api_token',
             type: 'text',
           },
           {
-            name: 'sellerId',
+            name: 'seller_id',
             type: 'text',
           },
           {
-            name: 'vtexPoliticId',
+            name: 'sales_policy_id',
             type: 'text',
           },
         ];
 
         break;
 
-      case 'woo':
+      case 'woocommerce':
         setTitle('WooCommerce');
 
         attrs = [
           {
-            name: 'url',
+            name: 'store_url',
             type: 'url',
           },
           {
-            name: 'wooCommerceKey',
+            name: 'api_key',
             type: 'text',
           },
           {
-            name: 'wooCommercePasswordConsumer',
+            name: 'secret_key',
             type: 'text',
           },
         ];
@@ -519,59 +515,71 @@ const Integrations: React.FC = () => {
   const integrationFieldLabel = useCallback(
     (integration: string, field: string) => {
       switch (field) {
-        case 'apiKey':
+        case 'api_key':
           return `API Key ${integration}`;
-        case 'secret':
+        case 'secret_key':
           return `Secret ${integration}`;
         case 'token':
           return `Token ${integration}`;
         case 'jwt':
           return `JWT (Token) ${integration}`;
-        case 'sellerId':
-          return `SellerId ${integration} (opcional)`;
-        case 'userId':
+        case 'seller_id':
+          return `SellerId ${integration}`;
+        case 'user_id':
           return `UserId ${integration}`;
-        case 'clientId':
+        case 'client_id':
           return `ClientId ${integration}`;
-        case 'channelId':
+        case 'channel_id':
           return `ChannelId ${integration}`;
-        case 'ecommerceId':
+        case 'ecommerce_id':
           return `EcommerceId ${integration}`;
-        case 'websiteId':
+        case 'website_id':
           return `Identificador do Site (WebsiteId) ${integration}`;
-        case 'storeView':
+        case 'store_view':
           return `Identificador da Vitrine (StoreView) ${integration}`;
-        case 'user':
+        case 'user_name':
           return `Usuário do(a) ${integration}`;
-        case 'email':
+        case 'user_email':
           return `E-mail do(a) ${integration}`;
-        case 'shopName':
+        case 'store_name':
           return `Nome da loja ${integration}`;
+        case 'user_password':
+          return `Senha do(a) ${integration}`;
         case 'password':
           return `Senha do(a) ${integration}`;
         case 'apiUrl':
           return `URL da API ${integration}`;
+        case 'store_url':
+          return `URL da loja ${integration}`;
         case 'url':
           return `URL da loja ${integration}`;
-        case 'shopId':
+        case 'url_v1':
+          return `URL da loja ${integration}`;
+        case 'store_domain':
+          return `URL da loja ${integration}`;
+        case 'domain':
+          return `URL ${integration}`;
+        case 'host':
+          return `URL ${integration}`;
+        case 'store_payload_id':
           return `Id da loja ${integration}`;
-        case 'stockId':
+        case 'store_stock_id':
           return `Id do estoque (stockId) ${integration}`;
-        case 'ecommerceUrl':
+        case 'store_url':
           return `URL do E-Commerce ${integration}`;
-        case 'eMillenium':
+        case 'showcase':
           return `Vitrine da E-Millenium`;
-        case 'adminIdOpenCart':
+        case 'rest_admin':
           return `Admin ID REST da Loja Opencart (Secret Key)`;
         case 'wooCommerceKey':
           return `Consumer Key WooCommerce`;
         case 'wooCommercePasswordConsumer':
           return `Senha do Consumer WooCommerce`;
-        case 'vtexKey':
+        case 'admin_app_key':
           return 'APP Key da Vtex';
-        case 'vtexToken':
+        case 'admin_api_token':
           return 'APP Token da Vtex';
-        case 'vtexPoliticId':
+        case 'sales_policy_id':
           return 'ID da política da Vtex';
       }
 
@@ -583,59 +591,71 @@ const Integrations: React.FC = () => {
   const integrationFieldPlaceholder = useCallback(
     (integration: string, field: string) => {
       switch (field) {
-        case 'apiKey':
+        case 'api_key':
           return `Insira a API Key do(a) ${integration}`;
-        case 'secret':
+        case 'secret_key':
           return `Secret Key de Acesso ${integration}`;
         case 'token':
           return `Token ${integration}`;
         case 'jwt':
           return `Token JWT (Token) para API do(a) ${integration}`;
-        case 'userId':
+        case 'user_id':
           return `Insira o UserId ${integration}`;
-        case 'sellerId':
+        case 'seller_id':
           return `Insira o Seller Id no ${integration}`;
-        case 'clientId':
+        case 'client_id':
           return `Insira o clientId do(a)) ${integration}`;
-        case 'channelId':
+        case 'channel_id':
           return `Insira o channelId do(a) ${integration}`;
-        case 'ecommerceId':
+        case 'ecommerce_id':
           return `Insira o EcommerceId ${integration}`;
-        case 'websiteId':
+        case 'website_id':
           return `Insira o identificador do site (websiteId) ${integration}`;
-        case 'storeView':
+        case 'store_view':
           return `Insira o identificador da Vitrine (storeView) ${integration}`;
-        case 'user':
+        case 'user_name':
           return `Insira o seu usuário do(a) ${integration}`;
-        case 'email':
+        case 'user_email':
           return `Insira o email do(a) ${integration}`;
-        case 'shopName':
+        case 'store_name':
           return `Insira o nome da loja ${integration}`;
+        case 'user_password':
+          return `Insira a Senha do(a) ${integration}`;
         case 'password':
           return `Insira a Senha do(a) ${integration}`;
-        case 'apiUrl':
+        case 'host':
           return `URL da API ${integration}`;
         case 'url':
           return `Insira a URL da loja ${integration}`;
-        case 'shopId':
+        case 'url_v1':
+          return `Insira a URL da loja ${integration}`;
+        case 'store_url':
+          return `Insira a URL da loja ${integration}`;
+        case 'store_domain':
+          return `Insira a URL da loja ${integration}`;
+        case 'domain':
+          return `Insira a URL da loja ${integration}`;
+        case 'host':
+          return `Insira a URL da loja ${integration}`;
+        case 'store_payload_id':
           return `Insira o Id da loja (shopId) ${integration}`;
-        case 'stockId':
+        case 'store_stock_id':
           return `Insira o Id do estoque (stockId) ${integration}`;
-        case 'ecommerceUrl':
+        case 'store_url':
           return `Insira a URL/Dominio do seu ecommerce ${integration}`;
-        case 'eMillenium':
+        case 'showcase':
           return `Insira a vitrine da loja E-millenium`;
-        case 'adminIdOpenCart':
+        case 'rest_admin':
           return `Admin ID REST da Loja Opencart (Secret Key)`;
         case 'wooCommerceKey':
           return `Consumer Key WooCommerce`;
         case 'wooCommercePasswordConsumer':
           return `Senha do Consumer WooCommerce`;
-        case 'vtexKey':
+        case 'admin_app_key':
           return 'Insira o APP Key da Vtex';
-        case 'vtexToken':
+        case 'admin_api_token':
           return 'Insira o APP Token da Vtex';
-        case 'vtexPoliticId':
+        case 'sales_policy_id':
           return 'Insira o ID da política da Vtex';
       }
 
@@ -650,8 +670,8 @@ const Integrations: React.FC = () => {
     if (
       platform === 'bling' ||
       platform === 'bsellser' ||
-      platform === 'eccoys' ||
-      platform === 'lojaintegrada' ||
+      platform === 'eccosys' ||
+      platform === 'loja_integrada' ||
       platform === 'magento' ||
       platform === 'opencart' ||
       platform === 'softvar'
@@ -663,16 +683,16 @@ const Integrations: React.FC = () => {
     }
 
     if (
-      platform === 'eccoys' ||
-      platform === 'idealaware' ||
+      platform === 'eccosys' ||
+      platform === 'idealeware' ||
       platform === 'infracommerce' ||
-      platform === 'linxe' ||
+      platform === 'linx_commerce' ||
       platform === 'magento' ||
-      platform === 'magento2' ||
+      platform === 'magento_2' ||
       platform === 'opencart' ||
       platform === 'tray' ||
       platform === 'vtex' ||
-      platform === 'woo'
+      platform === 'woocommerce'
     ) {
       validationSchema = {
         ...validationSchema,
@@ -687,8 +707,8 @@ const Integrations: React.FC = () => {
     if (platform === 'eccoys') {
       validationSchema = {
         ...validationSchema,
-        secret: Yup.string().required('Campo obrigatório'),
-        ecommerceUrl: Yup.string()
+        secret_key: Yup.string().required('Campo obrigatório'),
+        store_url: Yup.string()
           .url(
             'Deve ser informada uma url válida (Ex.: https://www.url.com.br)',
           )
@@ -696,17 +716,17 @@ const Integrations: React.FC = () => {
       };
     }
 
-    if (platform === 'idealaware') {
+    if (platform === 'idealeware') {
       validationSchema = {
         ...validationSchema,
-        email: Yup.string().email().required('Campo obrigatório'),
+        user_email: Yup.string().email().required('Campo obrigatório'),
       };
     }
 
     if (platform === 'ihub' || platform === 'linxo') {
       validationSchema = {
         ...validationSchema,
-        apiUrl: Yup.string()
+        host: Yup.string()
           .url(
             'Deve ser informada uma url válida (Ex.: https://www.url.com.br)',
           )
@@ -718,66 +738,66 @@ const Integrations: React.FC = () => {
       validationSchema = {
         ...validationSchema,
         jwt: Yup.string().required('Campo obrigatório'),
-        sellerId: Yup.string(),
+        seller_id: Yup.string(),
       };
     }
 
     if (
       platform === 'infracommerce' ||
-      platform === 'idealaware' ||
-      platform === 'linxc' ||
-      platform === 'linxe' ||
-      platform === 'linxo'
+      platform === 'idealeware' ||
+      platform === 'linx_commerce' ||
+      platform === 'linx_emillenium' ||
+      platform === 'linx_oms'
     ) {
       validationSchema = {
         ...validationSchema,
-        user: Yup.string().required('Campo obrigatório'),
-        password: Yup.string().required('Campo obrigatório'),
+        user_name: Yup.string().required('Campo obrigatório'),
+        user_password: Yup.string().required('Campo obrigatório'),
       };
     }
 
     if (platform === 'softvar') {
       validationSchema = {
         ...validationSchema,
-        shopId: Yup.string().required('Campo obrigatório'),
-        stockId: Yup.string().required('Campo obrigatório'),
+        store_payload_id: Yup.string().required('Campo obrigatório'),
+        store_stock_id: Yup.string().required('Campo obrigatório'),
       };
     }
 
     if (platform === 'infracommerce') {
       validationSchema = {
         ...validationSchema,
-        shopName: Yup.string().required('Campo obrigatório'),
+        store_name: Yup.string().required('Campo obrigatório'),
       };
     }
 
-    if (platform === 'linxe') {
+    if (platform === 'linx_emillenium') {
       validationSchema = {
         ...validationSchema,
-        eMillenium: Yup.string().required('Campo obrigatório'),
+        showcase: Yup.string().required('Campo obrigatório'),
       };
     }
 
     if (platform === 'linxo') {
       validationSchema = {
         ...validationSchema,
-        clientId: Yup.string().required('Campo obrigatório'),
-        channelId: Yup.string().required('Campo obrigatório'),
+        client_id: Yup.string().required('Campo obrigatório'),
+        channel_id: Yup.string().required('Campo obrigatório'),
       };
     }
 
     if (platform === 'magento' || platform === 'softvar') {
       validationSchema = {
         ...validationSchema,
-        userId: Yup.string().required('Campo obrigatório'),
+        user_id: Yup.string().required('Campo obrigatório'),
       };
     }
 
     if (platform === 'magento') {
       validationSchema = {
         ...validationSchema,
-        websiteId: Yup.string().required('Campo obrigatório'),
-        storeView: Yup.string().required('Campo obrigatório'),
+        website_id: Yup.string().required('Campo obrigatório'),
+        store_view: Yup.string().required('Campo obrigatório'),
       };
     }
 
@@ -791,32 +811,32 @@ const Integrations: React.FC = () => {
     if (platform === 'opencart') {
       validationSchema = {
         ...validationSchema,
-        adminIdOpenCart: Yup.string().required('Campo obrigatório'),
+        rest_admin: Yup.string().required('Campo obrigatório'),
       };
     }
 
     if (platform === 'tiny') {
       validationSchema = {
         ...validationSchema,
-        ecommerceId: Yup.string(),
+        ecommerce_id: Yup.string(),
       };
     }
 
     if (platform === 'vtex') {
       validationSchema = {
         ...validationSchema,
-        vtexKey: Yup.string().required('Campo obrigatório'),
-        vtexToken: Yup.string().required('Campo obrigatório'),
-        sellerId: Yup.string().required('Campo obrigatório'),
-        vtexPoliticId: Yup.string().required('Campo obrigatório'),
+        admin_app_key: Yup.string().required('Campo obrigatório'),
+        admin_api_token: Yup.string().required('Campo obrigatório'),
+        seller_id: Yup.string().required('Campo obrigatório'),
+        sales_policy_id: Yup.string().required('Campo obrigatório'),
       };
     }
 
-    if (platform === 'woo') {
+    if (platform === 'woocommerce') {
       validationSchema = {
         ...validationSchema,
-        wooCommerceKey: Yup.string().required('Campo obrigatório'),
-        wooCommercePasswordConsumer: Yup.string().required('Campo obrigatório'),
+        api_key: Yup.string().required('Campo obrigatório'),
+        secret_key: Yup.string().required('Campo obrigatório'),
       };
     }
 

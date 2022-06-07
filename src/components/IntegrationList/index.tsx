@@ -34,7 +34,7 @@ const IntegrationList: React.FC<IntegrationListProps> = ({
         <span>
           {
             items[items.findIndex(item => item.value === selectedItem.value)]
-              .text
+              ?.text
           }
         </span>
       </div>

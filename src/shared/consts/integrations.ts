@@ -8,16 +8,16 @@ export const platformItems = [
     value: 'bseller',
   },
   {
-    text: 'Eccoys',
+    text: 'Eccosys',
     value: 'eccosys',
   },
   {
-    text: 'IdealaWare',
-    value: 'idealaware',
+    text: 'IdealeWare',
+    value: 'idealeware',
   },
   {
     text: 'IHub',
-    value: 'iHub',
+    value: 'ihub',
   },
   {
     text: 'Infra.commerce',
@@ -25,19 +25,19 @@ export const platformItems = [
   },
   {
     text: 'Linx Commerce',
-    value: 'linxc',
+    value: 'linx_commerce',
   },
   {
     text: 'Linx eMillenium',
-    value: 'linxe',
+    value: 'linx_emillenium',
   },
   {
     text: 'Linx OMS',
-    value: 'linxo',
+    value: 'linx_oms',
   },
   {
     text: 'Loja Integrada',
-    value: 'lojaintegrada',
+    value: 'loja_integrada',
   },
   {
     text: 'Magento',
@@ -45,7 +45,7 @@ export const platformItems = [
   },
   {
     text: 'Magento2',
-    value: 'magento2',
+    value: 'magento_2',
   },
   {
     text: 'Opencart',
@@ -69,6 +69,6 @@ export const platformItems = [
   },
   {
     text: 'WooCommerce',
-    value: 'woo',
+    value: 'woocommerce',
   },
 ];
