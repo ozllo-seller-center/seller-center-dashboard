@@ -283,6 +283,7 @@ const Sells: React.FC = () => {
             order.status.status !== 'Delivered' &&
             order.status.status !== 'Completed' &&
             order.status.status !== 'Canceled' &&
+            order.status.status !== 'Pending' &&
             !!order.payment.paymentDate &&
             getDaysToShip(order.payment.paymentDate) < 0
           ) {
@@ -647,6 +648,7 @@ const Sells: React.FC = () => {
                     item.order.status.status !== 'Delivered' &&
                     item.order.status.status !== 'Completed' &&
                     item.order.status.status !== 'Canceled' &&
+                    item.order.status.status !== 'Pending' &&
                     !!item.order.payment.paymentDate &&
                     getDaysToShip(item.order.payment.paymentDate) <= 2 ? (
                       <div className={styles.shippmentWarning}>
@@ -918,7 +920,7 @@ const Sells: React.FC = () => {
               <span>Último dia p/ despachar</span>
             )}
             {getDaysToShip(tooltipItem.payment.paymentDate) < 0 && (
-              <span>Despache atrasado!</span>
+              <span>Despacho atrasado!</span>
             )}
           </div>
         </HoverTooltip>
