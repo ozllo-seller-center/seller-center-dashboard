@@ -9,7 +9,7 @@ export const platformItems = [
   },
   {
     text: 'Eccoys',
-    value: 'eccoys',
+    value: 'eccosys',
   },
   {
     text: 'IdealaWare',

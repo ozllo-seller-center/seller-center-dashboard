@@ -167,7 +167,7 @@ const Integrations: React.FC = () => {
         ];
         break;
 
-      case 'eccoys':
+      case 'eccosys':
         setTitle('Eccoys');
 
         attrs = [
