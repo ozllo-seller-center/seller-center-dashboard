@@ -908,12 +908,6 @@ const Integrations: React.FC = () => {
   return (
     <>
       <div className={styles.container}>
-        {/* <div className={styles.header}>
-          <div>
-            <HeaderDropdown items={platformItems} setActiveItem={setPlatform} />
-          </div>
-        </div> */}
-        {/* <div className={styles.divider} /> */}
         <IntegrationList
           items={platformItems}
           setActiveItem={setPlatform}
