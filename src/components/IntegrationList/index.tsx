@@ -3,6 +3,7 @@ import React, {
   HTMLAttributes,
   LiHTMLAttributes,
   useCallback,
+  useEffect,
   useState,
 } from 'react';
 
@@ -16,7 +17,7 @@ type Item = {
 interface IntegrationListProps {
   items: Item[];
   setActiveItem: React.Dispatch<any>;
-  defaultItem?: Item;
+  defaultItem?: string;
 }
 
 const IntegrationList: React.FC<IntegrationListProps> = ({
@@ -24,9 +25,11 @@ const IntegrationList: React.FC<IntegrationListProps> = ({
   setActiveItem,
   defaultItem,
 }) => {
-  const [selectedItem, setSelectedItem] = useState(
-    !defaultItem ? items[0] : defaultItem,
-  );
+  const [selectedItem, setSelectedItem] = useState(items[0]);
+
+  useEffect(() => {
+    setSelectedItem(items.find(item => item.value === defaultItem) || items[0]);
+  }, [defaultItem, items]);
 
   return (
     <div className={styles.container}>

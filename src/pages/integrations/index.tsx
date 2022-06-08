@@ -914,7 +914,11 @@ const Integrations: React.FC = () => {
           </div>
         </div> */}
         {/* <div className={styles.divider} /> */}
-        <IntegrationList items={platformItems} setActiveItem={setPlatform} />
+        <IntegrationList
+          items={platformItems}
+          setActiveItem={setPlatform}
+          defaultItem={savedInfo?.name}
+        />
         <div className={styles.divider} />
         <div className={styles.content}>
           {tutorialLink && (
