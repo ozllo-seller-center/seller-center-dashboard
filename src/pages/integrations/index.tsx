@@ -934,50 +934,6 @@ const Integrations: React.FC = () => {
             {attributes.map((attribute, i) => {
               if (attribute) {
                 const label = integrationFieldLabel(title, attribute.name);
-
-                if (attribute.type === 'email')
-                  return (
-                    <Input
-                      key={i}
-                      name={attribute.name}
-                      label={label}
-                      autoComplete="off"
-                      placeholder={integrationFieldPlaceholder(
-                        title,
-                        attribute.name,
-                      )}
-                    />
-                  );
-
-                if (attribute.type === 'url')
-                  return (
-                    <Input
-                      key={i}
-                      name={attribute.name}
-                      label={label}
-                      autoComplete="off"
-                      placeholder={integrationFieldPlaceholder(
-                        title,
-                        attribute.name,
-                      )}
-                    />
-                  );
-
-                if (attribute.type === 'password')
-                  return (
-                    <Input
-                      key={i}
-                      name={attribute.name}
-                      label={label}
-                      autoComplete="off"
-                      type="password"
-                      placeholder={integrationFieldPlaceholder(
-                        title,
-                        attribute.name,
-                      )}
-                    />
-                  );
-
                 return (
                   <Input
                     key={i}
