@@ -1015,8 +1015,8 @@ export function EditProductForm() {
             />
             <p>
               {' '}
-              *Obrigatório: 1 foto de capa fundo branco/neutro + 3 imagens ângulos
-              diferentes +1 foto próximo ao corpo + 1 tabela de medidas
+              *Obrigatório: 1 foto de capa fundo branco/neutro + 3 imagens
+              ângulos diferentes +1 foto próximo ao corpo + 1 tabela de medidas
             </p>
             <p>
               *Observação: todas as fotos serão redimensionadas automaticamente
@@ -1039,8 +1039,8 @@ export function EditProductForm() {
               />
             </div>
             <p>
-              *Obrigatório: Nome do produto + Principais Características + Cor/Sabor
-              + Marca
+              *Obrigatório: Nome do produto + Principais Características +
+              Cor/Sabor + Marca
             </p>
             <p>
               *Limite: <b>100</b> caracteres.
@@ -1056,8 +1056,9 @@ export function EditProductForm() {
               />
               <p>
                 {' '}
-                *Obrigatório: detalhes do produto + Nome da marca + Funcionalidades e
-                como usar o produto + Composição + Medidas + Validade
+                *Obrigatório: detalhes do produto + Nome da marca +
+                Funcionalidades e como usar o produto + Composição + Medidas +
+                Validade
               </p>
               <p>
                 *Limite: <b>1800</b> caracteres.

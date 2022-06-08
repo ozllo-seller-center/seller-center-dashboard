@@ -565,8 +565,6 @@ const Integrations: React.FC = () => {
           return `Id da loja ${integration}`;
         case 'store_stock_id':
           return `Id do estoque (stockId) ${integration}`;
-        case 'store_url':
-          return `URL do E-Commerce ${integration}`;
         case 'showcase':
           return `Vitrine da E-Millenium`;
         case 'rest_admin':
@@ -623,8 +621,6 @@ const Integrations: React.FC = () => {
           return `Insira a Senha do(a) ${integration}`;
         case 'password':
           return `Insira a Senha do(a) ${integration}`;
-        case 'host':
-          return `URL da API ${integration}`;
         case 'url':
           return `Insira a URL da loja ${integration}`;
         case 'url_v1':
@@ -641,8 +637,6 @@ const Integrations: React.FC = () => {
           return `Insira o Id da loja (shopId) ${integration}`;
         case 'store_stock_id':
           return `Insira o Id do estoque (stockId) ${integration}`;
-        case 'store_url':
-          return `Insira a URL/Dominio do seu ecommerce ${integration}`;
         case 'showcase':
           return `Insira a vitrine da loja E-millenium`;
         case 'rest_admin':
