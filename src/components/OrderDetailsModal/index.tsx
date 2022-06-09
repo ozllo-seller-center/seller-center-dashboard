@@ -179,7 +179,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
               <div className={styles.column}>
                 <strong className={styles.subTitle}>Dados do envio</strong>
                 <strong>Prestador</strong>
-                <span>{order.shipping.provider.toLocaleLowerCase()}</span>
+                <span>{order.shipping.provider?.toLocaleLowerCase()}</span>
                 <strong>Serviço</strong>
                 <span>{order.shipping.service}</span>
                 <strong>Responsável</strong>
