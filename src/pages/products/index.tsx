@@ -1,3 +1,4 @@
+import Pagination from '@mui/material/Pagination';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { useRouter } from 'next/router';
@@ -47,6 +48,11 @@ const Products: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const [error, setError] = useState('');
 
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(50);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -88,33 +94,16 @@ const Products: React.FC = () => {
       setLoading(true);
 
       api
-        .get('/product', {
+        .get(`/product?page=${page}&limit=${limit}`, {
           headers: {
             authorization: token,
             shop_id: user.shopInfo._id,
           },
         })
         .then(response => {
-          let productsDto = response.data as Product[];
-
-          productsDto = productsDto.map(product => {
-            let stockCount = 0;
-
-            if (product.variations) {
-              product.variations.forEach(variation => {
-                stockCount += Number(variation.stock);
-              });
-            }
-
-            product.stock = stockCount;
-            product.checked = false;
-
-            return product;
-          });
-
-          setProducts(productsDto);
-          setItems(productsDto);
-
+          formatProducts(response.data.products);
+          setTotalPages(Math.ceil(response.data.total / limit));
+          setTotalItems(response.data.total);
           setLoading(false);
         })
         .catch(err => {
@@ -126,6 +115,29 @@ const Products: React.FC = () => {
         });
     }
   }, [setLoading, token, user]);
+
+  const formatProducts = useCallback(
+    (products: Product[]) => {
+      const productsDto = products.map(product => {
+        let stockCount = 0;
+
+        if (product.variations) {
+          product.variations.forEach(variation => {
+            stockCount += Number(variation.stock);
+          });
+        }
+
+        product.stock = stockCount;
+        product.checked = false;
+
+        return product;
+      });
+
+      setProducts(productsDto);
+      setItems(productsDto);
+    },
+    [setProducts, setItems],
+  );
 
   const handleSubmit = useCallback(
     async (data: SearchFormData) => {
@@ -227,26 +239,7 @@ const Products: React.FC = () => {
         },
       })
       .then(response => {
-        let productsDto = response.data as Product[];
-
-        productsDto = productsDto.map(product => {
-          let stockCount = 0;
-
-          if (product.variations) {
-            product.variations.forEach(variation => {
-              stockCount += Number(variation.stock);
-            });
-          }
-
-          product.stock = stockCount;
-          product.checked = false;
-
-          return product;
-        });
-
-        setProducts(productsDto);
-        setItems(productsDto);
-
+        formatProducts(response.data.products);
         setLoading(false);
       })
       .catch(err => {
@@ -271,7 +264,7 @@ const Products: React.FC = () => {
               shop_id: user.shopInfo._id,
             },
           })
-          .then(response => {
+          .then(() => {
             console.log('produto deletado');
           })
           .catch(err => {
@@ -321,6 +314,31 @@ const Products: React.FC = () => {
   const handleActionModalVisibility = useCallback(() => {
     setIsModalOpen(false);
   }, [isModalOpen]);
+
+  const handleChangePage = async (event: any, page: number) => {
+    setLoading(true);
+    setPage(page);
+
+    try {
+      const products = await api.get(`/product?page=${page}&limit=${limit}`, {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        },
+      });
+      formatProducts(products.data.products);
+      setTotalPages(Math.ceil(products.data.total / limit));
+      setTotalItems(products.data.total);
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+    }
+  };
+
+  // useEffect(() => {
+  //   handleChangePage(null, 1);
+  // }, [limit]);
 
   return (
     <>
@@ -420,6 +438,41 @@ const Products: React.FC = () => {
                     />
                   ))}
                 </tbody>
+                {limit < totalItems && (
+                  <tfoot className={styles.tableFoot}>
+                    <tr>
+                      <td colSpan={9}>
+                        <div className={styles.counter}>
+                          {/* Total de produtos: {totalItems} */}
+                          {/* Mostrar
+                        <input
+                          type="number"
+                          size={2}
+                          value={limit}
+                          onChange={e =>
+                            setLimit(
+                              Number(
+                                Math.max(
+                                  1,
+                                  Math.min(limit, Number(e.target.value)),
+                                ),
+                              ),
+                            )
+                          }
+                          maxLength={2}
+                        />{' '}
+                        por página. */}
+                        </div>
+                        <Pagination
+                          count={totalPages}
+                          page={page}
+                          shape="rounded"
+                          onChange={handleChangePage}
+                        />
+                      </td>
+                    </tr>
+                  </tfoot>
+                )}
               </table>
             ) : (
               <span className={styles.emptyList}>

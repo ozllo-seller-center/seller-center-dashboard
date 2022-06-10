@@ -130,6 +130,22 @@
           padding: 0 0.5rem;
           background-color: var(--white);
         }
+
+        .tableFoot {
+          flex: 1;
+
+          td {
+            padding: 0.5rem 0.5rem;
+            font-size: 0.8rem;
+          }
+
+          td:first-child {
+            text-align: center;
+            align-items: center;
+            justify-self: center;
+          }
+
+        }
       }
     }
   }
@@ -277,5 +293,22 @@
     height: 5rem;
 
     margin-bottom: 2rem;
+  }
+}
+
+.pagination {
+  margin-top: 1em;
+}
+
+.counter {
+  float: right;
+  font-size: 0.85rem;
+  input {
+    width: 3ch;
+    text-align: center;
+    padding: 3px 0;
+    background: #ede8e8;
+    border: none;
+    margin: 0;
   }
 }
