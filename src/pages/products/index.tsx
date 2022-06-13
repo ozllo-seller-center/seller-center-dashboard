@@ -1,4 +1,4 @@
-import Pagination from '@mui/material/Pagination';
+import TablePagination from '@material-ui/core/TablePagination/TablePagination';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { useRouter } from 'next/router';
@@ -48,10 +48,9 @@ const Products: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const [error, setError] = useState('');
 
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(50);
-  const [totalPages, setTotalPages] = useState(0);
+  const [page, setPage] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(50);
 
   const router = useRouter();
 
@@ -94,7 +93,7 @@ const Products: React.FC = () => {
       setLoading(true);
 
       api
-        .get(`/product?page=${page}&limit=${limit}`, {
+        .get(`/product?page=${page}&limit=${rowsPerPage}`, {
           headers: {
             authorization: token,
             shop_id: user.shopInfo._id,
@@ -102,7 +101,6 @@ const Products: React.FC = () => {
         })
         .then(response => {
           formatProducts(response.data.products);
-          setTotalPages(Math.ceil(response.data.total / limit));
           setTotalItems(response.data.total);
           setLoading(false);
         })
@@ -315,30 +313,51 @@ const Products: React.FC = () => {
     setIsModalOpen(false);
   }, [isModalOpen]);
 
-  const handleChangePage = async (event: any, page: number) => {
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number,
+  ) => {
     setLoading(true);
-    setPage(page);
-
-    try {
-      const products = await api.get(`/product?page=${page}&limit=${limit}`, {
+    api
+      .get(`/product?page=${newPage + 1}&limit=${rowsPerPage}`, {
         headers: {
           authorization: token,
           shop_id: user.shopInfo._id,
         },
+      })
+      .then(response => {
+        setPage(newPage);
+        formatProducts(response.data.products);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.log(err);
+        setLoading(false);
       });
-      formatProducts(products.data.products);
-      setTotalPages(Math.ceil(products.data.total / limit));
-      setTotalItems(products.data.total);
-      setLoading(false);
-    } catch (err) {
-      console.log(err);
-      setLoading(false);
-    }
   };
 
-  // useEffect(() => {
-  //   handleChangePage(null, 1);
-  // }, [limit]);
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setLoading(true);
+    api
+      .get(`/product?page=${page + 1}&limit=${event.target.value}`, {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        },
+      })
+      .then(response => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+        formatProducts(response.data.products);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.log(err);
+        setLoading(false);
+      });
+  };
 
   return (
     <>
@@ -394,6 +413,18 @@ const Products: React.FC = () => {
               </div>
             </div>
           </div>
+          <TablePagination
+            component="div"
+            count={totalItems}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Produtos por página"
+            labelDisplayedRows={({ from, to, count }) =>
+              `${from}-${to} de ${count}`
+            }
+          />
           <div className={styles.tableContainer}>
             {items.length > 0 ? (
               <table className={styles.table}>
@@ -438,41 +469,6 @@ const Products: React.FC = () => {
                     />
                   ))}
                 </tbody>
-                {limit < totalItems && (
-                  <tfoot className={styles.tableFoot}>
-                    <tr>
-                      <td colSpan={9}>
-                        <div className={styles.counter}>
-                          {/* Total de produtos: {totalItems} */}
-                          {/* Mostrar
-                        <input
-                          type="number"
-                          size={2}
-                          value={limit}
-                          onChange={e =>
-                            setLimit(
-                              Number(
-                                Math.max(
-                                  1,
-                                  Math.min(limit, Number(e.target.value)),
-                                ),
-                              ),
-                            )
-                          }
-                          maxLength={2}
-                        />{' '}
-                        por página. */}
-                        </div>
-                        <Pagination
-                          count={totalPages}
-                          page={page}
-                          shape="rounded"
-                          onChange={handleChangePage}
-                        />
-                      </td>
-                    </tr>
-                  </tfoot>
-                )}
               </table>
             ) : (
               <span className={styles.emptyList}>
@@ -481,6 +477,20 @@ const Products: React.FC = () => {
               </span>
             )}
           </div>
+          {rowsPerPage < totalItems && (
+            <TablePagination
+              component="div"
+              count={totalItems}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              labelRowsPerPage="Produtos por página"
+              labelDisplayedRows={({ from, to, count }) =>
+                `${from}-${to} de ${count}`
+              }
+            />
+          )}
         </div>
       </div>
       {isLoading && (
