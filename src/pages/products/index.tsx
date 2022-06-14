@@ -288,12 +288,15 @@ const Products: React.FC = () => {
   ) => {
     setLoading(true);
     api
-      .get(`/product?page=${newPage + 1}&limit=${rowsPerPage}`, {
-        headers: {
-          authorization: token,
-          shop_id: user.shopInfo._id,
+      .get(
+        `/product?page=${newPage + 1}&limit=${rowsPerPage}&search=${search}`,
+        {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          },
         },
-      })
+      )
       .then(response => {
         setPage(newPage);
         formatProducts(response.data.products);
