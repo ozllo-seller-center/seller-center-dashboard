@@ -3,10 +3,11 @@ import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FiCheck, FiSearch, FiX } from 'react-icons/fi';
+import { FiCheck, FiChevronLeft, FiSearch, FiX } from 'react-icons/fi';
 import Loader from 'src/components/Loader';
 import MessageModal from 'src/components/MessageModal';
 import ActionModal from 'src/components/ModalAction';
+import Button from 'src/components/PrimaryButton';
 import ProductTableItem from 'src/components/ProductTableItem';
 import { useAuth } from 'src/hooks/auth';
 import { useLoading } from 'src/hooks/loading';
@@ -26,7 +27,6 @@ interface SearchFormData {
 const Products: React.FC = () => {
   const [products, setProducts] = useState([] as Product[]);
   const [items, setItems] = useState([] as Product[]);
-  const [search, setSeacrh] = useState('');
 
   const [disabledActions, setDisableActions] = useState(false);
 
@@ -39,18 +39,17 @@ const Products: React.FC = () => {
 
   const { token, user, updateUser } = useAuth();
   const [checked, setChecked] = useState(false);
-  const [checkedState, setCheckedState] = useState(false);
 
   const [isDisabledAcoes, setIsDisabledAcoes] = React.useState(true);
   const [valorAcoes, setValorAcoes] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const formRef = useRef<FormHandles>(null);
-  const [error, setError] = useState('');
 
   const [page, setPage] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(50);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [search, setSearch] = useState('');
 
   const router = useRouter();
 
@@ -74,26 +73,11 @@ const Products: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
-
-    setItems(
-      products.filter(
-        product =>
-          // !!product.name &&
-          search === '' ||
-          product.name.toLowerCase().includes(search.toLowerCase()),
-      ),
-    );
-
-    setLoading(false);
-  }, [search, products, setLoading]);
-
-  useEffect(() => {
     if (user) {
       setLoading(true);
 
       api
-        .get(`/product?page=${page}&limit=${rowsPerPage}`, {
+        .get(`/product?page=${page + 1}&limit=${rowsPerPage}`, {
           headers: {
             authorization: token,
             shop_id: user.shopInfo._id,
@@ -135,21 +119,6 @@ const Products: React.FC = () => {
       setItems(productsDto);
     },
     [setProducts, setItems],
-  );
-
-  const handleSubmit = useCallback(
-    async (data: SearchFormData) => {
-      try {
-        formRef.current?.setErrors({});
-
-        if (data.search !== search) {
-          setSeacrh(data.search);
-        }
-      } catch (err) {
-        setError('Ocorreu um erro ao fazer login, cheque as credenciais.');
-      }
-    },
-    [search],
   );
 
   const handleModalVisibility = useCallback(() => {
@@ -341,16 +310,57 @@ const Products: React.FC = () => {
   ) => {
     setLoading(true);
     api
-      .get(`/product?page=${page + 1}&limit=${event.target.value}`, {
-        headers: {
-          authorization: token,
-          shop_id: user.shopInfo._id,
+      .get(
+        `/product?page=${page}&limit=${event.target.value}&search=${search}`,
+        {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          },
         },
-      })
+      )
       .then(response => {
-        setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
-        formatProducts(response.data.products);
+        if (response.status === 200) {
+          setRowsPerPage(parseInt(event.target.value, 10));
+          formatProducts(response.data.products);
+          setTotalItems(response.data.total);
+        } else {
+          setProducts([]);
+          setTotalItems(0);
+          setItems([]);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.log(err);
+        setLoading(false);
+      });
+  };
+
+  const handleSubmit = (event: any) => {
+    setLoading(true);
+    setSearch(event.search);
+    api
+      .get(
+        `/product?page=${page}&limit=${rowsPerPage}&search=${event.search}`,
+        {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          },
+        },
+      )
+      .then(response => {
+        setPage(0);
+        if (response.status === 200) {
+          formatProducts(response.data.products);
+          setTotalItems(response.data.total);
+        } else {
+          setProducts([]);
+          setTotalItems(0);
+          setItems([]);
+        }
         setLoading(false);
       })
       .catch(err => {
@@ -474,6 +484,23 @@ const Products: React.FC = () => {
               <span className={styles.emptyList}>
                 {' '}
                 Nenhum item foi encontrado{' '}
+                {search && <span>para "{search}"</span>}
+                {search && (
+                  <span className={styles.back}>
+                    <Button
+                      onClick={() => {
+                        setSearch('');
+                        formRef.current?.reset();
+                        handleSubmit({ search: '' });
+                      }}
+                      type="button"
+                      icon={FiChevronLeft}
+                      className={styles.backButton}
+                    >
+                      Voltar
+                    </Button>
+                  </span>
+                )}
               </span>
             )}
           </div>

@@ -295,3 +295,46 @@
     margin-bottom: 2rem;
   }
 }
+
+.backButton {
+  display: flex;
+  align-items: center;
+
+  border: 1.25px var(--grafite) solid;
+  border-radius: 4px;
+  background-color: transparent;
+
+  padding: 0.25rem 0;
+  padding-right: 0.5rem;
+  padding-left: 0.1rem;
+
+  transition: color 0.2s, border-color 0.2s;
+
+  > svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--grafite);
+
+    margin-right: 0.25rem;
+
+    transition: color 0.2s;
+  }
+
+  &:hover {
+    border-color: var(--yellow-300);
+    color: var(--yellow-300);
+
+    > svg {
+      color: var(--yellow-300);
+    }
+  }
+}
+
+.back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  button {
+    margin-top: 0.9rem;
+  }
+}
