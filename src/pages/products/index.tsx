@@ -48,7 +48,7 @@ const Products: React.FC = () => {
 
   const [page, setPage] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = React.useState(50);
   const [search, setSearch] = useState('');
 
   const router = useRouter();
@@ -484,7 +484,13 @@ const Products: React.FC = () => {
               <span className={styles.emptyList}>
                 {' '}
                 Nenhum item foi encontrado{' '}
-                {search && <span>para "{search}"</span>}
+                {search && (
+                  <span>
+                    para {'"'}
+                    {search}
+                    {'"'}
+                  </span>
+                )}
                 {search && (
                   <span className={styles.back}>
                     <Button
