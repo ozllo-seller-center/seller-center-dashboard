@@ -59,7 +59,6 @@ const Products: React.FC = () => {
           shopInfo: { ...user.shopInfo, _id: response.data.shopInfo._id },
         });
         setLoading(false);
-        // return response.data as User;
       })
       .catch(err => {
         // eslint-disable-next-line no-console
@@ -136,10 +135,6 @@ const Products: React.FC = () => {
 
   const handleCheckboxChange = useCallback(
     async (id: any) => {
-      // const index = products.findIndex(product => product._id === id);
-      // const updateProducts = [...products];
-      // updateProducts[index].checked = !updateProducts[position].checked;
-
       const indexItem = items.findIndex(item => item._id === id);
       const updateItems = [...items];
 
@@ -159,8 +154,6 @@ const Products: React.FC = () => {
         }
       });
       setIsDisabledAcoes(isChecked);
-
-      // setProducts(updateProducts);
       setItems(updateItems);
     },
     [items],
