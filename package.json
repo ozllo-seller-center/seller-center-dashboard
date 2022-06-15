@@ -35,7 +35,7 @@
     "dotenv": "^9.0.0",
     "jsonwebtoken": "^8.5.1",
     "jwt-decode": "^3.1.2",
-    "next": "11.1.2",
+    "next": "^11.1.4",
     "next-iron-session": "^4.1.12",
     "react": "^17.0.2",
     "react-datepicker": "^3.7.0",
