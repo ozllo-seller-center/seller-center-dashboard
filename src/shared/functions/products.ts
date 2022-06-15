@@ -1,7 +1,4 @@
-import Categories from 'src/shared/enums/Categories';
 import Genres from 'src/shared/enums/Genres';
-import Nationalities from 'src/shared/enums/Nationalities';
-import { Subcategories } from 'src/shared/enums/Subcategories';
 import { Variation } from '../types/product';
 
 export const getGender = (produto: any) => {
@@ -15,13 +12,6 @@ export const getGender = (produto: any) => {
     return Genres.U;
   }
   return '';
-};
-
-export const getCategory = (produto: any) => {
-  const nacionalidade = Nationalities[produto.nationality] || '';
-  const categoria = Categories[produto.category] || '';
-  const subCategoria = Subcategories[produto.subcategory] || '';
-  return `${nacionalidade} > ${categoria} > ${subCategoria}`;
 };
 
 export const getImages = (images: any) => {
@@ -48,8 +38,8 @@ export const getImagesHeader = () => {
 
 export const getVariations = (produto: any) => {
   const { variations } = produto;
-  return variations.map((variacao: Variation, index: number) => ({
-    Categoria: getCategory(produto),
+  return variations.map((variacao: Variation) => ({
+    Categoria: [produto.nationality, produto.category, produto.subcategory],
     Nome_do_Produto: produto.name,
     Marca: produto.brand,
     Id_agupador: variacao._id ? variacao._id : '',

@@ -13,6 +13,7 @@ import { useAuth } from 'src/hooks/auth';
 import { useLoading } from 'src/hooks/loading';
 import { useModalMessage } from 'src/hooks/message';
 import api from 'src/services/api';
+import Nationalities from 'src/shared/enums/Nationalities';
 import { getHeader, getVariations } from 'src/shared/functions/products';
 import { ProductSummary as Product } from 'src/shared/types/product';
 import XLSX from 'xlsx';
@@ -169,12 +170,40 @@ const Products: React.FC = () => {
     return produtosCSV;
   }, [items]);
 
-  const exportToCSV = useCallback(() => {
+  const exportToCSV = useCallback(async () => {
     const fileType =
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
     const csvData = getProducts();
 
-    const ws = XLSX.utils.json_to_sheet(csvData);
+    const csvDataFormated: any[] = [];
+
+    const categories = await api.get('/category/all');
+
+    csvData.forEach((produto: any, i: number) => {
+      if (0 === i) return;
+      const nacionalidade = Nationalities[produto.Categoria[0]] || '';
+
+      const categoria =
+        categories.data.length &&
+        categories.data.find(
+          (categoria: any) => categoria.code == produto.Categoria[1],
+        );
+
+      const subCategoria =
+        (categoria &&
+          categoria.subCategories.find(
+            (subCategoria: any) => subCategoria.code == produto.Categoria[2],
+          )?.value) ||
+        '';
+
+      produto.Categoria = `${nacionalidade} > ${
+        categoria?.value || ''
+      } > ${subCategoria}`;
+
+      csvDataFormated.push(produto);
+    });
+
+    const ws = XLSX.utils.json_to_sheet(csvDataFormated);
     const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
     const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const data = new Blob([excelBuffer], { type: fileType });
