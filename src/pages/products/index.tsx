@@ -313,15 +313,12 @@ const Products: React.FC = () => {
   ) => {
     setLoading(true);
     api
-      .get(
-        `/product?page=${page}&limit=${event.target.value}&search=${search}`,
-        {
-          headers: {
-            authorization: token,
-            shop_id: user.shopInfo._id,
-          },
+      .get(`/product?page=1&limit=${event.target.value}&search=${search}`, {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
         },
-      )
+      })
       .then(response => {
         setPage(0);
         if (response.status === 200) {
@@ -346,7 +343,7 @@ const Products: React.FC = () => {
     setSearch(event.search);
     api
       .get(
-        `/product?page=${page}&limit=${rowsPerPage}&search=${event.search}`,
+        `/product?page=1&limit=${rowsPerPage}&search=${event.search}`,
         {
           headers: {
             authorization: token,
