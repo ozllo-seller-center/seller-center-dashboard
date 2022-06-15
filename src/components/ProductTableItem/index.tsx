@@ -3,11 +3,7 @@ import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FiCameraOff, FiEdit } from 'react-icons/fi';
 import api from 'src/services/api';
-import {
-  Product,
-  ProductSummary,
-  Validation_Errors,
-} from 'src/shared/types/product';
+import { Product, ProductSummary } from 'src/shared/types/product';
 import styles from './styles.module.scss';
 import switchStyles from './switch-styles.module.scss';
 
@@ -90,6 +86,7 @@ const ProductTableItem: React.FC<ProductItemProps> = ({
             setIsAvailable(response.data.is_active);
           })
           .catch(err => {
+            // eslint-disable-next-line no-console
             console.log(err);
           });
 
@@ -101,8 +98,6 @@ const ProductTableItem: React.FC<ProductItemProps> = ({
             },
           })
           .then(response => {
-            console.log(response.data as Product);
-
             const product = response.data as Product;
 
             const variations = product.variations.map(v => {
@@ -125,6 +120,7 @@ const ProductTableItem: React.FC<ProductItemProps> = ({
                     },
                   )
                   .catch(err => {
+                    // eslint-disable-next-line no-console
                     console.log(err);
                   });
 
@@ -134,6 +130,7 @@ const ProductTableItem: React.FC<ProductItemProps> = ({
             });
           })
           .catch(err => {
+            // eslint-disable-next-line no-console
             console.log(err);
           });
       }

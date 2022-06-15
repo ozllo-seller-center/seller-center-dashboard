@@ -20,10 +20,6 @@ import BulletedButton from '../../components/BulletedButton';
 import FilterInput from '../../components/FilterInput';
 import styles from './styles.module.scss';
 
-interface SearchFormData {
-  search: string;
-}
-
 const Products: React.FC = () => {
   const [products, setProducts] = useState([] as Product[]);
   const [items, setItems] = useState([] as Product[]);
@@ -66,37 +62,12 @@ const Products: React.FC = () => {
         // return response.data as User;
       })
       .catch(err => {
+        // eslint-disable-next-line no-console
         console.log(err);
         setLoading(false);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (user) {
-      setLoading(true);
-
-      api
-        .get(`/product?page=${page + 1}&limit=${rowsPerPage}`, {
-          headers: {
-            authorization: token,
-            shop_id: user.shopInfo._id,
-          },
-        })
-        .then(response => {
-          formatProducts(response.data.products);
-          setTotalItems(response.data.total);
-          setLoading(false);
-        })
-        .catch(err => {
-          console.log(err);
-          setProducts([]);
-          setItems([]);
-
-          setLoading(false);
-        });
-    }
-  }, [setLoading, token, user]);
 
   const formatProducts = useCallback(
     (products: Product[]) => {
@@ -120,6 +91,33 @@ const Products: React.FC = () => {
     },
     [setProducts, setItems],
   );
+
+  useEffect(() => {
+    if (user) {
+      setLoading(true);
+
+      api
+        .get(`/product?page=${page + 1}&limit=${rowsPerPage}`, {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          },
+        })
+        .then(response => {
+          formatProducts(response.data.products);
+          setTotalItems(response.data.total);
+          setLoading(false);
+        })
+        .catch(err => {
+          // eslint-disable-next-line no-console
+          console.log(err);
+          setProducts([]);
+          setItems([]);
+
+          setLoading(false);
+        });
+    }
+  }, [formatProducts, page, rowsPerPage, setLoading, token, user]);
 
   const handleModalVisibility = useCallback(() => {
     handleModalMessage(false);
@@ -191,7 +189,7 @@ const Products: React.FC = () => {
     const a = document.createElement('a');
     a.download = 'Produtos.xlsx';
     a.href = URL.createObjectURL(data);
-    a.addEventListener('click', e => {
+    a.addEventListener('click', () => {
       setTimeout(() => URL.revokeObjectURL(a.href), 30 * 1000);
     });
     a.click();
@@ -210,13 +208,14 @@ const Products: React.FC = () => {
         setLoading(false);
       })
       .catch(err => {
+        // eslint-disable-next-line no-console
         console.log(err);
         setProducts([]);
         setItems([]);
 
         setLoading(false);
       });
-  }, [products, items]);
+  }, [token, user.shopInfo._id, formatProducts, setLoading]);
 
   const deleteProducts = useCallback(async () => {
     try {
@@ -231,12 +230,10 @@ const Products: React.FC = () => {
               shop_id: user.shopInfo._id,
             },
           })
-          .then(() => {
-            console.log('produto deletado');
-          })
+          .then()
           .catch(err => {
+            // eslint-disable-next-line no-console
             console.log(err);
-
             setLoading(false);
           });
       });
@@ -253,6 +250,7 @@ const Products: React.FC = () => {
         findItems();
       }, 1500);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
       setLoading(false);
     }
@@ -278,10 +276,6 @@ const Products: React.FC = () => {
     }
   }, [exportToCSV, valorAcoes]);
 
-  const handleActionModalVisibility = useCallback(() => {
-    setIsModalOpen(false);
-  }, [isModalOpen]);
-
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number,
@@ -303,6 +297,7 @@ const Products: React.FC = () => {
         setLoading(false);
       })
       .catch(err => {
+        // eslint-disable-next-line no-console
         console.log(err);
         setLoading(false);
       });
@@ -333,6 +328,7 @@ const Products: React.FC = () => {
         setLoading(false);
       })
       .catch(err => {
+        // eslint-disable-next-line no-console
         console.log(err);
         setLoading(false);
       });
@@ -361,6 +357,7 @@ const Products: React.FC = () => {
         setLoading(false);
       })
       .catch(err => {
+        // eslint-disable-next-line no-console
         console.log(err);
         setLoading(false);
       });
@@ -543,7 +540,7 @@ const Products: React.FC = () => {
       )}
       {isModalOpen && (
         <ActionModal
-          handleVisibility={handleActionModalVisibility}
+          handleVisibility={() => setIsModalOpen(false)}
           titulo="Excluir Produto(s)"
           mensagem="Deseja relmente excluir o(s) produto(s) selecionado(s) ?"
           execute={deleteProducts}
