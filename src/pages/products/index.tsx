@@ -342,15 +342,12 @@ const Products: React.FC = () => {
     setLoading(true);
     setSearch(event.search);
     api
-      .get(
-        `/product?page=1&limit=${rowsPerPage}&search=${event.search}`,
-        {
-          headers: {
-            authorization: token,
-            shop_id: user.shopInfo._id,
-          },
+      .get(`/product?page=1&limit=${rowsPerPage}&search=${event.search}`, {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
         },
-      )
+      })
       .then(response => {
         setPage(0);
         if (response.status === 200) {
