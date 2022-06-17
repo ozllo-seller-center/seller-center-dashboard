@@ -27,7 +27,6 @@ interface TrackingModalContentProps {
 const TrackingModalContent: React.FC<TrackingModalContentProps> = ({
   item,
   onTrackSent,
-  closeModal,
 }) => {
   const formRef = useRef<FormHandles>(null);
 
@@ -56,9 +55,12 @@ const TrackingModalContent: React.FC<TrackingModalContentProps> = ({
         setLoading(false);
       })
       .catch(err => {
+        // eslint-disable-next-line no-console
+        console.log(err);
         setLoading(false);
         router.push('/');
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSubmit = useCallback(async data => {
@@ -93,7 +95,7 @@ const TrackingModalContent: React.FC<TrackingModalContentProps> = ({
             shop_id: user.shopInfo._id,
           },
         })
-        .then(reponse => {
+        .then(() => {
           setLoading(false);
 
           setSuccess(true);
@@ -103,6 +105,8 @@ const TrackingModalContent: React.FC<TrackingModalContentProps> = ({
           }
         })
         .catch(err => {
+          // eslint-disable-next-line no-console
+          console.log(err);
           setLoading(false);
 
           handleModalMessage(true, {
@@ -122,8 +126,10 @@ const TrackingModalContent: React.FC<TrackingModalContentProps> = ({
         return;
       }
 
+      // eslint-disable-next-line no-console
       console.log(err);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
