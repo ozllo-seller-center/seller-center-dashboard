@@ -334,6 +334,7 @@ const Sells: React.FC = () => {
         currency: 'BRL',
       }).format(totals.total),
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orders, orderStatus, fromDateFilter, toDateFilter, filter, inInterval]);
 
   useEffect(() => {
