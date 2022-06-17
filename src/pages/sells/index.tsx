@@ -147,6 +147,7 @@ const Sells: React.FC = () => {
       .catch(err => {
         setLoading(false);
 
+        // eslint-disable-next-line no-console
         console.log(err);
         router.push('/');
       });
@@ -180,6 +181,7 @@ const Sells: React.FC = () => {
         setDaysUntilDelivery(response.data[0].average_shipping_time.last_week);
       })
       .catch(err => {
+        // eslint-disable-next-line no-console
         console.log(err);
         setDaysUntilDelivery(0);
 
@@ -207,6 +209,7 @@ const Sells: React.FC = () => {
         setLoading(false);
       })
       .catch(err => {
+        // eslint-disable-next-line no-console
         console.log(err);
         setLoading(false);
       });
@@ -784,6 +787,7 @@ const Sells: React.FC = () => {
                                   window.open(response.data.data.url, '_blank');
                                 })
                                 .catch(err => {
+                                  // eslint-disable-next-line no-console
                                   console.log(err);
 
                                   setLoading(false);
@@ -870,6 +874,7 @@ const Sells: React.FC = () => {
                                         type: 'error',
                                       });
 
+                                      // eslint-disable-next-line no-console
                                       console.log(err);
                                     });
                                 }}
