@@ -148,6 +148,62 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({
     ],
   );
 
+  const handleFileUpload = async (file: File) => {
+    setLoading(true);
+
+    if (file.type !== 'text/xml') {
+      setLoading(false);
+      handleModalMessage(true, {
+        title: 'Erro',
+        message: ['A NF-e deve ser um arquivo XML'],
+        type: 'error',
+      });
+      return false;
+    }
+
+    const xml = await file.text().then(data => data);
+
+    const nfeFromFile = {} as OrderNFe;
+
+    const parser = new xml2js.Parser();
+
+    await parser
+      .parseStringPromise(xml)
+      .then((result: any) => {
+        const read = result.nfeProc;
+
+        nfeFromFile.key = read.protNFe[0].infProt[0].chNFe;
+        nfeFromFile.series = read.NFe[0].infNFe[0].$.versao;
+        nfeFromFile.cfop = read.NFe[0].infNFe[0].det[0].prod[0].CFOP[0];
+        nfeFromFile.number = read.NFe[0].infNFe[0].ide[0].cNF[0];
+        nfeFromFile.issueDate = isoDateHub2b(
+          read.NFe[0].infNFe[0].ide[0].dhEmi[0],
+        );
+
+        return true;
+      })
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.log(err);
+        return false;
+      });
+
+    if (nfeFromFile) {
+      setNfeFile(file);
+      setNfeData(nfeFromFile);
+
+      formRef.current?.setData(nfeFromFile);
+
+      // setCanConfirm(true)
+
+      setLoading(false);
+      return true;
+    }
+
+    setLoading(false);
+    return false;
+  };
+
   return (
     <div>
       {!isSuccess ? (
@@ -192,58 +248,7 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({
           <span className={styles.nfeTip}>
             Anexe a NF-e abaixo para preencher os campos automaticamente
           </span>
-          <NfeDropzone
-            name="nfe"
-            onFileUploaded={async (file: File) => {
-              setLoading(true);
-
-              const xml = await file.text().then(data => data);
-
-              const nfeFromFile = {} as OrderNFe;
-
-              const parser = new xml2js.Parser();
-
-              await parser
-                .parseStringPromise(xml)
-                .then((result: any) => {
-                  const read = result.nfeProc;
-
-                  nfeFromFile.key = read.protNFe[0].infProt[0].chNFe;
-                  nfeFromFile.series = read.NFe[0].infNFe[0].$.versao;
-                  nfeFromFile.cfop =
-                    read.NFe[0].infNFe[0].det[0].prod[0].CFOP[0];
-                  nfeFromFile.number = read.NFe[0].infNFe[0].ide[0].cNF[0];
-                  nfeFromFile.issueDate = isoDateHub2b(
-                    read.NFe[0].infNFe[0].ide[0].dhEmi[0],
-                  );
-
-                  return true;
-                })
-                .catch(err => {
-                  // Failed
-
-                  // eslint-disable-next-line no-console
-                  console.log(err);
-
-                  return false;
-                });
-
-              if (nfeFromFile) {
-                setNfeFile(file);
-                setNfeData(nfeFromFile);
-
-                formRef.current?.setData(nfeFromFile);
-
-                // setCanConfirm(true)
-
-                setLoading(false);
-                return true;
-              }
-
-              setLoading(false);
-              return false;
-            }}
-          />
+          <NfeDropzone name="nfe" onFileUploaded={handleFileUpload} />
 
           <button type="submit" className={styles.button}>
             Confirmar
