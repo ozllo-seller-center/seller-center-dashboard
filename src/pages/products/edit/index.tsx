@@ -65,8 +65,6 @@ export function EditProductForm() {
   const [subCategory, setSubCategory] = useState('');
   const [subCategoryName, setSubCategoryName] = useState('');
 
-  const [isChanging, setChanging] = useState(false);
-
   const formRef = useRef<FormHandles>(null);
 
   const router = useRouter();
@@ -205,8 +203,6 @@ export function EditProductForm() {
             );
           }
 
-          setChanging(true);
-
           setLoading(false);
         })
         .catch(err => {
@@ -306,7 +302,7 @@ export function EditProductForm() {
         if (f.file) {
           f.uploaded = false;
 
-          const compressor = new Compressor(f.file, {
+          new Compressor(f.file, {
             width: 1000,
             height: 1000,
             success(result) {
@@ -460,8 +456,6 @@ export function EditProductForm() {
         }
       });
     });
-
-    setChanging(false);
 
     return filled;
   }, [files, variations, attributes]);
@@ -796,7 +790,6 @@ export function EditProductForm() {
       });
 
       setVariations([...tempVars]);
-      setChanging(true);
     },
     [variations, token, user, router],
   );
