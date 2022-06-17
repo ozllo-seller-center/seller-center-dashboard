@@ -260,6 +260,7 @@ export function EditProductForm() {
           setLoading(false);
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subCategory, setLoading]);
 
   useEffect(() => {
@@ -759,9 +760,6 @@ export function EditProductForm() {
       }
     },
     [
-      filledFields,
-      totalFields,
-      handleModalMessage,
       setLoading,
       yupVariationSchema,
       router,
