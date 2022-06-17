@@ -150,19 +150,23 @@ const TrackingModalContent: React.FC<TrackingModalContentProps> = ({
               mask={'99/99/9999'}
               maskChar={'#'}
             /> */}
-            <DatePickerInput name="shippingDate" label="Data de postagem" />
+            <DatePickerInput
+              name="shippingDate"
+              label="Data de postagem"
+              placeholder="Ex: dd/mm/aaaa"
+            />
           </div>
           <div className={styles.doubleInputContainer}>
             <Input
               name="code"
-              label="Código"
-              placeholder="Código de rastreio"
+              label="Código de rastreio"
+              placeholder="Ex: SQ346887BR"
               autoComplete="off"
             />
             <Input
               name="url"
-              label="Link"
-              placeholder="Link do rastreio"
+              label="Link do rastreio"
+              placeholder="Ex: http://transportadora.com.br/tracking"
               autoComplete="off"
             />
           </div>
@@ -170,13 +174,13 @@ const TrackingModalContent: React.FC<TrackingModalContentProps> = ({
             <Input
               name="shippingProvider"
               label="Trasnportadora"
-              placeholder="Transportadora"
+              placeholder="Ex: Correios"
               autoComplete="off"
             />
             <Input
               name="shippingService"
               label="Serviço"
-              placeholder="Serviço"
+              placeholder="Ex: Sedex"
               autoComplete="off"
             />
           </div>
