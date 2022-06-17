@@ -64,7 +64,7 @@ export function EditProductForm() {
   const [categoryName, setCategoryName] = useState('');
   const [subCategory, setSubCategory] = useState('');
   const [subCategoryName, setSubCategoryName] = useState('');
-  const [genderRadio, setGenderRadio] = useState('M');
+  const [genderRadio, setGenderRadio] = useState('U');
 
   const [isChanging, setChanging] = useState(false);
 

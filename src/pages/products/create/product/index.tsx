@@ -531,8 +531,6 @@ export function ProductForm() {
           vars = data.variations,
         } = data;
 
-        console.log(`Gender: ${gender}`);
-
         vars.map((v: Variation) => {
           delete v._id;
         });
@@ -784,7 +782,7 @@ export function ProductForm() {
 
               <RadioButtonGroup
                 name="gender"
-                defaultRadio="M"
+                defaultRadio="U"
                 radios={[
                   { name: 'masculino', value: 'M', label: 'Masculino' },
                   { name: 'feminino', value: 'F', label: 'Feminino' },
