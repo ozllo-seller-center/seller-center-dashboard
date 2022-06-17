@@ -4,7 +4,7 @@
 
   height: fit-content;
 
-  >div {
+  > div {
     flex: 1;
 
     display: flex;
@@ -13,14 +13,14 @@
     margin: 0.25rem;
     padding: 0.75rem 1rem;
 
-    background: #FFFFFF;
+    background: #ffffff;
     border-radius: 4px;
 
     transition: border-color 0.4s, color 0.4s, box-shadow 0.4s;
   }
 
   .inputLabel {
-    font-size: .73rem;
+    font-size: 0.73rem;
 
     margin-bottom: 0.25rem;
   }
@@ -35,8 +35,8 @@
     background: transparent;
 
     &::placeholder {
-      color: var(--grafite);
-      opacity: .75;
+      color: var(--gray-300);
+      opacity: 0.75;
     }
   }
 }
@@ -100,7 +100,7 @@
 .error {
   width: 100%;
 
-  font-size: .8rem;
+  font-size: 0.8rem;
   color: var(--red-100);
   text-align: left;
 
