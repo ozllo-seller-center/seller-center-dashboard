@@ -64,7 +64,6 @@ export function EditProductForm() {
   const [categoryName, setCategoryName] = useState('');
   const [subCategory, setSubCategory] = useState('');
   const [subCategoryName, setSubCategoryName] = useState('');
-  const [genderRadio, setGenderRadio] = useState('U');
 
   const [isChanging, setChanging] = useState(false);
 
@@ -155,8 +154,6 @@ export function EditProductForm() {
           );
 
           setFiles(fs);
-
-          // setGenderRadio(response.data.gender);
 
           setVariations(response.data.variations);
           setOldStock(
@@ -973,7 +970,7 @@ export function EditProductForm() {
               <p className={styles.title}>Selecione o gênero</p>
               <RadioButtonGroup
                 name="gender"
-                defaultRadio={genderRadio}
+                defaultRadio={'U'}
                 radios={[
                   { name: 'masculino', value: 'M', label: 'Masculino' },
                   { name: 'feminino', value: 'F', label: 'Feminino' },
