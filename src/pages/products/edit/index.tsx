@@ -116,6 +116,7 @@ export function EditProductForm() {
             });
           })
           .catch(err => {
+            // eslint-disable-next-line no-console
             console.log(err);
           });
       })
@@ -212,8 +213,8 @@ export function EditProductForm() {
           setLoading(false);
         })
         .catch(err => {
+          // eslint-disable-next-line no-console
           console.log(err);
-
           setLoading(false);
           handleModalMessage(true, {
             title: 'Erro',
@@ -236,6 +237,7 @@ export function EditProductForm() {
           setLoading(false);
         })
         .catch(err => {
+          // eslint-disable-next-line no-console
           console.log(err);
 
           setLoading(false);
@@ -256,6 +258,7 @@ export function EditProductForm() {
           setLoading(false);
         })
         .catch(err => {
+          // eslint-disable-next-line no-console
           console.log(err);
           setLoading(false);
         });
@@ -319,8 +322,8 @@ export function EditProductForm() {
               setLoading(false);
             },
             error(err) {
+              // eslint-disable-next-line no-console
               console.log(err.message);
-
               setLoading(false);
             },
           });
@@ -750,6 +753,7 @@ export function EditProductForm() {
           });
       } catch (err) {
         setLoading(false);
+        // eslint-disable-next-line no-console
         console.log(err);
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
