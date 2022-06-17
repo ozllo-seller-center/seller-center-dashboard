@@ -571,6 +571,7 @@ export function EditProductForm() {
               .min(10, 'Mínimo de 10cm')
               .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
             weight: Yup.number()
+              .min(100, 'Mínimo de 100 gramas')
               .nullable(true)
               .transform(v => (v === '' || Number.isNaN(v) ? null : v)),
             gender: Yup.string(),
