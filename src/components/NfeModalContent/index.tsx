@@ -14,7 +14,6 @@ import { useLoading } from 'src/hooks/loading';
 import { FiCheck } from 'react-icons/fi';
 import getValidationErrors from 'src/utils/getValidationErrors';
 import { useRouter } from 'next/router';
-import { MdOutlineFitnessCenter } from 'react-icons/md';
 import Input from '../Input';
 import NfeDropzone from '../NfeDropzone';
 import styles from './styles.module.scss';
@@ -29,7 +28,6 @@ interface NfeModalContentProps {
 const NfeModalContent: React.FC<NfeModalContentProps> = ({
   item,
   onNfeSent,
-  closeModal,
 }) => {
   const formRef = useRef<FormHandles>(null);
 
@@ -134,6 +132,7 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({
           return;
         }
 
+        // eslint-disable-next-line no-console
         console.log(err);
       }
     },
@@ -141,6 +140,7 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({
       handleModalMessage,
       item.order.reference.id,
       nfeData,
+      nfeFile,
       onNfeSent,
       setLoading,
       token,
@@ -162,14 +162,14 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({
             <Input
               name="key"
               label="Chave"
-              placeholder="Chave da NF-e"
+              placeholder="Ex: 35280416777602000128550020000009921070009988"
               maxLength={44}
               autoComplete="off"
             />
             <Input
               name="series"
-              label="Versão"
-              placeholder="Versão da NF-e"
+              label="Série"
+              placeholder="Ex: 1"
               autoComplete="off"
             />
           </div>
@@ -177,14 +177,14 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({
             <Input
               name="cfop"
               label="CFOP"
-              placeholder="CFOP"
+              placeholder="Ex: 0000"
               autoComplete="off"
               maxLength={4}
             />
             <Input
               name="number"
               label="Número"
-              placeholder="Número da NF"
+              placeholder="Ex: 000701"
               autoComplete="off"
             />
           </div>
@@ -203,7 +203,7 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({
 
               const parser = new xml2js.Parser();
 
-              const res = await parser
+              await parser
                 .parseStringPromise(xml)
                 .then((result: any) => {
                   const read = result.nfeProc;
@@ -222,6 +222,7 @@ const NfeModalContent: React.FC<NfeModalContentProps> = ({
                 .catch(err => {
                   // Failed
 
+                  // eslint-disable-next-line no-console
                   console.log(err);
 
                   return false;
