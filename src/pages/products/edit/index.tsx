@@ -1,5 +1,4 @@
 import React, {
-  ChangeEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -12,7 +11,7 @@ import { FormHandles, Scope } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 
-import { FiCheck, FiChevronLeft, FiInfo, FiX } from 'react-icons/fi';
+import { FiCheck, FiChevronLeft, FiX } from 'react-icons/fi';
 
 import api from 'src/services/api';
 import { useAuth } from 'src/hooks/auth';
@@ -20,7 +19,6 @@ import {
   Product,
   ProductImage,
   Validation_Errors,
-  Variation,
 } from 'src/shared/types/product';
 import TextArea from 'src/components/Textarea';
 import { useLoading } from 'src/hooks/loading';
@@ -30,9 +28,6 @@ import MessageModal from 'src/components/MessageModal';
 import VariationField from 'src/components/VariationsController/Variation';
 import { Attribute, SubCategory } from 'src/shared/types/category';
 import ImageController from 'src/components/ImageController';
-import { Rule } from 'src/components/RuledHintbox';
-import { matchingWords } from 'src/utils/util';
-
 import Compressor from 'compressorjs';
 import styles from './styles.module.scss';
 import getValidationErrors from '../../../utils/getValidationErrors';
@@ -62,9 +57,6 @@ export function EditProductForm() {
 
   const [oldStock, setOldStock] = useState<number[]>([]);
   const [priceChanged, setPriceChange] = useState(false);
-  const [isHintDisabled, setHintDisabled] = useState(false);
-  const [brandInName, setBrandInName] = useState(false);
-  const [colorInName, setColorInName] = useState(false);
 
   const [variations, setVariations] = useState<VariationDTO[]>([{}]);
   const [nationality, setNationality] = useState('');
@@ -96,24 +88,6 @@ export function EditProductForm() {
 
   const [isProductCategoriesOpened, setProductCategoriesOpened] =
     useState(false);
-
-  const hintRules = useMemo(() => {
-    if (isHintDisabled) {
-      return [];
-    }
-
-    const rules = [
-      { state: !brandInName, descr: 'Não deve conter o nome da marca' },
-      { descr: 'Identifique o produto' },
-      { descr: 'Use palavras chave' },
-    ] as Rule[];
-
-    if (attributes.findIndex(attr => attr.name === 'color') >= 0) {
-      rules.splice(1, 0, { state: !colorInName, descr: 'Não deve conter cor' });
-    }
-
-    return rules;
-  }, [attributes, brandInName, colorInName, isHintDisabled]);
 
   useEffect(() => {
     // setLoading(true)
@@ -259,13 +233,6 @@ export function EditProductForm() {
         .then(response => {
           setAttributes(response.data[0].attributes);
           setCategoryName(response.data[0].value);
-
-          response.data[0].attributes.map((attr: Attribute) => {
-            if (attr.name === 'flavor') {
-              setHintDisabled(true);
-            }
-          });
-
           setLoading(false);
         })
         .catch(err => {
@@ -303,57 +270,6 @@ export function EditProductForm() {
 
     setTotalFields(10 + (attributes.length + 1));
   }, [variations, attributes]);
-
-  const setNameChecks = useCallback(
-    (name: string) => {
-      if (
-        !name ||
-        name.length === 0 ||
-        !formRef.current?.getFieldValue('brand') ||
-        isHintDisabled
-      ) {
-        setBrandInName(false);
-        setColorInName(false);
-        return;
-      }
-
-      const brandCheck = matchingWords(
-        name,
-        formRef.current?.getFieldValue('brand'),
-      );
-
-      setBrandInName(brandCheck);
-
-      let colorCheck = false;
-
-      attributes.map(async attr => {
-        if (attr.name === 'color') {
-          attr.values?.map(color => {
-            if (colorCheck) {
-              return;
-            }
-
-            colorCheck = matchingWords(name, color);
-          });
-        }
-      });
-
-      setColorInName(colorCheck);
-
-      if (brandCheck || colorCheck) {
-        formRef.current?.setFieldError(
-          'name',
-          brandCheck
-            ? 'Não insira a marca no nome do produto'
-            : 'Não informe a cor no nome do produto',
-        );
-        return;
-      }
-
-      formRef.current?.setFieldError('name', '');
-    },
-    [attributes, isHintDisabled],
-  );
 
   const handleModalVisibility = useCallback(() => {
     handleModalMessage(false);
@@ -595,20 +511,6 @@ export function EditProductForm() {
       //   });
       //   return;
       // }
-
-      if (colorInName || brandInName) {
-        handleModalMessage(true, {
-          type: 'error',
-          title: 'Nome de produto inválido',
-          message: [
-            brandInName
-              ? 'Remova a marca do nome do produto.'
-              : 'Remova a cor do nome do produto.',
-            'Quando necessário o sistema adicionará essas informações ao nome do produto.',
-          ],
-        });
-        return;
-      }
 
       if (data.price_discounted === '') {
         data.price_discounted = data.price;
@@ -858,8 +760,6 @@ export function EditProductForm() {
     [
       filledFields,
       totalFields,
-      colorInName,
-      brandInName,
       handleModalMessage,
       setLoading,
       yupVariationSchema,
