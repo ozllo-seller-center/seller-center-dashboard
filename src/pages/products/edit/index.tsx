@@ -604,7 +604,7 @@ export function EditProductForm() {
         const dataContainer = new FormData();
 
         files.forEach(
-          (f, i) =>
+          f =>
             !!f.file &&
             !f.uploaded &&
             dataContainer.append('images', f.file, f.file.name),
@@ -1101,7 +1101,7 @@ export function EditProductForm() {
               <FiX style={{ color: 'var(--red-100)' }} />
             )}
             <p className={styles.title}>{modalMessage.title}</p>
-            {modalMessage.message.map((message, i) => (
+            {modalMessage.message.map(message => (
               <p key={message} className={styles.messages}>
                 {message}
               </p>
