@@ -85,7 +85,7 @@ const Sells: React.FC = () => {
     () =>
       Array(items.length)
         .fill(0)
-        .map(i => React.createRef<HTMLTableRowElement>()),
+        .map(_i => React.createRef<HTMLTableRowElement>()),
     [items],
   );
 
@@ -94,7 +94,7 @@ const Sells: React.FC = () => {
       items.length > 2 &&
       Array(items.length)
         .fill(0)
-        .map(i => React.createRef<HTMLDivElement>()),
+        .map(_i => React.createRef<HTMLDivElement>()),
     [items],
   );
 
