@@ -288,7 +288,9 @@ const Sells: React.FC = () => {
             order.status.status !== 'Canceled' &&
             order.status.status !== 'Pending' &&
             !!order.payment.paymentDate &&
-            getDaysToShip(order.payment.paymentDate) < 0
+            getDaysToShip(
+              order.payment?.approvedDate || order.payment.paymentDate,
+            ) < 0
           ) {
             accumulator.totalDelayed += 1;
           }
@@ -358,7 +360,6 @@ const Sells: React.FC = () => {
             (order.status.status === 'Delivered' ||
               order.status.status === 'Completed')
           );
-
         default:
           return inInterval(order) && InOrderStatus(order, orderStatus);
       }
@@ -655,7 +656,10 @@ const Sells: React.FC = () => {
                     item.order.status.status !== 'Canceled' &&
                     item.order.status.status !== 'Pending' &&
                     !!item.order.payment.paymentDate &&
-                    getDaysToShip(item.order.payment.paymentDate) <= 2 ? (
+                    getDaysToShip(
+                      item.order.payment?.approvedDate ||
+                        item.order.payment.paymentDate,
+                    ) <= 2 ? (
                       <div className={styles.shippmentWarning}>
                         {/* {
                           getDaysToShip(item.order.status.updatedDate) >= 2 &&
@@ -671,7 +675,10 @@ const Sells: React.FC = () => {
                         } */}
                         <FiAlertTriangle
                           style={
-                            getDaysToShip(item.order.payment.paymentDate) >= 0
+                            getDaysToShip(
+                              item.order.payment?.approvedDate ||
+                                item.order.payment.paymentDate,
+                            ) >= 0
                               ? { color: 'var(--yellow-300)' }
                               : { color: 'var(--red-300)' }
                           }
@@ -687,7 +694,10 @@ const Sells: React.FC = () => {
                         />
                         <span
                           style={
-                            getDaysToShip(item.order.payment.paymentDate) >= 0
+                            getDaysToShip(
+                              item.order.payment?.approvedDate ||
+                                item.order.payment.paymentDate,
+                            ) >= 0
                               ? { color: 'var(--yellow-300)' }
                               : { color: 'var(--red-300)' }
                           }
@@ -912,23 +922,34 @@ const Sells: React.FC = () => {
         >
           <div
             className={
-              getDaysToShip(tooltipItem.payment.paymentDate) >= 0
+              getDaysToShip(
+                tooltipItem.payment.approvedDate ||
+                  tooltipItem.payment.paymentDate,
+              ) >= 0
                 ? styles.yellowText
                 : styles.redText
             }
           >
-            {getDaysToShip(tooltipItem.payment.paymentDate) >= 1 && (
+            {getDaysToShip(
+              tooltipItem.payment.approvedDate ||
+                tooltipItem.payment.paymentDate,
+            ) >= 1 && (
               <span>
-                {getDaysToShip(tooltipItem.payment.paymentDate)} dias p/
-                despachar
+                {getDaysToShip(
+                  tooltipItem.payment.approvedDate ||
+                    tooltipItem.payment.paymentDate,
+                )}{' '}
+                dias p/ despachar
               </span>
             )}
-            {getDaysToShip(tooltipItem.payment.paymentDate) === 0 && (
-              <span>Último dia p/ despachar</span>
-            )}
-            {getDaysToShip(tooltipItem.payment.paymentDate) < 0 && (
-              <span>Despacho atrasado!</span>
-            )}
+            {getDaysToShip(
+              tooltipItem.payment.approvedDate ||
+                tooltipItem.payment.paymentDate,
+            ) === 0 && <span>Último dia p/ despachar</span>}
+            {getDaysToShip(
+              tooltipItem.payment.approvedDate ||
+                tooltipItem.payment.paymentDate,
+            ) < 0 && <span>Despacho atrasado!</span>}
           </div>
         </HoverTooltip>
       )}

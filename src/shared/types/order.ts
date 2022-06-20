@@ -33,6 +33,7 @@ export type OrderPayment = {
   method: string;
   paymentDate: string;
   purchaseDate: string;
+  approvedDate?: string;
   totalAmount: number;
   totalAmountPlusShipping: number;
   totalDiscount: number;

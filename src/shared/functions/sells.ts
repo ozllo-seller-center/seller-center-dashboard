@@ -32,8 +32,10 @@ export function InOrderStatus(order: Order, filter: OrderStatus): boolean {
         order.status.status !== 'Delivered' &&
         order.status.status !== 'Completed' &&
         order.status.status !== 'Canceled' &&
+        order.status.status !== 'Pending' &&
         !!order.payment.paymentDate &&
-        getDaysToShip(order.payment.paymentDate) < 0
+        getDaysToShip(order.payment.approvedDate || order.payment.paymentDate) <
+          0
       );
     default:
       break;
