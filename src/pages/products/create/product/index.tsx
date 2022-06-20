@@ -740,7 +740,7 @@ export function ProductForm() {
                 label="Nome do produto"
                 placeholder="Insira o nome do produto"
                 autoComplete="off"
-                maxLength={100}
+                maxLength={60}
               />
 
               <Input
@@ -755,7 +755,7 @@ export function ProductForm() {
               Cor/Sabor + Marca
             </p>
             <p>
-              *Limite: <b>100</b> caracteres.
+              *Limite: <b>60</b> caracteres.
             </p>
 
             <div className={styles.singleInputContainer}>
