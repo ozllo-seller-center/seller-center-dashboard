@@ -160,21 +160,7 @@ const Products: React.FC = () => {
     [items],
   );
 
-  const getProducts = useCallback(() => {
-    const produtosFiltrados = items.filter(p => p.checked);
-    let produtosCSV: any = [];
-    produtosCSV.push(getHeader());
-    produtosFiltrados.forEach(produto => {
-      produtosCSV = [...produtosCSV, ...getVariations(produto)];
-    });
-    return produtosCSV;
-  }, [items]);
-
-  const exportToCSV = useCallback(async () => {
-    const fileType =
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-    const csvData = getProducts();
-
+  const getCsvCategories = async (csvData: any) => {
     const csvDataFormated: any[] = [];
 
     const categories = await api.get('/category/all');
@@ -203,7 +189,25 @@ const Products: React.FC = () => {
       csvDataFormated.push(produto);
     });
 
-    const ws = XLSX.utils.json_to_sheet(csvDataFormated);
+    return csvDataFormated;
+  };
+
+  const getProducts = useCallback(async () => {
+    const produtosFiltrados = items.filter(p => p.checked);
+    let produtosCSV: any = [];
+    produtosCSV.push(getHeader());
+    produtosFiltrados.forEach(produto => {
+      produtosCSV = [...produtosCSV, ...getVariations(produto)];
+    });
+
+    return await getCsvCategories(produtosCSV);
+  }, [items]);
+
+  const exportToCSV = useCallback(async () => {
+    const fileType =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const csvData = await getProducts();
+    const ws = XLSX.utils.json_to_sheet(csvData);
     const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
     const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const data = new Blob([excelBuffer], { type: fileType });
