@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { FiChevronLeft, FiHome, FiPackage } from 'react-icons/fi';
+import { FiChevronLeft, FiHome, FiPackage, FiHelpCircle } from 'react-icons/fi';
 import { FaRegMoneyBillAlt } from 'react-icons/fa';
 import { RiStore2Line } from 'react-icons/ri';
 import { MdOutlineIntegrationInstructions } from 'react-icons/md';
@@ -24,12 +24,11 @@ const Menu: React.FC<MenuProps> = ({ open, setOpen, visible }) => {
     return {
       width: undefined,
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [process.browser]);
 
   const route = useRouter();
-  const [selected, setSelected] = useState(route.pathname);
-
-  // console.log(`Route? ${selected}/${route.pathname}`);
+  const [, setSelected] = useState(route.pathname);
 
   const visibility = useMemo(() => {
     if (!visible) {
@@ -86,6 +85,12 @@ const Menu: React.FC<MenuProps> = ({ open, setOpen, visible }) => {
           setSelected={setSelected}
           iconLib={HiOutlineSpeakerphone}
           isExternal
+        />
+        <MenuItem
+          to="/faq"
+          name="FAQ"
+          setSelected={setSelected}
+          iconLib={FiHelpCircle}
         />
       </div>
       {!!width && width < 768 && open && (

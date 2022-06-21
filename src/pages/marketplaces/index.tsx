@@ -12,7 +12,7 @@ type MarketplaceData = {
 };
 
 const SignUp: React.FC = () => {
-  const { isLoading, setLoading } = useLoading();
+  const { isLoading } = useLoading();
 
   const [marketplaces, setMarketplaces] = useState<MarketplaceData[]>([]);
 
