@@ -177,7 +177,7 @@ const TrackingModalContent: React.FC<TrackingModalContentProps> = ({
               placeholder="Ex: Correios"
               autoComplete="off"
               {...(item.order?.shipping?.provider?.length
-                ? { value: item.order?.shipping?.provider }
+                ? { value: item.order.shipping.provider }
                 : {})}
             />
             <Input
@@ -186,7 +186,7 @@ const TrackingModalContent: React.FC<TrackingModalContentProps> = ({
               placeholder="Ex: Sedex"
               autoComplete="off"
               {...(item.order?.shipping?.service?.length
-                ? { value: item.order?.shipping?.service }
+                ? { value: item.order.shipping.service }
                 : {})}
             />
           </div>
