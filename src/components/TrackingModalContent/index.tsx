@@ -176,16 +176,18 @@ const TrackingModalContent: React.FC<TrackingModalContentProps> = ({
               label="Trasnportadora"
               placeholder="Ex: Correios"
               autoComplete="off"
-              value={item.order?.shipping?.provider || ''}
-              disabled={item.order?.shipping?.provider ? true : false}
+              {...(item.order?.shipping?.provider?.length
+                ? { value: item.order?.shipping?.provider }
+                : {})}
             />
             <Input
               name="shippingService"
               label="Serviço"
               placeholder="Ex: Sedex"
               autoComplete="off"
-              value={item.order?.shipping?.service || ''}
-              disabled={item.order?.shipping?.service ? true : false}
+              {...(item.order?.shipping?.service?.length
+                ? { value: item.order?.shipping?.service }
+                : {})}
             />
           </div>
 
