@@ -14,25 +14,27 @@ const Campaigns = () => {
   return (
     <div className={styles.container}>
       <Container maxWidth="lg">
-        <script src="https://static.airtable.com/js/embed/embed_snippet_v1.js"></script>
-        <iframe
-          className="airtable-embed airtable-dynamic-height"
-          src="https://airtable.com/embed/shrRuIRdHXKXtKcYB?backgroundColor=green"
-          frameBorder="0"
-          width="100%"
-          height="1402"
-          style={{
-            background: 'transparent',
-            border: '1px solid #ccc',
-          }}
-          onLoad={() => setLoading(false)}
-        ></iframe>
-      </Container>
-      {isLoading && (
-        <div className={styles.loadingContainer}>
-          <Loader />
+        <div className={styles.iframeWrap}>
+          <script src="https://static.airtable.com/js/embed/embed_snippet_v1.js"></script>
+          <iframe
+            className="airtable-embed airtable-dynamic-height"
+            src="https://airtable.com/embed/shrRuIRdHXKXtKcYB?backgroundColor=green"
+            frameBorder="0"
+            width="100%"
+            height="1402"
+            style={{
+              background: 'transparent',
+              border: '1px solid #ccc',
+            }}
+            onLoad={() => setLoading(false)}
+          ></iframe>
+          {isLoading && (
+            <div className={styles.loadingContainer}>
+              <Loader />
+            </div>
+          )}
         </div>
-      )}
+      </Container>
     </div>
   );
 };
