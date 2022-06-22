@@ -90,6 +90,12 @@ const Header: React.FC<HeaderProps> = ({ open, setOpen }) => {
       return;
     }
 
+    if (router.pathname.includes('campaigns')) {
+      setTitle('Campanhas');
+      setDescription(<span>Preencha o formulário e participe!</span>);
+      return;
+    }
+
     setTitle('Produtos');
     setDescription(
       <span>Adicione produtos manualmente ou através de um planilha</span>,

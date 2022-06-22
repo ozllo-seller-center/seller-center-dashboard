@@ -80,11 +80,10 @@ const Menu: React.FC<MenuProps> = ({ open, setOpen, visible }) => {
           iconLib={MdOutlineIntegrationInstructions}
         />
         <MenuItem
-          to="https://airtable.com/shrRuIRdHXKXtKcYB"
+          to="/campaigns"
           name="Campanhas"
           setSelected={setSelected}
           iconLib={HiOutlineSpeakerphone}
-          isExternal
         />
         <MenuItem
           to="/faq"
