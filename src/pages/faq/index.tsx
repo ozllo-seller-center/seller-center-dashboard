@@ -7,9 +7,7 @@ import {
   Container,
   List,
   ListItem,
-  ListItemText,
   Stack,
-  Typography,
 } from '@mui/material';
 import React from 'react';
 import styles from './styles.module.scss';
@@ -29,49 +27,47 @@ const Faq: React.FC = () => {
                 aria-controls="panel1a-content"
                 id="panel1a-header"
               >
-                <Typography>Como cadastrar as imagens</Typography>
+                <p>Como cadastrar as imagens</p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography variant="subtitle1">Requisitos:</Typography>
+                <p>Requisitos:</p>
                 <List>
-                  <ListItemText>- De 2 à 6 imagens</ListItemText>
-                  <ListItemText>
-                    - Imagem com fundo branco ou cinza claro.
-                  </ListItemText>
-                  <ListItemText>- Imagem sem escritos.</ListItemText>
-                  <ListItemText>- Imagem sem colagem.</ListItemText>
-                  <ListItemText>
+                  <ListItem>- De 2 à 6 imagens</ListItem>
+                  <ListItem>- Imagem com fundo branco ou cinza claro.</ListItem>
+                  <ListItem>- Imagem sem escritos.</ListItem>
+                  <ListItem>- Imagem sem colagem.</ListItem>
+                  <ListItem>
                     - Imagem não podem ser fotos no espelho (selfies no espelho)
-                  </ListItemText>
+                  </ListItem>
                 </List>
-                <Typography variant="subtitle1">Ordem das imagens:</Typography>
-                <Typography>
+                <p>Ordem das imagens:</p>
+                <p>
                   A foto de capa precisa ser em fundo branco ou cinza claro,
                   mostrando o produto de frente e sem recortes.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   O restante das fotos precisa ser mostrando detalhes do produto
                   e é importante ter referência de tamanho. Para produtos de
                   moda, é interessante adicionar a tabela de medidas na última
                   foto, caso exista.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Para produtos de beleza e alimentos, é interessante adicionar
                   a tabela nutricional. Lembre-se que o consumidor está
                   comprando a foto. Ou seja, capriche na foto e tente colocar o
                   maior número de fotos possível.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Observação 1: Nossa plataforma recorta automaticamente para
                   que todas as imagens fiquem no formato de 1000x1000. Veja se o
                   recorte ficou coerente. Caso tenha cortado o seu produto,
                   cadastre uma foto 1000x1000.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Observação 2: Nossa plataforma reconfigura para que a imagem
                   tenha 1MG, tamanho exigido pelos marketplaces. Veja se, após a
                   reconfiguração, a imagem se mantém em boa qualidade.
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
             <Accordion>
@@ -80,26 +76,26 @@ const Faq: React.FC = () => {
                 aria-controls="panel2a-content"
                 id="panel2a-header"
               >
-                <Typography>Como cadastrar o nome do produto</Typography>
+                <p>Como cadastrar o nome do produto</p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography>
+                <p>
                   Nome do produto + Principais Características + Cor/Sabor +
                   Marca
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Lembrando que mais de 60% dos consumidores pesquisam palavras
                   chaves nos marketplaces, então adicione as principais
                   características no título para que aumente a chance do seu
                   produto ser encontrado.
-                </Typography>
-                <Typography>Exemplo:</Typography>
-                <Typography>
+                </p>
+                <p>Exemplo:</p>
+                <p>
                   Se o seu produto chama “Blusa Victoria” um exemplo de cadastro
                   seria “Blusa Victoria algodão estampado amarelo XYZ Brand”. Se
                   o seu produto chama “Blush rosa” um exemplo de cadastro seria
                   “Blush rosa bastão vegano XYZ Brand”
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
             <Accordion>
@@ -108,22 +104,22 @@ const Faq: React.FC = () => {
                 aria-controls="panel3a-content"
                 id="panel3a-header"
               >
-                <Typography>Como cadastrar a descrição</Typography>
+                <p>Como cadastrar a descrição</p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography>
+                <p>
                   A descrição precisa ter todos os elementos necessários para o
                   consumidor. Recomendamos as seguintes informações:
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Nome do produto + detalhes do produto + Nome da marca +
                   Funcionalidades e como usar o produto + Composição + Medidas +
                   Validade.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   É proibido escrever dados pessoais: site, telefone pessoal,
                   e-mail da empresa, conta de rede social na descrição.
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
             <Accordion>
@@ -132,14 +128,14 @@ const Faq: React.FC = () => {
                 aria-controls="panel4a-content"
                 id="panel4a-header"
               >
-                <Typography>O EAN é obrigatorio?</Typography>
+                <p>O EAN é obrigatorio?</p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography>
+                <p>
                   O EAN é o código de barras do seu produto que possui 13
                   digitos. Caso você tenha, preencha-o na plataforma. Caso você
                   não tenha, pode deixar em branco
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
             <Accordion>
@@ -148,15 +144,15 @@ const Faq: React.FC = () => {
                 aria-controls="panel5a-content"
                 id="panel5a-header"
               >
-                <Typography>Como preencher o SKU</Typography>
+                <p>Como preencher o SKU</p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography>
+                <p>
                   O SKU é como se fosse o RG do seu produto. Serve para você
                   identifca-lo. O campo de SKU na plataforma é referente ao SKU
                   pai do seu produto. É um campo obrigatório. Caso você não
                   tenha, é necessário criar.
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
             <Accordion>
@@ -165,17 +161,15 @@ const Faq: React.FC = () => {
                 aria-controls="panel6a-content"
                 id="panel6a-header"
               >
-                <Typography>
-                  Como cadastrar medidas e peso da emabalagem
-                </Typography>
+                <p>Como cadastrar medidas e peso da emabalagem</p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography>
+                <p>
                   As medidas e peso das embalagens são importantes para o
                   calculo do frete. Insira o tamanho da embalagem do seu produto
                   e o peso estimado. Lembrando que as medidas são em CM e o peso
                   é em GRAMAS.
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
             <Accordion>
@@ -184,33 +178,29 @@ const Faq: React.FC = () => {
                 aria-controls="panel7a-content"
                 id="panel7a-header"
               >
-                <Typography>
-                  Como cadastrar os atributos: Tamanho, Cor/Sabor e Estoque
-                </Typography>
+                <p>Como cadastrar os atributos: Tamanho, Cor/Sabor e Estoque</p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography>
-                  Tamanho: escolha o tamanho na listagem que aparece.
-                </Typography>
-                <Typography>
+                <p>Tamanho: escolha o tamanho na listagem que aparece.</p>
+                <p>
                   Se sua categoria for vestuario, você vai criar uma variação
                   para cada tamanho, ou seja, Variação 1 = PP, Variação 2 = P,
                   Variação 3 = M e assim vai. Se a sua categoria for Beleza,
                   você pode selecionar {'"'}U{'"'} caso seja tamanho Único. Ou
                   também pode escolher o Tamanho 30, caso sua embalagem tenha
                   30gramas.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   {' '}
                   Cor/Sabor: na seleção, escolha a cor ou sabor que melhor
                   represente o seu produto.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Caso seu produto seja da cor {'"'}
                   azul turquesa{'"'} escolha a cor aproximada, como {'"'}azul
                   {'"'} na nossa plataforma. Estoque: coloque a informação de
                   estoque de cada variação.
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
           </Box>
@@ -224,23 +214,23 @@ const Faq: React.FC = () => {
                 aria-controls="panel8a-content"
                 id="panel8a-header"
               >
-                <Typography>Cadastrando produtos manualmente</Typography>
+                <p>Cadastrando produtos manualmente</p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography>
+                <p>
                   Vá em Menu {'>'} Produtos {'>'} Cadastrar novos produtos e
                   cadastre seus produtos conforme as orientações que contém na
                   plataforma de cada campo.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Se você quiser mais detalhes de como cadastrar cada campo, em
                   nosso FAQ {'"'}Como fazer seu catálogo da forma correta{'"'}{' '}
                   explica detalhadamente cada campo.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Caso você queira editar seu produto, é possível editar a
                   qualquer momento. Vá em Menu {'>'} Produtos {'>'} Editar.
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
             <Accordion>
@@ -249,18 +239,16 @@ const Faq: React.FC = () => {
                 aria-controls="panel9a-content"
                 id="panel9a-header"
               >
-                <Typography>
-                  Cadastrando produtos de forma massiva via Excel
-                </Typography>
+                <p>Cadastrando produtos de forma massiva via Excel</p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography>
+                <p>
                   Caso você tenha diversos produtos, é possível cadastrar eles
                   via Excel. Vá em Produtos {'>'} Importar ou Exportar {'>'}{' '}
                   Exportar Planilha Inicial. O uso da nossa planilha é
                   obrigatório.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Caso você tente subir qualquer outra planilha vai dar erro e
                   não será possível cadastrar seus produtos. Também irá dar erro
                   caso você altere alguma informação das 2 primeiras linhas da
@@ -270,28 +258,28 @@ const Faq: React.FC = () => {
                   primeira linha, as informações da variação M na segunda linha
                   e as informações da variação G na terceira linha. E assim por
                   diante.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Para que a plataforma entenda que será necessário agrupar
                   essas 3 linhas e considera-las um produto só, o campo ID
                   Agrupador precisa ser preenchido.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Exemplo: No campo ID Agrupador, preencha o numero 1 em todas
                   as variações do produto 1. Preencha o numero 2 em todos as
                   variações do produto 2. E assim por diante.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Se você quiser mais detalhes de como cadastrar cada campo, em
                   nosso FAQ {'"'}
                   Como fazer seu catálogo da forma correta{'"'} explica
                   detalhadamente cada campo, como Titulo e Descrição.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Após preenchido, vá em Vá em Produtos {'>'} Importar ou
                   Exportar {'>'} Importar Planilha. Seus produtos estarão na Aba
                   de Produtos {'>'} Meus Produtos.
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
             <Accordion>
@@ -300,27 +288,25 @@ const Faq: React.FC = () => {
                 aria-controls="panel10a-content"
                 id="panel10a-header"
               >
-                <Typography>
-                  Alterando produtos de forma massiva via Excel
-                </Typography>
+                <p>Alterando produtos de forma massiva via Excel</p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography>
+                <p>
                   Caso você queira alterar seus produtos, é possivel faze-los de
                   forma massiva via excel. Vá em Produtos {'>'} Meus produtos{' '}
                   {'>'} Selecione os produtos que você queira exportar para
                   editar {'>'} Ações em Massa {'>'} Exportar Produtos {'>'}{' '}
                   Aplicar
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Edite seus produtos através do Excel e suba novamente na
                   plataforma em Produtos {'>'} Importar ou Exportar {'>'}{' '}
                   Importar Planilha.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Em segundos suas atualizações estarão disponíveis na pagina de
                   produtos.
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
             <Accordion>
@@ -329,15 +315,15 @@ const Faq: React.FC = () => {
                 aria-controls="panel11a-content"
                 id="panel11a-header"
               >
-                <Typography>Cadastrando produtos via Integração</Typography>
+                <p>Cadastrando produtos via Integração</p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography>
+                <p>
                   Caso você tenha algum ERP/Ecommerce que possuímos integração,
                   recomendo fazer a integração de seus produtos para que você
                   tenha todo o processo automatizado.
-                </Typography>
-                <Typography>A integração significa que iremos:</Typography>
+                </p>
+                <p>A integração significa que iremos:</p>
                 <List>
                   <ListItem>- Importar seus produtos para a OZLLO</ListItem>
                   <ListItem>
@@ -350,37 +336,37 @@ const Faq: React.FC = () => {
                     Despacho automatizada.
                   </ListItem>
                 </List>
-                <Typography>
+                <p>
                   Caso você tenha um processo automatizado de emissão de NF e
                   Etiqueta de Despacho na nossa plataforma, assim que tiver uma
                   venda, receberemos sua Nota Fiscal e Etiqueta de Despacho.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Para começar a integração, vá em Integrações {'>'} escolha sua
                   plataforma e coloque os dados.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Caso você tenha dúvidas de como conseguir os dados requeridos,
                   aperte no botão de {'"'}
                   Dúvidas?{'"'} no canto direito que você terá o passo a passo.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Após completar as informações necessárias da integração, seu
                   catálogo de produtos será importado para o Seller Center e
                   estará disponível para visualização no menu
                   {'"'}Produtos{'"'}.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Informação importante: Após importado o seu catálogo, caso
                   você queira atualizar o preço ou estoque, será necessário
                   fazer direto no seu ERP/Ecommerce. Os demais campos como
                   Descrição, Título e Imagens, devem obrigatoriamente ser
                   editados direto no Seller Center OZLLO.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Caso você deseja excluir um produto, entre em contato com o
                   Suporte.
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
           </Box>
@@ -392,22 +378,22 @@ const Faq: React.FC = () => {
                 aria-controls="panel12a-content"
                 id="panel12a-header"
               >
-                <Typography>
+                <p>
                   Quanto tempo leva para que meus produtos apareçam nos
                   marketplaces?
-                </Typography>
+                </p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography>
+                <p>
                   A partir do momento em que os seus produtos estão em nossa
                   plataforma, eles são enviados automaticamente para cada canal
                   e o prazo de Go Live depende de cada canal.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Magazine Luiza e B2W: Até 2 dias uteis Mercado Livre e Shopee:
                   Até 7 dias uteis CEA, Dafiti, Zattini, Netshoes, Drogasil,
                   Carrefour e GPA: até 15 dias uteis.
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
             <Accordion>
@@ -416,50 +402,48 @@ const Faq: React.FC = () => {
                 aria-controls="panel13a-content"
                 id="panel13a-header"
               >
-                <Typography>Vendi um produto e agora?</Typography>
+                <p>Vendi um produto e agora?</p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography>
+                <p>
                   Sempre que houver vendas você será notificado no email
                   cadastrado em seu painel.
-                </Typography>
-                <Typography>1.Ver detalhes do pedido:</Typography>
-                <Typography>
+                </p>
+                <p>1.Ver detalhes do pedido:</p>
+                <p>
                   No seu pedido, aperte {'"'}ver detalhes{'"'} para ver todo os
                   detalhes do pedido
-                </Typography>
-                <Typography>
-                  2. Emita a Nota Fiscal e insira em nosssa plataforma:
-                </Typography>
-                <Typography>
+                </p>
+                <p>2. Emita a Nota Fiscal e insira em nosssa plataforma:</p>
+                <p>
                   Vá em Aguardando Faturamento {'>'} Inserir NF e anexe a sua
                   Nota Fiscal.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   3. Emita e Etiqueta de Despacho e insira na nossa plataforma:
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Depois que voce emitir a NF, o pedido aparecerá na aba
                   Aguardando Despacho. No canto a direita, aperte em Anexar
                   Etiqueta de Despacho e coloque as informações da Etiqueta.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Caso seu cadastro seja de Integração, o pedido aparecerá em
                   sua plataforma e você pode seguir a etapa normalmente de
                   Emissão de Nota Fiscal e Etiqueta de Despacho em sua
                   plataforma e ela será importada para a nossa plataforma.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Informação relevante: vendas da B2W, Mercado Livre e Shopee o
                   uso da Etiqueta de Despacho que eles fornecem é obrigatório e
                   estará disponível na Aba
                   {'"'}Aguardando Despacho{'"'} após a emissão da Nota Fiscal.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Assim que feito esses passos, o processo da venda é concluída
                   e o cliente final será atualizado. O prazo para esse passo é
                   de 48hrs uteis após a venda.
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
             <Accordion>
@@ -468,18 +452,18 @@ const Faq: React.FC = () => {
                 aria-controls="panel14a-content"
                 id="panel14a-header"
               >
-                <Typography>Posso enviar uma cartinha na embalagem?</Typography>
+                <p>Posso enviar uma cartinha na embalagem?</p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography>
+                <p>
                   Você pode enviar uma carta de agradecimento pela compra porém
                   é PROIBIDO enviar brindes, cupons de desconto que direcionam
                   ao seu site ou seu telefone na embalagem.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   Caso enviado, sua marca entrará no Black List do marketplace
                   por tempo indeterminado.
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
             <Accordion>
@@ -488,13 +472,13 @@ const Faq: React.FC = () => {
                 aria-controls="panel15a-content"
                 id="panel15a-header"
               >
-                <Typography>Quando recebo minhas vendas?</Typography>
+                <p>Quando recebo minhas vendas?</p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography>
+                <p>
                   Vendas entre os dias 11 ao 24 são repassadas dia 15 do mês
                   seguinte. Vendas entre os dias 25 ao 10 são repassadas dia 30.
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
             <Accordion>
@@ -503,16 +487,14 @@ const Faq: React.FC = () => {
                 aria-controls="panel16a-content"
                 id="panel16a-header"
               >
-                <Typography>
-                  Como participar de campanhas nos marketplaces?
-                </Typography>
+                <p>Como participar de campanhas nos marketplaces?</p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography>
+                <p>
                   Semanalmente disponibilizamos as campanhas da semana em nossa
                   plataforma. Vá em Menu {'>'} Campanhas e selecione as
                   campanhas que você quer participar.
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
             <Accordion>
@@ -521,25 +503,23 @@ const Faq: React.FC = () => {
                 aria-controls="panel17a-content"
                 id="panel17a-header"
               >
-                <Typography>
-                  Como funciona a cobrança da mensalidade?
-                </Typography>
+                <p>Como funciona a cobrança da mensalidade?</p>
               </AccordionSummary>
               <AccordionDetails className={styles.accordionDetails}>
-                <Typography>
+                <p>
                   À partir do momento em que você faz a contratação do plano,
                   você já começa a pagar a sua assinatura.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   A data em que você fez a assinatura será a data do mês que
                   sempre será cobrado em seu cartão de crédito.
-                </Typography>
-                <Typography>
+                </p>
+                <p>
                   O pagamento refere-se ao direito de possibilidade de uso da
                   plataforma e independe do fluxo de uso ou de vendas. Você pode
                   alterar seu plano a qualquer momento, basta chamar o nosso
                   Suporte. para te auxiliarem com a mudança de plano.
-                </Typography>
+                </p>
               </AccordionDetails>
             </Accordion>
           </Box>

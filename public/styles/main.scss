@@ -36,6 +36,14 @@
     margin-bottom: 1rem;
   }
 
+  p + ul {
+    padding-top: 0;
+  }
+
+  p + ul > li {
+    padding-top: 0;
+  }
+
   h6 {
     margin-bottom: 0.75rem;
   }
