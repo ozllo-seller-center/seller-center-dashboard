@@ -252,11 +252,14 @@ const Faq: React.FC = () => {
                   Caso você tente subir qualquer outra planilha vai dar erro e
                   não será possível cadastrar seus produtos. Também irá dar erro
                   caso você altere alguma informação das 2 primeiras linhas da
-                  planilha. Não exclua nenhuma coluna. Cada linha da planilha é
-                  uma variação. Ou seja, se seu produto tenha 3 variações
-                  (exemplo P, M e G), cadastre as informações da variação P na
-                  primeira linha, as informações da variação M na segunda linha
-                  e as informações da variação G na terceira linha. E assim por
+                  planilha.
+                </p>
+                <p>
+                  Não exclua nenhuma coluna. Cada linha da planilha é uma
+                  variação. Ou seja, se seu produto tenha 3 variações (exemplo
+                  P, M e G), cadastre as informações da variação P na primeira
+                  linha, as informações da variação M na segunda linha e as
+                  informações da variação G na terceira linha. E assim por
                   diante.
                 </p>
                 <p>
