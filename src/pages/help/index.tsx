@@ -16,7 +16,7 @@ import React from 'react';
 import styles from './styles.module.scss';
 import { FaWhatsapp } from 'react-icons/fa';
 
-const Faq: React.FC = () => {
+const Help: React.FC = () => {
   const theme = createTheme({
     palette: {
       primary: {
@@ -33,7 +33,7 @@ const Faq: React.FC = () => {
     <div className={styles.container}>
       <ThemeProvider theme={theme}>
         <Container maxWidth="lg">
-          <Stack spacing={4}>
+          <Stack spacing={5}>
             <Box>
               <h3 className={styles.h3}>
                 Como fazer o seu catálogo da forma correta:
@@ -581,4 +581,4 @@ const Faq: React.FC = () => {
   );
 };
 
-export default Faq;
+export default Help;

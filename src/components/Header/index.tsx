@@ -84,8 +84,8 @@ const Header: React.FC<HeaderProps> = ({ open, setOpen }) => {
       return;
     }
 
-    if (router.pathname.includes('faq')) {
-      setTitle('Perguntas Frequentes');
+    if (router.pathname.includes('help')) {
+      setTitle('Ajuda');
       setDescription(<span>Como posso te ajudar hoje?</span>);
       return;
     }

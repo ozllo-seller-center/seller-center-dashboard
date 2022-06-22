@@ -86,8 +86,8 @@ const Menu: React.FC<MenuProps> = ({ open, setOpen, visible }) => {
           iconLib={HiOutlineSpeakerphone}
         />
         <MenuItem
-          to="/faq"
-          name="FAQ"
+          to="/help"
+          name="Ajuda"
           setSelected={setSelected}
           iconLib={FiHelpCircle}
         />
