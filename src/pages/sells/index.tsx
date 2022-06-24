@@ -77,7 +77,6 @@ const Sells: React.FC = () => {
   const [toDateFilter, setToDateFilter] = useState(new Date());
 
   const [filter, setFilter] = useState(Filter.Mes);
-  // const [search, setSeacrh] = useState('');
 
   const [daysUntilDelivery, setDaysUntilDelivery] = useState(0);
 
@@ -661,18 +660,6 @@ const Sells: React.FC = () => {
                         item.order.payment.paymentDate,
                     ) <= 2 ? (
                       <div className={styles.shippmentWarning}>
-                        {/* {
-                          getDaysToShip(item.order.status.updatedDate) >= 2 &&
-                          <span>{getDaysToShip(item.order.status.updatedDate)} dias p/ despachar</span>
-                        }
-                        {
-                          getDaysToShip(item.order.status.updatedDate) === 1 &&
-                          <span>Último dia p/ despachar</span>
-                        }
-                        {
-                          getDaysToShip(item.order.status.updatedDate) <= 0 &&
-                          <span>Data de despacho vencida</span>
-                        } */}
                         <FiAlertTriangle
                           style={
                             getDaysToShip(
