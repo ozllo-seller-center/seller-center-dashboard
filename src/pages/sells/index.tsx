@@ -622,7 +622,7 @@ const Sells: React.FC = () => {
                   <td id={styles.itemsCell}>
                     {item.order.products.map(
                       (product, j) =>
-                        j <= 2 && <p key={product.idProduct}>{product.name}</p>,
+                        j <= 2 && <p key={product.sku}>{product.name}</p>,
                     )}
                     {item.order.products.length > 3 && (
                       <Collapsible
@@ -632,7 +632,7 @@ const Sells: React.FC = () => {
                         }
                       >
                         {item.order.products.map(product => (
-                          <p key={product.idProduct}>{product.name}</p>
+                          <p key={product.sku}>{product.name}</p>
                         ))}
                       </Collapsible>
                     )}
