@@ -14,5 +14,6 @@ export enum Filter {
   Hoje = 0,
   Semana = 1,
   Mes = 3,
-  Custom = 4,
+  Período = 4,
+  Todos = 5,
 }

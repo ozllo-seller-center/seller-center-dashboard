@@ -15,7 +15,7 @@
 
     min-height: 3rem;
 
-    button+button {
+    button + button {
       margin-left: 1rem;
 
       @media screen and (min-width: $desktop-size) {
@@ -81,7 +81,7 @@
 
       margin-bottom: 1rem;
 
-      >div+div {
+      > div + div {
         margin-top: 0;
         margin-left: 1rem;
       }
@@ -96,6 +96,10 @@
       text-align: center;
 
       color: var(--gray-300);
+      p {
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+      }
     }
 
     .table {
@@ -106,7 +110,6 @@
       box-shadow: 0 2px 3px rgba(0, 0, 0, 0.09), 0 6px 6px rgba(0, 0, 0, 0.05);
 
       .tableHeader {
-
         th {
           text-align: left;
           padding: 1rem 1rem;
@@ -293,7 +296,7 @@
     color: var(--grafite);
   }
 
-  >svg {
+  > svg {
     width: 5rem;
     height: 5rem;
 

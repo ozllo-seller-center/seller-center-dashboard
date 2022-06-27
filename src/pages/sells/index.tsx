@@ -76,7 +76,7 @@ const Sells: React.FC = () => {
   const [fromDateFilter, setFromDateFilter] = useState(new Date());
   const [toDateFilter, setToDateFilter] = useState(new Date());
 
-  const [filter, setFilter] = useState(Filter.Mes);
+  const [filter, setFilter] = useState(Filter.Todos);
 
   const [daysUntilDelivery, setDaysUntilDelivery] = useState(0);
 
@@ -168,7 +168,7 @@ const Sells: React.FC = () => {
       .then(response => {
         if (
           filter === Filter.Mes ||
-          (filter === Filter.Custom &&
+          (filter === Filter.Período &&
             differenceInDays(toDateFilter, fromDateFilter) > 10)
         ) {
           setDaysUntilDelivery(
@@ -237,14 +237,15 @@ const Sells: React.FC = () => {
             date.getTime() <= today.getTime()
           );
 
-        case Filter.Custom:
+        case Filter.Período:
           return (
             format(date, 'yyyy/MM/dd') <= format(toDateFilter, 'yyyy/MM/dd') &&
             format(date, 'yyyy/MM/dd') >= format(fromDateFilter, 'yyyy/MM/dd')
           );
-
-        default:
+        case Filter.Hoje:
           return isToday(date);
+        default:
+          return true;
       }
     },
     [fromDateFilter, toDateFilter, filter],
@@ -488,20 +489,19 @@ const Sells: React.FC = () => {
             >
               Últimos 30 dias
             </Button>
-            <div className={styles.verticalDivider} />
             <div>
               <Button
                 icon={FiCalendar}
-                isActive={filter === Filter.Custom}
+                isActive={filter === Filter.Período}
                 onClick={() => {
-                  setFilter(Filter.Custom);
+                  setFilter(Filter.Período);
                   setDatePickerVisibility(!datePickerVisibility);
                 }}
               >
                 Escolher período
               </Button>
 
-              {filter === Filter.Custom && (
+              {filter === Filter.Período && (
                 <DatePickerPopup
                   formRef={datePickerRef}
                   setToDateFilter={setToDateFilter}
@@ -515,6 +515,9 @@ const Sells: React.FC = () => {
                 />
               )}
             </div>
+            <Button onClick={() => setFilter(Filter.Todos)}>
+              Remover Filtro
+            </Button>
           </div>
         </div>
         {status === SellStatus.Todos && (
@@ -898,7 +901,22 @@ const Sells: React.FC = () => {
             </tbody>
           </table>
         ) : (
-          <span className={styles.emptyList}> Nenhum item foi encontrado </span>
+          <span className={styles.emptyList}>
+            {' '}
+            Nenhum item foi encontrado.
+            {filter !== 5 && (
+              <p>
+                {' '}
+                (Filtrando por {'"'}
+                <b>{Filter[filter].toLowerCase()}</b>
+                {'"'}. Experimente{' '}
+                <a href="#" onClick={() => setFilter(Filter.Todos)}>
+                  remover o filtro
+                </a>
+                .)
+              </p>
+            )}
+          </span>
         )}
       </div>
       {openTooltip && tooltipItem && (
