@@ -55,7 +55,7 @@ import {
   mercadoLivreStore,
   shoppeeStore,
 } from 'src/shared/consts/sells';
-import { TablePagination } from '@mui/material';
+import { Badge, TablePagination } from '@mui/material';
 import InfoPanel from 'src/components/InfoPanel';
 
 const Sells: React.FC = () => {
@@ -114,6 +114,8 @@ const Sells: React.FC = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [search, setSearch] = useState('');
+  const [approvedCount, setApprovedCount] = useState(0);
+  const [invoicedCount, setInvoicedCount] = useState(0);
 
   useEffect(() => {
     // setOrders(ordersFromApi)
@@ -168,6 +170,22 @@ const Sells: React.FC = () => {
         }
 
         setDaysUntilDelivery(response.data[0].average_shipping_time.last_week);
+
+        setApprovedCount(
+          response.data[
+            response.data.findIndex(
+              (item: { status_count: any }) => item.status_count,
+            )
+          ]['status_count'].approved,
+        );
+
+        setInvoicedCount(
+          response.data[
+            response.data.findIndex(
+              (item: { status_count: any }) => item.status_count,
+            )
+          ]['status_count'].invoiced,
+        );
       })
       .catch(err => {
         // eslint-disable-next-line no-console
@@ -486,24 +504,38 @@ const Sells: React.FC = () => {
         >
           Aguardando Pagamento
         </BulletedButton>
-        <BulletedButton
-          onClick={() => {
-            getOrdersByStatus('approved');
-            setStatus(SellStatus.Faturando);
-          }}
-          isActive={status === SellStatus.Faturando}
+        <Badge
+          color={approvedCount === 0 ? 'success' : 'error'}
+          badgeContent={approvedCount}
+          max={99}
+          style={{ marginLeft: '1.5rem', marginRight: '1.5rem' }}
         >
-          Aguardando Faturamento
-        </BulletedButton>
-        <BulletedButton
-          onClick={() => {
-            getOrdersByStatus('invoiced');
-            setStatus(SellStatus.Despachando);
-          }}
-          isActive={status === SellStatus.Despachando}
+          <BulletedButton
+            onClick={() => {
+              getOrdersByStatus('approved');
+              setStatus(SellStatus.Faturando);
+            }}
+            isActive={status === SellStatus.Faturando}
+          >
+            Aguardando Faturamento
+          </BulletedButton>
+        </Badge>
+        <Badge
+          color={invoicedCount === 0 ? 'success' : 'error'}
+          badgeContent={invoicedCount}
+          max={99}
+          style={{ marginLeft: '1.5rem', marginRight: '1.5rem' }}
         >
-          Aguardando Despacho
-        </BulletedButton>
+          <BulletedButton
+            onClick={() => {
+              getOrdersByStatus('invoiced');
+              setStatus(SellStatus.Despachando);
+            }}
+            isActive={status === SellStatus.Despachando}
+          >
+            Aguardando Despacho
+          </BulletedButton>
+        </Badge>
         <BulletedButton
           onClick={() => {
             getOrdersByStatus('shipped');
