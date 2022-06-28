@@ -328,3 +328,12 @@
 .yellowText {
   color: var(--yellow-300);
 }
+
+.sellsTop {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}

@@ -47,32 +47,22 @@ import { Filter, SellStatus } from 'src/shared/enums/sells';
 import Collapsible from '../../components/Collapsible';
 import DatePickerPopup from '../../components/DatePickerPopup';
 import styles from './styles.module.scss';
-import StatusPanel from '../../components/OrderStatusPanel';
+
 import BulletedButton from '../../components/BulletedButton';
 import Button from '../../components/FilterButton';
-import InfoPanel from 'src/components/InfoPanel';
 import {
   b2wStore,
   mercadoLivreStore,
   shoppeeStore,
 } from 'src/shared/consts/sells';
 import { TablePagination } from '@mui/material';
-
-interface Totals {
-  totalApproved: number;
-  totalProcessing: number;
-  totalCanceled: number;
-  totalDelayed: number;
-  total: number;
-}
+import InfoPanel from 'src/components/InfoPanel';
 
 const Sells: React.FC = () => {
   const [orders, setOrders] = useState([] as OrderParent[]);
   const [items, setItems] = useState([] as OrderParent[]);
   const [status, setStatus] = useState(SellStatus.Todos as SellStatus);
-  const [orderStatus, setOrderStatus] = useState(
-    OrderStatus.Todos as OrderStatus,
-  );
+  const [orderStatus] = useState(OrderStatus.Todos as OrderStatus);
 
   const [fromDateFilter, setFromDateFilter] = useState(new Date());
   const [toDateFilter, setToDateFilter] = useState(new Date());
@@ -97,12 +87,6 @@ const Sells: React.FC = () => {
         .map(_i => React.createRef<HTMLDivElement>()),
     [items],
   );
-
-  const [totalApproved, setTotalApproved] = useState('Carregando...');
-  const [totalProcessing, setTotalProcessing] = useState('Carregando...');
-  const [totalCanceled, setTotalCanceled] = useState('Carregando...');
-  const [totalDelayed, setTotalDelayed] = useState(0);
-  const [total, setTotal] = useState('Carregando...');
 
   const { user, token, updateUser } = useAuth();
   const { isLoading, setLoading } = useLoading();
@@ -255,94 +239,6 @@ const Sells: React.FC = () => {
     },
     [fromDateFilter, toDateFilter, filter],
   );
-
-  useEffect(() => {
-    const totals = orders.reduce(
-      (accumulator: Totals, orderParent: OrderParent) => {
-        const { order } = orderParent;
-
-        if (inInterval(order)) {
-          switch (order.status.status) {
-            case 'Completed':
-            case 'Delivered':
-            case 'Invoiced':
-            case 'Shipped':
-              accumulator.totalApproved +=
-                order.payment.totalAmountPlusShipping;
-              accumulator.total += order.payment.totalAmountPlusShipping;
-              break;
-            case 'Approved':
-            case 'Pending':
-              accumulator.totalProcessing +=
-                order.payment.totalAmountPlusShipping;
-              accumulator.total += order.payment.totalAmountPlusShipping;
-              break;
-            case 'Canceled':
-              accumulator.totalCanceled +=
-                order.payment.totalAmountPlusShipping;
-              accumulator.total += order.payment.totalAmountPlusShipping;
-              break;
-            default:
-              break;
-          }
-
-          if (
-            order.status.status !== 'Shipped' &&
-            order.status.status !== 'Delivered' &&
-            order.status.status !== 'Completed' &&
-            order.status.status !== 'Canceled' &&
-            order.status.status !== 'Pending' &&
-            !!order.payment.paymentDate &&
-            getDaysToShip(
-              order.payment?.approvedDate || order.payment.paymentDate,
-            ) < 0
-          ) {
-            accumulator.totalDelayed += 1;
-          }
-        }
-
-        return accumulator;
-      },
-      {
-        totalApproved: 0,
-        totalCanceled: 0,
-        totalProcessing: 0,
-        totalDelayed: 0,
-        total: 0,
-      },
-    );
-
-    setTotalDelayed(totals.totalDelayed);
-
-    setTotalApproved(
-      new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-      }).format(totals.totalApproved),
-    );
-
-    setTotalProcessing(
-      new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-      }).format(totals.totalProcessing),
-    );
-
-    setTotalCanceled(
-      new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-      }).format(totals.totalCanceled),
-    );
-
-    setTotal(
-      new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-      }).format(totals.total),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orders, orderStatus, fromDateFilter, toDateFilter, filter, inInterval]);
 
   useEffect(() => {
     const newItems = orders.filter(orderParent => {
@@ -534,12 +430,43 @@ const Sells: React.FC = () => {
 
   return (
     <div className={styles.sellsContainer}>
-      <span className={styles.aviso}> Prazo de despacho: 2 dias úteis </span>
-      <span className={styles.aviso}>
-        Uso obrigatório da etiqueta de despacho da B2W, Mercado Livre e Shopee
-        que estará disponível após o anexo da Nota Fiscal
-      </span>
-      <br />
+      <div className={styles.sellsTop}>
+        <InfoPanel
+          title="Tempo médio de envio"
+          icon={FiAlertCircle}
+          warning={daysUntilDelivery > 2 && orders.length > 0}
+          warningMessage={
+            <span>
+              Devido a média de entrega estar acima de 2 dias
+              <br /> sua loja está sujeita a punições!
+            </span>
+          }
+        >
+          <span
+            style={
+              daysUntilDelivery > 2 && orders.length > 0
+                ? { color: 'var(--red-100)' }
+                : {}
+            }
+          >
+            {' '}
+            {orders.length > 0 ? daysUntilDelivery : '--'}{' '}
+            {daysUntilDelivery > 1 ? 'dias' : 'dia'}{' '}
+          </span>
+        </InfoPanel>
+        <div className={styles.sellsWarnig}>
+          <span className={styles.aviso}>
+            {' '}
+            Prazo de despacho: 2 dias úteis{' '}
+          </span>
+          <br />
+          <span className={styles.aviso}>
+            Uso obrigatório da etiqueta de despacho da B2W, Mercado Livre e
+            Shopee que estará disponível após o anexo da Nota Fiscal
+          </span>
+          <br />
+        </div>
+      </div>
       <div className={styles.sellsHeader}>
         <BulletedButton
           onClick={() => {
@@ -670,87 +597,6 @@ const Sells: React.FC = () => {
             }
           />
         </div>
-        {status === SellStatus.Todos && (
-          <div className={styles.orderStatusButtons}>
-            <StatusPanel
-              title="Todos"
-              onClick={() => setOrderStatus(OrderStatus.Todos)}
-              isActive={orderStatus === OrderStatus.Todos}
-            >
-              <span className={styles.grayText}> {total} </span>
-            </StatusPanel>
-            <StatusPanel
-              title="Aprovados"
-              onClick={() => setOrderStatus(OrderStatus.Aprovado)}
-              isActive={orderStatus === OrderStatus.Aprovado}
-            >
-              <span className={styles.greenText}> {totalApproved} </span>
-            </StatusPanel>
-            <StatusPanel
-              title="Processando"
-              onClick={() => setOrderStatus(OrderStatus.Processando)}
-              isActive={orderStatus === OrderStatus.Processando}
-            >
-              <span className={styles.blueText}> {totalProcessing} </span>
-            </StatusPanel>
-            <StatusPanel
-              title="Cancelados"
-              onClick={() => setOrderStatus(OrderStatus.Cancelado)}
-              isActive={orderStatus === OrderStatus.Cancelado}
-            >
-              <span className={styles.redText}> {totalCanceled} </span>
-            </StatusPanel>
-            <InfoPanel
-              style={{ marginLeft: 'auto' }}
-              title="Tempo médio de envio"
-              icon={FiAlertCircle}
-              warning={daysUntilDelivery > 2 && orders.length > 0}
-              warningMessage={
-                <span>
-                  Devido a média de entrega estar acima de 2 dias
-                  <br /> sua loja está sujeita a punições!
-                </span>
-              }
-            >
-              <span
-                style={
-                  daysUntilDelivery > 2 && orders.length > 0
-                    ? { color: 'var(--red-100)' }
-                    : {}
-                }
-              >
-                {' '}
-                {orders.length > 0 ? daysUntilDelivery : '--'}{' '}
-                {daysUntilDelivery > 1 ? 'dias' : 'dia'}{' '}
-              </span>
-            </InfoPanel>
-            <StatusPanel
-              title={daysUntilDelivery > 1 ? 'Atrados' : 'Atrasado'}
-              altAlign
-              onClick={() => setOrderStatus(OrderStatus.Atrasado)}
-              isActive={orderStatus === OrderStatus.Atrasado}
-              style={
-                totalDelayed > 0 && orderStatus !== OrderStatus.Atrasado
-                  ? {
-                      backgroundColor: 'var(--red-100-40)',
-                      color: 'var(--white)',
-                    }
-                  : {}
-              }
-            >
-              <span
-                className={
-                  totalDelayed > 0 && orderStatus !== OrderStatus.Atrasado
-                    ? styles.whiteText
-                    : ''
-                }
-              >
-                {' '}
-                {totalDelayed}{' '}
-              </span>
-            </StatusPanel>
-          </div>
-        )}
         {items.length > 0 ? (
           <>
             <table className={styles.table}>
