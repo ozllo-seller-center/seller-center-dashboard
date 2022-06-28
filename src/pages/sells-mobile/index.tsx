@@ -170,7 +170,7 @@ export const SellsMobile: React.FC = () => {
       .then(response => {
         if (
           filter === Filter.Mes ||
-          (filter === Filter.Custom &&
+          (filter === Filter.Período &&
             differenceInDays(toDateFilter, fromDateFilter) > 10)
         ) {
           setDaysUntilDelivery(
@@ -237,7 +237,7 @@ export const SellsMobile: React.FC = () => {
             date.getTime() <= today.getTime()
           );
 
-        case Filter.Custom:
+        case Filter.Período:
           return (
             format(date, 'yyyy/MM/dd') <= format(toDateFilter, 'yyyy/MM/dd') &&
             format(date, 'yyyy/MM/dd') >= format(fromDateFilter, 'yyyy/MM/dd')
@@ -450,16 +450,16 @@ export const SellsMobile: React.FC = () => {
               <div>
                 <FilterButton
                   icon={FiCalendar}
-                  isActive={filter === Filter.Custom}
+                  isActive={filter === Filter.Período}
                   onClick={() => {
-                    setFilter(Filter.Custom);
+                    setFilter(Filter.Período);
                     setDatePickerVisibility(!datePickerVisibility);
                   }}
                 >
                   Escolher período
                 </FilterButton>
 
-                {filter === Filter.Custom && (
+                {filter === Filter.Período && (
                   <DatePickerPopup
                     formRef={datePickerRef}
                     setToDateFilter={setToDateFilter}
@@ -494,7 +494,7 @@ export const SellsMobile: React.FC = () => {
               warning={
                 daysUntilDelivery > 2 &&
                 orders.length > 0 &&
-                filter !== Filter.Custom
+                filter !== Filter.Período
               }
               warningMessage={
                 <span>
@@ -505,13 +505,13 @@ export const SellsMobile: React.FC = () => {
             >
               <span
                 style={
-                  daysUntilDelivery > 2 && Filter.Custom && orders.length > 0
+                  daysUntilDelivery > 2 && Filter.Período && orders.length > 0
                     ? { color: 'var(--red-100)' }
                     : {}
                 }
               >
                 {' '}
-                {!Filter.Custom && orders.length > 0
+                {!Filter.Período && orders.length > 0
                   ? daysUntilDelivery
                   : '--'}{' '}
                 dias{' '}
