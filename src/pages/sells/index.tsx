@@ -508,7 +508,7 @@ const Sells: React.FC = () => {
           color={approvedCount === 0 ? 'success' : 'error'}
           badgeContent={approvedCount}
           max={99}
-          style={{ marginLeft: '1.5rem', marginRight: '1.5rem' }}
+          style={{ marginLeft: '1.5rem' }}
         >
           <BulletedButton
             onClick={() => {
