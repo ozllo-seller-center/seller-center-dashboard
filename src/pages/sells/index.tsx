@@ -169,7 +169,11 @@ const Sells: React.FC = () => {
           return;
         }
 
-        setDaysUntilDelivery(response.data[0].average_shipping_time.last_week);
+        const days =
+          response.data[0].average_shipping_time.last_week ??
+          response.data[0].average_shipping_time.last_month;
+
+        days ? setDaysUntilDelivery(days) : setDaysUntilDelivery(0);
 
         setApprovedCount(
           response.data[
