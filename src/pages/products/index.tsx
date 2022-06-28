@@ -104,7 +104,7 @@ const Products: React.FC = () => {
           },
         })
         .then(response => {
-          formatProducts(response.data.products);
+          formatProducts(response.data.items);
           setTotalItems(response.data.total);
           setLoading(false);
         })
@@ -230,7 +230,7 @@ const Products: React.FC = () => {
         },
       })
       .then(response => {
-        formatProducts(response.data.products);
+        formatProducts(response.data.items);
         setLoading(false);
       })
       .catch(err => {
@@ -319,7 +319,7 @@ const Products: React.FC = () => {
       )
       .then(response => {
         setPage(newPage);
-        formatProducts(response.data.products);
+        formatProducts(response.data.items);
         setLoading(false);
       })
       .catch(err => {
@@ -344,7 +344,7 @@ const Products: React.FC = () => {
         setPage(0);
         if (response.status === 200) {
           setRowsPerPage(parseInt(event.target.value, 10));
-          formatProducts(response.data.products);
+          formatProducts(response.data.items);
           setTotalItems(response.data.total);
         } else {
           setProducts([]);
@@ -373,7 +373,7 @@ const Products: React.FC = () => {
       .then(response => {
         setPage(0);
         if (response.status === 200) {
-          formatProducts(response.data.products);
+          formatProducts(response.data.items);
           setTotalItems(response.data.total);
         } else {
           setProducts([]);

@@ -56,6 +56,7 @@ import {
   mercadoLivreStore,
   shoppeeStore,
 } from 'src/shared/consts/sells';
+import { TablePagination } from '@mui/material';
 
 interface Totals {
   totalApproved: number;
@@ -125,6 +126,11 @@ const Sells: React.FC = () => {
   const [toolTipYOffset, setToolTipYOffset] = useState(0);
   const [toolTipXOffset, setToolTipXOffset] = useState(0);
 
+  const [page, setPage] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [search, setSearch] = useState('');
+
   useEffect(() => {
     // setOrders(ordersFromApi)
     setLoading(true);
@@ -192,19 +198,18 @@ const Sells: React.FC = () => {
     setLoading(true);
 
     api
-      .get('/order/all', {
+      .get(`/order/all?page=${page + 1}&limit=${rowsPerPage}`, {
         headers: {
           authorization: token,
           shop_id: user.shopInfo._id,
         },
       })
       .then(response => {
-        const ords: OrderParent[] = response.data;
-
+        const ords: OrderParent[] = response.data.items;
+        setPage(0);
         setOrders(ords);
-
-        // setOrders(response.data as OrderParent[]);
-
+        setTotalItems(response.data.total);
+        setItems(response.data.items);
         setLoading(false);
       })
       .catch(err => {
@@ -212,7 +217,7 @@ const Sells: React.FC = () => {
         console.log(err);
         setLoading(false);
       });
-  }, [user, token, setLoading]);
+  }, [setLoading, page, rowsPerPage, token, user.shopInfo._id]);
 
   const inInterval = useCallback(
     (order: Order) => {
@@ -376,6 +381,31 @@ const Sells: React.FC = () => {
     inInterval,
   ]);
 
+  const getOrdersByStatus = useCallback(
+    (status: string) => {
+      setLoading(true);
+      api
+        .get(`/order/status/${status}?page=1&limit=${rowsPerPage}`, {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          },
+        })
+        .then(response => {
+          setPage(0);
+          setTotalItems(response.data.total);
+          setItems(response.data.items);
+          setLoading(false);
+        })
+        .catch(err => {
+          // eslint-disable-next-line no-console
+          console.log(err);
+          setLoading(false);
+        });
+    },
+    [setLoading, rowsPerPage, token, user.shopInfo._id],
+  );
+
   const datePickerRef = useRef<FormHandles>(null);
   const [datePickerVisibility, setDatePickerVisibility] = useState(false);
 
@@ -415,6 +445,93 @@ const Sells: React.FC = () => {
     return differenceInBusinessDays(orderDate, today);
   }, []);
 
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number,
+  ) => {
+    setLoading(true);
+
+    api
+      .get(`${getOrderQueryPrefix()}?page=${page + 1}&limit=${rowsPerPage}`, {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        },
+      })
+      .then(response => {
+        setPage(newPage);
+        setOrders(response.data.items);
+        setLoading(false);
+      })
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.log(err);
+        setLoading(false);
+      });
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setLoading(true);
+    api
+      .get(
+        `${getOrderQueryPrefix()}?page=1&limit=${
+          event.target.value
+        }&search=${search}`,
+        {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          },
+        },
+      )
+      .then(response => {
+        setPage(0);
+        if (response.status === 200) {
+          setRowsPerPage(parseInt(event.target.value, 10));
+          setOrders(response.data.items);
+          setTotalItems(response.data.total);
+        } else {
+          setOrders([]);
+          setTotalItems(0);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.log(err);
+        setLoading(false);
+      });
+  };
+
+  const getOrderQueryPrefix = () => {
+    let query;
+    switch (status) {
+      case SellStatus.Processando:
+        query = '/order/status/pending';
+        break;
+      case SellStatus.Faturando:
+        query = '/order/status/approved';
+        break;
+      case SellStatus.Despachando:
+        query = '/order/status/invoiced';
+        break;
+      case SellStatus.Despachado:
+        query = '/order/status/shipped';
+        break;
+      case SellStatus.Cancelado:
+        query = '/order/status/canceled';
+        break;
+      case SellStatus.Entregue:
+        query = '/order/status/delivered';
+        break;
+      default:
+        query = '/order/all';
+    }
+    return query;
+  };
+
   return (
     <div className={styles.sellsContainer}>
       <span className={styles.aviso}> Prazo de despacho: 2 dias úteis </span>
@@ -425,43 +542,64 @@ const Sells: React.FC = () => {
       <br />
       <div className={styles.sellsHeader}>
         <BulletedButton
-          onClick={() => setStatus(SellStatus.Todos)}
+          onClick={() => {
+            loadOrders();
+            setStatus(SellStatus.Todos);
+          }}
           isActive={status === SellStatus.Todos}
         >
           Todas
         </BulletedButton>
         <BulletedButton
-          onClick={() => setStatus(SellStatus.Processando)}
+          onClick={() => {
+            getOrdersByStatus('pending');
+            setStatus(SellStatus.Processando);
+          }}
           isActive={status === SellStatus.Processando}
         >
           Aguardando Pagamento
         </BulletedButton>
         <BulletedButton
-          onClick={() => setStatus(SellStatus.Faturando)}
+          onClick={() => {
+            getOrdersByStatus('approved');
+            setStatus(SellStatus.Faturando);
+          }}
           isActive={status === SellStatus.Faturando}
         >
           Aguardando Faturamento
         </BulletedButton>
         <BulletedButton
-          onClick={() => setStatus(SellStatus.Despachando)}
+          onClick={() => {
+            getOrdersByStatus('invoiced');
+            setStatus(SellStatus.Despachando);
+          }}
           isActive={status === SellStatus.Despachando}
         >
           Aguardando Despacho
         </BulletedButton>
         <BulletedButton
-          onClick={() => setStatus(SellStatus.Despachado)}
+          onClick={() => {
+            getOrdersByStatus('shipped');
+            setStatus(SellStatus.Despachado);
+          }}
           isActive={status === SellStatus.Despachado}
         >
           Despachados
         </BulletedButton>
         <BulletedButton
-          onClick={() => setStatus(SellStatus.Entregue)}
+          onClick={() => {
+            getOrdersByStatus('delivered');
+            setStatus(SellStatus.Entregue);
+          }}
           isActive={status === SellStatus.Entregue}
         >
           Entregues & Concluídos
         </BulletedButton>
         <BulletedButton
-          onClick={() => setStatus(SellStatus.Cancelado)}
+          onClick={() => {
+            getOrdersByStatus('canceled');
+            setStatus(SellStatus.Cancelado);
+          }}
           isActive={status === SellStatus.Cancelado}
         >
           Cancelados
@@ -519,6 +657,18 @@ const Sells: React.FC = () => {
               Remover Filtro
             </Button>
           </div>
+          <TablePagination
+            component="div"
+            count={totalItems}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Pedidos por página"
+            labelDisplayedRows={({ from, to, count }) =>
+              `${from}-${to} de ${count}`
+            }
+          />
         </div>
         {status === SellStatus.Todos && (
           <div className={styles.orderStatusButtons}>
@@ -602,304 +752,325 @@ const Sells: React.FC = () => {
           </div>
         )}
         {items.length > 0 ? (
-          <table className={styles.table}>
-            <thead className={styles.tableHeader}>
-              <tr>
-                <th>Número do pedido</th>
-                <th>Produtos</th>
-                <th>Data</th>
-                <th>Valor</th>
-                <th>Status</th>
-                <th>Ação</th>
-              </tr>
-            </thead>
-            <tbody className={styles.tableBody}>
-              {items.map((item, i) => (
-                <tr
-                  className={styles.tableItem}
-                  key={item._id}
-                  ref={itemsRef[i]}
-                >
-                  <td width="10%">{item.order.reference.id}</td>
-                  <td id={styles.itemsCell}>
-                    {item.order.products.map(
-                      (product, j) =>
-                        j <= 2 && <p key={product.sku}>{product.name}</p>,
-                    )}
-                    {item.order.products.length > 3 && (
-                      <Collapsible
-                        totalItems={item.order.products.length}
-                        toggleRef={
-                          collapsibleRefs ? collapsibleRefs[i] : undefined
-                        }
-                      >
-                        {item.order.products.map(product => (
-                          <p key={product.sku}>{product.name}</p>
-                        ))}
-                      </Collapsible>
-                    )}
-                  </td>
-                  <td id={styles.dateCell}>
-                    {format(
-                      new Date(item.order.payment.purchaseDate),
-                      'dd/MM/yyyy',
-                    )}
-                  </td>
-                  <td id={styles.valueCell}>
-                    {new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL',
-                    }).format(item.order.payment.totalAmountPlusShipping)}
-                  </td>
-                  <td width="12.5%" className={styles.statusCell}>
-                    {item.order.status.status !== 'Shipped' &&
-                    item.order.status.status !== 'Delivered' &&
-                    item.order.status.status !== 'Completed' &&
-                    item.order.status.status !== 'Canceled' &&
-                    item.order.status.status !== 'Pending' &&
-                    !!item.order.payment.paymentDate &&
-                    getDaysToShip(
-                      item.order.payment?.approvedDate ||
-                        item.order.payment.paymentDate,
-                    ) <= 2 ? (
-                      <div className={styles.shippmentWarning}>
-                        <FiAlertTriangle
-                          style={
-                            getDaysToShip(
-                              item.order.payment?.approvedDate ||
-                                item.order.payment.paymentDate,
-                            ) >= 0
-                              ? { color: 'var(--yellow-300)' }
-                              : { color: 'var(--red-300)' }
-                          }
-                          onMouseOver={e => {
-                            setOpenTooltip(true);
-                            setTooltipItem(item.order);
-                            setToolTipYOffset(e.pageY);
-                            setToolTipXOffset(e.pageX);
-                          }}
-                          onMouseOut={() => {
-                            setOpenTooltip(false);
-                          }}
-                        />
-                        <span
-                          style={
-                            getDaysToShip(
-                              item.order.payment?.approvedDate ||
-                                item.order.payment.paymentDate,
-                            ) >= 0
-                              ? { color: 'var(--yellow-300)' }
-                              : { color: 'var(--red-300)' }
+          <>
+            <table className={styles.table}>
+              <thead className={styles.tableHeader}>
+                <tr>
+                  <th>Número do pedido</th>
+                  <th>Produtos</th>
+                  <th>Data</th>
+                  <th>Valor</th>
+                  <th>Status</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody className={styles.tableBody}>
+                {items.map((item, i) => (
+                  <tr
+                    className={styles.tableItem}
+                    key={item._id}
+                    ref={itemsRef[i]}
+                  >
+                    <td width="10%">{item.order.reference.id}</td>
+                    <td id={styles.itemsCell}>
+                      {item.order.products.map(
+                        (product, j) =>
+                          j <= 2 && <p key={product.sku}>{product.name}</p>,
+                      )}
+                      {item.order.products.length > 3 && (
+                        <Collapsible
+                          totalItems={item.order.products.length}
+                          toggleRef={
+                            collapsibleRefs ? collapsibleRefs[i] : undefined
                           }
                         >
-                          {getOrderStatus(item.order.status.status)}
-                        </span>
-                      </div>
-                    ) : (
-                      getOrderStatus(item.order.status.status)
-                    )}
-                  </td>
-                  <td
-                    id={
-                      status === SellStatus.Faturando ||
-                      status === SellStatus.Despachando
-                        ? styles.attachmentCell
-                        : styles.actionCell
-                    }
-                  >
-                    {status === SellStatus.Faturando && (
-                      <AttachButton
-                        name={item._id}
-                        title="Anexo de NF-e"
-                        attachedText="NF-e Anexada"
-                        unattachedText="Anexar NF-e"
-                        placeholder="Informe a URL da NF-e"
-                        // isAttached={!!item.order.orderNotes && item.order.orderNotes.length > 0} //!item.nfe_url
-                        isAttached={item.order.status.status === 'Invoiced'}
-                        onClick={() => {
-                          if (item.order.status.status === 'Approved') {
-                            setNfeModalOpen(true);
-                            setNfeItem(item);
-                          }
-                        }}
-                      />
-                    )}
-                    {status === SellStatus.Despachando && (
-                      <>
+                          {item.order.products.map(product => (
+                            <p key={product.sku}>{product.name}</p>
+                          ))}
+                        </Collapsible>
+                      )}
+                    </td>
+                    <td id={styles.dateCell}>
+                      {format(
+                        new Date(item.order.payment.purchaseDate),
+                        'dd/MM/yyyy',
+                      )}
+                    </td>
+                    <td id={styles.valueCell}>
+                      {new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL',
+                      }).format(item.order.payment.totalAmountPlusShipping)}
+                    </td>
+                    <td width="12.5%" className={styles.statusCell}>
+                      {item.order.status.status !== 'Shipped' &&
+                      item.order.status.status !== 'Delivered' &&
+                      item.order.status.status !== 'Completed' &&
+                      item.order.status.status !== 'Canceled' &&
+                      item.order.status.status !== 'Pending' &&
+                      !!item.order.payment.paymentDate &&
+                      getDaysToShip(
+                        item.order.payment?.approvedDate ||
+                          item.order.payment.paymentDate,
+                      ) <= 2 ? (
+                        <div className={styles.shippmentWarning}>
+                          <FiAlertTriangle
+                            style={
+                              getDaysToShip(
+                                item.order.payment?.approvedDate ||
+                                  item.order.payment.paymentDate,
+                              ) >= 0
+                                ? { color: 'var(--yellow-300)' }
+                                : { color: 'var(--red-300)' }
+                            }
+                            onMouseOver={e => {
+                              setOpenTooltip(true);
+                              setTooltipItem(item.order);
+                              setToolTipYOffset(e.pageY);
+                              setToolTipXOffset(e.pageX);
+                            }}
+                            onMouseOut={() => {
+                              setOpenTooltip(false);
+                            }}
+                          />
+                          <span
+                            style={
+                              getDaysToShip(
+                                item.order.payment?.approvedDate ||
+                                  item.order.payment.paymentDate,
+                              ) >= 0
+                                ? { color: 'var(--yellow-300)' }
+                                : { color: 'var(--red-300)' }
+                            }
+                          >
+                            {getOrderStatus(item.order.status.status)}
+                          </span>
+                        </div>
+                      ) : (
+                        getOrderStatus(item.order.status.status)
+                      )}
+                    </td>
+                    <td
+                      id={
+                        status === SellStatus.Faturando ||
+                        status === SellStatus.Despachando
+                          ? styles.attachmentCell
+                          : styles.actionCell
+                      }
+                    >
+                      {status === SellStatus.Faturando && (
                         <AttachButton
                           name={item._id}
-                          title="Código de envio"
-                          attachedText="Código de Envio"
-                          unattachedText="Informar código"
-                          placeholder="Informe o código de envio"
-                          // handleAttachment={handleAttachment}
-                          // isAttached={!!item.order.orderNotes} //!item.nfe_url
-                          isAttached={item.order.status.status === 'Shipped'}
+                          title="Anexo de NF-e"
+                          attachedText="NF-e Anexada"
+                          unattachedText="Anexar NF-e"
+                          placeholder="Informe a URL da NF-e"
+                          // isAttached={!!item.order.orderNotes && item.order.orderNotes.length > 0} //!item.nfe_url
+                          isAttached={item.order.status.status === 'Invoiced'}
                           onClick={() => {
-                            if (item.order.status.status === 'Invoiced') {
-                              setTrackingModalOpen(true);
-                              setTrackingItem(item);
+                            if (item.order.status.status === 'Approved') {
+                              setNfeModalOpen(true);
+                              setNfeItem(item);
                             }
                           }}
                         />
-                        {(item.order.reference.system.source === shoppeeStore ||
-                          item.order.reference.system.source ===
-                            mercadoLivreStore ||
-                          item.order.reference.system.source === b2wStore) && (
-                          <AttachButton
-                            style={{ marginTop: '1rem' }}
-                            name={item._id}
-                            title="Etiqueta de envio"
-                            attachedText="Etiqueta de envio"
-                            unattachedText="Etiqueta de envio"
-                            isAttached={true}
-                            placeholder={''}
-                            type="button"
-                            alterIcon={FiDownload}
-                            onClick={async () => {
-                              setLoading(true);
-
-                              return await api
-                                .get(
-                                  `order/${item.order.reference.id}/shippingLabel`,
-                                  {
-                                    headers: {
-                                      authorization: token,
-                                      shop_id: user.shopInfo._id,
-                                    },
-                                  },
-                                )
-                                .then(response => {
-                                  setLoading(false);
-
-                                  if (!response.data.data.url) {
-                                    handleModalMessage(true, {
-                                      message: [
-                                        'Etiqueta não pode ser encontrada.',
-                                        'Por favor, tente novamente mais tarde.',
-                                      ],
-                                      title: 'Etiqueta não encontrada',
-                                      type: 'other',
-                                    });
-
-                                    return;
-                                  }
-
-                                  window.open(response.data.data.url, '_blank');
-                                })
-                                .catch(err => {
-                                  // eslint-disable-next-line no-console
-                                  console.log(err);
-
-                                  setLoading(false);
-
-                                  handleModalMessage(true, {
-                                    message: [
-                                      'Etiqueta não pode ser encontrada.',
-                                      'Por favor, tente novamente mais tarde.',
-                                    ],
-                                    title: 'Etiqueta não encontrada',
-                                    type: 'error',
-                                  });
-
-                                  return;
-                                });
-                            }}
-                          ></AttachButton>
-                        )}
-                      </>
-                    )}
-                    {status !== SellStatus.Faturando &&
-                      status !== SellStatus.Despachando && (
+                      )}
+                      {status === SellStatus.Despachando && (
                         <>
-                          {status === SellStatus.Despachado &&
-                            (item.order.reference.system.source ===
-                              shoppeeStore ||
-                              item.order.reference.system.source ===
-                                mercadoLivreStore ||
-                              item.order.reference.system.source ===
-                                b2wStore) && (
-                              <AttachButton
-                                style={{ marginBottom: '1rem' }}
-                                name={item._id}
-                                title="Etiqueta de envio"
-                                attachedText="Etiqueta de envio"
-                                unattachedText="Etiqueta de envio"
-                                isAttached={true}
-                                placeholder={''}
-                                type="button"
-                                alterIcon={FiDownload}
-                                onClick={async () => {
-                                  setLoading(true);
+                          <AttachButton
+                            name={item._id}
+                            title="Código de envio"
+                            attachedText="Código de Envio"
+                            unattachedText="Informar código"
+                            placeholder="Informe o código de envio"
+                            // handleAttachment={handleAttachment}
+                            // isAttached={!!item.order.orderNotes} //!item.nfe_url
+                            isAttached={item.order.status.status === 'Shipped'}
+                            onClick={() => {
+                              if (item.order.status.status === 'Invoiced') {
+                                setTrackingModalOpen(true);
+                                setTrackingItem(item);
+                              }
+                            }}
+                          />
+                          {(item.order.reference.system.source ===
+                            shoppeeStore ||
+                            item.order.reference.system.source ===
+                              mercadoLivreStore ||
+                            item.order.reference.system.source ===
+                              b2wStore) && (
+                            <AttachButton
+                              style={{ marginTop: '1rem' }}
+                              name={item._id}
+                              title="Etiqueta de envio"
+                              attachedText="Etiqueta de envio"
+                              unattachedText="Etiqueta de envio"
+                              isAttached={true}
+                              placeholder={''}
+                              type="button"
+                              alterIcon={FiDownload}
+                              onClick={async () => {
+                                setLoading(true);
 
-                                  return await api
-                                    .get(
-                                      `order/${item.order.reference.id}/shippingLabel`,
-                                      {
-                                        headers: {
-                                          authorization: token,
-                                          shop_id: user.shopInfo._id,
-                                        },
+                                return await api
+                                  .get(
+                                    `order/${item.order.reference.id}/shippingLabel`,
+                                    {
+                                      headers: {
+                                        authorization: token,
+                                        shop_id: user.shopInfo._id,
                                       },
-                                    )
-                                    .then(response => {
-                                      setLoading(false);
+                                    },
+                                  )
+                                  .then(response => {
+                                    setLoading(false);
 
-                                      if (!response.data.data.url) {
-                                        handleModalMessage(true, {
-                                          message: [
-                                            'Etiqueta não pode ser encontrada.',
-                                            'Por favor, tente novamente mais tarde.',
-                                          ],
-                                          title: 'Etiqueta não encontrada',
-                                          type: 'other',
-                                        });
-
-                                        return;
-                                      }
-
-                                      window.open(
-                                        response.data.data.url,
-                                        '_blank',
-                                      );
-                                    })
-                                    .catch(err => {
-                                      setLoading(false);
-
+                                    if (!response.data.data.url) {
                                       handleModalMessage(true, {
                                         message: [
                                           'Etiqueta não pode ser encontrada.',
                                           'Por favor, tente novamente mais tarde.',
                                         ],
                                         title: 'Etiqueta não encontrada',
-                                        type: 'error',
+                                        type: 'other',
                                       });
 
-                                      // eslint-disable-next-line no-console
-                                      console.log(err);
-                                    });
-                                }}
-                              ></AttachButton>
-                            )}
+                                      return;
+                                    }
 
-                          <button
-                            type="button"
-                            className={styles.action}
-                            onClick={() => {
-                              setOrderModalOpen(true);
-                              setModalOrder(item.order);
-                            }}
-                          >
-                            {' '}
-                            Ver detalhes{' '}
-                          </button>
+                                    window.open(
+                                      response.data.data.url,
+                                      '_blank',
+                                    );
+                                  })
+                                  .catch(err => {
+                                    // eslint-disable-next-line no-console
+                                    console.log(err);
+
+                                    setLoading(false);
+
+                                    handleModalMessage(true, {
+                                      message: [
+                                        'Etiqueta não pode ser encontrada.',
+                                        'Por favor, tente novamente mais tarde.',
+                                      ],
+                                      title: 'Etiqueta não encontrada',
+                                      type: 'error',
+                                    });
+
+                                    return;
+                                  });
+                              }}
+                            ></AttachButton>
+                          )}
                         </>
                       )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      {status !== SellStatus.Faturando &&
+                        status !== SellStatus.Despachando && (
+                          <>
+                            {status === SellStatus.Despachado &&
+                              (item.order.reference.system.source ===
+                                shoppeeStore ||
+                                item.order.reference.system.source ===
+                                  mercadoLivreStore ||
+                                item.order.reference.system.source ===
+                                  b2wStore) && (
+                                <AttachButton
+                                  style={{ marginBottom: '1rem' }}
+                                  name={item._id}
+                                  title="Etiqueta de envio"
+                                  attachedText="Etiqueta de envio"
+                                  unattachedText="Etiqueta de envio"
+                                  isAttached={true}
+                                  placeholder={''}
+                                  type="button"
+                                  alterIcon={FiDownload}
+                                  onClick={async () => {
+                                    setLoading(true);
+
+                                    return await api
+                                      .get(
+                                        `order/${item.order.reference.id}/shippingLabel`,
+                                        {
+                                          headers: {
+                                            authorization: token,
+                                            shop_id: user.shopInfo._id,
+                                          },
+                                        },
+                                      )
+                                      .then(response => {
+                                        setLoading(false);
+
+                                        if (!response.data.data.url) {
+                                          handleModalMessage(true, {
+                                            message: [
+                                              'Etiqueta não pode ser encontrada.',
+                                              'Por favor, tente novamente mais tarde.',
+                                            ],
+                                            title: 'Etiqueta não encontrada',
+                                            type: 'other',
+                                          });
+
+                                          return;
+                                        }
+
+                                        window.open(
+                                          response.data.data.url,
+                                          '_blank',
+                                        );
+                                      })
+                                      .catch(err => {
+                                        setLoading(false);
+
+                                        handleModalMessage(true, {
+                                          message: [
+                                            'Etiqueta não pode ser encontrada.',
+                                            'Por favor, tente novamente mais tarde.',
+                                          ],
+                                          title: 'Etiqueta não encontrada',
+                                          type: 'error',
+                                        });
+
+                                        // eslint-disable-next-line no-console
+                                        console.log(err);
+                                      });
+                                  }}
+                                ></AttachButton>
+                              )}
+
+                            <button
+                              type="button"
+                              className={styles.action}
+                              onClick={() => {
+                                setOrderModalOpen(true);
+                                setModalOrder(item.order);
+                              }}
+                            >
+                              {' '}
+                              Ver detalhes{' '}
+                            </button>
+                          </>
+                        )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {rowsPerPage < totalItems && (
+              <TablePagination
+                component="div"
+                count={totalItems}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                labelRowsPerPage="Produtos por página"
+                labelDisplayedRows={({ from, to, count }) =>
+                  `${from}-${to} de ${count}`
+                }
+              />
+            )}
+          </>
         ) : (
           <span className={styles.emptyList}>
             {' '}
