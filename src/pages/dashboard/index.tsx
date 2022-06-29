@@ -1,6 +1,4 @@
-import { GetStaticProps } from 'next';
-
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FiSend } from 'react-icons/fi';
 import { MdAttachMoney } from 'react-icons/md';
 
@@ -9,25 +7,82 @@ import PanelItem from '../../components/PanelItem';
 
 import styles from './styles.module.scss';
 import Panel from '../../components/Panel';
-
-interface OrderSummary {
-  name: string;
-  value: string;
-}
+import { useAuth } from 'src/hooks/auth';
+import api from 'src/services/api';
+import { useLoading } from 'src/hooks/loading';
+import Loader from 'src/components/Loader';
 
 const Dashboard: React.FC = () => {
-  const [approvedOrders, setApprovedOrders] = useState({
-    name: 'Aprovados',
-    value: new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(0),
-  } as OrderSummary);
-
-  const [canceledOrders, setCanceledOrders] = useState({} as OrderSummary);
-  const [returnedOredres, setReturnedOrders] = useState({} as OrderSummary);
-
   const router = useRouter();
+
+  const { user, token } = useAuth();
+
+  const { isLoading, setLoading } = useLoading();
+
+  const [amount, setAmount] = useState({
+    pending: 'R$ 0,00',
+    approved: 'R$ 0,00',
+    invoiced: 'R$ 0,00',
+    shipped: 'R$ 0,00',
+    delivered: 'R$ 0,00',
+    canceled: 'R$ 0,00',
+  });
+
+  const [quantity, setQuantity] = useState({
+    pending: '0',
+    approved: '0',
+    invoiced: '0',
+    shipped: '0',
+    delivered: '0',
+    canceled: '0',
+  });
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    setLoading(true);
+    api
+      .get('/order/revenue', {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        },
+      })
+      .then(response => {
+        setAmount(response.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.log(err);
+        setLoading(false);
+      });
+
+    api
+      .get('/order/insigths', {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        },
+      })
+      .then(response => {
+        const statusCount =
+          response.data[
+            response.data.findIndex(
+              (item: { status_count: any }) => item.status_count,
+            )
+          ]['status_count'];
+
+        setQuantity(statusCount);
+        setLoading(false);
+      })
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.log(err);
+        setLoading(false);
+      });
+  }, [setLoading, token, user]);
 
   return (
     <div className={styles.dashboardContainer}>
@@ -41,13 +96,35 @@ const Dashboard: React.FC = () => {
           }}
         >
           <PanelItem
-            title={approvedOrders.name}
-            value={approvedOrders.value}
+            title={'Processando'}
+            value={amount.pending}
+            valueColor="blue"
+          />
+          <PanelItem
+            title="Aguardando Faturamento"
+            value={amount.approved}
+            valueColor="orange"
+          />
+          <PanelItem
+            title="Aguardando Despacho"
+            value={amount.invoiced}
+            valueColor="red"
+          />
+          <PanelItem
+            title="Despachados"
+            value={amount.shipped}
+            valueColor="yellow"
+          />
+          <PanelItem
+            title="Entregues"
+            value={amount.delivered}
             valueColor="green"
           />
-          <PanelItem title="Processando" value="R$ 0,00" valueColor="blue" />
-          <PanelItem title="Cancelados" value="R$ 0,00" valueColor="red" />
-          <PanelItem title="Devolvidos" value="R$ 0,00" valueColor="orange" />
+          <PanelItem
+            title="Cancelados"
+            value={amount.canceled}
+            valueColor="gray"
+          />
         </Panel>
         <Panel
           icon={FiSend}
@@ -58,27 +135,42 @@ const Dashboard: React.FC = () => {
           }}
         >
           <PanelItem
-            title="Aguardando confirmação"
-            value="0"
-            valueColor="gray"
+            title="Processando"
+            value={quantity.pending}
+            valueColor="blue"
           />
           <PanelItem
-            title="Aguardando despacho"
-            value="0"
+            title="Aguardando Faturamento"
+            value={quantity.approved}
+            valueColor="orange"
+          />
+          <PanelItem
+            title="Aguardando Despacho"
+            value={quantity.invoiced}
+            valueColor="red"
+          />
+          <PanelItem
+            title="Despachados"
+            value={quantity.shipped}
             valueColor="yellow"
           />
-          <PanelItem title="Despachados" value="0" valueColor="blue" />
-          <PanelItem title="Entregues" value="0" valueColor="green" />
-          <PanelItem title="Retornados" value="0" valueColor="orange" />
-          <PanelItem title="Cancelados" value="0" valueColor="red" />
+          <PanelItem
+            title="Entregues"
+            value={quantity.delivered}
+            valueColor="green"
+          />
+          <PanelItem
+            title="Cancelados"
+            value={quantity.canceled}
+            valueColor="gray"
+          />
         </Panel>
-        {/* <div className={styles.panelShortcuts}>
-          <span>Atalhos</span>
-          <div className={styles.shortcutsArea}>
-
-          </div>
-        </div> */}
       </div>
+      {isLoading && (
+        <div className={styles.loadingContainer}>
+          <Loader />
+        </div>
+      )}
     </div>
   );
 };
