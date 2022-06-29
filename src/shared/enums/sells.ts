@@ -3,9 +3,9 @@ export enum SellStatus {
   Entregue = 'Entregue',
   Processando = 'Processando',
   Cancelado = 'Cancelado',
-  Faturando = 'Aprovado',
+  Faturando = 'Aguardando Faturamento',
   Despachado = 'Despachado',
-  Despachando = 'Despachando',
+  Despachando = 'Aguardando Despacho',
   Atrasado = 'Atrasado',
   Todos = '?',
 }

@@ -506,7 +506,7 @@ const Sells: React.FC = () => {
           }}
           isActive={status === SellStatus.Processando}
         >
-          Aguardando Pagamento
+          Processando
         </BulletedButton>
         <Badge
           color={approvedCount === 0 ? 'success' : 'error'}
