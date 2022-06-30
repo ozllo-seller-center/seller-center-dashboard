@@ -113,7 +113,7 @@ const Sells: React.FC = () => {
   const [page, setPage] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [search, setSearch] = useState('');
+  const [search] = useState('');
   const [approvedCount, setApprovedCount] = useState(0);
   const [invoicedCount, setInvoicedCount] = useState(0);
 
