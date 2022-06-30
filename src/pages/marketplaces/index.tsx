@@ -19,11 +19,6 @@ const SignUp: React.FC = () => {
   useEffect(() => {
     setMarketplaces([
       {
-        name: 'amazon',
-        url: 'https://www.amazon.com.br/s?me=A3NLIHGRNR1YJA&marketplaceID=A2Q3Y263D00KWC',
-        image: '/assets/amazon-transparent.png',
-      },
-      {
         name: 'americanas',
         url: 'https://www.americanas.com.br/lojista/ozllo?origem=blancalojista',
         image: '/assets/americanas-transparent.png',
@@ -52,11 +47,6 @@ const SignUp: React.FC = () => {
         name: 'drograsil',
         url: 'https://www.drogasil.com.br/search?w=ozllo',
         image: '/assets/drograsil.png',
-      },
-      {
-        name: 'enjoei',
-        url: 'https://www.enjoei.com.br/@ozllo360',
-        image: '/assets/enjoei4.png',
       },
       {
         name: 'extra',
