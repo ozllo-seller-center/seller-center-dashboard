@@ -370,12 +370,15 @@ const Sells: React.FC = () => {
     setLoading(true);
 
     api
-      .get(`${getOrderQueryPrefix()}?page=${page + 1}&limit=${rowsPerPage}`, {
-        headers: {
-          authorization: token,
-          shop_id: user.shopInfo._id,
+      .get(
+        `${getOrderQueryPrefix()}?page=${newPage + 1}&limit=${rowsPerPage}`,
+        {
+          headers: {
+            authorization: token,
+            shop_id: user.shopInfo._id,
+          },
         },
-      })
+      )
       .then(response => {
         setPage(newPage);
         setOrders(response.data.items);
