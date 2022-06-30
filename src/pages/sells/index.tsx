@@ -348,8 +348,9 @@ const Sells: React.FC = () => {
       case 'Canceled':
         return SellStatus.Cancelado;
       case 'Delivered':
-      case 'Completed':
         return SellStatus.Entregue;
+      case 'Completed':
+        return SellStatus.Completed;
       default:
         return SellStatus.Processando;
     }

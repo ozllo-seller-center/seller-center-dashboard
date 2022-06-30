@@ -116,7 +116,7 @@ const Dashboard: React.FC = () => {
             valueColor="yellow"
           />
           <PanelItem
-            title="Entregues"
+            title="Entregues e Concluídos"
             value={amount.delivered}
             valueColor="green"
           />
@@ -155,7 +155,7 @@ const Dashboard: React.FC = () => {
             valueColor="yellow"
           />
           <PanelItem
-            title="Entregues"
+            title="Entregues e Concluídos"
             value={quantity.delivered}
             valueColor="green"
           />

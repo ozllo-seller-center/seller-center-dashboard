@@ -8,6 +8,7 @@ export enum SellStatus {
   Despachando = 'Aguardando Despacho',
   Atrasado = 'Atrasado',
   Todos = '?',
+  Completed = 'Concluído',
 }
 
 export enum Filter {
