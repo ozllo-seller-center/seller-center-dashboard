@@ -158,22 +158,7 @@ const Sells: React.FC = () => {
         },
       })
       .then(response => {
-        if (
-          filter === Filter.Mes ||
-          (filter === Filter.Período &&
-            differenceInDays(toDateFilter, fromDateFilter) > 10)
-        ) {
-          setDaysUntilDelivery(
-            response.data[0].average_shipping_time.last_month,
-          );
-          return;
-        }
-
-        const days =
-          response.data[0].average_shipping_time.last_week ??
-          response.data[0].average_shipping_time.last_month;
-
-        days ? setDaysUntilDelivery(days) : setDaysUntilDelivery(0);
+        setDaysUntilDelivery(response.data[0].average_shipping_time.all);
 
         setApprovedCount(
           response.data[
