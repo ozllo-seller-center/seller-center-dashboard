@@ -70,8 +70,8 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
           <div className={styles.content}>
             <div className={styles.info}>
               <div className={styles.column}>
-                <strong>Nº do pedido</strong>
-                <span>{order.reference.id}</span>
+                <strong>Código do pedido</strong>
+                <span>{order.reference.source}</span>
                 <strong>Vendido por</strong>
                 <span>{order.reference.store}</span>
               </div>

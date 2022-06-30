@@ -642,7 +642,7 @@ const Sells: React.FC = () => {
             <table className={styles.table}>
               <thead className={styles.tableHeader}>
                 <tr>
-                  <th>Número do pedido</th>
+                  <th>Código do pedido</th>
                   <th>Produtos</th>
                   <th>Data</th>
                   <th>Valor</th>
@@ -657,7 +657,7 @@ const Sells: React.FC = () => {
                     key={item._id}
                     ref={itemsRef[i]}
                   >
-                    <td width="10%">{item.order.reference.id}</td>
+                    <td width="15%">{item.order.reference.source}</td>
                     <td id={styles.itemsCell}>
                       {item.order.products.map(
                         (product, j) =>
