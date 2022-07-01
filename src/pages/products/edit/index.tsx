@@ -219,6 +219,25 @@ export function EditProductForm() {
   }, [user, formRef, token, setLoading, router.query, handleModalMessage]);
 
   useEffect(() => {
+    const { id } = router.query;
+
+    api
+      .get(`/product/${id}/ad`, {
+        headers: {
+          authorization: token,
+          shop_id: user.shopInfo._id,
+        },
+      })
+      .then(response => {
+        console.table(response.data);
+      })
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.log(err);
+      });
+  }, [router.query, token, user.shopInfo._id]);
+
+  useEffect(() => {
     setLoading(true);
 
     if (category) {
