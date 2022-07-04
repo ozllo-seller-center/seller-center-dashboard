@@ -1363,7 +1363,6 @@ const Profile: React.FC = () => {
                     autoComplete="off"
                     // isMasked
                     mask="9999-9"
-                    maskChar="0"
                     alwaysShowMask
                     onChange={() => {
                       setChanged(true);
