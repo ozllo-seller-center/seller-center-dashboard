@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useRef,
-  ChangeEvent,
-  useState,
-  useMemo,
-} from 'react';
+import React, { useCallback, useRef, useState, useMemo } from 'react';
 
 import { FormHandles, Scope } from '@unform/core';
 import { Form } from '@unform/web';
@@ -43,7 +37,6 @@ interface PersonalInfoDTO {
   firstName: string;
   lastName: string;
   cpf: string;
-  // birthday?: string,
   day: number;
   month: number;
   year: number;
@@ -62,10 +55,6 @@ type ProfileFormData = {
   };
 
   email: string;
-  // phone?: string,
-
-  // commission: number,
-  // role: string,
 
   bankInfo: {
     bank: string;
@@ -84,12 +73,6 @@ type ProfileFormData = {
     _id: string;
     name: string;
     cnpj: string;
-
-    // address: string,
-    // district: string,
-    // city: string,
-    // complement: string,
-    // number: number,
   };
 };
 
@@ -133,9 +116,6 @@ const Profile: React.FC = () => {
     if (flowStep === -1) {
       setFlowStep(!!user && !!user.personalInfo ? 0 : -1);
     }
-
-    // isTokenValid(token).then(valid => {
-    // if (valid) {
     api
       .get(`auth/token/${token}`)
       .then(response => {
@@ -147,13 +127,11 @@ const Profile: React.FC = () => {
         }
       })
       .catch(error => {
+        // eslint-disable-next-line no-console
+        console.log(error);
         signOut();
         router.push('/');
       });
-
-    // return
-    // }
-    // })
   }, [user, token]);
 
   const userData = useMemo(() => {
@@ -220,8 +198,6 @@ const Profile: React.FC = () => {
             },
           } as ProfileFormData);
 
-          console.log(`Loading false? ${isLoading}`);
-
           setLoading(false);
 
           return;
@@ -232,10 +208,12 @@ const Profile: React.FC = () => {
         setLoading(false);
       })
       .catch(err => {
+        // eslint-disable-next-line no-console
         console.log(err);
 
         setLoading(false);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -251,6 +229,7 @@ const Profile: React.FC = () => {
           );
         })
         .catch(err => {
+          // eslint-disable-next-line no-console
           console.log(err);
         });
     }
@@ -676,6 +655,7 @@ const Profile: React.FC = () => {
                   setStepCompleted(true);
                 })
                 .catch(err => {
+                  // eslint-disable-next-line no-console
                   console.log(err.response.data);
 
                   setStepCompleted(false);
@@ -716,9 +696,6 @@ const Profile: React.FC = () => {
             const { cep, address, city, complement, district, number } =
               data.address;
 
-            // var cepFormatted = cep.replaceAll("-", "")
-            // cepFormatted = cepFormatted.slice(0, 5) + "-" + cepFormatted.slice(5, cep.length)
-
             if (complement) {
               if (complement.length < 4) {
                 setStepCompleted(false);
@@ -747,6 +724,7 @@ const Profile: React.FC = () => {
                 setStepCompleted(true);
               })
               .catch(err => {
+                // eslint-disable-next-line no-console
                 console.log(err.response.data);
 
                 setStepCompleted(false);
@@ -805,6 +783,7 @@ const Profile: React.FC = () => {
                 setStepCompleted(true);
               })
               .catch(err => {
+                // eslint-disable-next-line no-console
                 console.log(err.response.data);
 
                 setStepCompleted(false);
@@ -872,6 +851,7 @@ const Profile: React.FC = () => {
                 setStepCompleted(true);
               })
               .catch(err => {
+                // eslint-disable-next-line no-console
                 console.log(err.response.data);
 
                 setStepCompleted(false);
@@ -927,6 +907,7 @@ const Profile: React.FC = () => {
                 setStepCompleted(true);
               })
               .catch(err => {
+                // eslint-disable-next-line no-console
                 console.log(err.response.data);
 
                 setStepCompleted(false);
@@ -991,23 +972,6 @@ const Profile: React.FC = () => {
     },
     [isChanged, flowIntent],
   );
-
-  const handleAvatarChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const data = new FormData();
-
-      data.append('avatar', e.target.files[0]);
-
-      // api.patch('/users/avatar', data).then(response => {
-      //   updateUser(response.data)
-
-      //   // addToast({
-      //   //   type: 'success',
-      //   //   title: 'Avatar atualizado!',
-      //   // })
-      // })
-    }
-  }, []);
 
   const handleSetBankCode = useCallback(
     (bank: string) => {

@@ -14,20 +14,16 @@ import {
   FiDownload,
   FiMoreHorizontal,
   FiPaperclip,
-  FiSearch,
   FiX,
 } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import {
-  addDays,
-  differenceInBusinessDays,
   differenceInDays,
   format,
   isSameWeek,
   isToday,
   subDays,
 } from 'date-fns';
-import { Form } from '@unform/web';
 
 import HeaderDropdown from 'src/components/HeaderDropdown';
 import AttachButton from 'src/components/AttachButton';
@@ -42,11 +38,7 @@ import api from 'src/services/api';
 import { BiPackage } from 'react-icons/bi';
 import OrderDetailsModal from 'src/components/OrderDetailsModal';
 import TrackingModalContent from 'src/components/TrackingModalContent';
-import {
-  getDaysToShip,
-  InOrderStatus,
-  OrderContainsProduct,
-} from 'src/shared/functions/sells';
+import { getDaysToShip, InOrderStatus } from 'src/shared/functions/sells';
 import OrderStatus from 'src/shared/enums/order';
 import { useRouter } from 'next/router';
 import { MdOutlineLocalShipping } from 'react-icons/md';
@@ -56,20 +48,14 @@ import Collapsible from '../../components/Collapsible';
 import DatePickerPopup from '../../components/DatePickerPopup';
 import styles from './styles.module.scss';
 import StatusPanel from '../../components/OrderStatusPanel';
-import FilterInput from '../../components/FilterInput';
 import FilterButton from '../../components/FilterButton';
 import Button from '../../components/PrimaryButton';
-import InfoPanel from 'src/components/InfoPanel';
 import InfoPanelMobile from 'src/components/InfoPanelMobile';
 import {
   b2wStore,
   mercadoLivreStore,
   shoppeeStore,
 } from 'src/shared/consts/sells';
-
-interface SearchFormData {
-  search: string;
-}
 
 interface Totals {
   totalApproved: number;
@@ -90,7 +76,6 @@ export const SellsMobile: React.FC = () => {
   const [fromDateFilter, setFromDateFilter] = useState(new Date());
   const [toDateFilter, setToDateFilter] = useState(new Date());
   const [filter, setFilter] = useState(Filter.Mes);
-  // const [search, setSeacrh] = useState('');
 
   const [totalDelayed, setTotalDelayed] = useState(0);
   const [daysUntilDelivery, setDaysUntilDelivery] = useState(0);
@@ -129,7 +114,6 @@ export const SellsMobile: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // setOrders(ordersFromApi)
     setLoading(true);
 
     api
@@ -149,6 +133,7 @@ export const SellsMobile: React.FC = () => {
       .catch(err => {
         setLoading(false);
 
+        // eslint-disable-next-line no-console
         console.log(err);
         router.push('/');
       });
@@ -182,6 +167,7 @@ export const SellsMobile: React.FC = () => {
         setDaysUntilDelivery(response.data[0].average_shipping_time.last_week);
       })
       .catch(err => {
+        // eslint-disable-next-line no-console
         console.log(err);
         setDaysUntilDelivery(0);
 
@@ -203,12 +189,10 @@ export const SellsMobile: React.FC = () => {
         const ords: OrderParent[] = response.data.items;
 
         setOrders(ords);
-
-        // setOrders(response.data as OrderParent[]);
-
         setLoading(false);
       })
       .catch(err => {
+        // eslint-disable-next-line no-console
         console.log(err);
         setLoading(false);
       });
@@ -465,7 +449,6 @@ export const SellsMobile: React.FC = () => {
                     setToDateFilter={setToDateFilter}
                     setFromDateFilter={setFromDateFilter}
                     style={{
-                      // marginBottom: '-13.25rem',
                       marginTop: '-3rem',
                       marginLeft: '-11rem',
                     }}
@@ -475,18 +458,6 @@ export const SellsMobile: React.FC = () => {
                   />
                 )}
               </div>
-              {/* <Form
-                ref={formRef}
-                onSubmit={handleSubmit}
-                className={styles.searchContainer}
-              >
-                <FilterInput
-                  name="search"
-                  icon={FiSearch}
-                  placeholder="Pesquise um produto..."
-                  autoComplete="off"
-                />
-              </Form> */}
             </div>
             <InfoPanelMobile
               title="Tempo médio de envio"
@@ -600,15 +571,6 @@ export const SellsMobile: React.FC = () => {
                         Cancelado
                       </div>
                     )}
-                    {/* FIXME: Determinar o status de retornado no back-end
-                     {
-                      getOrderStatus(item.order.status.status) === SellStatus.Retornado && (
-                        <div className={styles.returnedItem}>
-                          <RiArrowGoBackFill />
-                          Retornado
-                        </div>
-                      )
-                    } */}
                   </div>
                   <div className={styles.cardDivider} />
                   <div className={styles.cardFooter}>
@@ -674,8 +636,6 @@ export const SellsMobile: React.FC = () => {
                           attachedText="Código de Envio"
                           unattachedText="Informar código"
                           placeholder="Informe o código de envio"
-                          // handleAttachment={handleAttachment}
-                          // isAttached={!!item.order.orderNotes} //!item.nfe_url
                           isAttached={item.order.status.status === 'Shipped'}
                           onClick={() => {
                             if (item.order.status.status === 'Invoiced') {
@@ -729,6 +689,7 @@ export const SellsMobile: React.FC = () => {
                                   window.open(response.data.data.url, '_blank');
                                 })
                                 .catch(err => {
+                                  // eslint-disable-next-line no-console
                                   console.log(err);
 
                                   setLoading(false);
@@ -814,6 +775,7 @@ export const SellsMobile: React.FC = () => {
                                         type: 'error',
                                       });
 
+                                      // eslint-disable-next-line no-console
                                       console.log(err);
                                     });
                                 }}
