@@ -57,7 +57,7 @@ export function Products({ userFromApi }: ProductsProps) {
         .then(response => {
           // console.log(response.data)
 
-          let productsDto = response.data as Product[];
+          let productsDto = response.data.items as Product[];
 
           productsDto = productsDto.map(product => {
             let stockCount = 0;
