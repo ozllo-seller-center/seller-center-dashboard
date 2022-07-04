@@ -192,12 +192,12 @@ const Profile: React.FC = () => {
         updateUser({
           ...user,
           ...response.data,
-          userType: response.data.personalInfo.cpf ? 'f' : 'j',
+          userType: response.data.personalInfo?.cpf ? 'f' : 'j',
         });
 
         const userInfo = { ...response.data };
 
-        if (userInfo.personalInfo.cpf) {
+        if (userInfo.personalInfo?.cpf) {
           const parts = userInfo.personalInfo.birthday
             ? userInfo.personalInfo.birthday.split('-')
             : [];

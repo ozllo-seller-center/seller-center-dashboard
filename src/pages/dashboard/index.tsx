@@ -38,7 +38,7 @@ const Dashboard: React.FC = () => {
   });
 
   useEffect(() => {
-    if (!user) {
+    if (!user?.shopInfo?._id) {
       return;
     }
     setLoading(true);

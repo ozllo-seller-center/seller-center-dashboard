@@ -130,7 +130,7 @@ const AuthProvider: React.FC = ({ children }) => {
           ...user,
           ...resp.data,
           isActive,
-          userType: resp.data.personalInfo.cpf ? 'f' : 'j',
+          userType: resp.data.personalInfo?.cpf ? 'f' : 'j',
         };
 
         if (!user.isActive) {
@@ -175,7 +175,7 @@ const AuthProvider: React.FC = ({ children }) => {
           ...user,
           ...resp.data,
           isActive,
-          userType: resp.data.personalInfo.cpf ? 'f' : 'j',
+          userType: resp.data.personalInfo?.cpf ? 'f' : 'j',
         };
 
         if (!user.isActive) {
